@@ -1,0 +1,32 @@
+{
+	"compilerOptions": {
+		/* Language and Environment */
+		"target": "es2021",
+		"lib": ["es2021"],
+
+		/* Modules */
+		"module": "node16",
+		"moduleResolution": "node16",
+		"rootDir": "src",
+		"outDir": "dist",
+		"resolveJsonModule": true,
+
+		/* Type Checking */
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitOverride": true,
+
+		/* Interop */
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+
+		/* Other */
+		"skipLibCheck": true
+	}
+}
