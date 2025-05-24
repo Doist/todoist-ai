@@ -4,6 +4,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import { registerTool } from "./mcp-helpers.js";
 import { projectsList } from "./tools/projects-list.js";
+import { quickAddTask } from "./tools/quick-add-task.js";
 import { tasksByDateRange } from "./tools/tasks-by-date-range.js";
 import { tasksByProject } from "./tools/tasks-by-project.js";
 import { tasksOverdue } from "./tools/tasks-overdue.js";
@@ -38,6 +39,7 @@ export async function startMcpServer({
 	registerTool(tasksByProject, server, todoist);
 	registerTool(tasksSearch, server, todoist);
 	registerTool(projectsList, server, todoist);
+	registerTool(quickAddTask, server, todoist);
 
 	await server.connect(transport ?? new StdioServerTransport());
 }
