@@ -5,3 +5,4 @@ dist
 *.log*
 .npm
 *.tgz
+.claude/settings.local.json

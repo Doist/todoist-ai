@@ -91,3 +91,30 @@ See [docs/mcp-server.md](docs/mcp-server.md) for full instructions on setting up
 ## Local Development Setup
 
 See [docs/dev-setup.md](docs/dev-setup.md) for full instructions on setting up this repository locally for development and contributing.
+
+## Releasing
+
+This project uses [release-please](https://github.com/googleapis/release-please) to automate version management and package publishing.
+
+### How it works
+
+1. Make your changes using [Conventional Commits](https://www.conventionalcommits.org/):
+
+    - `feat:` for new features (minor version bump)
+    - `fix:` for bug fixes (patch version bump)
+    - `feat!:` or `fix!:` for breaking changes (major version bump)
+    - `docs:` for documentation changes
+    - `chore:` for maintenance tasks
+    - `ci:` for CI changes
+
+2. When commits are pushed to `main`:
+
+    - Release-please automatically creates/updates a release PR
+    - The PR includes version bump and changelog updates
+    - Review the PR and merge when ready
+
+3. After merging the release PR:
+    - A new GitHub release is automatically created
+    - A new tag is created
+    - The `publish` workflow is triggered
+    - The package is published to npm
