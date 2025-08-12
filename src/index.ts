@@ -1,19 +1,17 @@
 import { getMcpServer } from './mcp-server'
 
+import { deleteOne } from './tools/delete-one'
 import { projectsAddOne } from './tools/projects-add-one'
-import { projectsDeleteOne } from './tools/projects-delete-one'
 import { projectsList } from './tools/projects-list'
 import { projectsUpdateOne } from './tools/projects-update-one'
 
 import { sectionsAddOne } from './tools/sections-add-one'
-import { sectionsDeleteOne } from './tools/sections-delete-one'
 import { sectionsSearch } from './tools/sections-search'
 import { sectionsUpdateOne } from './tools/sections-update-one'
 
 import { overview } from './tools/overview'
 import { tasksAddMultiple } from './tools/tasks-add-multiple'
 import { tasksCompleteMultiple } from './tools/tasks-complete-multiple'
-import { tasksDeleteOne } from './tools/tasks-delete-one'
 import { tasksListByDate } from './tools/tasks-list-by-date'
 import { tasksListCompleted } from './tools/tasks-list-completed'
 import { tasksListForContainer } from './tools/tasks-list-for-container'
@@ -25,15 +23,13 @@ const tools = {
     projectsList,
     projectsAddOne,
     projectsUpdateOne,
-    projectsDeleteOne,
+    deleteOne,
     sectionsSearch,
     sectionsAddOne,
     sectionsUpdateOne,
-    sectionsDeleteOne,
     tasksListByDate,
     tasksListCompleted,
     tasksListForContainer,
-    tasksDeleteOne,
     tasksCompleteMultiple,
     tasksSearch,
     tasksAddMultiple,
@@ -48,18 +44,17 @@ export {
     projectsList,
     projectsAddOne,
     projectsUpdateOne,
-    projectsDeleteOne,
+    deleteOne,
     sectionsSearch,
     sectionsAddOne,
     sectionsUpdateOne,
-    sectionsDeleteOne,
     tasksListByDate,
-    tasksDeleteOne,
+    tasksListForContainer,
+    tasksListCompleted,
     tasksCompleteMultiple,
     tasksSearch,
     tasksAddMultiple,
     tasksUpdateOne,
     tasksOrganizeMultiple,
-    tasksListForContainer,
     overview,
 }

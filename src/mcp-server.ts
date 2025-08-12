@@ -2,20 +2,18 @@ import { TodoistApi } from '@doist/todoist-api-typescript'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { registerTool } from './mcp-helpers'
 
+import { deleteOne } from './tools/delete-one'
 import { projectsAddOne } from './tools/projects-add-one'
-import { projectsDeleteOne } from './tools/projects-delete-one'
 import { projectsList } from './tools/projects-list'
 import { projectsUpdateOne } from './tools/projects-update-one'
 
 import { sectionsAddOne } from './tools/sections-add-one'
-import { sectionsDeleteOne } from './tools/sections-delete-one'
 import { sectionsSearch } from './tools/sections-search'
 import { sectionsUpdateOne } from './tools/sections-update-one'
 
 import { overview } from './tools/overview'
 import { tasksAddMultiple } from './tools/tasks-add-multiple'
 import { tasksCompleteMultiple } from './tools/tasks-complete-multiple'
-import { tasksDeleteOne } from './tools/tasks-delete-one'
 import { tasksListByDate } from './tools/tasks-list-by-date'
 import { tasksListCompleted } from './tools/tasks-list-completed'
 import { tasksListForContainer } from './tools/tasks-list-for-container'
@@ -52,15 +50,13 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     registerTool(projectsList, server, todoist)
     registerTool(tasksAddMultiple, server, todoist)
     registerTool(tasksUpdateOne, server, todoist)
-    registerTool(tasksDeleteOne, server, todoist)
+    registerTool(deleteOne, server, todoist)
     registerTool(tasksCompleteMultiple, server, todoist)
     registerTool(projectsAddOne, server, todoist)
     registerTool(projectsUpdateOne, server, todoist)
     registerTool(sectionsAddOne, server, todoist)
     registerTool(sectionsUpdateOne, server, todoist)
     registerTool(tasksOrganizeMultiple, server, todoist)
-    registerTool(projectsDeleteOne, server, todoist)
-    registerTool(sectionsDeleteOne, server, todoist)
     registerTool(sectionsSearch, server, todoist)
     registerTool(overview, server, todoist)
     registerTool(tasksListForContainer, server, todoist)
