@@ -5,9 +5,8 @@ import { projectsAddOne } from './tools/projects-add-one'
 import { projectsList } from './tools/projects-list'
 import { projectsUpdateOne } from './tools/projects-update-one'
 
-import { sectionsAddOne } from './tools/sections-add-one'
+import { sectionsManage } from './tools/sections-manage'
 import { sectionsSearch } from './tools/sections-search'
-import { sectionsUpdateOne } from './tools/sections-update-one'
 
 import { overview } from './tools/overview'
 import { tasksAddMultiple } from './tools/tasks-add-multiple'
@@ -25,8 +24,7 @@ const tools = {
     projectsUpdateOne,
     deleteOne,
     sectionsSearch,
-    sectionsAddOne,
-    sectionsUpdateOne,
+    sectionsManage,
     tasksListByDate,
     tasksListCompleted,
     tasksListForContainer,
@@ -46,8 +44,7 @@ export {
     projectsUpdateOne,
     deleteOne,
     sectionsSearch,
-    sectionsAddOne,
-    sectionsUpdateOne,
+    sectionsManage,
     tasksListByDate,
     tasksListForContainer,
     tasksListCompleted,

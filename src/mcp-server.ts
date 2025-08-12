@@ -7,9 +7,8 @@ import { projectsAddOne } from './tools/projects-add-one'
 import { projectsList } from './tools/projects-list'
 import { projectsUpdateOne } from './tools/projects-update-one'
 
-import { sectionsAddOne } from './tools/sections-add-one'
+import { sectionsManage } from './tools/sections-manage'
 import { sectionsSearch } from './tools/sections-search'
-import { sectionsUpdateOne } from './tools/sections-update-one'
 
 import { overview } from './tools/overview'
 import { tasksAddMultiple } from './tools/tasks-add-multiple'
@@ -54,8 +53,7 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     registerTool(tasksCompleteMultiple, server, todoist)
     registerTool(projectsAddOne, server, todoist)
     registerTool(projectsUpdateOne, server, todoist)
-    registerTool(sectionsAddOne, server, todoist)
-    registerTool(sectionsUpdateOne, server, todoist)
+    registerTool(sectionsManage, server, todoist)
     registerTool(tasksOrganizeMultiple, server, todoist)
     registerTool(sectionsSearch, server, todoist)
     registerTool(overview, server, todoist)

@@ -64,4 +64,4 @@ function registerTool<Params extends z.ZodRawShape>(
     server.tool(tool.name, tool.description, tool.parameters, cb)
 }
 
-export { registerTool }
+export { registerTool, errorContent }
