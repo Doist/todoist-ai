@@ -18,7 +18,6 @@ import { tasksDeleteOne } from './tools/tasks-delete-one'
 import { tasksListByDate } from './tools/tasks-list-by-date'
 import { tasksListCompleted } from './tools/tasks-list-completed'
 import { tasksListForContainer } from './tools/tasks-list-for-container'
-import { tasksListOverdue } from './tools/tasks-list-overdue'
 import { tasksOrganizeMultiple } from './tools/tasks-organize-multiple'
 import { tasksSearch } from './tools/tasks-search'
 import { tasksUpdateOne } from './tools/tasks-update-one'
@@ -34,15 +33,14 @@ const tools = {
     sectionsUpdateOne,
     sectionsDeleteOne,
     tasksListByDate,
+    tasksListCompleted,
+    tasksListForContainer,
     tasksDeleteOne,
     tasksCompleteMultiple,
-    tasksListOverdue,
-    tasksListCompleted,
     tasksSearch,
     tasksAddMultiple,
     tasksUpdateOne,
     tasksOrganizeMultiple,
-    tasksListForContainer,
     overview,
 }
 
@@ -61,7 +59,6 @@ export {
     tasksListByDate,
     tasksDeleteOne,
     tasksCompleteMultiple,
-    tasksListOverdue,
     tasksSearch,
     tasksAddMultiple,
     tasksUpdateOne,
