@@ -1,35 +1,35 @@
 {
-	"compilerOptions": {
-		/* Language and Environment */
-		"target": "es2021",
-		"lib": ["es2021"],
+    "compilerOptions": {
+        /* Language and Environment */
+        "target": "es2021",
+        "lib": ["es2021"],
 
-		/* Modules */
-		"module": "CommonJS",
-		"moduleResolution": "node",
-		"rootDir": "src",
-		"outDir": "dist",
-		"resolveJsonModule": true,
+        /* Modules */
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "rootDir": "src",
+        "outDir": "dist",
+        "resolveJsonModule": true,
 
-		/* Type Checking */
-		"strict": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"noImplicitReturns": true,
-		"noFallthroughCasesInSwitch": true,
-		"noUncheckedIndexedAccess": true,
-		"noImplicitOverride": true,
+        /* Type Checking */
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedIndexedAccess": true,
+        "noImplicitOverride": true,
 
-		/* Interop */
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"verbatimModuleSyntax": false,
-		"isolatedModules": true,
+        /* Interop */
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "verbatimModuleSyntax": false,
+        "isolatedModules": true,
 
-		/* Other */
-		"skipLibCheck": true,
-		"declaration": true,
-		"declarationMap": true
-	},
-	"include": ["src"]
+        /* Other */
+        "skipLibCheck": true,
+        "declaration": true,
+        "declarationMap": true
+    },
+    "include": ["src"]
 }
