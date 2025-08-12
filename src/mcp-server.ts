@@ -21,6 +21,7 @@ import { tasksAddMultiple } from './tools/tasks-add-multiple'
 import { tasksCompleteMultiple } from './tools/tasks-complete-multiple'
 import { tasksDeleteOne } from './tools/tasks-delete-one'
 import { tasksListByDate } from './tools/tasks-list-by-date'
+import { tasksListCompleted } from './tools/tasks-list-completed'
 import { tasksListForProject } from './tools/tasks-list-for-project'
 import { tasksListForSection } from './tools/tasks-list-for-section'
 import { tasksListOverdue } from './tools/tasks-list-overdue'
@@ -51,6 +52,7 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
 
     const todoist = new TodoistApi(todoistApiKey, baseUrl)
 
+    registerTool(tasksListCompleted, server, todoist)
     registerTool(tasksListByDate, server, todoist)
     registerTool(tasksListOverdue, server, todoist)
     registerTool(tasksListForProject, server, todoist)

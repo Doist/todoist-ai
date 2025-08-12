@@ -26,6 +26,7 @@ import { subtasksListForParentTask } from './tools/subtasks-list-for-parent-task
 
 import { accountOverview } from './tools/account-overview'
 import { projectOverview } from './tools/project-overview'
+import { tasksListCompleted } from './tools/tasks-list-completed'
 
 const tools = {
     projectsList,
@@ -42,6 +43,7 @@ const tools = {
     tasksCompleteMultiple,
     tasksListForProject,
     tasksListOverdue,
+    tasksListCompleted,
     tasksSearch,
     tasksAddMultiple,
     tasksUpdateOne,
