@@ -1,0 +1,55 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Only a single workflow will run at a time. Cancel any in-progress run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubicloud # `ubuntu-latest` is the official drop-in replacement
+
+    services:
+      memcached:
+        image: memcached:1.6-alpine
+        ports:
+          - 11211:11211
+        options: >-
+          --health-cmd "echo 'stats' | nc localhost 11211"
+
+    env:
+      MEMCACHED_HOST: localhost
+      MEMCACHED_PORT: 11211
+
+      NODE_ENV: test
+      CI: true
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Run type checks
+        run: npm run type-check
+
+      - name: Run linting checks
+        run: npm run lint:check && npm run format:check
