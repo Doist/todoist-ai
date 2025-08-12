@@ -1,10 +1,25 @@
 import {
-	type Project,
+	type PersonalProject,
 	type Task,
 	type TodoistApi,
+	type WorkspaceProject,
 	getSanitizedContent,
 } from "@doist/todoist-api-typescript";
 import z from "zod";
+
+export type Project = PersonalProject | WorkspaceProject;
+
+export function isPersonalProject(
+	project: Project,
+): project is PersonalProject {
+	return "inboxProject" in project;
+}
+
+export function isWorkspaceProject(
+	project: Project,
+): project is WorkspaceProject {
+	return "accessLevel" in project;
+}
 
 /**
  * Map a single Todoist task to a more structured format, for LLM consumption.
@@ -39,8 +54,12 @@ function mapProject(project: Project) {
 		color: project.color,
 		isFavorite: project.isFavorite,
 		isShared: project.isShared,
-		parentId: project.parentId ?? null,
-		inboxProject: project.isInboxProject ?? false,
+		parentId: isPersonalProject(project)
+			? (project.parentId ?? null)
+			: null,
+		inboxProject: isPersonalProject(project)
+			? (project.inboxProject ?? false)
+			: false,
 		viewStyle: project.viewStyle,
 	};
 }

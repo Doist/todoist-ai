@@ -1,9 +1,6 @@
-import type {
-	Project,
-	Section,
-	TodoistApi,
-} from "@doist/todoist-api-typescript";
+import type { Section, TodoistApi } from "@doist/todoist-api-typescript";
 import type { TodoistTool } from "../todoist-tool.js";
+import { type Project, isPersonalProject } from "./shared.js";
 
 const ArgsSchema = {};
 
@@ -26,7 +23,7 @@ function buildProjectTree(projects: Project[]): Project[] {
 	for (const p of projects) {
 		const current = byId[p.id];
 		if (!current) continue;
-		if (p.parentId) {
+		if (isPersonalProject(p) && p.parentId) {
 			const parent = byId[p.parentId];
 			if (parent) {
 				parent.children.push(current);
@@ -87,8 +84,12 @@ const accountOverview = {
 	parameters: ArgsSchema,
 	async execute(_args, client) {
 		const { results: projects } = await client.getProjects({});
-		const inbox = projects.find((p) => p.isInboxProject === true);
-		const nonInbox = projects.filter((p) => p.isInboxProject !== true);
+		const inbox = projects.find(
+			(p) => isPersonalProject(p) && p.inboxProject === true,
+		);
+		const nonInbox = projects.filter(
+			(p) => !isPersonalProject(p) || p.inboxProject !== true,
+		);
 		const tree = buildProjectTree(nonInbox);
 		const allProjectIds = projects.map((p) => p.id);
 		const sectionsByProject = await getSectionsByProject(

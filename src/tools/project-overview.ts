@@ -1,11 +1,7 @@
-import type {
-	Project,
-	Section,
-	TodoistApi,
-} from "@doist/todoist-api-typescript";
+import type { Section, TodoistApi } from "@doist/todoist-api-typescript";
 import { z } from "zod";
 import type { TodoistTool } from "../todoist-tool.js";
-import { mapTask } from "./shared.js";
+import { type Project, mapTask } from "./shared.js";
 
 const ArgsSchema = {
 	projectId: z
