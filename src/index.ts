@@ -11,20 +11,17 @@ import { sectionsDeleteOne } from './tools/sections-delete-one'
 import { sectionsSearch } from './tools/sections-search'
 import { sectionsUpdateOne } from './tools/sections-update-one'
 
+import { overview } from './tools/overview'
 import { tasksAddMultiple } from './tools/tasks-add-multiple'
 import { tasksCompleteMultiple } from './tools/tasks-complete-multiple'
 import { tasksDeleteOne } from './tools/tasks-delete-one'
 import { tasksListByDate } from './tools/tasks-list-by-date'
+import { tasksListCompleted } from './tools/tasks-list-completed'
+import { tasksListForContainer } from './tools/tasks-list-for-container'
 import { tasksListOverdue } from './tools/tasks-list-overdue'
 import { tasksOrganizeMultiple } from './tools/tasks-organize-multiple'
 import { tasksSearch } from './tools/tasks-search'
 import { tasksUpdateOne } from './tools/tasks-update-one'
-
-import { tasksListForContainer } from './tools/tasks-list-for-container'
-
-import { accountOverview } from './tools/account-overview'
-import { projectOverview } from './tools/project-overview'
-import { tasksListCompleted } from './tools/tasks-list-completed'
 
 const tools = {
     projectsList,
@@ -46,8 +43,7 @@ const tools = {
     tasksUpdateOne,
     tasksOrganizeMultiple,
     tasksListForContainer,
-    accountOverview,
-    projectOverview,
+    overview,
 }
 
 export { tools, getMcpServer }
@@ -71,6 +67,5 @@ export {
     tasksUpdateOne,
     tasksOrganizeMultiple,
     tasksListForContainer,
-    accountOverview,
-    projectOverview,
+    overview,
 }
