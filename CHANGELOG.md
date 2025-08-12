@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/Doist/todoist-ai/compare/v1.0.0...v1.0.1) (2025-08-12)
+
+
+### Bug Fixes
+
+* format package.json for release ([526eae6](https://github.com/Doist/todoist-ai/commit/526eae67298ad668666be56b3272e912823fb8e1))
+
 ## 1.0.0 (2025-08-12)
 
 
