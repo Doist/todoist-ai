@@ -3,9 +3,8 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { registerTool } from './mcp-helpers'
 
 import { deleteOne } from './tools/delete-one'
-import { projectsAddOne } from './tools/projects-add-one'
 import { projectsList } from './tools/projects-list'
-import { projectsUpdateOne } from './tools/projects-update-one'
+import { projectsManage } from './tools/projects-manage'
 
 import { sectionsManage } from './tools/sections-manage'
 import { sectionsSearch } from './tools/sections-search'
@@ -51,8 +50,7 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     registerTool(tasksUpdateOne, server, todoist)
     registerTool(deleteOne, server, todoist)
     registerTool(tasksCompleteMultiple, server, todoist)
-    registerTool(projectsAddOne, server, todoist)
-    registerTool(projectsUpdateOne, server, todoist)
+    registerTool(projectsManage, server, todoist)
     registerTool(sectionsManage, server, todoist)
     registerTool(tasksOrganizeMultiple, server, todoist)
     registerTool(sectionsSearch, server, todoist)
