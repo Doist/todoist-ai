@@ -3,7 +3,6 @@ import { getMcpServer } from './mcp-server'
 import { projectsAddOne } from './tools/projects-add-one'
 import { projectsDeleteOne } from './tools/projects-delete-one'
 import { projectsList } from './tools/projects-list'
-import { projectsSearch } from './tools/projects-search'
 import { projectsUpdateOne } from './tools/projects-update-one'
 
 import { sectionsAddOne } from './tools/sections-add-one'
@@ -24,7 +23,6 @@ import { tasksUpdateOne } from './tools/tasks-update-one'
 
 const tools = {
     projectsList,
-    projectsSearch,
     projectsAddOne,
     projectsUpdateOne,
     projectsDeleteOne,
@@ -48,7 +46,6 @@ export { tools, getMcpServer }
 
 export {
     projectsList,
-    projectsSearch,
     projectsAddOne,
     projectsUpdateOne,
     projectsDeleteOne,

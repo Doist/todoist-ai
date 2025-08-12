@@ -1,7 +1,14 @@
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool'
+import { mapProject } from './shared'
 
 const ArgsSchema = {
+    search: z
+        .string()
+        .optional()
+        .describe(
+            'Search for a project by name (partial and case insensitive match). If omitted, all projects are returned.',
+        ),
     limit: z
         .number()
         .int()
@@ -19,15 +26,20 @@ const ArgsSchema = {
 
 const projectsList = {
     name: 'projects-list',
-    description: 'List all projects for the user.',
+    description:
+        'List all projects or search for projects by name. If search parameter is omitted, all projects are returned.',
     parameters: ArgsSchema,
     async execute(args, client) {
         const { results, nextCursor } = await client.getProjects({
             limit: args.limit,
             cursor: args.cursor ?? null,
         })
+        const searchLower = args.search ? args.search.toLowerCase() : undefined
+        const filtered = searchLower
+            ? results.filter((project) => project.name.toLowerCase().includes(searchLower))
+            : results
         return {
-            projects: results,
+            projects: filtered.map(mapProject),
             nextCursor,
         }
     },
