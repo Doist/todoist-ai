@@ -15,14 +15,12 @@ import { tasksAddMultiple } from './tools/tasks-add-multiple'
 import { tasksCompleteMultiple } from './tools/tasks-complete-multiple'
 import { tasksDeleteOne } from './tools/tasks-delete-one'
 import { tasksListByDate } from './tools/tasks-list-by-date'
-import { tasksListForProject } from './tools/tasks-list-for-project'
-import { tasksListForSection } from './tools/tasks-list-for-section'
 import { tasksListOverdue } from './tools/tasks-list-overdue'
 import { tasksOrganizeMultiple } from './tools/tasks-organize-multiple'
 import { tasksSearch } from './tools/tasks-search'
 import { tasksUpdateOne } from './tools/tasks-update-one'
 
-import { subtasksListForParentTask } from './tools/subtasks-list-for-parent-task'
+import { tasksListForContainer } from './tools/tasks-list-for-container'
 
 import { accountOverview } from './tools/account-overview'
 import { projectOverview } from './tools/project-overview'
@@ -41,15 +39,13 @@ const tools = {
     tasksListByDate,
     tasksDeleteOne,
     tasksCompleteMultiple,
-    tasksListForProject,
     tasksListOverdue,
     tasksListCompleted,
     tasksSearch,
     tasksAddMultiple,
     tasksUpdateOne,
     tasksOrganizeMultiple,
-    tasksListForSection,
-    subtasksListForParentTask,
+    tasksListForContainer,
     accountOverview,
     projectOverview,
 }
@@ -69,14 +65,12 @@ export {
     tasksListByDate,
     tasksDeleteOne,
     tasksCompleteMultiple,
-    tasksListForProject,
     tasksListOverdue,
     tasksSearch,
     tasksAddMultiple,
     tasksUpdateOne,
     tasksOrganizeMultiple,
-    tasksListForSection,
-    subtasksListForParentTask,
+    tasksListForContainer,
     accountOverview,
     projectOverview,
 }

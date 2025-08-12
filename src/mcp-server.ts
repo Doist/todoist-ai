@@ -13,8 +13,6 @@ import { sectionsDeleteOne } from './tools/sections-delete-one'
 import { sectionsSearch } from './tools/sections-search'
 import { sectionsUpdateOne } from './tools/sections-update-one'
 
-import { subtasksListForParentTask } from './tools/subtasks-list-for-parent-task'
-
 import { accountOverview } from './tools/account-overview'
 import { projectOverview } from './tools/project-overview'
 import { tasksAddMultiple } from './tools/tasks-add-multiple'
@@ -22,8 +20,7 @@ import { tasksCompleteMultiple } from './tools/tasks-complete-multiple'
 import { tasksDeleteOne } from './tools/tasks-delete-one'
 import { tasksListByDate } from './tools/tasks-list-by-date'
 import { tasksListCompleted } from './tools/tasks-list-completed'
-import { tasksListForProject } from './tools/tasks-list-for-project'
-import { tasksListForSection } from './tools/tasks-list-for-section'
+import { tasksListForContainer } from './tools/tasks-list-for-container'
 import { tasksListOverdue } from './tools/tasks-list-overdue'
 import { tasksOrganizeMultiple } from './tools/tasks-organize-multiple'
 import { tasksSearch } from './tools/tasks-search'
@@ -55,7 +52,6 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     registerTool(tasksListCompleted, server, todoist)
     registerTool(tasksListByDate, server, todoist)
     registerTool(tasksListOverdue, server, todoist)
-    registerTool(tasksListForProject, server, todoist)
     registerTool(tasksSearch, server, todoist)
     registerTool(projectsList, server, todoist)
     registerTool(tasksAddMultiple, server, todoist)
@@ -67,14 +63,13 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     registerTool(sectionsAddOne, server, todoist)
     registerTool(sectionsUpdateOne, server, todoist)
     registerTool(tasksOrganizeMultiple, server, todoist)
-    registerTool(subtasksListForParentTask, server, todoist)
-    registerTool(tasksListForSection, server, todoist)
     registerTool(projectsDeleteOne, server, todoist)
     registerTool(projectsSearch, server, todoist)
     registerTool(sectionsDeleteOne, server, todoist)
     registerTool(sectionsSearch, server, todoist)
     registerTool(accountOverview, server, todoist)
     registerTool(projectOverview, server, todoist)
+    registerTool(tasksListForContainer, server, todoist)
 
     return server
 }
