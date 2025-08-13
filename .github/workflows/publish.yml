@@ -1,48 +1,48 @@
 name: Release @doist/todoist-ai package
 
 on:
-    push:
-        tags:
-            - 'v*'
+  push:
+    tags:
+      - "v*"
 
 permissions:
-    # Enable the use of OIDC for npm provenance
-    contents: read
-    id-token: write
+  # Enable the use of OIDC for npm provenance
+  contents: read
+  id-token: write
 
 jobs:
-    publish:
-        # Only run if release-please created a release
-        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        runs-on: ubuntu-latest
-        # Based on historical data
-        timeout-minutes: 60
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+  publish:
+    # Only run if release-please created a release
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    runs-on: ubuntu-latest
+    # Based on historical data
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: '18'
-                  registry-url: 'https://registry.npmjs.org'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: "https://registry.npmjs.org"
 
-            - name: Install dependencies
-              run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-            - name: Build package
-              run: npm run build
+      - name: Build package
+        run: npm run build
 
-            - name: Type check
-              run: npm run type-check
+      - name: Type check
+        run: npm run type-check
 
-            - name: Lint check
-              run: npm run lint:check
+      - name: Lint check
+        run: npm run lint:check
 
-            - name: Format check
-              run: npm run format:check
+      - name: Format check
+        run: npm run format:check
 
-            - name: Publish to npm
-              run: npm publish --provenance --access public
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
