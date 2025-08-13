@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool'
-import { mapTask } from './shared'
+import { mapTask } from '../tool-helpers'
 
 const ArgsSchema = {
     projectId: z

@@ -1,7 +1,7 @@
 import { addDays, formatISO } from 'date-fns'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool'
-import { getTasksByFilter } from './shared'
+import { getTasksByFilter } from '../tool-helpers'
 
 const ArgsSchema = {
     startDate: z

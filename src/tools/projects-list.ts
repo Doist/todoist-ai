@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool'
-import { mapProject } from './shared'
+import { mapProject } from '../tool-helpers'
 
 const ArgsSchema = {
     search: z

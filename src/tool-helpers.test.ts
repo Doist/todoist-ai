@@ -1,5 +1,5 @@
 import type { PersonalProject, Task, WorkspaceProject } from '@doist/todoist-api-typescript'
-import { isPersonalProject, isWorkspaceProject, mapProject, mapTask } from './shared'
+import { isPersonalProject, isWorkspaceProject, mapProject, mapTask } from './tool-helpers'
 
 describe('shared utilities', () => {
     describe('mapTask', () => {

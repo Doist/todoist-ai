@@ -1,7 +1,7 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool'
-import { type Project, isPersonalProject, mapTask } from './shared'
+import { type Project, isPersonalProject, mapTask } from '../tool-helpers'
 
 const ArgsSchema = {
     projectId: z
