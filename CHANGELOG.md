@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.0.0](https://github.com/Doist/todoist-ai/compare/v1.1.0...v2.0.0) (2025-08-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* Consolidate MCP tools to reduce tool count ([#14](https://github.com/Doist/todoist-ai/issues/14))
+
+### Features
+
+* Consolidate MCP tools to reduce tool count ([#14](https://github.com/Doist/todoist-ai/issues/14)) ([f0ccdf8](https://github.com/Doist/todoist-ai/commit/f0ccdf8fd17f046fdb8d0938dea94163fd916a7c))
+
+
+### Bug Fixes
+
+* update release-please action to googleapis/release-please-action@v4 ([7fbb5fd](https://github.com/Doist/todoist-ai/commit/7fbb5fdd3f435e68a9b2ba054247d29e82fcc465))
+
 ## [1.1.0](https://github.com/Doist/todoist-ai/compare/v1.0.0...v1.1.0) (2025-08-13)
 
 
