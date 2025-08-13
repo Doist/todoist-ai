@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/Doist/todoist-ai/compare/v1.0.0...v1.1.0) (2025-08-13)
+
+
+### Features
+
+* Adds completed tasks tool ([#8](https://github.com/Doist/todoist-ai/issues/8)) ([d0ffad1](https://github.com/Doist/todoist-ai/commit/d0ffad10a331c16f14b4d738ed7ac368fd8e44b4))
+
+
+### Bug Fixes
+
+* add issues permission for release-please workflow ([0974fa4](https://github.com/Doist/todoist-ai/commit/0974fa45aa8578eafd2e9e1355a997ee09dce391))
+
 ## 1.0.0 (2025-08-12)
 
 

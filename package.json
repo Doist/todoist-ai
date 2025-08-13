@@ -1,16 +1,25 @@
 {
     "name": "@doist/todoist-ai",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
-    "files": ["dist", "package.json", "LICENSE.txt", "README.md"],
+    "files": [
+        "dist",
+        "package.json",
+        "LICENSE.txt",
+        "README.md"
+    ],
     "license": "MIT",
     "description": "A collection of tools for Todoist using AI",
     "repository": {
         "type": "git",
         "url": "https://github.com/Doist/todoist-ai"
     },
-    "keywords": ["todoist", "ai", "tools"],
+    "keywords": [
+        "todoist",
+        "ai",
+        "tools"
+    ],
     "scripts": {
         "test": "jest",
         "build": "rimraf dist && npx tsc --project tsconfig.json",
@@ -51,6 +60,8 @@
         "typescript": "^5.8.3"
     },
     "lint-staged": {
-        "*": ["biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"]
+        "*": [
+            "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
+        ]
     }
 }
