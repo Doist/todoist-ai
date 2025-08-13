@@ -1,29 +1,13 @@
+import { GetTasksArgs } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool'
 import { mapTask } from '../tool-helpers'
 
 const ArgsSchema = {
-    projectId: z
-        .string()
-        .min(1)
-        .optional()
-        .describe(
-            'The ID of the project to get tasks for. Exactly one of projectId, sectionId, or parentId must be provided.',
-        ),
-    sectionId: z
-        .string()
-        .min(1)
-        .optional()
-        .describe(
-            'The ID of the section to get tasks for. Exactly one of projectId, sectionId, or parentId must be provided.',
-        ),
-    parentId: z
-        .string()
-        .min(1)
-        .optional()
-        .describe(
-            'The ID of the parent task to get subtasks for. Exactly one of projectId, sectionId, or parentId must be provided.',
-        ),
+    type: z
+        .enum(['project', 'section', 'parent'])
+        .describe('The type of container to get tasks for.'),
+    id: z.string().min(1).describe('The ID of the container to get tasks for.'),
     limit: z
         .number()
         .int()
@@ -41,30 +25,29 @@ const ArgsSchema = {
 
 const tasksListForContainer = {
     name: 'tasks-list-for-container',
-    description:
-        'Get tasks for a specific project, section, or parent task (subtasks). Provide exactly one of projectId, sectionId, or parentId.',
+    description: 'Get tasks for a specific project, section, or parent task (subtasks).',
     parameters: ArgsSchema,
     async execute(args, client) {
-        const { projectId, sectionId, parentId, limit, cursor } = args
+        const { type, id, limit, cursor } = args
 
-        // Validate that exactly one ID is provided
-        const idCount = [projectId, sectionId, parentId].filter(Boolean).length
-        if (idCount === 0) {
-            throw new Error('Exactly one of projectId, sectionId, or parentId must be provided')
-        }
-        if (idCount > 1) {
-            throw new Error(
-                'Cannot provide multiple IDs. Choose exactly one: projectId, sectionId, or parentId.',
-            )
-        }
-
-        const { results, nextCursor } = await client.getTasks({
-            ...(projectId && { projectId }),
-            ...(sectionId && { sectionId }),
-            ...(parentId && { parentId }),
+        const taskParams: GetTasksArgs = {
             limit,
             cursor: cursor ?? null,
-        })
+        }
+
+        switch (type) {
+            case 'project':
+                taskParams.projectId = id
+                break
+            case 'section':
+                taskParams.sectionId = id
+                break
+            case 'parent':
+                taskParams.parentId = id
+                break
+        }
+
+        const { results, nextCursor } = await client.getTasks(taskParams)
 
         return {
             tasks: results.map(mapTask),
