@@ -5,6 +5,7 @@ import { mapTask } from './shared'
 const ArgsSchema = {
     getBy: z
         .enum(['completion', 'due'])
+        .default('completion')
         .describe(
             'The method to use to get the tasks: "completion" to get tasks by completion date (ie, when the task was actually completed), "due" to get tasks by due date (ie, when the task was due to be completed by).',
         ),
@@ -22,18 +23,6 @@ const ArgsSchema = {
     projectId: z.string().optional().describe('The ID of the project to get the tasks for.'),
     sectionId: z.string().optional().describe('The ID of the section to get the tasks for.'),
     parentId: z.string().optional().describe('The ID of the parent task to get the tasks for.'),
-    filterQuery: z
-        .string()
-        .optional()
-        .describe(
-            'The filter query to use to filter the tasks. If set, you must provide a `filterLang` parameter.',
-        ),
-    filterLang: z
-        .string()
-        .optional()
-        .describe(
-            'The filter language to use to filter the tasks. Should only be provided if the `filterQuery` parameter is set.',
-        ),
     limit: z
         .number()
         .int()
@@ -58,7 +47,7 @@ const tasksListCompleted = {
         const { items, nextCursor } =
             getBy === 'completion'
                 ? await client.getCompletedTasksByCompletionDate(rest)
-                : await client.getCompletedTasksByDueDate(args)
+                : await client.getCompletedTasksByDueDate(rest)
         return {
             tasks: items.map(mapTask),
             nextCursor,
