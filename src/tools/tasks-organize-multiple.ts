@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool'
+import { createMoveTaskArgs } from '../tool-helpers'
 
 const TaskUpdateSchema = z.object({
     id: z.string().min(1).describe('The ID of the task to update.'),
@@ -19,10 +20,22 @@ const tasksOrganizeMultiple = {
     parameters: ArgsSchema,
     async execute(args, client) {
         const results = []
+
+        // Process each task individually for move operations
         for (const update of args.tasks) {
-            const { id, ...updateArgs } = update
-            results.push(await client.updateTask(id, updateArgs))
+            const { id, projectId, sectionId, parentId } = update
+            if (!projectId && !sectionId && !parentId) {
+                continue
+            }
+
+            // Create and validate move arguments using helper
+            const moveArgs = createMoveTaskArgs(id, projectId, sectionId, parentId)
+
+            // Move each task individually to avoid bulk operation issues
+            const movedTasks = await client.moveTasks([id], moveArgs)
+            results.push(...movedTasks)
         }
+
         return results
     },
 } satisfies TodoistTool<typeof ArgsSchema>

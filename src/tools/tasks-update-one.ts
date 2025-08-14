@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool'
+import { createMoveTaskArgs } from '../tool-helpers'
 
 const ArgsSchema = {
     id: z.string().min(1).describe('The ID of the task to update.'),
@@ -26,8 +27,21 @@ const tasksUpdateOne = {
     description: 'Update an existing task with new values.',
     parameters: ArgsSchema,
     async execute(args, client) {
-        const { id, ...updateArgs } = args
-        return await client.updateTask(id, updateArgs)
+        const { id, projectId, sectionId, parentId, ...updateArgs } = args
+
+        // If no move parameters are provided, use updateTask without moveTasks
+        if (!projectId && !sectionId && !parentId) {
+            return await client.updateTask(id, updateArgs)
+        }
+
+        const moveArgs = createMoveTaskArgs(id, projectId, sectionId, parentId)
+        const movedTasks = await client.moveTasks([id], moveArgs)
+
+        if (Object.keys(updateArgs).length > 0) {
+            return await client.updateTask(id, updateArgs)
+        }
+
+        return movedTasks[0]
     },
 } satisfies TodoistTool<typeof ArgsSchema>
 

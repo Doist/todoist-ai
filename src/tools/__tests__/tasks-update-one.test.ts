@@ -6,6 +6,7 @@ import { createMockTask } from '../test-helpers'
 // Mock the Todoist API
 const mockTodoistApi = {
     updateTask: jest.fn(),
+    moveTasks: jest.fn(),
 } as unknown as jest.Mocked<TodoistApi>
 
 describe('tasks-update-one tool', () => {
@@ -65,11 +66,7 @@ describe('tasks-update-one tool', () => {
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
 
             const result = await tasksUpdateOne.execute(
-                {
-                    id: '8485093749',
-                    priority: 3,
-                    dueString: 'Aug 20',
-                },
+                { id: '8485093749', priority: 3, dueString: 'Aug 20' },
                 mockTodoistApi,
             )
 
@@ -81,31 +78,26 @@ describe('tasks-update-one tool', () => {
             expect(result).toEqual(mockApiResponse)
         })
 
-        it('should move task to different project and section', async () => {
+        it('should move task to different project', async () => {
             const mockApiResponse: Task = createMockTask({
                 id: '8485093750',
                 content: 'Task to move',
                 projectId: 'new-project-id',
-                sectionId: 'new-section-id',
                 url: 'https://todoist.com/showTask?id=8485093750',
                 addedAt: '2025-08-13T22:09:56.123456Z',
             })
 
-            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+            mockTodoistApi.moveTasks.mockResolvedValue([mockApiResponse])
 
             const result = await tasksUpdateOne.execute(
-                {
-                    id: '8485093750',
-                    projectId: 'new-project-id',
-                    sectionId: 'new-section-id',
-                },
+                { id: '8485093750', projectId: 'new-project-id' },
                 mockTodoistApi,
             )
 
-            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093750', {
+            expect(mockTodoistApi.moveTasks).toHaveBeenCalledWith(['8485093750'], {
                 projectId: 'new-project-id',
-                sectionId: 'new-section-id',
             })
+            expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
             expect(result).toEqual(mockApiResponse)
         })
@@ -119,33 +111,34 @@ describe('tasks-update-one tool', () => {
                 addedAt: '2025-08-13T22:09:56.123456Z',
             })
 
-            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+            mockTodoistApi.moveTasks.mockResolvedValue([mockApiResponse])
 
             const result = await tasksUpdateOne.execute(
-                {
-                    id: '8485093751',
-                    parentId: 'parent-task-123',
-                },
+                { id: '8485093751', parentId: 'parent-task-123' },
                 mockTodoistApi,
             )
 
-            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093751', {
+            expect(mockTodoistApi.moveTasks).toHaveBeenCalledWith(['8485093751'], {
                 parentId: 'parent-task-123',
             })
+            expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
             expect(result).toEqual(mockApiResponse)
         })
 
-        it('should update multiple properties at once', async () => {
-            const mockApiResponse: Task = createMockTask({
+        it('should move task and update properties at once', async () => {
+            const movedTask = createMockTask({
+                id: '8485093752',
+                content: 'Task to move',
+                projectId: 'different-project-id',
+            })
+
+            const updatedTask = createMockTask({
                 id: '8485093752',
                 content: 'Completely updated task',
                 description: 'New description with details',
-                labels: ['work', 'priority'],
                 priority: 4,
                 projectId: 'different-project-id',
-                sectionId: 'different-section-id',
-                parentId: 'parent-task-456',
                 url: 'https://todoist.com/showTask?id=8485093752',
                 addedAt: '2025-08-13T22:09:56.123456Z',
                 due: {
@@ -157,7 +150,8 @@ describe('tasks-update-one tool', () => {
                 },
             })
 
-            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+            mockTodoistApi.moveTasks.mockResolvedValue([movedTask])
+            mockTodoistApi.updateTask.mockResolvedValue(updatedTask)
 
             const result = await tasksUpdateOne.execute(
                 {
@@ -167,27 +161,51 @@ describe('tasks-update-one tool', () => {
                     priority: 4,
                     dueString: 'every Friday',
                     projectId: 'different-project-id',
-                    sectionId: 'different-section-id',
-                    parentId: 'parent-task-456',
                 },
                 mockTodoistApi,
             )
 
+            // Should call moveTasks first for the projectId
+            expect(mockTodoistApi.moveTasks).toHaveBeenCalledWith(['8485093752'], {
+                projectId: 'different-project-id',
+            })
+
+            // Then call updateTask for the other properties
             expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093752', {
                 content: 'Completely updated task',
                 description: 'New description with details',
                 priority: 4,
                 dueString: 'every Friday',
-                projectId: 'different-project-id',
-                sectionId: 'different-section-id',
-                parentId: 'parent-task-456',
             })
 
-            expect(result).toEqual(mockApiResponse)
+            expect(result).toEqual(updatedTask)
         })
     })
 
     describe('error handling', () => {
+        it('should throw error when multiple move parameters are provided', async () => {
+            await expect(
+                tasksUpdateOne.execute(
+                    { id: '8485093748', projectId: 'new-project', sectionId: 'new-section' },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(
+                'Only one of projectId, sectionId, or parentId can be specified at a time. ' +
+                    'The Todoist API requires exactly one destination for move operations.',
+            )
+        })
+
+        it('should throw error when all three move parameters are provided', async () => {
+            await expect(
+                tasksUpdateOne.execute(
+                    { id: '8485093748', projectId: 'p1', sectionId: 's1', parentId: 't1' },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(
+                'Only one of projectId, sectionId, or parentId can be specified at a time',
+            )
+        })
+
         it.each([
             {
                 error: 'API Error: Task not found',

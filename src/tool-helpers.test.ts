@@ -1,5 +1,11 @@
 import type { PersonalProject, Task, WorkspaceProject } from '@doist/todoist-api-typescript'
-import { isPersonalProject, isWorkspaceProject, mapProject, mapTask } from './tool-helpers'
+import {
+    createMoveTaskArgs,
+    isPersonalProject,
+    isWorkspaceProject,
+    mapProject,
+    mapTask,
+} from './tool-helpers'
 
 describe('shared utilities', () => {
     describe('mapTask', () => {
@@ -139,6 +145,49 @@ describe('shared utilities', () => {
 
             expect(isWorkspaceProject(workspaceProject)).toBe(true)
             expect(isPersonalProject(workspaceProject)).toBe(false)
+        })
+    })
+
+    describe('createMoveTaskArgs', () => {
+        it('should create MoveTaskArgs for projectId', () => {
+            const result = createMoveTaskArgs('task-1', 'project-123')
+            expect(result).toEqual({ projectId: 'project-123' })
+        })
+
+        it('should create MoveTaskArgs for sectionId', () => {
+            const result = createMoveTaskArgs('task-1', undefined, 'section-456')
+            expect(result).toEqual({ sectionId: 'section-456' })
+        })
+
+        it('should create MoveTaskArgs for parentId', () => {
+            const result = createMoveTaskArgs('task-1', undefined, undefined, 'parent-789')
+            expect(result).toEqual({ parentId: 'parent-789' })
+        })
+
+        it('should throw error when multiple move parameters are provided', () => {
+            expect(() => createMoveTaskArgs('task-1', 'project-123', 'section-456')).toThrow(
+                'Task task-1: Only one of projectId, sectionId, or parentId can be specified at a time',
+            )
+        })
+
+        it('should throw error when all three move parameters are provided', () => {
+            expect(() =>
+                createMoveTaskArgs('task-1', 'project-123', 'section-456', 'parent-789'),
+            ).toThrow(
+                'Task task-1: Only one of projectId, sectionId, or parentId can be specified at a time',
+            )
+        })
+
+        it('should throw error when no move parameters are provided', () => {
+            expect(() => createMoveTaskArgs('task-1')).toThrow(
+                'Task task-1: At least one of projectId, sectionId, or parentId must be provided',
+            )
+        })
+
+        it('should throw error when empty strings are provided', () => {
+            expect(() => createMoveTaskArgs('task-1', '', '', '')).toThrow(
+                'Task task-1: At least one of projectId, sectionId, or parentId must be provided',
+            )
         })
     })
 })
