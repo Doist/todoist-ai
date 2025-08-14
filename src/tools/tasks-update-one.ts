@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import type { TodoistTool } from '../todoist-tool'
-import { createMoveTaskArgs } from '../tool-helpers'
+import type { TodoistTool } from '../todoist-tool.js'
+import { createMoveTaskArgs } from '../tool-helpers.js'
 
 const ArgsSchema = {
     id: z.string().min(1).describe('The ID of the task to update.'),

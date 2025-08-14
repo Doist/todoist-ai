@@ -1,8 +1,8 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
-import { getTasksByFilter } from '../../tool-helpers'
-import { tasksListByDate } from '../tasks-list-by-date'
-import { TEST_ERRORS, TEST_IDS, createMappedTask } from '../test-helpers'
+import { getTasksByFilter } from '../../tool-helpers.js'
+import { tasksListByDate } from '../tasks-list-by-date.js'
+import { TEST_ERRORS, TEST_IDS, createMappedTask } from '../test-helpers.js'
 
 // Mock the tool helpers
 jest.mock('../../tool-helpers', () => ({

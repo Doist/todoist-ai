@@ -1,7 +1,7 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
-import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/mcp'
+import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/mcp.js'
 import type { ZodTypeAny, z } from 'zod'
-import type { TodoistTool } from './todoist-tool'
+import type { TodoistTool } from './todoist-tool.js'
 
 function textContent(text: string) {
     return {

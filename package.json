@@ -1,6 +1,7 @@
 {
     "name": "@doist/todoist-ai",
     "version": "2.0.0",
+    "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "files": [
@@ -23,7 +24,8 @@
     "scripts": {
         "test": "jest",
         "build": "rimraf dist && npx tsc --project tsconfig.json",
-        "dev": "concurrently \"npx tsc --watch\" \"nodemon --watch dist --ext js --exec 'npx -y @modelcontextprotocol/inspector npx node dist/main.js\"",
+        "start": "npm run build && npx @modelcontextprotocol/inspector node dist/main.js",
+        "dev": "concurrently \"npx tsc --watch\" \"nodemon --watch dist --ext js --exec 'npx @modelcontextprotocol/inspector node dist/main.js'\"",
         "setup": "cp .env.example .env && npm install && npm run build",
         "type-check": "npx tsc --noEmit",
         "biome:sort-imports": "biome check --formatter-enabled=false --linter-enabled=false --organize-imports-enabled=true --write .",

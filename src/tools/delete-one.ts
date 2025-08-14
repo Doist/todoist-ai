@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { TodoistTool } from '../todoist-tool'
+import type { TodoistTool } from '../todoist-tool.js'
 
 const ArgsSchema = {
     type: z.enum(['project', 'section', 'task']).describe('The type of entity to delete.'),

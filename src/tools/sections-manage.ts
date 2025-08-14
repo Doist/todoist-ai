@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { errorContent } from '../mcp-helpers'
-import type { TodoistTool } from '../todoist-tool'
+import { errorContent } from '../mcp-helpers.js'
+import type { TodoistTool } from '../todoist-tool.js'
 
 const ArgsSchema = {
     id: z

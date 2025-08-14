@@ -1,7 +1,7 @@
 import { GetTasksArgs } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import type { TodoistTool } from '../todoist-tool'
-import { mapTask } from '../tool-helpers'
+import type { TodoistTool } from '../todoist-tool.js'
+import { mapTask } from '../tool-helpers.js'
 
 const ArgsSchema = {
     type: z

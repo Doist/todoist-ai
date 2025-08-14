@@ -1,7 +1,7 @@
 import type { PersonalProject, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
-import { projectsManage } from '../projects-manage'
-import { TEST_IDS, createMockProject } from '../test-helpers'
+import { projectsManage } from '../projects-manage.js'
+import { TEST_IDS, createMockProject } from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {

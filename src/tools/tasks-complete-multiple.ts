@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { TodoistTool } from '../todoist-tool'
+import type { TodoistTool } from '../todoist-tool.js'
 
 const ArgsSchema = {
     ids: z.array(z.string().min(1)).min(1).describe('The IDs of the tasks to complete.'),

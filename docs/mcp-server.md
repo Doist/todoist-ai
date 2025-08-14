@@ -9,6 +9,14 @@ git clone https://github.com/doist/todoist-ai-tools
 npm run setup
 ```
 
+To test the server locally before connecting it to an MCP client, you can use:
+
+```sh
+npm start
+```
+
+This will build the project and run the MCP inspector for manual testing.
+
 Then, proceed depending on the MCP protocol transport you'll use.
 
 ## Using Standard I/O Transport

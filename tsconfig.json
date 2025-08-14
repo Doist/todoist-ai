@@ -5,8 +5,9 @@
         "lib": ["es2021"],
 
         /* Modules */
-        "module": "CommonJS",
-        "moduleResolution": "node",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "allowImportingTsExtensions": false,
         "rootDir": "src",
         "outDir": "dist",
         "resolveJsonModule": true,

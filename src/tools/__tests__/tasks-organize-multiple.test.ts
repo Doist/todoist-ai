@@ -1,7 +1,7 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
-import { tasksOrganizeMultiple } from '../tasks-organize-multiple'
-import { TEST_IDS, createMockTask } from '../test-helpers'
+import { tasksOrganizeMultiple } from '../tasks-organize-multiple.js'
+import { TEST_IDS, createMockTask } from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {

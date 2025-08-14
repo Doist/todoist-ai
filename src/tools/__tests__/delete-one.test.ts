@@ -1,6 +1,6 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
-import { deleteOne } from '../delete-one'
+import { deleteOne } from '../delete-one.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {

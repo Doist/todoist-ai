@@ -1,7 +1,7 @@
 import type { Task } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import type { TodoistTool } from '../todoist-tool'
-import { mapTask } from '../tool-helpers'
+import type { TodoistTool } from '../todoist-tool.js'
+import { mapTask } from '../tool-helpers.js'
 
 const TaskSchema = z.object({
     content: z.string().min(1).describe('The content of the task to create.'),

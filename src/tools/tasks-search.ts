@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import type { TodoistTool } from '../todoist-tool'
-import { getTasksByFilter } from '../tool-helpers'
+import type { TodoistTool } from '../todoist-tool.js'
+import { getTasksByFilter } from '../tool-helpers.js'
 
 const ArgsSchema = {
     searchText: z.string().min(1).describe('The text to search for in tasks.'),

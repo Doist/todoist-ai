@@ -5,7 +5,7 @@ import {
     isWorkspaceProject,
     mapProject,
     mapTask,
-} from './tool-helpers'
+} from './tool-helpers.js'
 
 describe('shared utilities', () => {
     describe('mapTask', () => {

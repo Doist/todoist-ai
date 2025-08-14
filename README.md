@@ -71,6 +71,13 @@ See [docs/mcp-server.md](docs/mcp-server.md) for full instructions on setting up
 
 See [docs/dev-setup.md](docs/dev-setup.md) for full instructions on setting up this repository locally for development and contributing.
 
+### Quick Start
+
+After cloning and setting up the repository:
+
+- `npm start` - Build and run the MCP inspector for testing
+- `npm run dev` - Development mode with auto-rebuild and restart
+
 ## Releasing
 
 This project uses [release-please](https://github.com/googleapis/release-please) to automate version management and package publishing.

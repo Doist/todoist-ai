@@ -1,6 +1,6 @@
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import dotenv from 'dotenv'
-import { getMcpServer } from './mcp-server'
+import { getMcpServer } from './mcp-server.js'
 
 function main() {
     const todoistApiKey = process.env.TODOIST_API_KEY

@@ -1,6 +1,6 @@
 import type { Section } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import type { TodoistTool } from '../todoist-tool'
+import type { TodoistTool } from '../todoist-tool.js'
 
 const ArgsSchema = {
     projectId: z.string().min(1).describe('The ID of the project to search sections in.'),

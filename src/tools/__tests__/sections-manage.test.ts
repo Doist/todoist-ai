@@ -1,7 +1,7 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
-import { sectionsManage } from '../sections-manage'
-import { TEST_IDS, createMockSection } from '../test-helpers'
+import { sectionsManage } from '../sections-manage.js'
+import { TEST_IDS, createMockSection } from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
