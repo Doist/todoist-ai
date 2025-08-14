@@ -6,6 +6,7 @@
     "types": "./dist/index.d.ts",
     "files": [
         "dist",
+        "scripts",
         "package.json",
         "LICENSE.txt",
         "README.md"
@@ -27,6 +28,7 @@
         "start": "npm run build && npx @modelcontextprotocol/inspector node dist/main.js",
         "dev": "concurrently \"npx tsc --watch\" \"nodemon --watch dist --ext js --exec 'npx @modelcontextprotocol/inspector node dist/main.js'\"",
         "setup": "cp .env.example .env && npm install && npm run build",
+        "test:executable": "npm run build && node scripts/test-executable.cjs",
         "type-check": "npx tsc --noEmit",
         "biome:sort-imports": "biome check --formatter-enabled=false --linter-enabled=false --organize-imports-enabled=true --write .",
         "lint:check": "biome lint",

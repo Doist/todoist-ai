@@ -53,3 +53,8 @@ jobs:
 
       - name: Run linting checks
         run: npm run lint:check && npm run format:check
+
+      - name: Test MCP server executable
+        run: npm run test:executable
+        env:
+          TODOIST_API_KEY: fake-api-key-for-testing
