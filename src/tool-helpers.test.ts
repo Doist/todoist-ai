@@ -22,9 +22,7 @@ describe('shared utilities', () => {
                 },
             } as unknown as Task
 
-            const result = mapTask(mockTask)
-
-            expect(result).toEqual({
+            expect(mapTask(mockTask)).toEqual({
                 id: '123',
                 content: 'Test task',
                 description: 'Test description',
@@ -76,9 +74,7 @@ describe('shared utilities', () => {
                 viewStyle: 'list',
             } as unknown as PersonalProject
 
-            const result = mapProject(mockPersonalProject)
-
-            expect(result).toEqual({
+            expect(mapProject(mockPersonalProject)).toEqual({
                 id: 'proj-1',
                 name: 'Personal Project',
                 color: 'blue',
@@ -100,9 +96,7 @@ describe('shared utilities', () => {
                 viewStyle: 'board',
             } as unknown as WorkspaceProject
 
-            const result = mapProject(mockWorkspaceProject)
-
-            expect(result).toEqual({
+            expect(mapProject(mockWorkspaceProject)).toEqual({
                 id: 'proj-2',
                 name: 'Workspace Project',
                 color: 'red',
