@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.1](https://github.com/Doist/todoist-ai/compare/v2.0.0...v2.0.1) (2025-08-14)
+
+
+### Bug Fixes
+
+* convert project from CommonJS to ES modules to resolve MCP initialization ([#24](https://github.com/Doist/todoist-ai/issues/24)) ([f817e04](https://github.com/Doist/todoist-ai/commit/f817e045a711f90b4f74464a480dd1aa8f7e1027))
+* resolve task move operations using correct Todoist API methods ([#22](https://github.com/Doist/todoist-ai/issues/22)) ([3b8f509](https://github.com/Doist/todoist-ai/commit/3b8f50943f517ae76b754923f7a8c5563880e9ba))
+
 ## [2.0.0](https://github.com/Doist/todoist-ai/compare/v1.1.0...v2.0.0) (2025-08-13)
 
 
