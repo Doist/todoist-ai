@@ -1,0 +1,33 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:recommended", ":semanticCommitTypeAll(chore)"],
+    "schedule": ["before 4am on Monday"],
+    "timezone": "UTC",
+    "labels": ["dependencies"],
+    "assigneesFromCodeOwners": true,
+    "reviewersFromCodeOwners": true,
+    "packageRules": [
+        {
+            "matchPackageNames": ["*"],
+            "groupName": "all dependencies",
+            "groupSlug": "all"
+        },
+        {
+            "matchDepTypes": ["devDependencies"],
+            "groupName": "dev dependencies",
+            "groupSlug": "dev"
+        },
+        {
+            "matchDepTypes": ["dependencies"],
+            "groupName": "production dependencies",
+            "groupSlug": "prod"
+        }
+    ],
+    "vulnerabilityAlerts": {
+        "enabled": true
+    },
+    "lockFileMaintenance": {
+        "enabled": true,
+        "schedule": ["before 4am on Monday"]
+    }
+}
