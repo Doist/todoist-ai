@@ -34,7 +34,13 @@ const result = streamText({
 
 ## Using as an MCP server
 
-For convenience, we already include a function that initializes an MCP Server with all the tools available:
+You can run the MCP server directly with npx:
+
+```bash
+npx @doist/todoist-ai
+```
+
+For convenience, we also include a function that initializes an MCP Server with all the tools available:
 
 ```js
 import { getMcpServer } from "@doist/todoist-ai";

@@ -2,6 +2,18 @@
 
 This document outlines the steps necessary to run this MCP server and connect to an MCP host application, such as Claude Desktop or Cursor.
 
+## Quick Setup
+
+The easiest way to use this MCP server is with npx:
+
+```bash
+npx @doist/todoist-ai
+```
+
+You'll need to set your Todoist API key as an environment variable `TODOIST_API_KEY`.
+
+## Local Development Setup
+
 Start by cloning this repository and setting it up locally, if you haven't done so yet.
 
 ```sh
@@ -20,6 +32,27 @@ This will build the project and run the MCP inspector for manual testing.
 Then, proceed depending on the MCP protocol transport you'll use.
 
 ## Using Standard I/O Transport
+
+### Quick Setup with npx
+
+Add this section to your `mcp.json` config in Claude, Cursor, etc.:
+
+```json
+{
+    "mcpServers": {
+        "todoist-ai": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["@doist/todoist-ai"],
+            "env": {
+                "TODOIST_API_KEY": "your-todoist-token-here"
+            }
+        }
+    }
+}
+```
+
+### Using local installation
 
 Add this `todoist-ai-tools` section to your `mcp.json` config in Cursor, Claude, Raycast, etc.
 
