@@ -149,9 +149,158 @@ describe('tasks-add-multiple tool', () => {
                 }),
             ])
         })
+
+        it('should add tasks with duration', async () => {
+            const mockApiResponse1: Task = createMockTask({
+                id: '8485093752',
+                content: 'Task with 2 hour duration',
+                duration: { amount: 120, unit: 'minute' },
+                url: 'https://todoist.com/showTask?id=8485093752',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            const mockApiResponse2: Task = createMockTask({
+                id: '8485093753',
+                content: 'Task with 45 minute duration',
+                duration: { amount: 45, unit: 'minute' },
+                url: 'https://todoist.com/showTask?id=8485093753',
+                addedAt: '2025-08-13T22:09:57.123456Z',
+            })
+
+            mockTodoistApi.addTask
+                .mockResolvedValueOnce(mockApiResponse1)
+                .mockResolvedValueOnce(mockApiResponse2)
+
+            const result = await tasksAddMultiple.execute(
+                {
+                    projectId: '6cfCcrrCFg2xP94Q',
+                    tasks: [
+                        {
+                            content: 'Task with 2 hour duration',
+                            duration: '2h',
+                        },
+                        {
+                            content: 'Task with 45 minute duration',
+                            duration: '45m',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Verify API was called with parsed duration
+            expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(1, {
+                content: 'Task with 2 hour duration',
+                projectId: '6cfCcrrCFg2xP94Q',
+                sectionId: undefined,
+                parentId: undefined,
+                duration: 120,
+                durationUnit: 'minute',
+            })
+            expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(2, {
+                content: 'Task with 45 minute duration',
+                projectId: '6cfCcrrCFg2xP94Q',
+                sectionId: undefined,
+                parentId: undefined,
+                duration: 45,
+                durationUnit: 'minute',
+            })
+
+            // Verify result includes formatted duration
+            expect(result).toEqual([
+                expect.objectContaining({
+                    id: '8485093752',
+                    content: 'Task with 2 hour duration',
+                    duration: '2h',
+                }),
+                expect.objectContaining({
+                    id: '8485093753',
+                    content: 'Task with 45 minute duration',
+                    duration: '45m',
+                }),
+            ])
+        })
+
+        it('should handle various duration formats', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093754',
+                content: 'Task with combined duration',
+                duration: { amount: 150, unit: 'minute' },
+                url: 'https://todoist.com/showTask?id=8485093754',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
+
+            // Test different duration formats
+            const testCases = [
+                { input: '2h30m', expectedMinutes: 150 },
+                { input: '1.5h', expectedMinutes: 90 },
+                { input: ' 90m ', expectedMinutes: 90 },
+                { input: '2H30M', expectedMinutes: 150 },
+            ]
+
+            for (const testCase of testCases) {
+                mockTodoistApi.addTask.mockClear()
+
+                await tasksAddMultiple.execute(
+                    {
+                        tasks: [
+                            {
+                                content: 'Test task',
+                                duration: testCase.input,
+                            },
+                        ],
+                    },
+                    mockTodoistApi,
+                )
+
+                expect(mockTodoistApi.addTask).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        duration: testCase.expectedMinutes,
+                        durationUnit: 'minute',
+                    }),
+                )
+            }
+        })
     })
 
     describe('error handling', () => {
+        it('should throw error for invalid duration format', async () => {
+            await expect(
+                tasksAddMultiple.execute(
+                    {
+                        tasks: [
+                            {
+                                content: 'Task with invalid duration',
+                                duration: 'invalid',
+                            },
+                        ],
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(
+                'Task "Task with invalid duration": Invalid duration format "invalid"',
+            )
+        })
+
+        it('should throw error for duration exceeding 24 hours', async () => {
+            await expect(
+                tasksAddMultiple.execute(
+                    {
+                        tasks: [
+                            {
+                                content: 'Task with too long duration',
+                                duration: '25h',
+                            },
+                        ],
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(
+                'Task "Task with too long duration": Invalid duration format "25h": Duration cannot exceed 24 hours (1440 minutes)',
+            )
+        })
         it('should propagate API errors', async () => {
             const apiError = new Error('API Error: Task content is required')
             mockTodoistApi.addTask.mockRejectedValue(apiError)

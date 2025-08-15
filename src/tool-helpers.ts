@@ -7,6 +7,7 @@ import {
     getSanitizedContent,
 } from '@doist/todoist-api-typescript'
 import z from 'zod'
+import { formatDuration } from './utils/duration-parser.js'
 
 export type Project = PersonalProject | WorkspaceProject
 
@@ -73,6 +74,7 @@ function mapTask(task: Task) {
         sectionId: task.sectionId,
         parentId: task.parentId,
         labels: task.labels,
+        duration: task.duration ? formatDuration(task.duration.amount) : null,
     }
 }
 

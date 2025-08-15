@@ -180,9 +180,142 @@ describe('tasks-update-one tool', () => {
 
             expect(result).toEqual(updatedTask)
         })
+
+        it('should update task duration', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093753',
+                content: 'Task with updated duration',
+                duration: { amount: 150, unit: 'minute' },
+                url: 'https://todoist.com/showTask?id=8485093753',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+
+            const result = await tasksUpdateOne.execute(
+                {
+                    id: '8485093753',
+                    duration: '2h30m',
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093753', {
+                duration: 150,
+                durationUnit: 'minute',
+            })
+
+            expect(result).toEqual(mockApiResponse)
+        })
+
+        it('should handle various duration formats', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093754',
+                content: 'Test task',
+                duration: { amount: 120, unit: 'minute' },
+            })
+
+            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+
+            // Test different duration formats
+            const testCases = [
+                { input: '2h', expectedMinutes: 120 },
+                { input: '90m', expectedMinutes: 90 },
+                { input: '1.5h', expectedMinutes: 90 },
+                { input: ' 2h 30m ', expectedMinutes: 150 },
+                { input: '2H30M', expectedMinutes: 150 },
+            ]
+
+            for (const testCase of testCases) {
+                mockTodoistApi.updateTask.mockClear()
+
+                await tasksUpdateOne.execute(
+                    {
+                        id: '8485093754',
+                        duration: testCase.input,
+                    },
+                    mockTodoistApi,
+                )
+
+                expect(mockTodoistApi.updateTask).toHaveBeenCalledWith(
+                    '8485093754',
+                    expect.objectContaining({
+                        duration: testCase.expectedMinutes,
+                        durationUnit: 'minute',
+                    }),
+                )
+            }
+        })
+
+        it('should update task with duration and move at once', async () => {
+            const movedTask = createMockTask({
+                id: '8485093755',
+                content: 'Task to move and update',
+                projectId: 'new-project-id',
+            })
+
+            const updatedTask = createMockTask({
+                id: '8485093755',
+                content: 'Updated task with duration',
+                duration: { amount: 120, unit: 'minute' },
+                projectId: 'new-project-id',
+            })
+
+            mockTodoistApi.moveTasks.mockResolvedValue([movedTask])
+            mockTodoistApi.updateTask.mockResolvedValue(updatedTask)
+
+            const result = await tasksUpdateOne.execute(
+                {
+                    id: '8485093755',
+                    content: 'Updated task with duration',
+                    duration: '2h',
+                    projectId: 'new-project-id',
+                },
+                mockTodoistApi,
+            )
+
+            // Should call moveTasks first
+            expect(mockTodoistApi.moveTasks).toHaveBeenCalledWith(['8485093755'], {
+                projectId: 'new-project-id',
+            })
+
+            // Then call updateTask with duration
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093755', {
+                content: 'Updated task with duration',
+                duration: 120,
+                durationUnit: 'minute',
+            })
+
+            expect(result).toEqual(updatedTask)
+        })
     })
 
     describe('error handling', () => {
+        it('should throw error for invalid duration format', async () => {
+            await expect(
+                tasksUpdateOne.execute(
+                    {
+                        id: '8485093756',
+                        duration: 'invalid',
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow('Task 8485093756: Invalid duration format "invalid"')
+        })
+
+        it('should throw error for duration exceeding 24 hours', async () => {
+            await expect(
+                tasksUpdateOne.execute(
+                    {
+                        id: '8485093757',
+                        duration: '25h',
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(
+                'Task 8485093757: Invalid duration format "25h": Duration cannot exceed 24 hours (1440 minutes)',
+            )
+        })
         it('should throw error when multiple move parameters are provided', async () => {
             await expect(
                 tasksUpdateOne.execute(

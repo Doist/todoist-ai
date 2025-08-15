@@ -39,6 +39,7 @@ describe('shared utilities', () => {
                 sectionId: null,
                 parentId: null,
                 labels: ['work'],
+                duration: null,
             })
         })
 
@@ -64,6 +65,28 @@ describe('shared utilities', () => {
             const result = mapTask(mockTask)
 
             expect(result.recurring).toBe('every day')
+            expect(result.duration).toBe(null)
+        })
+
+        it('should handle task with duration', () => {
+            const mockTask = {
+                id: '789',
+                content: 'Task with duration',
+                description: '',
+                projectId: 'proj-1',
+                sectionId: null,
+                parentId: null,
+                labels: [],
+                priority: 1,
+                duration: {
+                    amount: 150,
+                    unit: 'minute',
+                },
+            } as unknown as Task
+
+            const result = mapTask(mockTask)
+
+            expect(result.duration).toBe('2h30m')
         })
     })
 
