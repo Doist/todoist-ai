@@ -42,46 +42,27 @@ export function parseDuration(durationStr: string): ParsedDuration {
         throw new DurationParseError(durationStr, 'Duration must be a non-empty string')
     }
 
-    // Validate format - must contain only numbers, dots, h, and m
-    if (!/^[\d.]+[hm](?:[\d.]+[hm])?$/.test(normalized)) {
-        throw new DurationParseError(durationStr, 'Use format like "2h", "30m", "2h30m", or "1.5h"')
-    }
-
-    // Check for duplicate units
-    const hCount = (normalized.match(/h/g) || []).length
-    const mCount = (normalized.match(/m/g) || []).length
-    if (hCount > 1 || mCount > 1) {
+    // Validate format with strict ordering: hours must come before minutes
+    // This regex ensures: optional hours followed by optional minutes, no duplicates
+    const match = normalized.match(/^(?:(\d+(?:\.\d+)?)h)?(?:(\d+(?:\.\d+)?)m)?$/)
+    if (!match || (!match[1] && !match[2])) {
         throw new DurationParseError(durationStr, 'Use format like "2h", "30m", "2h30m", or "1.5h"')
     }
 
     let totalMinutes = 0
-    let hasHours = false
-    let hasMinutes = false
+    const [, hoursStr, minutesStr] = match
 
-    // Extract hours if present
-    const hoursMatch = normalized.match(/([\d.]+)h/)
-    if (hoursMatch?.[1]) {
-        const hoursStr = hoursMatch[1]
-        // Check for malformed numbers like "2.", "2..5", or empty
-        if (hoursStr.endsWith('.') || hoursStr === '' || hoursStr.includes('..')) {
-            throw new DurationParseError(durationStr, 'Hours must be a positive number')
-        }
+    // Parse hours if present
+    if (hoursStr) {
         const hours = Number.parseFloat(hoursStr)
         if (Number.isNaN(hours) || hours < 0) {
             throw new DurationParseError(durationStr, 'Hours must be a positive number')
         }
         totalMinutes += hours * 60
-        hasHours = true
     }
 
-    // Extract minutes if present
-    const minutesMatch = normalized.match(/([\d.]+)m/)
-    if (minutesMatch?.[1]) {
-        const minutesStr = minutesMatch[1]
-        // Check for malformed numbers like "2.", "2..5", or empty
-        if (minutesStr.endsWith('.') || minutesStr === '' || minutesStr.includes('..')) {
-            throw new DurationParseError(durationStr, 'Minutes must be a positive number')
-        }
+    // Parse minutes if present
+    if (minutesStr) {
         const minutes = Number.parseFloat(minutesStr)
         if (Number.isNaN(minutes) || minutes < 0) {
             throw new DurationParseError(durationStr, 'Minutes must be a positive number')
@@ -94,13 +75,9 @@ export function parseDuration(durationStr: string): ParsedDuration {
             )
         }
         totalMinutes += minutes
-        hasMinutes = true
     }
 
-    // Must have at least hours or minutes
-    if (!hasHours && !hasMinutes) {
-        throw new DurationParseError(durationStr, 'Must specify at least hours (h) or minutes (m)')
-    }
+    // The regex already ensures at least one unit is present
 
     // Round to nearest minute (handles decimal hours)
     totalMinutes = Math.round(totalMinutes)

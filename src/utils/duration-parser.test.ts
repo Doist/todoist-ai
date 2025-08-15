@@ -105,14 +105,24 @@ describe('parseDuration', () => {
         })
 
         it('should throw error for malformed numbers', () => {
-            expect(() => parseDuration('2.h')).toThrow('Hours must be a positive number')
-            expect(() => parseDuration('2h.m')).toThrow('Minutes must be a positive number')
-            expect(() => parseDuration('2..5h')).toThrow('Hours must be a positive number')
+            expect(() => parseDuration('2.h')).toThrow('Use format like')
+            expect(() => parseDuration('2h.m')).toThrow('Use format like')
+            expect(() => parseDuration('2..5h')).toThrow('Use format like')
         })
 
         it('should throw error for duplicate units', () => {
             expect(() => parseDuration('2h3h')).toThrow('Use format like')
             expect(() => parseDuration('30m45m')).toThrow('Use format like')
+        })
+
+        it('should throw error for wrong order (minutes before hours)', () => {
+            expect(() => parseDuration('30m2h')).toThrow('Use format like')
+            expect(() => parseDuration('45m1h')).toThrow('Use format like')
+        })
+
+        it('should throw error for invalid mixed formats with correct order', () => {
+            expect(() => parseDuration('2h30m15h')).toThrow('Use format like')
+            expect(() => parseDuration('1h2h30m')).toThrow('Use format like')
         })
     })
 
