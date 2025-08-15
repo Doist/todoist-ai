@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/Doist/todoist-ai/compare/v2.0.1...v2.1.0) (2025-08-15)
+
+
+### Features
+
+* add support for task duration when adding or updating tasks ([#28](https://github.com/Doist/todoist-ai/issues/28)) ([a0c6702](https://github.com/Doist/todoist-ai/commit/a0c6702dd446173c86675ecadd975506ce594c42))
+
 ## [2.0.1](https://github.com/Doist/todoist-ai/compare/v2.0.0...v2.0.1) (2025-08-14)
 
 
