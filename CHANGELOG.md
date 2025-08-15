@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/Doist/todoist-ai/compare/v2.1.0...v2.1.1) (2025-08-15)
+
+
+### Bug Fixes
+
+* update release-please manifest to current version ([00d81ec](https://github.com/Doist/todoist-ai/commit/00d81ec032721d94a49ceab7a874c57e1dd41f45))
+
 ## [2.1.0](https://github.com/Doist/todoist-ai/compare/v2.0.1...v2.1.0) (2025-08-15)
 
 
