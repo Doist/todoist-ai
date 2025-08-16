@@ -9,10 +9,13 @@ permissions:
     contents: write
     pull-requests: write
     issues: write
+    actions: write
 
 jobs:
     release-please:
         runs-on: ubuntu-latest
+        outputs:
+            release_created: ${{ steps.release.outputs.release_created }}
         steps:
             - uses: googleapis/release-please-action@v4
               id: release
@@ -21,3 +24,17 @@ jobs:
                   release-type: node
                   config-file: .github/release-please-config.json
                   manifest-file: .github/release-please-manifest.json
+
+            - name: Trigger publish workflow
+              if: ${{ steps.release.outputs.release_created }}
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      console.log('Release created, triggering publish workflow');
+                      await github.rest.actions.createWorkflowDispatch({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          workflow_id: 'publish.yml',
+                          ref: 'main'
+                      });
+                      console.log('Successfully triggered publish.yml');
