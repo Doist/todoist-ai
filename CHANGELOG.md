@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.2](https://github.com/Doist/todoist-ai/compare/v2.2.1...v2.2.2) (2025-08-16)
+
+
+### Bug Fixes
+
+* correct bin path in package.json for npx support ([#39](https://github.com/Doist/todoist-ai/issues/39)) ([816021d](https://github.com/Doist/todoist-ai/commit/816021dc3572dd476818981388fac634794d7e21))
+
 ## [2.2.1](https://github.com/Doist/todoist-ai/compare/v2.2.0...v2.2.1) (2025-08-16)
 
 
