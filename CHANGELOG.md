@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/Doist/todoist-ai/compare/v2.2.0...v2.2.1) (2025-08-16)
+
+
+### Bug Fixes
+
+* correct bin field format in package.json for npx support ([#37](https://github.com/Doist/todoist-ai/issues/37)) ([a50fa75](https://github.com/Doist/todoist-ai/commit/a50fa75d737bc6f4503442830565c3d4a942c9af))
+
 ## [2.2.0](https://github.com/Doist/todoist-ai/compare/v2.1.0...v2.2.0) (2025-08-16)
 
 
