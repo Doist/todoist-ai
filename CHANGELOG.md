@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/Doist/todoist-ai/compare/v2.1.0...v2.2.0) (2025-08-16)
+
+
+### Features
+
+* Add npx support for MCP server usage ([#33](https://github.com/Doist/todoist-ai/issues/33)) ([5ed0c5f](https://github.com/Doist/todoist-ai/commit/5ed0c5f40615ab4afb61d0fcd9796c97e666b1f9))
+
 ## [2.1.0](https://github.com/Doist/todoist-ai/compare/v2.0.1...v2.1.0) (2025-08-15)
 
 
