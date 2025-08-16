@@ -1,7 +1,7 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { sectionsManage } from '../sections-manage.js'
-import { TEST_IDS, createMockSection } from '../test-helpers.js'
+import { TEST_IDS, createMockSection, extractTextContent } from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
@@ -25,21 +25,32 @@ describe('sections-manage tool', () => {
             mockTodoistApi.addSection.mockResolvedValue(mockApiResponse)
 
             const result = await sectionsManage.execute(
-                {
-                    name: 'test-abc123def456-section',
-                    projectId: TEST_IDS.PROJECT_TEST,
-                },
+                { name: 'test-abc123def456-section', projectId: TEST_IDS.PROJECT_TEST },
                 mockTodoistApi,
             )
 
-            // Verify API was called correctly
             expect(mockTodoistApi.addSection).toHaveBeenCalledWith({
                 name: 'test-abc123def456-section',
                 projectId: TEST_IDS.PROJECT_TEST,
             })
 
-            // Verify result matches API response
-            expect(result).toEqual(mockApiResponse)
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Created section: test-abc123def456-section')
+            expect(textContent).toContain(`id=${TEST_IDS.SECTION_1}`)
+            expect(textContent).toContain('Use tasks-list-for-container with type=section')
+
+            // Verify structured content
+            const { structuredContent } = result
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    section: expect.objectContaining({
+                        id: TEST_IDS.SECTION_1,
+                        name: 'test-abc123def456-section',
+                    }),
+                    operation: 'created',
+                }),
+            )
         })
 
         it('should handle different section properties from API', async () => {
@@ -53,10 +64,7 @@ describe('sections-manage tool', () => {
             mockTodoistApi.addSection.mockResolvedValue(mockApiResponse)
 
             const result = await sectionsManage.execute(
-                {
-                    name: 'My Section Name',
-                    projectId: 'project-789',
-                },
+                { name: 'My Section Name', projectId: 'project-789' },
                 mockTodoistApi,
             )
 
@@ -65,30 +73,33 @@ describe('sections-manage tool', () => {
                 projectId: 'project-789',
             })
 
-            expect(result).toEqual(mockApiResponse)
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Created section: My Section Name')
+            expect(textContent).toContain(`id=${TEST_IDS.SECTION_2}`)
+            expect(textContent).toContain('Use tasks-add-multiple with sectionId')
+
+            // Verify structured content
+            const { structuredContent } = result
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    section: expect.objectContaining({
+                        id: TEST_IDS.SECTION_2,
+                        name: 'My Section Name',
+                    }),
+                    operation: 'created',
+                }),
+            )
         })
 
-        it('should return error when projectId is missing for new section', async () => {
-            const result = await sectionsManage.execute(
-                {
-                    name: 'test-section',
-                },
-                mockTodoistApi,
+        it('should throw error when projectId is missing for new section', async () => {
+            await expect(
+                sectionsManage.execute({ name: 'test-section' }, mockTodoistApi),
+            ).rejects.toThrow(
+                'Error: projectId is required when creating a new section (when id is not provided).',
             )
 
-            // Should not call API when projectId is missing
             expect(mockTodoistApi.addSection).not.toHaveBeenCalled()
-
-            // Should return error content
-            expect(result).toEqual({
-                content: [
-                    {
-                        type: 'text',
-                        text: 'Error: projectId is required when creating a new section (when id is not provided).',
-                    },
-                ],
-                isError: true,
-            })
         })
     })
 
@@ -111,10 +122,7 @@ describe('sections-manage tool', () => {
             mockTodoistApi.updateSection.mockResolvedValue(mockApiResponse)
 
             const result = await sectionsManage.execute(
-                {
-                    id: 'existing-section-123',
-                    name: 'Updated Section Name',
-                },
+                { id: 'existing-section-123', name: 'Updated Section Name' },
                 mockTodoistApi,
             )
 
@@ -122,7 +130,18 @@ describe('sections-manage tool', () => {
                 name: 'Updated Section Name',
             })
 
-            expect(result).toEqual(mockApiResponse)
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Updated section: Updated Section Name')
+            expect(textContent).toContain('id=existing-section-123')
+            expect(textContent).toContain('Use tasks-list-for-container with type=section')
+
+            // Verify structured content
+            const { structuredContent } = result
+            expect(structuredContent.section).toBeDefined()
+            expect(structuredContent.section.id).toBe('existing-section-123')
+            expect(structuredContent.section.name).toBe('Updated Section Name')
+            expect(structuredContent.operation).toBe('updated')
         })
 
         it('should update section without requiring projectId', async () => {
@@ -155,7 +174,18 @@ describe('sections-manage tool', () => {
                 name: 'Section New Name',
             })
 
-            expect(result).toEqual(mockApiResponse)
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Updated section: Section New Name')
+            expect(textContent).toContain('id=section-update-test')
+            expect(textContent).toContain('Use tasks-list-for-container with type=section')
+
+            // Verify structured content
+            const { structuredContent } = result
+            expect(structuredContent.section).toBeDefined()
+            expect(structuredContent.section.id).toBe('section-update-test')
+            expect(structuredContent.section.name).toBe('Section New Name')
+            expect(structuredContent.operation).toBe('updated')
         })
     })
 
@@ -165,13 +195,7 @@ describe('sections-manage tool', () => {
             mockTodoistApi.addSection.mockRejectedValue(apiError)
 
             await expect(
-                sectionsManage.execute(
-                    {
-                        name: '',
-                        projectId: '6cfCcrrCFg2xP94Q',
-                    },
-                    mockTodoistApi,
-                ),
+                sectionsManage.execute({ name: '', projectId: '6cfCcrrCFg2xP94Q' }, mockTodoistApi),
             ).rejects.toThrow('API Error: Section name is required')
         })
 
@@ -181,10 +205,7 @@ describe('sections-manage tool', () => {
 
             await expect(
                 sectionsManage.execute(
-                    {
-                        id: 'non-existent-section',
-                        name: 'Updated Name',
-                    },
+                    { id: 'non-existent-section', name: 'Updated Name' },
                     mockTodoistApi,
                 ),
             ).rejects.toThrow('API Error: Section not found')

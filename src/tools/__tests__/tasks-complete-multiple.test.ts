@@ -1,6 +1,7 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { tasksCompleteMultiple } from '../tasks-complete-multiple.js'
+import { extractTextContent } from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
@@ -27,11 +28,20 @@ describe('tasks-complete-multiple tool', () => {
             expect(mockTodoistApi.closeTask).toHaveBeenNthCalledWith(2, 'task-2')
             expect(mockTodoistApi.closeTask).toHaveBeenNthCalledWith(3, 'task-3')
 
-            // Verify all tasks were completed successfully
-            expect(result).toEqual({
-                success: true,
-                completed: ['task-1', 'task-2', 'task-3'],
-            })
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Verify structured content
+            const { structuredContent } = result
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    completed: ['task-1', 'task-2', 'task-3'],
+                    failures: [],
+                    totalRequested: 3,
+                    successCount: 3,
+                    failureCount: 0,
+                }),
+            )
         })
 
         it('should complete single task', async () => {
@@ -45,10 +55,19 @@ describe('tasks-complete-multiple tool', () => {
             expect(mockTodoistApi.closeTask).toHaveBeenCalledTimes(1)
             expect(mockTodoistApi.closeTask).toHaveBeenCalledWith('8485093748')
 
-            expect(result).toEqual({
-                success: true,
-                completed: ['8485093748'],
-            })
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Verify structured content
+            const { structuredContent } = result
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    completed: ['8485093748'],
+                    failures: [],
+                    totalRequested: 1,
+                    successCount: 1,
+                    failureCount: 0,
+                }),
+            )
         })
 
         it('should handle partial failures gracefully', async () => {
@@ -70,10 +89,24 @@ describe('tasks-complete-multiple tool', () => {
             expect(mockTodoistApi.closeTask).toHaveBeenNthCalledWith(3, 'task-3')
 
             // Verify only successful completions are reported
-            expect(result).toEqual({
-                success: true,
-                completed: ['task-1', 'task-3'], // task-2 excluded due to failure
-            })
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Verify structured content with partial failures
+            const { structuredContent } = result
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    completed: ['task-1', 'task-3'],
+                    failures: [
+                        expect.objectContaining({
+                            item: 'task-2',
+                            error: 'Task not found',
+                        }),
+                    ],
+                    totalRequested: 3,
+                    successCount: 2,
+                    failureCount: 1,
+                }),
+            )
         })
 
         it('should handle all tasks failing', async () => {
@@ -89,10 +122,7 @@ describe('tasks-complete-multiple tool', () => {
             expect(mockTodoistApi.closeTask).toHaveBeenCalledTimes(2)
 
             // Verify no tasks were completed but still returns success
-            expect(result).toEqual({
-                success: true,
-                completed: [], // no tasks completed
-            })
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
 
         it('should continue processing remaining tasks after failures', async () => {
@@ -112,10 +142,7 @@ describe('tasks-complete-multiple tool', () => {
             expect(mockTodoistApi.closeTask).toHaveBeenCalledTimes(5)
 
             // Only tasks 3 and 5 should be in completed list
-            expect(result).toEqual({
-                success: true,
-                completed: ['task-3', 'task-5'],
-            })
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
 
         it('should handle different types of API errors', async () => {
@@ -133,10 +160,7 @@ describe('tasks-complete-multiple tool', () => {
             expect(mockTodoistApi.closeTask).toHaveBeenCalledTimes(4)
 
             // All should fail, but the tool should handle it gracefully
-            expect(result).toEqual({
-                success: true,
-                completed: [],
-            })
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
     })
 
@@ -165,10 +189,89 @@ describe('tasks-complete-multiple tool', () => {
 
             expect(mockTodoistApi.closeTask).toHaveBeenCalledTimes(5)
 
-            expect(result).toEqual({
-                success: true,
-                completed: ['8485093748', '8485093749', '8485093751'],
-            })
+            expect(extractTextContent(result)).toMatchSnapshot()
+        })
+    })
+
+    describe('next steps logic validation', () => {
+        it('should suggest overdue tasks when all tasks complete successfully', async () => {
+            mockTodoistApi.closeTask.mockResolvedValue(true)
+
+            const result = await tasksCompleteMultiple.execute(
+                { ids: ['task-1', 'task-2'] },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain("Use tasks-list-by-date('overdue')")
+        })
+
+        it('should suggest reviewing failures when mixed results', async () => {
+            mockTodoistApi.closeTask
+                .mockResolvedValueOnce(true)
+                .mockRejectedValueOnce(new Error('Task not found'))
+
+            const result = await tasksCompleteMultiple.execute(
+                { ids: ['task-1', 'task-2'] },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Review failed completions and retry if needed')
+        })
+
+        it('should suggest checking IDs when all tasks fail', async () => {
+            mockTodoistApi.closeTask.mockRejectedValue(new Error('Task not found'))
+
+            const result = await tasksCompleteMultiple.execute(
+                { ids: ['bad-id-1', 'bad-id-2'] },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Check task IDs and permissions, then retry')
+            expect(textContent).not.toContain('Use overview tool') // Should only show retry message
+        })
+    })
+
+    describe('error message truncation', () => {
+        it('should truncate failure messages after 3 errors', async () => {
+            mockTodoistApi.closeTask
+                .mockRejectedValueOnce(new Error('Error 1'))
+                .mockRejectedValueOnce(new Error('Error 2'))
+                .mockRejectedValueOnce(new Error('Error 3'))
+                .mockRejectedValueOnce(new Error('Error 4'))
+                .mockRejectedValueOnce(new Error('Error 5'))
+
+            const result = await tasksCompleteMultiple.execute(
+                { ids: ['task-1', 'task-2', 'task-3', 'task-4', 'task-5'] },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('+2 more') // 5 total failures, showing first 3, so +2 more
+            expect(textContent).not.toContain('Error 4') // Should not show 4th error
+            expect(textContent).not.toContain('Error 5') // Should not show 5th error
+        })
+
+        it('should not show truncation message for exactly 3 errors', async () => {
+            mockTodoistApi.closeTask
+                .mockRejectedValueOnce(new Error('Error 1'))
+                .mockRejectedValueOnce(new Error('Error 2'))
+                .mockRejectedValueOnce(new Error('Error 3'))
+
+            const result = await tasksCompleteMultiple.execute(
+                { ids: ['task-1', 'task-2', 'task-3'] },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).not.toContain('more') // Should not show truncation
         })
     })
 
@@ -183,10 +286,7 @@ describe('tasks-complete-multiple tool', () => {
                 mockTodoistApi,
             )
 
-            expect(result).toEqual({
-                success: true,
-                completed: ['single-task'],
-            })
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
 
         it('should handle tasks with special ID formats', async () => {
@@ -202,10 +302,7 @@ describe('tasks-complete-multiple tool', () => {
             expect(mockTodoistApi.closeTask).toHaveBeenCalledWith('task-with-dashes')
             expect(mockTodoistApi.closeTask).toHaveBeenCalledWith('1234567890')
 
-            expect(result).toEqual({
-                success: true,
-                completed: ['proj_123_task_456', 'task-with-dashes', '1234567890'],
-            })
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
     })
 })

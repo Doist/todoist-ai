@@ -3,31 +3,19 @@ import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/m
 import type { ZodTypeAny, z } from 'zod'
 import type { TodoistTool } from './todoist-tool.js'
 
-function textContent(text: string) {
+function getToolOutput<StructuredContent extends Record<string, unknown>>({
+    textContent,
+    structuredContent,
+}: { textContent: string; structuredContent: StructuredContent }) {
     return {
-        content: [{ type: 'text' as const, text }],
+        content: [{ type: 'text' as const, text: textContent }],
+        structuredContent,
     }
 }
 
-function jsonContent(data: unknown) {
+function getErrorOutput(error: string) {
     return {
-        content: [
-            {
-                type: 'text' as const,
-                mimeType: 'application/json',
-                text: JSON.stringify(data, null, 2),
-            },
-        ],
-    }
-}
-
-function textOrJsonContent(data: unknown) {
-    return typeof data === 'string' ? textContent(data) : jsonContent(data)
-}
-
-function errorContent(error: string) {
-    return {
-        ...textContent(error),
+        content: [{ type: 'text' as const, text: error }],
         isError: true,
     }
 }
@@ -49,19 +37,18 @@ function registerTool<Params extends z.ZodRawShape>(
         _context,
     ) => {
         try {
-            const result = await tool.execute(args as z.infer<z.ZodObject<Params>>, client)
-            return textOrJsonContent(result)
+            return await tool.execute(args as z.infer<z.ZodObject<Params>>, client)
         } catch (error) {
             console.error(`Error executing tool ${tool.name}:`, {
                 args,
                 error,
             })
             const message = error instanceof Error ? error.message : 'An unknown error occurred'
-            return errorContent(message)
+            return getErrorOutput(message)
         }
     }
 
     server.tool(tool.name, tool.description, tool.parameters, cb)
 }
 
-export { registerTool, errorContent }
+export { registerTool, getToolOutput }

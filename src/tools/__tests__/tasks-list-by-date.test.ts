@@ -2,7 +2,7 @@ import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { getTasksByFilter } from '../../tool-helpers.js'
 import { tasksListByDate } from '../tasks-list-by-date.js'
-import { TEST_ERRORS, TEST_IDS, createMappedTask } from '../test-helpers.js'
+import { TEST_ERRORS, TEST_IDS, createMappedTask, extractTextContent } from '../test-helpers.js'
 
 // Mock the tool helpers
 jest.mock('../../tool-helpers', () => ({
@@ -75,7 +75,16 @@ describe('tasks-list-by-date tool', () => {
                 cursor: undefined,
                 limit: 50,
             })
-            expect(result).toEqual(mockResponse)
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Verify structured content
+            const { structuredContent } = result
+            expect(structuredContent.tasks).toHaveLength(hasTasks ? 1 : 0)
+            expect(structuredContent.totalCount).toBe(hasTasks ? 1 : 0)
+            expect(structuredContent.hasMore).toBe(false)
+            expect(structuredContent.nextCursor).toBeNull()
+            expect(structuredContent.appliedFilters.startDate).toBe('overdue')
         })
     })
 
@@ -97,7 +106,8 @@ describe('tasks-list-by-date tool', () => {
                 cursor: undefined,
                 limit: 50,
             })
-            expect(result).toEqual(mockResponse)
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
 
         it.each([
@@ -141,7 +151,8 @@ describe('tasks-list-by-date tool', () => {
                 cursor: params.cursor || undefined,
                 limit: params.limit,
             })
-            expect(result).toEqual(mockResponse)
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
     })
 
@@ -196,8 +207,110 @@ describe('tasks-list-by-date tool', () => {
 
             expect(mockGetTasksByFilter).toHaveBeenCalledTimes(1)
             if (shouldReturnResult) {
-                expect(result).toEqual(mockResponse)
+                // Verify result is a concise summary
+                expect(extractTextContent(result)).toMatchSnapshot()
             }
+        })
+    })
+
+    describe('next steps logic', () => {
+        it('should suggest appropriate actions when hasOverdue is true', async () => {
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Overdue task from list',
+                    dueDate: '2025-08-10', // Past date - creates hasOverdue context
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await tasksListByDate.execute(
+                { startDate: '2025-08-15', limit: 10, daysCount: 1 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain(
+                'Use tasks-update-multiple to modify priorities or due dates',
+            )
+        })
+
+        it('should suggest today-focused actions when startDate is today', async () => {
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: "Today's task",
+                    dueDate: '2025-08-15', // Today's date based on our mock
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await tasksListByDate.execute(
+                { startDate: 'today', limit: 10, daysCount: 1 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain(
+                'Use tasks-update-multiple to modify priorities or due dates',
+            )
+        })
+
+        it('should suggest appropriate actions when startDate is overdue', async () => {
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Overdue task',
+                    dueDate: '2025-08-10',
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await tasksListByDate.execute(
+                { startDate: 'overdue', limit: 10, daysCount: 1 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain(
+                'Use tasks-update-multiple to modify priorities or due dates',
+            )
+        })
+
+        it('should provide helpful suggestions for empty overdue results', async () => {
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await tasksListByDate.execute(
+                { startDate: 'overdue', limit: 10, daysCount: 1 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Great job! No overdue tasks')
+            expect(textContent).toContain("Check today's tasks with startDate='today'")
+        })
+
+        it('should provide helpful suggestions for empty date range results', async () => {
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await tasksListByDate.execute(
+                { startDate: '2025-08-20', limit: 10, daysCount: 1 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain("Expand date range with larger 'daysCount'")
+            expect(textContent).toContain("Check 'overdue' for past-due items")
         })
     })
 

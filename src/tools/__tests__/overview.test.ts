@@ -7,6 +7,7 @@ import {
     createMockProject,
     createMockSection,
     createMockTask,
+    extractTextContent,
 } from '../test-helpers.js'
 
 // Mock the Todoist API
@@ -63,13 +64,48 @@ describe('overview tool', () => {
             expect(mockTodoistApi.getProjects).toHaveBeenCalledWith({})
             expect(mockTodoistApi.getSections).toHaveBeenCalledTimes(2) // Once for each project
 
-            // Use snapshot testing for complex markdown output
-            expect(result).toMatchSnapshot()
+            // Test text content with snapshot
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Test structured content sanity checks
+            const { structuredContent } = result
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    type: 'account_overview',
+                    inbox: expect.objectContaining({
+                        id: TEST_IDS.PROJECT_INBOX,
+                        name: 'Inbox',
+                        sections: expect.any(Array),
+                    }),
+                    projects: expect.any(Array),
+                    totalProjects: 2,
+                    totalSections: 1,
+                    hasNestedProjects: false,
+                }),
+            )
+            expect(structuredContent.projects).toHaveLength(1) // Only non-inbox projects
         })
 
         it('should handle empty projects list', async () => {
             mockTodoistApi.getProjects.mockResolvedValue({ results: [], nextCursor: null })
-            expect(await overview.execute({}, mockTodoistApi)).toMatchSnapshot()
+
+            const result = await overview.execute({}, mockTodoistApi)
+
+            // Test text content with snapshot
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Test structured content sanity checks
+            const { structuredContent } = result
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    type: 'account_overview',
+                    inbox: null,
+                    projects: [],
+                    totalProjects: 0,
+                    totalSections: 0,
+                    hasNestedProjects: false,
+                }),
+            )
         })
     })
 
@@ -150,8 +186,29 @@ describe('overview tool', () => {
                 cursor: undefined,
             })
 
-            // Use snapshot testing for complex markdown output
-            expect(result).toMatchSnapshot()
+            // Test text content with snapshot
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Test structured content sanity checks
+            const { structuredContent } = result
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    type: 'project_overview',
+                    project: expect.objectContaining({
+                        id: TEST_IDS.PROJECT_TEST,
+                        name: 'test-abc123def456-project',
+                    }),
+                    sections: expect.any(Array),
+                    tasks: expect.any(Array),
+                    stats: expect.objectContaining({
+                        totalTasks: 3,
+                        totalSections: 2,
+                        tasksWithoutSection: 1,
+                    }),
+                }),
+            )
+            expect(structuredContent.sections).toHaveLength(2)
+            expect(structuredContent.tasks).toHaveLength(3)
         })
 
         it('should handle project with no tasks', async () => {
@@ -166,7 +223,28 @@ describe('overview tool', () => {
             mockTodoistApi.getTasks.mockResolvedValue({ results: [], nextCursor: null })
 
             const result = await overview.execute({ projectId: 'empty-project-id' }, mockTodoistApi)
-            expect(result).toMatchSnapshot()
+
+            // Test text content with snapshot
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Test structured content sanity checks
+            const { structuredContent } = result
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    type: 'project_overview',
+                    project: expect.objectContaining({
+                        id: 'empty-project-id',
+                        name: 'Empty Project',
+                    }),
+                    sections: [],
+                    tasks: [],
+                    stats: expect.objectContaining({
+                        totalTasks: 0,
+                        totalSections: 0,
+                        tasksWithoutSection: 0,
+                    }),
+                }),
+            )
         })
     })
 

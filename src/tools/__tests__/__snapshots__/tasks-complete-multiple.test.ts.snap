@@ -1,0 +1,141 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`tasks-complete-multiple tool completing multiple tasks should complete all tasks successfully 1`] = `
+"Completed tasks: 3/3 successful.
+Completed:
+    task-1
+    task-2
+    task-3.
+Next:
+- Use tasks-list-by-date('overdue') to tackle remaining overdue items."
+`;
+
+exports[`tasks-complete-multiple tool completing multiple tasks should complete single task 1`] = `
+"Completed tasks: 1/1 successful.
+Completed:
+    8485093748.
+Next:
+- Use tasks-list-by-date('overdue') to tackle remaining overdue items."
+`;
+
+exports[`tasks-complete-multiple tool completing multiple tasks should continue processing remaining tasks after failures 1`] = `
+"Completed tasks: 2/5 successful.
+Completed:
+    task-3
+    task-5.
+Failed (3):
+    task-1 (Error: Task already completed)
+    task-2 (Error: Task not found)
+    task-4 (Error: Permission denied).
+Next:
+- Review failed completions and retry if needed."
+`;
+
+exports[`tasks-complete-multiple tool completing multiple tasks should handle all tasks failing 1`] = `
+"Completed tasks: 0/2 successful.
+Failed (2):
+    task-1 (Error: API Error: Network timeout)
+    task-2 (Error: API Error: Network timeout).
+Next:
+- Check task IDs and permissions, then retry."
+`;
+
+exports[`tasks-complete-multiple tool completing multiple tasks should handle different types of API errors 1`] = `
+"Completed tasks: 0/4 successful.
+Failed (4):
+    not-found (Error: Task not found)
+    already-done (Error: Task already completed)
+    no-permission (Error: Permission denied), +1 more.
+Next:
+- Check task IDs and permissions, then retry."
+`;
+
+exports[`tasks-complete-multiple tool completing multiple tasks should handle partial failures gracefully 1`] = `
+"Completed tasks: 2/3 successful.
+Completed:
+    task-1
+    task-3.
+Failed (1):
+    task-2 (Error: Task not found).
+Next:
+- Review failed completions and retry if needed."
+`;
+
+exports[`tasks-complete-multiple tool edge cases should handle empty task completion (minimum one task required by schema) 1`] = `
+"Completed tasks: 1/1 successful.
+Completed:
+    single-task.
+Next:
+- Use tasks-list-by-date('overdue') to tackle remaining overdue items."
+`;
+
+exports[`tasks-complete-multiple tool edge cases should handle tasks with special ID formats 1`] = `
+"Completed tasks: 3/3 successful.
+Completed:
+    proj_123_task_456
+    task-with-dashes
+    1234567890.
+Next:
+- Use tasks-list-by-date('overdue') to tackle remaining overdue items."
+`;
+
+exports[`tasks-complete-multiple tool error message truncation should not show truncation message for exactly 3 errors 1`] = `
+"Completed tasks: 0/3 successful.
+Failed (3):
+    task-1 (Error: Error 1)
+    task-2 (Error: Error 2)
+    task-3 (Error: Error 3).
+Next:
+- Check task IDs and permissions, then retry."
+`;
+
+exports[`tasks-complete-multiple tool error message truncation should truncate failure messages after 3 errors 1`] = `
+"Completed tasks: 0/5 successful.
+Failed (5):
+    task-1 (Error: Error 1)
+    task-2 (Error: Error 2)
+    task-3 (Error: Error 3), +2 more.
+Next:
+- Check task IDs and permissions, then retry."
+`;
+
+exports[`tasks-complete-multiple tool mixed success and failure scenarios should handle realistic mixed scenario 1`] = `
+"Completed tasks: 3/5 successful.
+Completed:
+    8485093748
+    8485093749
+    8485093751.
+Failed (2):
+    8485093750 (Error: Task already completed)
+    8485093752 (Error: Task not found).
+Next:
+- Review failed completions and retry if needed."
+`;
+
+exports[`tasks-complete-multiple tool next steps logic validation should suggest checking IDs when all tasks fail 1`] = `
+"Completed tasks: 0/2 successful.
+Failed (2):
+    bad-id-1 (Error: Task not found)
+    bad-id-2 (Error: Task not found).
+Next:
+- Check task IDs and permissions, then retry."
+`;
+
+exports[`tasks-complete-multiple tool next steps logic validation should suggest overdue tasks when all tasks complete successfully 1`] = `
+"Completed tasks: 2/2 successful.
+Completed:
+    task-1
+    task-2.
+Next:
+- Use tasks-list-by-date('overdue') to tackle remaining overdue items."
+`;
+
+exports[`tasks-complete-multiple tool next steps logic validation should suggest reviewing failures when mixed results 1`] = `
+"Completed tasks: 1/2 successful.
+Completed:
+    task-1.
+Failed (1):
+    task-2 (Error: Task not found).
+Next:
+- Review failed completions and retry if needed."
+`;

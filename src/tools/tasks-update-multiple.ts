@@ -1,8 +1,11 @@
 import type { Task, UpdateTaskArgs } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import type { TodoistTool } from '../todoist-tool'
-import { createMoveTaskArgs } from '../tool-helpers.js'
+import { getToolOutput } from '../mcp-helpers.js'
+import type { TodoistTool } from '../todoist-tool.js'
+import { createMoveTaskArgs, mapTask } from '../tool-helpers.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
+import { summarizeTaskOperation } from '../utils/response-builders.js'
+import { TOOL_NAMES } from '../utils/tool-names.js'
 
 const TasksUpdateSchema = z.object({
     id: z.string().min(1).describe('The ID of the task to update.'),
@@ -38,7 +41,7 @@ const ArgsSchema = {
 }
 
 const tasksUpdateMultiple = {
-    name: 'tasks-update-multiple',
+    name: TOOL_NAMES.TASKS_UPDATE_MULTIPLE,
     description: 'Update multiple existing tasks with new values.',
     parameters: ArgsSchema,
     async execute(args, client) {
@@ -93,9 +96,59 @@ const tasksUpdateMultiple = {
         const updatedTasks = (await Promise.all(updateTasksPromises)).filter(
             (task): task is Task => task !== undefined,
         )
-        return updatedTasks
+
+        const mappedTasks = updatedTasks.map(mapTask)
+
+        const textContent = generateTextContent({
+            tasks: mappedTasks,
+            args,
+        })
+
+        return getToolOutput({
+            textContent,
+            structuredContent: {
+                tasks: mappedTasks,
+                totalCount: mappedTasks.length,
+                updatedTaskIds: updatedTasks.map((task) => task.id),
+                appliedOperations: {
+                    updateCount: mappedTasks.length,
+                    skippedCount: tasks.length - mappedTasks.length,
+                },
+            },
+        })
     },
 } satisfies TodoistTool<typeof ArgsSchema>
+
+function generateTextContent({
+    tasks,
+    args,
+}: {
+    tasks: ReturnType<typeof mapTask>[]
+    args: z.infer<z.ZodObject<typeof ArgsSchema>>
+}) {
+    const totalRequested = args.tasks.length
+    const actuallyUpdated = tasks.length
+    const skipped = totalRequested - actuallyUpdated
+
+    let context = ''
+    if (skipped > 0) {
+        context = ` (${skipped} skipped - no changes)`
+    }
+
+    const nextSteps: string[] = []
+    if (tasks.length > 0) {
+        nextSteps.push('Use tasks-list-by-date to see your updated schedule')
+        nextSteps.push('Use overview to see updated project organization')
+    } else {
+        nextSteps.push('Use tasks-list-by-date to see current tasks')
+    }
+
+    return summarizeTaskOperation('Updated', tasks, {
+        context,
+        nextSteps,
+        showDetails: tasks.length <= 5,
+    })
+}
 
 function hasUpdatesToMake({ id, ...otherUpdateArgs }: TaskUpdate) {
     return Object.keys(otherUpdateArgs).length > 0

@@ -1,6 +1,9 @@
 import { z } from 'zod'
+import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask } from '../tool-helpers.js'
+import { previewTasks, summarizeList } from '../utils/response-builders.js'
+import { TOOL_NAMES } from '../utils/tool-names.js'
 
 const ArgsSchema = {
     getBy: z
@@ -39,7 +42,7 @@ const ArgsSchema = {
 }
 
 const tasksListCompleted = {
-    name: 'tasks-list-completed',
+    name: TOOL_NAMES.TASKS_LIST_COMPLETED,
     description: 'Get completed tasks.',
     parameters: ArgsSchema,
     async execute(args, client) {
@@ -48,11 +51,92 @@ const tasksListCompleted = {
             getBy === 'completion'
                 ? await client.getCompletedTasksByCompletionDate(rest)
                 : await client.getCompletedTasksByDueDate(rest)
-        return {
-            tasks: items.map(mapTask),
+        const mappedTasks = items.map(mapTask)
+
+        const textContent = generateTextContent({
+            tasks: mappedTasks,
+            args,
             nextCursor,
-        }
+        })
+
+        return getToolOutput({
+            textContent,
+            structuredContent: {
+                tasks: mappedTasks,
+                nextCursor,
+                totalCount: mappedTasks.length,
+                hasMore: Boolean(nextCursor),
+                appliedFilters: {
+                    getBy: args.getBy,
+                    since: args.since,
+                    until: args.until,
+                    workspaceId: args.workspaceId,
+                    projectId: args.projectId,
+                    sectionId: args.sectionId,
+                    parentId: args.parentId,
+                    limit: args.limit,
+                    cursor: args.cursor,
+                },
+            },
+        })
     },
 } satisfies TodoistTool<typeof ArgsSchema>
+
+function generateTextContent({
+    tasks,
+    args,
+    nextCursor,
+}: {
+    tasks: ReturnType<typeof mapTask>[]
+    args: z.infer<z.ZodObject<typeof ArgsSchema>>
+    nextCursor: string | null
+}) {
+    // Generate subject description
+    const getByText = args.getBy === 'completion' ? 'completed' : 'due'
+    const subject = `Completed tasks (by ${getByText} date)`
+
+    // Generate filter hints
+    const filterHints: string[] = []
+    filterHints.push(`${getByText} date: ${args.since} to ${args.until}`)
+    if (args.projectId) filterHints.push(`project: ${args.projectId}`)
+    if (args.sectionId) filterHints.push(`section: ${args.sectionId}`)
+    if (args.parentId) filterHints.push(`parent: ${args.parentId}`)
+    if (args.workspaceId) filterHints.push(`workspace: ${args.workspaceId}`)
+
+    // Generate helpful suggestions for empty results
+    const zeroReasonHints: string[] = []
+    if (tasks.length === 0) {
+        zeroReasonHints.push('No tasks completed in this date range')
+        zeroReasonHints.push('Try expanding the date range')
+        if (args.projectId || args.sectionId || args.parentId) {
+            zeroReasonHints.push('Try removing project/section/parent filters')
+        }
+        if (args.getBy === 'due') {
+            zeroReasonHints.push('Try switching to "completion" date instead')
+        }
+    }
+
+    // Generate contextual next steps
+    const nextSteps: string[] = []
+    if (tasks.length > 0) {
+        nextSteps.push(
+            'Use tasks-list-by-date for active tasks or overview for current productivity.',
+        )
+        if (tasks.some((task) => task.recurring)) {
+            nextSteps.push('Recurring tasks will automatically create new instances.')
+        }
+    }
+
+    return summarizeList({
+        subject,
+        count: tasks.length,
+        limit: args.limit,
+        nextCursor: nextCursor ?? undefined,
+        filterHints,
+        previewLines: previewTasks(tasks),
+        zeroReasonHints,
+        nextSteps,
+    })
+}
 
 export { tasksListCompleted }

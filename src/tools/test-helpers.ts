@@ -160,6 +160,33 @@ export function createTestCases<T, E = unknown>(
 }
 
 /**
+ * Extracts the text content from a tool output for snapshot testing.
+ * This allows tests to match against just the text content while tools return structured output.
+ */
+export function extractTextContent(toolOutput: unknown): string {
+    if (typeof toolOutput === 'string') {
+        return toolOutput
+    }
+
+    if (typeof toolOutput === 'object' && toolOutput !== null && 'content' in toolOutput) {
+        const output = toolOutput as { content: unknown }
+        if (
+            Array.isArray(output.content) &&
+            output.content[0] &&
+            typeof output.content[0] === 'object' &&
+            output.content[0] !== null &&
+            'type' in output.content[0] &&
+            'text' in output.content[0] &&
+            output.content[0].type === 'text'
+        ) {
+            return output.content[0].text as string
+        }
+    }
+
+    throw new Error('Expected tool output to have text content')
+}
+
+/**
  * Common mock IDs used across tests for consistency.
  */
 export const TEST_IDS = {
@@ -173,3 +200,9 @@ export const TEST_IDS = {
     SECTION_2: 'section-456',
     USER_ID: '713437',
 } as const
+
+/**
+ * Fixed date for consistent test snapshots.
+ * Use this instead of new Date() in tests to avoid snapshot drift.
+ */
+export const TODAY = '2025-08-17' as const

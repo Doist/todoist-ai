@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`tasks-list-completed tool getting completed tasks by completion date (default) should get completed tasks by completion date 1`] = `
+"Completed tasks (by completed date): 1 (limit 50).
+Filter: completed date: 2025-08-10 to 2025-08-15.
+Preview:
+    Completed task 1 • due 2025-08-14 • P2 • id=8485093748
+Next:
+- Use tasks-list-by-date for active tasks or overview for current productivity."
+`;
+
+exports[`tasks-list-completed tool getting completed tasks by completion date (default) should handle explicit completion date query 1`] = `
+"Completed tasks (by completed date): 0 (limit 100), more available.
+Filter: completed date: 2025-08-01 to 2025-08-31; project: specific-project-id.
+No results. No tasks completed in this date range; Try expanding the date range; Try removing project/section/parent filters.
+Next:
+- Pass cursor 'next-cursor' to fetch more results."
+`;
+
+exports[`tasks-list-completed tool getting completed tasks by due date should get completed tasks by due date 1`] = `
+"Completed tasks (by due date): 1 (limit 50).
+Filter: due date: 2025-08-10 to 2025-08-20.
+Preview:
+    Task completed by due date • due 2025-08-15 • P3 • id=8485093750
+Next:
+- Use tasks-list-by-date for active tasks or overview for current productivity.
+- Recurring tasks will automatically create new instances."
+`;

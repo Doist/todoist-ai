@@ -1,7 +1,13 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { tasksListForContainer } from '../tasks-list-for-container.js'
-import { TEST_IDS, createMockApiResponse, createMockTask } from '../test-helpers.js'
+import {
+    TEST_IDS,
+    TODAY,
+    createMockApiResponse,
+    createMockTask,
+    extractTextContent,
+} from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
@@ -49,8 +55,8 @@ describe('tasks-list-for-container tool', () => {
                 cursor: null,
                 ...expectedParam,
             })
-            expect(result.tasks).toHaveLength(1)
-            expect(result.nextCursor).toBeNull()
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
     })
 
@@ -91,21 +97,8 @@ describe('tasks-list-for-container tool', () => {
                 sectionId: 'section-123',
             })
 
-            expect(result).toEqual({
-                tasks: [
-                    expect.objectContaining({
-                        id: '8485093751',
-                        content: 'Section task 1',
-                        description: 'Task in specific section',
-                        dueDate: '2025-08-16',
-                        recurring: 'every week',
-                        priority: 3,
-                        sectionId: 'section-123',
-                        labels: ['urgent'],
-                    }),
-                ],
-                nextCursor: null,
-            })
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
 
         it('should handle empty section', async () => {
@@ -122,7 +115,8 @@ describe('tasks-list-for-container tool', () => {
                 sectionId: 'empty-section-id',
             })
 
-            expect(result).toEqual({ tasks: [], nextCursor: null })
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
     })
 
@@ -174,27 +168,8 @@ describe('tasks-list-for-container tool', () => {
                 limit: 10,
             })
 
-            expect(result).toEqual({
-                tasks: [
-                    expect.objectContaining({
-                        id: '8485093752',
-                        content: 'Subtask 1',
-                        description: 'First subtask',
-                        parentId: 'parent-task-123',
-                        labels: [],
-                    }),
-                    expect.objectContaining({
-                        id: '8485093753',
-                        content: 'Subtask 2',
-                        description: 'Second subtask',
-                        dueDate: '2025-08-18',
-                        parentId: 'parent-task-123',
-                        priority: 2,
-                        labels: ['follow-up'],
-                    }),
-                ],
-                nextCursor: null,
-            })
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
 
         it('should handle parent task with no subtasks', async () => {
@@ -211,7 +186,8 @@ describe('tasks-list-for-container tool', () => {
                 limit: 10,
             })
 
-            expect(result).toEqual({ tasks: [], nextCursor: null })
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
     })
 
@@ -230,7 +206,8 @@ describe('tasks-list-for-container tool', () => {
                 sectionId: 'test-section',
             })
 
-            expect(result.nextCursor).toBe('next-cursor')
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
     })
 
@@ -328,6 +305,139 @@ describe('tasks-list-for-container tool', () => {
                     mockTodoistApi,
                 ),
             ).rejects.toThrow('API Error: Invalid cursor')
+        })
+    })
+
+    describe('zero reason hints for each container type', () => {
+        it('should provide project-specific hints for empty projects', async () => {
+            mockTodoistApi.getTasks.mockResolvedValue({ results: [], nextCursor: null })
+
+            const result = await tasksListForContainer.execute(
+                { type: 'project', id: 'empty-project', limit: 10 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Project has no tasks yet')
+            expect(textContent).toContain('Use tasks-add-multiple to create tasks')
+        })
+
+        it('should provide section-specific hints for empty sections', async () => {
+            mockTodoistApi.getTasks.mockResolvedValue({ results: [], nextCursor: null })
+
+            const result = await tasksListForContainer.execute(
+                { type: 'section', id: 'empty-section', limit: 10 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Section is empty')
+            expect(textContent).toContain('Tasks may be in other sections of the project')
+        })
+
+        it('should provide parent-specific hints for tasks with no subtasks', async () => {
+            mockTodoistApi.getTasks.mockResolvedValue({ results: [], nextCursor: null })
+
+            const result = await tasksListForContainer.execute(
+                { type: 'parent', id: 'task-no-subtasks', limit: 10 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('No subtasks created yet')
+            expect(textContent).toContain('Use tasks-add-multiple with parentId to add subtasks')
+        })
+    })
+
+    describe('next steps logic', () => {
+        it('should suggest appropriate actions when hasOverdue is true', async () => {
+            const mockTasks = [
+                createMockTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Overdue task in container',
+                    due: {
+                        date: '2025-08-10',
+                        isRecurring: false,
+                        lang: 'en',
+                        string: 'Aug 10',
+                        timezone: null,
+                    },
+                }),
+            ]
+            mockTodoistApi.getTasks.mockResolvedValue({ results: mockTasks, nextCursor: null })
+
+            const result = await tasksListForContainer.execute(
+                { type: 'project', id: 'project-with-overdue', limit: 10 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain(
+                'Use tasks-update-multiple to modify priorities or due dates',
+            )
+            expect(textContent).toContain('Use tasks-complete-multiple to mark finished tasks')
+        })
+
+        it('should suggest appropriate actions when hasToday is true', async () => {
+            const mockTasks = [
+                createMockTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Task due today in container',
+                    due: {
+                        date: TODAY,
+                        isRecurring: false,
+                        lang: 'en',
+                        string: 'today',
+                        timezone: null,
+                    },
+                }),
+            ]
+            mockTodoistApi.getTasks.mockResolvedValue({ results: mockTasks, nextCursor: null })
+
+            const result = await tasksListForContainer.execute(
+                { type: 'section', id: 'section-with-today', limit: 10 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain(
+                'Use tasks-update-multiple to modify priorities or due dates',
+            )
+            expect(textContent).toContain('Use tasks-complete-multiple to mark finished tasks')
+        })
+
+        it('should provide standard next steps for regular tasks', async () => {
+            const mockTasks = [
+                createMockTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Regular future task',
+                    due: {
+                        date: '2025-08-25',
+                        isRecurring: false,
+                        lang: 'en',
+                        string: 'Aug 25',
+                        timezone: null,
+                    },
+                }),
+            ]
+            mockTodoistApi.getTasks.mockResolvedValue({ results: mockTasks, nextCursor: null })
+
+            const result = await tasksListForContainer.execute(
+                { type: 'parent', id: 'parent-with-regular', limit: 10 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain(
+                'Use tasks-update-multiple to modify priorities or due dates',
+            )
+            expect(textContent).toContain('Use tasks-complete-multiple to mark finished tasks')
         })
     })
 })

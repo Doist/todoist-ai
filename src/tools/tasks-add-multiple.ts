@@ -1,8 +1,11 @@
 import type { AddTaskArgs, Task } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
+import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask } from '../tool-helpers.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
+import { generateTaskNextSteps, summarizeTaskOperation } from '../utils/response-builders.js'
+import { TOOL_NAMES } from '../utils/tool-names.js'
 
 const TaskSchema = z.object({
     content: z.string().min(1).describe('The content of the task to create.'),
@@ -25,12 +28,13 @@ const ArgsSchema = {
 }
 
 const tasksAddMultiple = {
-    name: 'tasks-add-multiple',
+    name: TOOL_NAMES.TASKS_ADD_MULTIPLE,
     description: 'Add one or more tasks to a project, section, or parent.',
     parameters: ArgsSchema,
     async execute(args, client) {
         const { projectId, sectionId, parentId, tasks } = args
         const newTasks: Task[] = []
+
         for (const task of tasks) {
             const { duration: durationStr, ...otherTaskArgs } = task
 
@@ -55,8 +59,49 @@ const tasksAddMultiple = {
 
             newTasks.push(await client.addTask(taskArgs))
         }
-        return newTasks.map(mapTask)
+
+        const mappedTasks = newTasks.map(mapTask)
+
+        const textContent = generateTextContent({
+            tasks: mappedTasks,
+            args,
+        })
+
+        return getToolOutput({
+            textContent,
+            structuredContent: {
+                tasks: mappedTasks,
+                totalCount: mappedTasks.length,
+            },
+        })
     },
 } satisfies TodoistTool<typeof ArgsSchema>
+
+function generateTextContent({
+    tasks,
+    args,
+}: {
+    tasks: ReturnType<typeof mapTask>[]
+    args: z.infer<z.ZodObject<typeof ArgsSchema>>
+}) {
+    // Get context for smart next steps
+    const hasToday = tasks.some((task) => task.dueDate === new Date().toISOString().split('T')[0])
+
+    // Generate context description without API calls
+    let projectContext = ''
+    if (args.projectId) {
+        projectContext = 'to specified project'
+    } else if (args.sectionId) {
+        projectContext = 'to specified section'
+    } else if (args.parentId) {
+        projectContext = 'as subtasks'
+    }
+
+    return summarizeTaskOperation('Added', tasks, {
+        context: projectContext,
+        nextSteps: generateTaskNextSteps('added', tasks, { hasToday }),
+        showDetails: true,
+    })
+}
 
 export { tasksAddMultiple }

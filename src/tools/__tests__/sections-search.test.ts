@@ -1,7 +1,7 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { sectionsSearch } from '../sections-search.js'
-import { TEST_ERRORS, TEST_IDS, createMockSection } from '../test-helpers.js'
+import { TEST_ERRORS, TEST_IDS, createMockSection, extractTextContent } from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
@@ -51,18 +51,26 @@ describe('sections-search tool', () => {
                 mockTodoistApi,
             )
 
-            // Verify API was called correctly
             expect(mockTodoistApi.getSections).toHaveBeenCalledWith({
                 projectId: TEST_IDS.PROJECT_TEST,
             })
 
-            // Verify result is properly mapped (simplified format)
-            expect(result).toEqual([
-                { id: TEST_IDS.SECTION_1, name: 'To Do' },
-                { id: TEST_IDS.SECTION_2, name: 'In Progress' },
-                { id: 'section-789', name: 'Done' },
-                { id: 'section-999', name: 'Backlog Items' },
-            ])
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Sections in project')
+            expect(textContent).toContain('To Do • id=')
+            expect(textContent).toContain('In Progress • id=')
+            expect(textContent).toContain('Done • id=')
+            expect(textContent).toContain('Backlog Items • id=')
+
+            // Verify structured content
+            const { structuredContent } = result
+            expect(structuredContent.sections).toHaveLength(4)
+            expect(structuredContent.totalCount).toBe(4)
+            expect(structuredContent.appliedFilters).toEqual({
+                projectId: TEST_IDS.PROJECT_TEST,
+                search: undefined,
+            })
         })
 
         it('should handle project with no sections', async () => {
@@ -80,7 +88,19 @@ describe('sections-search tool', () => {
                 projectId: 'empty-project-id',
             })
 
-            expect(result).toEqual([])
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Project has no sections yet')
+            expect(textContent).toContain('Use sections-manage to create sections')
+
+            // Verify structured content
+            const { structuredContent } = result
+            expect(structuredContent.sections).toHaveLength(0)
+            expect(structuredContent.totalCount).toBe(0)
+            expect(structuredContent.appliedFilters).toEqual({
+                projectId: 'empty-project-id',
+                search: undefined,
+            })
         })
     })
 
@@ -118,10 +138,7 @@ describe('sections-search tool', () => {
             })
 
             const result = await sectionsSearch.execute(
-                {
-                    projectId: TEST_IDS.PROJECT_TEST,
-                    search: 'progress',
-                },
+                { projectId: TEST_IDS.PROJECT_TEST, search: 'progress' },
                 mockTodoistApi,
             )
 
@@ -130,10 +147,11 @@ describe('sections-search tool', () => {
             })
 
             // Should return both "In Progress" and "Progress Review" (case insensitive partial match)
-            expect(result).toEqual([
-                { id: TEST_IDS.SECTION_2, name: 'In Progress' },
-                { id: 'section-999', name: 'Progress Review' },
-            ])
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('matching "progress"')
+            expect(textContent).toContain('In Progress • id=')
+            expect(textContent).toContain('Progress Review • id=')
         })
 
         it('should handle search with no matches', async () => {
@@ -157,14 +175,15 @@ describe('sections-search tool', () => {
             })
 
             const result = await sectionsSearch.execute(
-                {
-                    projectId: TEST_IDS.PROJECT_TEST,
-                    search: 'nonexistent',
-                },
+                { projectId: TEST_IDS.PROJECT_TEST, search: 'nonexistent' },
                 mockTodoistApi,
             )
 
-            expect(result).toEqual([])
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Try broader search terms')
+            expect(textContent).toContain('Check spelling')
+            expect(textContent).toContain('Remove search to see all sections')
         })
 
         it('should handle case sensitive search correctly', async () => {
@@ -188,16 +207,15 @@ describe('sections-search tool', () => {
             })
 
             const result = await sectionsSearch.execute(
-                {
-                    projectId: TEST_IDS.PROJECT_TEST,
-                    search: 'IMPORTANT',
-                },
+                { projectId: TEST_IDS.PROJECT_TEST, search: 'IMPORTANT' },
                 mockTodoistApi,
             )
 
             // Should match despite different case
-            expect(result).toHaveLength(1)
-            expect(result[0]).toEqual({ id: TEST_IDS.SECTION_1, name: 'Important Tasks' })
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('matching "IMPORTANT"')
+            expect(textContent).toContain('Important Tasks • id=')
         })
 
         it('should handle partial matches correctly', async () => {
@@ -227,18 +245,16 @@ describe('sections-search tool', () => {
             })
 
             const result = await sectionsSearch.execute(
-                {
-                    projectId: TEST_IDS.PROJECT_TEST,
-                    search: 'task',
-                },
+                { projectId: TEST_IDS.PROJECT_TEST, search: 'task' },
                 mockTodoistApi,
             )
 
             // Should match both sections with "task" in the name
-            expect(result).toEqual([
-                { id: TEST_IDS.SECTION_1, name: 'Development Tasks' },
-                { id: TEST_IDS.SECTION_2, name: 'Testing Tasks' },
-            ])
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('matching "task"')
+            expect(textContent).toContain('Development Tasks • id=')
+            expect(textContent).toContain('Testing Tasks • id=')
         })
 
         it('should handle exact matches', async () => {
@@ -262,18 +278,16 @@ describe('sections-search tool', () => {
             })
 
             const result = await sectionsSearch.execute(
-                {
-                    projectId: TEST_IDS.PROJECT_TEST,
-                    search: 'done',
-                },
+                { projectId: TEST_IDS.PROJECT_TEST, search: 'done' },
                 mockTodoistApi,
             )
 
             // Should match both sections containing "done"
-            expect(result).toEqual([
-                { id: TEST_IDS.SECTION_1, name: 'Done' },
-                { id: TEST_IDS.SECTION_2, name: 'Done Soon' },
-            ])
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('matching "done"')
+            expect(textContent).toContain('Done • id=')
+            expect(textContent).toContain('Done Soon • id=')
         })
     })
 

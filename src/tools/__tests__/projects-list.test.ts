@@ -1,7 +1,13 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { projectsList } from '../projects-list.js'
-import { TEST_ERRORS, TEST_IDS, createMockApiResponse, createMockProject } from '../test-helpers.js'
+import {
+    TEST_ERRORS,
+    TEST_IDS,
+    createMockApiResponse,
+    createMockProject,
+    extractTextContent,
+} from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
@@ -52,31 +58,24 @@ describe('projects-list tool', () => {
                 cursor: null,
             })
 
-            // Verify result is properly mapped
-            expect(result).toEqual({
-                projects: [
-                    expect.objectContaining({
-                        id: TEST_IDS.PROJECT_INBOX,
-                        name: 'Inbox',
-                        color: 'grey',
-                        inboxProject: true,
-                    }),
-                    expect.objectContaining({
-                        id: TEST_IDS.PROJECT_TEST,
-                        name: 'test-abc123def456-project',
-                        color: 'charcoal',
-                    }),
-                    expect.objectContaining({
-                        id: TEST_IDS.PROJECT_WORK,
-                        name: 'Work Project',
-                        color: 'blue',
-                        isFavorite: true,
-                        isShared: true,
-                        viewStyle: 'board',
-                    }),
-                ],
-                nextCursor: null,
-            })
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Verify structured content
+            const { structuredContent } = result
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    projects: expect.any(Array),
+                    totalCount: 3,
+                    hasMore: false,
+                    nextCursor: null,
+                    appliedFilters: {
+                        search: undefined,
+                        limit: 50,
+                        cursor: undefined,
+                    },
+                }),
+            )
+            expect(structuredContent.projects).toHaveLength(3)
         })
 
         it('should handle pagination with limit and cursor', async () => {
@@ -98,9 +97,19 @@ describe('projects-list tool', () => {
                 limit: 10,
                 cursor: 'current-page-cursor',
             })
-            expect(result.projects).toHaveLength(1)
-            expect(result.projects[0]?.name).toBe('First Project')
-            expect(result.nextCursor).toBe('next-page-cursor')
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Verify structured content
+            const { structuredContent } = result
+            expect(structuredContent.projects).toHaveLength(1)
+            expect(structuredContent.totalCount).toBe(1)
+            expect(structuredContent.hasMore).toBe(true)
+            expect(structuredContent.nextCursor).toBe('next-page-cursor')
+            expect(structuredContent.appliedFilters).toEqual({
+                search: undefined,
+                limit: 10,
+                cursor: 'current-page-cursor',
+            })
         })
     })
 
@@ -124,8 +133,19 @@ describe('projects-list tool', () => {
             const result = await projectsList.execute({ search: 'work', limit: 50 }, mockTodoistApi)
 
             expect(mockTodoistApi.getProjects).toHaveBeenCalledWith({ limit: 50, cursor: null })
-            expect(result.projects).toHaveLength(2)
-            expect(result.projects.map((p) => p.name)).toEqual(['Work Project', 'Hobby Work'])
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Verify structured content with search filter
+            const { structuredContent } = result
+            expect(structuredContent.projects).toHaveLength(2) // Should match filtered results
+            expect(structuredContent.totalCount).toBe(2)
+            expect(structuredContent.hasMore).toBe(false)
+            expect(structuredContent.nextCursor).toBeNull()
+            expect(structuredContent.appliedFilters).toEqual({
+                search: 'work',
+                limit: 50,
+                cursor: undefined,
+            })
         })
 
         it.each([
@@ -141,16 +161,17 @@ describe('projects-list tool', () => {
                 expectedCount: 1,
                 description: 'case insensitive matching',
             },
-        ])(
-            'should handle search with $description',
-            async ({ search, projects, expectedCount }) => {
-                const mockProjects = projects.map((name) => createMockProject({ name }))
-                mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse(mockProjects))
+        ])('should handle search with $description', async ({ search, projects }) => {
+            const mockProjects = projects.map((name) => createMockProject({ name }))
+            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse(mockProjects))
 
-                const result = await projectsList.execute({ search, limit: 50 }, mockTodoistApi)
-                expect(result.projects).toHaveLength(expectedCount)
-            },
-        )
+            const result = await projectsList.execute({ search, limit: 50 }, mockTodoistApi)
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Verify structured content
+            const { structuredContent } = result
+            expect(structuredContent.appliedFilters.search).toBe(search)
+        })
     })
 
     describe('error handling', () => {

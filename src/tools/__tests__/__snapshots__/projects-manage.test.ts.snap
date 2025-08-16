@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`projects-manage tool creating a new project should create a project and return mapped result 1`] = `
+"Created project: test-abc123def456-project • id=6cfCcrrCFg2xP94Q
+Next:
+- Use sections-manage to organize this project with sections
+- Use tasks-add-multiple to add your first tasks
+- Use overview with projectId to see updated project structure."
+`;
+
+exports[`projects-manage tool creating a new project should handle different project properties from API 1`] = `
+"Created project: My Blue Project • id=project-456
+Next:
+- Use sections-manage to organize this project with sections
+- Use tasks-add-multiple to add your first tasks
+- Use overview with projectId to see updated project structure."
+`;
+
+exports[`projects-manage tool updating an existing project should update a project when id is provided 1`] = `
+"Updated project: Updated Project Name • id=existing-project-123
+Next:
+- Use overview with projectId=existing-project-123 to see project structure
+- Use projects-list to see all projects with updated name
+- Use tasks-list-for-container to review existing tasks"
+`;

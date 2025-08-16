@@ -1,7 +1,7 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { tasksUpdateMultiple } from '../tasks-update-multiple.js'
-import { TEST_IDS, createMockTask } from '../test-helpers.js'
+import { TEST_IDS, createMockTask, extractTextContent } from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
@@ -46,8 +46,12 @@ describe('tasks-update-multiple tool', () => {
                 description: 'Updated task description',
             })
 
-            // Verify result matches API response
-            expect(result).toEqual([mockApiResponse])
+            // Verify result matches expected structure with text and structured content
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('Updated 1 task')
+            const structuredContent = result.structuredContent
+            expect(structuredContent.tasks).toHaveLength(1)
+            expect(structuredContent.tasks[0]?.id).toBe('8485093748')
         })
 
         it('should update all tasks when multiple tasks are provided', async () => {
@@ -89,8 +93,12 @@ describe('tasks-update-multiple tool', () => {
                 description: 'Updated task description',
             })
 
-            // Verify result matches API response
-            expect(result).toEqual([mockApiResponse, mockApiResponse])
+            // Verify result matches expected structure with text and structured content
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('Updated 2 tasks')
+            const { structuredContent } = result
+            expect(structuredContent.tasks).toHaveLength(2)
+            expect(structuredContent.totalCount).toBe(2)
         })
 
         it('should update task priority and due date', async () => {
@@ -130,7 +138,11 @@ describe('tasks-update-multiple tool', () => {
                 dueString: 'Aug 20',
             })
 
-            expect(result).toEqual([mockApiResponse])
+            // Verify result structure
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
+            expect(structuredContent.tasks).toHaveLength(1)
         })
 
         it('should move task to different project', async () => {
@@ -161,7 +173,11 @@ describe('tasks-update-multiple tool', () => {
             })
             expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
-            expect(result).toEqual([mockApiResponse])
+            // Verify result structure
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
+            expect(structuredContent.tasks).toHaveLength(1)
         })
 
         it('should update task parent (create subtask relationship)', async () => {
@@ -192,7 +208,11 @@ describe('tasks-update-multiple tool', () => {
             })
             expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
-            expect(result).toEqual([mockApiResponse])
+            // Verify result structure
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
+            expect(structuredContent.tasks).toHaveLength(1)
         })
 
         it('should move task and update properties at once', async () => {
@@ -251,7 +271,12 @@ describe('tasks-update-multiple tool', () => {
                 dueString: 'every Friday',
             })
 
-            expect(result).toEqual([updatedTask])
+            // Verify result structure
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
+            expect(structuredContent.tasks).toHaveLength(1)
+            expect(structuredContent.tasks[0]?.id).toBe('8485093752')
         })
 
         it('should update task duration', async () => {
@@ -282,7 +307,12 @@ describe('tasks-update-multiple tool', () => {
                 durationUnit: 'minute',
             })
 
-            expect(result).toEqual([mockApiResponse])
+            // Verify result structure
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
+            expect(structuredContent.tasks).toHaveLength(1)
+            expect(structuredContent.tasks[0]?.id).toBe('8485093753')
         })
 
         it('should handle various duration formats', async () => {
@@ -371,7 +401,12 @@ describe('tasks-update-multiple tool', () => {
                 durationUnit: 'minute',
             })
 
-            expect(result).toEqual([updatedTask])
+            // Verify result structure
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
+            expect(structuredContent.tasks).toHaveLength(1)
+            expect(structuredContent.tasks[0]?.id).toBe('8485093755')
         })
     })
 
@@ -505,7 +540,12 @@ describe('tasks-update-multiple tool', () => {
                 })
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
-                expect(result).toEqual(mockResponses)
+                // Verify result structure
+                const textContent = extractTextContent(result)
+                expect(textContent).toContain('Updated 2 tasks')
+                const { structuredContent } = result
+                expect(structuredContent.tasks).toHaveLength(2)
+                expect(structuredContent.totalCount).toBe(2)
             })
 
             it('should move multiple tasks with different destinations', async () => {
@@ -547,7 +587,11 @@ describe('tasks-update-multiple tool', () => {
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
                 // Verify results are returned in the correct order
-                expect(result).toEqual(mockResponses)
+                const textContent = extractTextContent(result)
+                expect(textContent).toContain('Updated 3 tasks')
+                const { structuredContent } = result
+                expect(structuredContent.tasks).toHaveLength(3)
+                expect(structuredContent.totalCount).toBe(3)
             })
 
             it('should handle single task organization', async () => {
@@ -572,7 +616,12 @@ describe('tasks-update-multiple tool', () => {
                 })
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
-                expect(result).toEqual([mockTaskResponse])
+                // Verify result structure
+                const textContent = extractTextContent(result)
+                expect(textContent).toContain('Updated 1 task')
+                const { structuredContent } = result
+                expect(structuredContent.tasks).toHaveLength(1)
+                expect(structuredContent.tasks[0]?.id).toBe('8485093751')
             })
 
             it('should handle complex reorganization scenario', async () => {
@@ -631,7 +680,12 @@ describe('tasks-update-multiple tool', () => {
                 })
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
-                expect(result).toEqual(mockResponses)
+                // Verify result structure
+                const textContent = extractTextContent(result)
+                expect(textContent).toContain('Updated 3 tasks')
+                const { structuredContent } = result
+                expect(structuredContent.tasks).toHaveLength(3)
+                expect(structuredContent.totalCount).toBe(3)
             })
         })
 
@@ -664,7 +718,13 @@ describe('tasks-update-multiple tool', () => {
                     projectId: 'new-project-only',
                 })
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
-                expect(result).toEqual([mockResponse])
+
+                // Verify result structure
+                const textContent = extractTextContent(result)
+                expect(textContent).toContain('Updated 1 task')
+                const { structuredContent } = result
+                expect(structuredContent.tasks).toHaveLength(1)
+                expect(structuredContent.tasks[0]?.id).toBe('8485093752')
             })
 
             it('should handle empty updates (only id provided)', async () => {
@@ -677,8 +737,12 @@ describe('tasks-update-multiple tool', () => {
                 expect(mockTodoistApi.moveTasks).not.toHaveBeenCalled()
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
-                // Returns empty array since no moves were processed
-                expect(result).toEqual([])
+                // Returns empty results since no moves were processed
+                const textContent = extractTextContent(result)
+                expect(textContent).toContain('Updated 0 tasks')
+                const { structuredContent } = result
+                expect(structuredContent.tasks).toHaveLength(0)
+                expect(structuredContent.totalCount).toBe(0)
             })
         })
 

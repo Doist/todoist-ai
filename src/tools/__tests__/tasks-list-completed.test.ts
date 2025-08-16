@@ -1,7 +1,7 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { tasksListCompleted } from '../tasks-list-completed.js'
-import { createMockTask } from '../test-helpers.js'
+import { createMockTask, extractTextContent } from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
@@ -52,19 +52,7 @@ describe('tasks-list-completed tool', () => {
                 limit: 50,
             })
 
-            expect(result).toEqual({
-                tasks: [
-                    expect.objectContaining({
-                        id: '8485093748',
-                        content: 'Completed task 1',
-                        description: 'Task completed yesterday',
-                        dueDate: '2025-08-14',
-                        priority: 2,
-                        labels: ['work'],
-                    }),
-                ],
-                nextCursor: null,
-            })
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
 
         it('should handle explicit completion date query', async () => {
@@ -93,7 +81,7 @@ describe('tasks-list-completed tool', () => {
                 cursor: 'current-cursor',
             })
 
-            expect(result).toEqual({ tasks: [], nextCursor: 'next-cursor' })
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
     })
 
@@ -141,20 +129,7 @@ describe('tasks-list-completed tool', () => {
             })
             expect(mockTodoistApi.getCompletedTasksByCompletionDate).not.toHaveBeenCalled()
 
-            expect(result).toEqual({
-                tasks: [
-                    expect.objectContaining({
-                        id: '8485093750',
-                        content: 'Task completed by due date',
-                        description: 'This task was due and completed',
-                        dueDate: '2025-08-15',
-                        recurring: 'every Monday',
-                        priority: 3,
-                        labels: ['urgent'],
-                    }),
-                ],
-                nextCursor: null,
-            })
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
     })
 

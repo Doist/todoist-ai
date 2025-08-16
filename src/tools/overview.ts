@@ -1,7 +1,9 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
+import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { type Project, isPersonalProject, mapTask } from '../tool-helpers.js'
+import { TOOL_NAMES } from '../utils/tool-names.js'
 
 const ArgsSchema = {
     projectId: z
@@ -127,6 +129,55 @@ function renderTaskTreeMarkdown(tasks: TaskTreeNode[], indent = ''): string[] {
     return lines
 }
 
+interface ProjectStructure {
+    id: string
+    name: string
+    parentId: string | null
+    sections: Section[]
+    children: ProjectStructure[]
+}
+
+interface AccountOverviewStructured extends Record<string, unknown> {
+    type: 'account_overview'
+    inbox: {
+        id: string
+        name: string
+        sections: Section[]
+    } | null
+    projects: ProjectStructure[]
+    totalProjects: number
+    totalSections: number
+    hasNestedProjects: boolean
+}
+
+interface ProjectOverviewStructured extends Record<string, unknown> {
+    type: 'project_overview'
+    project: {
+        id: string
+        name: string
+    }
+    sections: Section[]
+    tasks: Array<ReturnType<typeof mapTask> & { children: never[] }>
+    stats: {
+        totalTasks: number
+        totalSections: number
+        tasksWithoutSection: number
+    }
+}
+
+function buildProjectStructure(
+    project: ProjectWithChildren,
+    sectionsByProject: Record<string, Section[]>,
+): ProjectStructure {
+    return {
+        id: project.id,
+        name: project.name,
+        parentId: isPersonalProject(project) ? (project.parentId ?? null) : null,
+        sections: sectionsByProject[project.id] || [],
+        children: project.children.map((child) => buildProjectStructure(child, sectionsByProject)),
+    }
+}
+
 async function getAllTasksForProject(client: TodoistApi, projectId: string): Promise<MappedTask[]> {
     let allTasks: MappedTask[] = []
     let cursor: string | undefined = undefined
@@ -147,8 +198,9 @@ async function getProjectSections(client: TodoistApi, projectId: string): Promis
     return results
 }
 
-// Account overview implementation
-async function generateAccountOverview(client: TodoistApi): Promise<string> {
+async function generateAccountOverview(
+    client: TodoistApi,
+): Promise<{ textContent: string; structuredContent: AccountOverviewStructured }> {
     const { results: projects } = await client.getProjects({})
     const inbox = projects.find((p) => isPersonalProject(p) && p.inboxProject === true)
     const nonInbox = projects.filter((p) => !isPersonalProject(p) || p.inboxProject !== true)
@@ -156,6 +208,7 @@ async function generateAccountOverview(client: TodoistApi): Promise<string> {
     const allProjectIds = projects.map((p) => p.id)
     const sectionsByProject = await getSectionsByProject(client, allProjectIds)
 
+    // Generate markdown text content
     const lines: string[] = ['# Personal Projects', '']
     if (inbox) {
         lines.push(`- Inbox Project: ${inbox.name} (id=${inbox.id})`)
@@ -179,11 +232,36 @@ async function generateAccountOverview(client: TodoistApi): Promise<string> {
             '',
         )
     }
-    return lines.join('\n')
+    const textContent = lines.join('\n')
+
+    // Generate structured content
+    const structuredContent = {
+        type: 'account_overview' as const,
+        inbox: inbox
+            ? {
+                  id: inbox.id,
+                  name: inbox.name,
+                  sections: sectionsByProject[inbox.id] || [],
+              }
+            : null,
+        projects: tree.map((project) =>
+            buildProjectStructure(project as ProjectWithChildren, sectionsByProject),
+        ),
+        totalProjects: projects.length,
+        totalSections: allProjectIds.reduce(
+            (total, id) => total + (sectionsByProject[id]?.length || 0),
+            0,
+        ),
+        hasNestedProjects: hasNested,
+    }
+
+    return { textContent, structuredContent }
 }
 
-// Project overview implementation
-async function generateProjectOverview(client: TodoistApi, projectId: string): Promise<string> {
+async function generateProjectOverview(
+    client: TodoistApi,
+    projectId: string,
+): Promise<{ textContent: string; structuredContent: ProjectOverviewStructured }> {
     const project: Project = await client.getProject(projectId)
     const sections = await getProjectSections(client, projectId)
     const allTasks = await getAllTasksForProject(client, projectId)
@@ -203,6 +281,7 @@ async function generateProjectOverview(client: TodoistApi, projectId: string): P
         }
     }
 
+    // Generate markdown text content
     const lines: string[] = [`# ${project.name}`]
     if (tasksWithoutSection.length > 0) {
         lines.push('')
@@ -219,20 +298,45 @@ async function generateProjectOverview(client: TodoistApi, projectId: string): P
         const tree = buildTaskTree(sectionTasks)
         lines.push(...renderTaskTreeMarkdown(tree))
     }
-    return lines.join('\n')
+    const textContent = lines.join('\n')
+
+    // Generate structured content
+    const structuredContent = {
+        type: 'project_overview' as const,
+        project: {
+            id: project.id,
+            name: project.name,
+        },
+        sections: sections,
+        tasks: allTasks.map((task) => ({
+            ...task,
+            children: [], // Tasks already include hierarchical info via parentId
+        })),
+        stats: {
+            totalTasks: allTasks.length,
+            totalSections: sections.length,
+            tasksWithoutSection: tasksWithoutSection.length,
+        },
+    }
+
+    return { textContent, structuredContent }
 }
 
 const overview = {
-    name: 'overview',
+    name: TOOL_NAMES.OVERVIEW,
     description:
         'Get a Markdown overview. If no projectId is provided, shows all projects with hierarchy and sections (useful for navigation). If projectId is provided, shows detailed overview of that specific project including all tasks grouped by sections.',
     parameters: ArgsSchema,
     async execute(args, client) {
-        if (args.projectId) {
-            return await generateProjectOverview(client, args.projectId)
-        }
-        return await generateAccountOverview(client)
+        const result = args.projectId
+            ? await generateProjectOverview(client, args.projectId)
+            : await generateAccountOverview(client)
+
+        return getToolOutput({
+            textContent: result.textContent,
+            structuredContent: result.structuredContent,
+        })
     },
 } satisfies TodoistTool<typeof ArgsSchema>
 
-export { overview }
+export { overview, type AccountOverviewStructured, type ProjectOverviewStructured }

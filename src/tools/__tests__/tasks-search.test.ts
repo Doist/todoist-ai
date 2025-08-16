@@ -2,7 +2,13 @@ import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { getTasksByFilter } from '../../tool-helpers.js'
 import { tasksSearch } from '../tasks-search.js'
-import { TEST_ERRORS, TEST_IDS, createMappedTask } from '../test-helpers.js'
+import {
+    TEST_ERRORS,
+    TEST_IDS,
+    TODAY,
+    createMappedTask,
+    extractTextContent,
+} from '../test-helpers.js'
 
 // Mock the tool helpers
 jest.mock('../../tool-helpers', () => ({
@@ -52,7 +58,25 @@ describe('tasks-search tool', () => {
                 cursor: undefined,
                 limit: 10,
             })
-            expect(result).toEqual(mockResponse)
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Verify structured content
+            const { structuredContent } = result
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    tasks: expect.any(Array),
+                    totalCount: 2,
+                    hasMore: true,
+                    nextCursor: 'cursor-for-next-page',
+                    appliedFilters: {
+                        searchText: 'important meeting',
+                        limit: 10,
+                        cursor: undefined,
+                    },
+                }),
+            )
+            expect(structuredContent.tasks).toHaveLength(2)
         })
 
         it.each([
@@ -85,7 +109,24 @@ describe('tasks-search tool', () => {
                     cursor: expectedCursor,
                     limit: expectedLimit,
                 })
-                expect(result).toEqual(mockResponse)
+                // Verify result is a concise summary
+                expect(extractTextContent(result)).toMatchSnapshot()
+
+                // Verify structured content
+                const { structuredContent } = result
+                expect(structuredContent).toEqual(
+                    expect.objectContaining({
+                        tasks: expect.any(Array),
+                        totalCount: 1,
+                        hasMore: false,
+                        nextCursor: null,
+                        appliedFilters: expect.objectContaining({
+                            limit: expectedLimit,
+                            cursor: expectedCursor,
+                        }),
+                    }),
+                )
+                expect(structuredContent.tasks).toHaveLength(1)
             },
         )
 
@@ -104,7 +145,111 @@ describe('tasks-search tool', () => {
                 cursor: undefined,
                 limit: 10,
             })
-            expect(result).toEqual(mockResponse)
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Verify structured content for empty results
+            const { structuredContent } = result
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    tasks: [],
+                    totalCount: 0,
+                    hasMore: false,
+                    nextCursor: null,
+                    appliedFilters: expect.objectContaining({
+                        searchText: searchText,
+                    }),
+                }),
+            )
+        })
+    })
+
+    describe('next steps logic', () => {
+        it('should suggest different actions when hasOverdue is true', async () => {
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Overdue search result',
+                    dueDate: '2025-08-10', // Past date
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await tasksSearch.execute(
+                { searchText: 'overdue tasks', limit: 10 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            // Should prioritize overdue tasks in next steps
+            expect(textContent).toContain(
+                'Use tasks-update-multiple to modify priorities or due dates',
+            )
+        })
+
+        it('should suggest today tasks when hasToday is true', async () => {
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Task due today',
+                    dueDate: TODAY,
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await tasksSearch.execute(
+                { searchText: 'today tasks', limit: 10 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            // Should suggest today-focused actions
+            expect(textContent).toContain(
+                'Use tasks-update-multiple to modify priorities or due dates',
+            )
+        })
+
+        it('should provide different next steps for regular tasks', async () => {
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Regular future task',
+                    dueDate: '2025-08-25', // Future date
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await tasksSearch.execute(
+                { searchText: 'future tasks', limit: 10 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain(
+                'Use tasks-update-multiple to modify priorities or due dates',
+            )
+        })
+
+        it('should provide helpful suggestions for empty search results', async () => {
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await tasksSearch.execute(
+                { searchText: 'nonexistent', limit: 10 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Try broader search terms')
+            expect(textContent).toContain('Check completed tasks with tasks-list-completed')
+            expect(textContent).toContain('Verify spelling and try partial words')
         })
     })
 

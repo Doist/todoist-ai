@@ -1,6 +1,7 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { deleteOne } from '../delete-one.js'
+import { extractTextContent } from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
@@ -23,13 +24,21 @@ describe('delete-one tool', () => {
                 mockTodoistApi,
             )
 
-            // Verify API was called correctly
             expect(mockTodoistApi.deleteProject).toHaveBeenCalledWith('6cfCcrrCFg2xP94Q')
             expect(mockTodoistApi.deleteSection).not.toHaveBeenCalled()
             expect(mockTodoistApi.deleteTask).not.toHaveBeenCalled()
 
-            // Verify success response
-            expect(result).toEqual({ success: true })
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Deleted project: id=6cfCcrrCFg2xP94Q')
+            expect(textContent).toContain('Use projects-list to see remaining projects')
+            expect(result.structuredContent).toEqual({
+                deletedEntity: {
+                    type: 'project',
+                    id: '6cfCcrrCFg2xP94Q',
+                },
+                success: true,
+            })
         })
 
         it('should propagate project deletion errors', async () => {
@@ -51,13 +60,21 @@ describe('delete-one tool', () => {
                 mockTodoistApi,
             )
 
-            // Verify API was called correctly
             expect(mockTodoistApi.deleteSection).toHaveBeenCalledWith('section-123')
             expect(mockTodoistApi.deleteProject).not.toHaveBeenCalled()
             expect(mockTodoistApi.deleteTask).not.toHaveBeenCalled()
 
-            // Verify success response
-            expect(result).toEqual({ success: true })
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Deleted section: id=section-123')
+            expect(textContent).toContain('Use sections-search to see remaining sections')
+            expect(result.structuredContent).toEqual({
+                deletedEntity: {
+                    type: 'section',
+                    id: 'section-123',
+                },
+                success: true,
+            })
         })
 
         it('should propagate section deletion errors', async () => {
@@ -79,13 +96,21 @@ describe('delete-one tool', () => {
                 mockTodoistApi,
             )
 
-            // Verify API was called correctly
             expect(mockTodoistApi.deleteTask).toHaveBeenCalledWith('8485093748')
             expect(mockTodoistApi.deleteProject).not.toHaveBeenCalled()
             expect(mockTodoistApi.deleteSection).not.toHaveBeenCalled()
 
-            // Verify success response
-            expect(result).toEqual({ success: true })
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Deleted task: id=8485093748')
+            expect(textContent).toContain('Use tasks-list-by-date to see remaining tasks')
+            expect(result.structuredContent).toEqual({
+                deletedEntity: {
+                    type: 'task',
+                    id: '8485093748',
+                },
+                success: true,
+            })
         })
 
         it('should propagate task deletion errors', async () => {
@@ -109,7 +134,6 @@ describe('delete-one tool', () => {
 
     describe('type validation', () => {
         it('should handle all supported entity types', async () => {
-            // Test all three supported types work correctly
             mockTodoistApi.deleteProject.mockResolvedValue(true)
             mockTodoistApi.deleteSection.mockResolvedValue(true)
             mockTodoistApi.deleteTask.mockResolvedValue(true)

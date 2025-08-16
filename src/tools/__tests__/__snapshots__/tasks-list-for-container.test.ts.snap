@@ -1,0 +1,124 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`tasks-list-for-container tool container types should get tasks for parent task 1`] = `
+"Subtasks: 1 (limit 10).
+Filter: subtasks of 8485093748.
+Preview:
+    Subtask • P1 • id=8485093748
+Next:
+- Use tasks-update-multiple to modify priorities or due dates
+- Use tasks-complete-multiple to mark finished tasks"
+`;
+
+exports[`tasks-list-for-container tool container types should get tasks for project 1`] = `
+"Tasks in project: 1 (limit 10).
+Filter: in project 6cfCcrrCFg2xP94Q.
+Preview:
+    Project task • P1 • id=8485093748
+Next:
+- Use tasks-update-multiple to modify priorities or due dates
+- Use tasks-complete-multiple to mark finished tasks"
+`;
+
+exports[`tasks-list-for-container tool container types should get tasks for section 1`] = `
+"Tasks in section: 1 (limit 10).
+Filter: in section section-123.
+Preview:
+    Section task • P1 • id=8485093748
+Next:
+- Use tasks-update-multiple to modify priorities or due dates
+- Use tasks-complete-multiple to mark finished tasks"
+`;
+
+exports[`tasks-list-for-container tool getting subtasks for a parent task should get subtasks for a specific parent task 1`] = `
+"Subtasks: 2 (limit 10).
+Filter: subtasks of parent-task-123.
+Preview:
+    Subtask 1 • P1 • id=8485093752
+    Subtask 2 • due 2025-08-18 • P2 • id=8485093753
+Next:
+- Use tasks-update-multiple to modify priorities or due dates
+- Use tasks-complete-multiple to mark finished tasks
+- Focus on overdue items first to get back on track"
+`;
+
+exports[`tasks-list-for-container tool getting subtasks for a parent task should handle parent task with no subtasks 1`] = `
+"Subtasks: 0 (limit 10).
+Filter: subtasks of parent-with-no-subtasks.
+No results. No subtasks created yet; Use tasks-add-multiple with parentId to add subtasks."
+`;
+
+exports[`tasks-list-for-container tool getting tasks for a section should get tasks for a specific section 1`] = `
+"Tasks in section: 1 (limit 15).
+Filter: in section section-123.
+Preview:
+    Section task 1 • due 2025-08-16 • P3 • id=8485093751
+Next:
+- Use tasks-update-multiple to modify priorities or due dates
+- Use tasks-complete-multiple to mark finished tasks
+- Focus on overdue items first to get back on track"
+`;
+
+exports[`tasks-list-for-container tool getting tasks for a section should handle empty section 1`] = `
+"Tasks in section: 0 (limit 10).
+Filter: in section empty-section-id.
+No results. Section is empty; Tasks may be in other sections of the project."
+`;
+
+exports[`tasks-list-for-container tool next steps logic should provide standard next steps for regular tasks 1`] = `
+"Subtasks: 1 (limit 10).
+Filter: subtasks of parent-with-regular.
+Preview:
+    Regular future task • due 2025-08-25 • P1 • id=8485093748
+Next:
+- Use tasks-update-multiple to modify priorities or due dates
+- Use tasks-complete-multiple to mark finished tasks"
+`;
+
+exports[`tasks-list-for-container tool next steps logic should suggest appropriate actions when hasOverdue is true 1`] = `
+"Tasks in project: 1 (limit 10).
+Filter: in project project-with-overdue.
+Preview:
+    Overdue task in container • due 2025-08-10 • P1 • id=8485093748
+Next:
+- Use tasks-update-multiple to modify priorities or due dates
+- Use tasks-complete-multiple to mark finished tasks
+- Focus on overdue items first to get back on track"
+`;
+
+exports[`tasks-list-for-container tool next steps logic should suggest appropriate actions when hasToday is true 1`] = `
+"Tasks in section: 1 (limit 10).
+Filter: in section section-with-today.
+Preview:
+    Task due today in container • due 2025-08-17 • P1 • id=8485093748
+Next:
+- Use tasks-update-multiple to modify priorities or due dates
+- Use tasks-complete-multiple to mark finished tasks
+- Focus on overdue items first to get back on track"
+`;
+
+exports[`tasks-list-for-container tool pagination and limits should handle custom limit and cursor 1`] = `
+"Tasks in section: 0 (limit 25), more available.
+Filter: in section test-section.
+No results. Section is empty; Tasks may be in other sections of the project.
+Next:
+- Pass cursor 'next-cursor' to fetch more results."
+`;
+
+exports[`tasks-list-for-container tool zero reason hints for each container type should provide parent-specific hints for tasks with no subtasks 1`] = `
+"Subtasks: 0 (limit 10).
+Filter: subtasks of task-no-subtasks.
+No results. No subtasks created yet; Use tasks-add-multiple with parentId to add subtasks."
+`;
+
+exports[`tasks-list-for-container tool zero reason hints for each container type should provide project-specific hints for empty projects 1`] = `
+"Tasks in project: 0 (limit 10).
+Filter: in project empty-project.
+No results. Project has no tasks yet; Use tasks-add-multiple to create tasks."
+`;
+
+exports[`tasks-list-for-container tool zero reason hints for each container type should provide section-specific hints for empty sections 1`] = `
+"Tasks in section: 0 (limit 10).
+Filter: in section empty-section.
+No results. Section is empty; Tasks may be in other sections of the project."
+`;
