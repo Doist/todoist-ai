@@ -5,7 +5,7 @@
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "bin": {
-        "todoist-ai": "./dist/main.js"
+        "todoist-ai": "dist/main.js"
     },
     "files": [
         "dist",
