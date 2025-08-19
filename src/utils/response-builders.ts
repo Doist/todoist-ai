@@ -1,3 +1,4 @@
+import { DISPLAY_LIMITS } from './constants.js'
 import { TOOL_NAMES } from './tool-names.js'
 
 const {
@@ -102,9 +103,11 @@ export function summarizeBatch(params: BatchOperationParams): string {
     if (failures?.length) {
         const failureCount = failures.length
         const failureBit = `Failed (${failureCount}):\n${failures
-            .slice(0, 3)
+            .slice(0, DISPLAY_LIMITS.MAX_FAILURES_SHOWN)
             .map((f) => `    ${f.item} (Error: ${f.error}${f.code ? ` [${f.code}]` : ''})`)
-            .join('\n')}${failureCount > 3 ? `, +${failureCount - 3} more` : ''}.`
+            .join(
+                '\n',
+            )}${failureCount > DISPLAY_LIMITS.MAX_FAILURES_SHOWN ? `, +${failureCount - DISPLAY_LIMITS.MAX_FAILURES_SHOWN} more` : ''}.`
         bits.push(failureBit)
     }
 
@@ -290,7 +293,7 @@ export function generateTaskNextSteps(
                 nextSteps.push(`Use ${OVERVIEW} with projectId to see tasks in other projects`)
             } else if (count > 0) {
                 // Tailor suggestions based on result size
-                if (count > 10) {
+                if (count > DISPLAY_LIMITS.BATCH_OPERATION_THRESHOLD) {
                     nextSteps.push(
                         `Use ${TASKS_UPDATE_MULTIPLE} to batch-update priorities or dates`,
                     )

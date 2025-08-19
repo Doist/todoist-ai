@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask } from '../tool-helpers.js'
+import { API_LIMITS } from '../utils/constants.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
 import { TOOL_NAMES } from '../utils/tool-names.js'
 
@@ -30,9 +31,9 @@ const ArgsSchema = {
         .number()
         .int()
         .min(1)
-        .max(200)
-        .default(50)
-        .describe('The maximum number of tasks to return. Default is 50, maximum is 200.'),
+        .max(API_LIMITS.COMPLETED_TASKS_MAX)
+        .default(API_LIMITS.COMPLETED_TASKS_DEFAULT)
+        .describe('The maximum number of tasks to return.'),
     cursor: z
         .string()
         .optional()

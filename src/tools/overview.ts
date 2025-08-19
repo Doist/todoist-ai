@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { type Project, isPersonalProject, mapTask } from '../tool-helpers.js'
+import { API_LIMITS } from '../utils/constants.js'
 import { TOOL_NAMES } from '../utils/tool-names.js'
 
 const ArgsSchema = {
@@ -184,7 +185,7 @@ async function getAllTasksForProject(client: TodoistApi, projectId: string): Pro
     do {
         const { results, nextCursor } = await client.getTasks({
             projectId,
-            limit: 50,
+            limit: API_LIMITS.TASKS_BATCH_SIZE,
             cursor: cursor ?? undefined,
         })
         allTasks = allTasks.concat(results.map(mapTask))
@@ -273,12 +274,10 @@ async function generateProjectOverview(
     }
     const tasksWithoutSection: MappedTask[] = []
     for (const task of allTasks) {
-        if (task.sectionId && tasksBySection[task.sectionId]) {
-            // biome-ignore lint/style/noNonNullAssertion: the "if" above ensures that it is defined
-            tasksBySection[task.sectionId]!.push(task)
-        } else {
-            tasksWithoutSection.push(task)
-        }
+        const sectionTasks = task.sectionId
+            ? (tasksBySection[task.sectionId] ?? tasksWithoutSection)
+            : tasksWithoutSection
+        sectionTasks.push(task)
     }
 
     // Generate markdown text content
