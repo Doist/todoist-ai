@@ -1,8 +1,8 @@
 import type { UpdateTaskArgs } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool'
-import { createMoveTaskArgs } from '../tool-helpers'
-import { DurationParseError, parseDuration } from '../utils/duration-parser'
+import { createMoveTaskArgs } from '../tool-helpers.js'
+import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
 
 const TasksSchema = z.object({
     id: z.string().min(1).describe('The ID of the task to update.'),
