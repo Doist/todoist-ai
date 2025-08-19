@@ -13,7 +13,6 @@ import { tasksCompleteMultiple } from './tools/tasks-complete-multiple.js'
 import { tasksListByDate } from './tools/tasks-list-by-date.js'
 import { tasksListCompleted } from './tools/tasks-list-completed.js'
 import { tasksListForContainer } from './tools/tasks-list-for-container.js'
-import { tasksOrganizeMultiple } from './tools/tasks-organize-multiple.js'
 import { tasksSearch } from './tools/tasks-search.js'
 import { tasksUpdateMultiple } from './tools/tasks-update-multiple.js'
 
@@ -30,7 +29,6 @@ const tools = {
     tasksSearch,
     tasksAddMultiple,
     tasksUpdateMultiple,
-    tasksOrganizeMultiple,
     overview,
 }
 
@@ -49,6 +47,5 @@ export {
     tasksSearch,
     tasksAddMultiple,
     tasksUpdateMultiple,
-    tasksOrganizeMultiple,
     overview,
 }

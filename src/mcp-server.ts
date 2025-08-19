@@ -15,7 +15,6 @@ import { tasksCompleteMultiple } from './tools/tasks-complete-multiple.js'
 import { tasksListByDate } from './tools/tasks-list-by-date.js'
 import { tasksListCompleted } from './tools/tasks-list-completed.js'
 import { tasksListForContainer } from './tools/tasks-list-for-container.js'
-import { tasksOrganizeMultiple } from './tools/tasks-organize-multiple.js'
 import { tasksSearch } from './tools/tasks-search.js'
 import { tasksUpdateMultiple } from './tools/tasks-update-multiple.js'
 
@@ -52,7 +51,6 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     registerTool(tasksCompleteMultiple, server, todoist)
     registerTool(projectsManage, server, todoist)
     registerTool(sectionsManage, server, todoist)
-    registerTool(tasksOrganizeMultiple, server, todoist)
     registerTool(sectionsSearch, server, todoist)
     registerTool(overview, server, todoist)
     registerTool(tasksListForContainer, server, todoist)

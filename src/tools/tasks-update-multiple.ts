@@ -1,16 +1,17 @@
-import type { UpdateTaskArgs } from '@doist/todoist-api-typescript'
+import type { Task, UpdateTaskArgs } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool'
 import { createMoveTaskArgs } from '../tool-helpers.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
 
-const TasksSchema = z.object({
+const TasksUpdateSchema = z.object({
     id: z.string().min(1).describe('The ID of the task to update.'),
     content: z.string().optional().describe('The new content of the task.'),
     description: z.string().optional().describe('The new description of the task.'),
     projectId: z.string().optional().describe('The new project ID for the task.'),
     sectionId: z.string().optional().describe('The new section ID for the task.'),
     parentId: z.string().optional().describe('The new parent task ID (for subtasks).'),
+    order: z.number().optional().describe('The new order of the task within its parent/section.'),
     priority: z
         .number()
         .int()
@@ -30,8 +31,10 @@ const TasksSchema = z.object({
         ),
 })
 
+type TaskUpdate = z.infer<typeof TasksUpdateSchema>
+
 const ArgsSchema = {
-    tasks: z.array(TasksSchema).min(1).describe('The tasks to update.'),
+    tasks: z.array(TasksUpdateSchema).min(1).describe('The tasks to update.'),
 }
 
 const tasksUpdateMultiple = {
@@ -41,6 +44,10 @@ const tasksUpdateMultiple = {
     async execute(args, client) {
         const { tasks } = args
         const updateTasksPromises = tasks.map(async (task) => {
+            if (!hasUpdatesToMake(task)) {
+                return undefined
+            }
+
             const {
                 id,
                 projectId,
@@ -83,8 +90,15 @@ const tasksUpdateMultiple = {
 
             return movedTasks[0]
         })
-        return await Promise.all(updateTasksPromises)
+        const updatedTasks = (await Promise.all(updateTasksPromises)).filter(
+            (task): task is Task => task !== undefined,
+        )
+        return updatedTasks
     },
 } satisfies TodoistTool<typeof ArgsSchema>
+
+function hasUpdatesToMake({ id, ...otherUpdateArgs }: TaskUpdate) {
+    return Object.keys(otherUpdateArgs).length > 0
+}
 
 export { tasksUpdateMultiple }
