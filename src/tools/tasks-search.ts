@@ -79,9 +79,11 @@ function generateTextContent({
     }
 
     // Generate contextual next steps
+    const now = new Date()
+    const todayDateString = now.toISOString().split('T')[0]
     const nextSteps = generateTaskNextSteps('listed', tasks, {
-        hasToday: tasks.some((task) => task.dueDate === new Date().toISOString().split('T')[0]),
-        hasOverdue: tasks.some((task) => task.dueDate && new Date(task.dueDate) < new Date()),
+        hasToday: tasks.some((task) => task.dueDate === todayDateString),
+        hasOverdue: tasks.some((task) => task.dueDate && new Date(task.dueDate) < now),
     })
 
     return summarizeList({
