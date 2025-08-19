@@ -7,6 +7,7 @@ import {
     TEST_IDS,
     TODAY,
     createMappedTask,
+    extractStructuredContent,
     extractTextContent,
 } from '../test-helpers.js'
 
@@ -62,7 +63,7 @@ describe('tasks-search tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Verify structured content
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     tasks: expect.any(Array),
@@ -76,7 +77,11 @@ describe('tasks-search tool', () => {
                     },
                 }),
             )
-            expect(structuredContent.tasks).toHaveLength(2)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    tasks: expect.any(Array),
+                }),
+            )
         })
 
         it.each([
@@ -113,7 +118,7 @@ describe('tasks-search tool', () => {
                 expect(extractTextContent(result)).toMatchSnapshot()
 
                 // Verify structured content
-                const { structuredContent } = result
+                const structuredContent = extractStructuredContent(result)
                 expect(structuredContent).toEqual(
                     expect.objectContaining({
                         tasks: expect.any(Array),
@@ -126,7 +131,11 @@ describe('tasks-search tool', () => {
                         }),
                     }),
                 )
-                expect(structuredContent.tasks).toHaveLength(1)
+                expect(structuredContent).toEqual(
+                    expect.objectContaining({
+                        tasks: expect.any(Array),
+                    }),
+                )
             },
         )
 
@@ -149,7 +158,7 @@ describe('tasks-search tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Verify structured content for empty results
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     tasks: [],

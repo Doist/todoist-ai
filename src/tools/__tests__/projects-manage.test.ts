@@ -1,7 +1,12 @@
 import type { PersonalProject, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { projectsManage } from '../projects-manage.js'
-import { TEST_IDS, createMockProject, extractTextContent } from '../test-helpers.js'
+import {
+    TEST_IDS,
+    createMockProject,
+    extractStructuredContent,
+    extractTextContent,
+} from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
@@ -42,11 +47,16 @@ describe('projects-manage tool', () => {
             expect(textContent).toContain('Use tasks-add-multiple to add your first tasks')
 
             // Verify structured content
-            const { structuredContent } = result
-            expect(structuredContent.project).toBeDefined()
-            expect(structuredContent.project.id).toBe(TEST_IDS.PROJECT_TEST)
-            expect(structuredContent.project.name).toBe('test-abc123def456-project')
-            expect(structuredContent.operation).toBe('created')
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    project: expect.objectContaining({
+                        id: TEST_IDS.PROJECT_TEST,
+                        name: 'test-abc123def456-project',
+                    }),
+                    operation: 'created',
+                }),
+            )
         })
 
         it('should handle different project properties from API', async () => {

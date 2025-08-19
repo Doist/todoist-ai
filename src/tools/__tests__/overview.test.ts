@@ -7,6 +7,7 @@ import {
     createMockProject,
     createMockSection,
     createMockTask,
+    extractStructuredContent,
     extractTextContent,
 } from '../test-helpers.js'
 
@@ -68,7 +69,7 @@ describe('overview tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Test structured content sanity checks
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     type: 'account_overview',
@@ -95,7 +96,7 @@ describe('overview tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Test structured content sanity checks
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     type: 'account_overview',
@@ -190,7 +191,7 @@ describe('overview tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Test structured content sanity checks
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     type: 'project_overview',
@@ -228,7 +229,7 @@ describe('overview tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Test structured content sanity checks
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     type: 'project_overview',

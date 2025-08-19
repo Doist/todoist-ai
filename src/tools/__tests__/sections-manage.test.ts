@@ -1,7 +1,12 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { sectionsManage } from '../sections-manage.js'
-import { TEST_IDS, createMockSection, extractTextContent } from '../test-helpers.js'
+import {
+    TEST_IDS,
+    createMockSection,
+    extractStructuredContent,
+    extractTextContent,
+} from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
@@ -41,7 +46,7 @@ describe('sections-manage tool', () => {
             expect(textContent).toContain('Use tasks-list-for-container with type=section')
 
             // Verify structured content
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     section: expect.objectContaining({
@@ -80,7 +85,7 @@ describe('sections-manage tool', () => {
             expect(textContent).toContain('Use tasks-add-multiple with sectionId')
 
             // Verify structured content
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     section: expect.objectContaining({
@@ -137,11 +142,16 @@ describe('sections-manage tool', () => {
             expect(textContent).toContain('Use tasks-list-for-container with type=section')
 
             // Verify structured content
-            const { structuredContent } = result
-            expect(structuredContent.section).toBeDefined()
-            expect(structuredContent.section.id).toBe('existing-section-123')
-            expect(structuredContent.section.name).toBe('Updated Section Name')
-            expect(structuredContent.operation).toBe('updated')
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    section: expect.objectContaining({
+                        id: 'existing-section-123',
+                        name: 'Updated Section Name',
+                    }),
+                    operation: 'updated',
+                }),
+            )
         })
 
         it('should update section without requiring projectId', async () => {
@@ -181,11 +191,16 @@ describe('sections-manage tool', () => {
             expect(textContent).toContain('Use tasks-list-for-container with type=section')
 
             // Verify structured content
-            const { structuredContent } = result
-            expect(structuredContent.section).toBeDefined()
-            expect(structuredContent.section.id).toBe('section-update-test')
-            expect(structuredContent.section.name).toBe('Section New Name')
-            expect(structuredContent.operation).toBe('updated')
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    section: expect.objectContaining({
+                        id: 'section-update-test',
+                        name: 'Section New Name',
+                    }),
+                    operation: 'updated',
+                }),
+            )
         })
     })
 

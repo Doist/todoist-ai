@@ -1,4 +1,5 @@
 import type { PersonalProject, Section, Task } from '@doist/todoist-api-typescript'
+import { getToolOutput } from '../mcp-helpers'
 
 /**
  * Mapped task type matching the output of mapTask function.
@@ -184,6 +185,37 @@ export function extractTextContent(toolOutput: unknown): string {
     }
 
     throw new Error('Expected tool output to have text content')
+}
+
+/**
+ * Extracts the structured content from a tool output for testing.
+ * This handles both the new `structuredContent` field and legacy JSON-encoded content.
+ */
+export function extractStructuredContent(
+    output: ReturnType<typeof getToolOutput>,
+): Record<string, unknown> {
+    // Check for new structuredContent field first
+    if ('structuredContent' in output && typeof output.structuredContent === 'object') {
+        return output.structuredContent as Record<string, unknown>
+    }
+
+    // Fall back to checking for JSON content in the content array
+    if ('content' in output && Array.isArray(output.content)) {
+        for (const item of output.content) {
+            if (
+                typeof item === 'object' &&
+                item !== null &&
+                'type' in item &&
+                'text' in item &&
+                item.type === 'text' &&
+                item.mimeType === 'application/json'
+            ) {
+                return JSON.parse(item.text) as Record<string, unknown>
+            }
+        }
+    }
+
+    throw new Error('Expected tool output to have structured content')
 }
 
 /**

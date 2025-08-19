@@ -1,7 +1,12 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { tasksAddMultiple } from '../tasks-add-multiple.js'
-import { TODAY, createMockTask, extractTextContent } from '../test-helpers.js'
+import {
+    TODAY,
+    createMockTask,
+    extractStructuredContent,
+    extractTextContent,
+} from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
@@ -83,16 +88,17 @@ describe('tasks-add-multiple tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Verify structured content
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.tasks).toHaveLength(2)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
-                    tasks: expect.any(Array),
                     totalCount: 2,
+                    tasks: expect.arrayContaining([
+                        expect.objectContaining({ id: '8485093748' }),
+                        expect.objectContaining({ id: '8485093749' }),
+                    ]),
                 }),
             )
-            expect(structuredContent.tasks).toHaveLength(2)
-            expect(structuredContent.tasks[0]?.id).toBe('8485093748')
-            expect(structuredContent.tasks[1]?.id).toBe('8485093749')
         })
 
         it('should handle tasks with section and parent IDs', async () => {
@@ -138,10 +144,13 @@ describe('tasks-add-multiple tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Verify structured content
-            const { structuredContent } = result
-            expect(structuredContent.tasks).toHaveLength(1)
-            expect(structuredContent.totalCount).toBe(1)
-            expect(structuredContent.tasks[0]?.id).toBe('8485093750')
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    totalCount: 1,
+                    tasks: expect.arrayContaining([expect.objectContaining({ id: '8485093750' })]),
+                }),
+            )
         })
 
         it('should add tasks with duration', async () => {
@@ -198,11 +207,17 @@ describe('tasks-add-multiple tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Verify structured content
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent.tasks).toHaveLength(2)
-            expect(structuredContent.totalCount).toBe(2)
-            expect(structuredContent.tasks[0]?.id).toBe('8485093752')
-            expect(structuredContent.tasks[1]?.id).toBe('8485093753')
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    totalCount: 2,
+                    tasks: expect.arrayContaining([
+                        expect.objectContaining({ id: '8485093752' }),
+                        expect.objectContaining({ id: '8485093753' }),
+                    ]),
+                }),
+            )
         })
 
         it('should handle various duration formats', async () => {

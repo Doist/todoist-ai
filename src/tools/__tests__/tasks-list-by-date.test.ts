@@ -2,7 +2,13 @@ import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { getTasksByFilter } from '../../tool-helpers.js'
 import { tasksListByDate } from '../tasks-list-by-date.js'
-import { TEST_ERRORS, TEST_IDS, createMappedTask, extractTextContent } from '../test-helpers.js'
+import {
+    TEST_ERRORS,
+    TEST_IDS,
+    createMappedTask,
+    extractStructuredContent,
+    extractTextContent,
+} from '../test-helpers.js'
 
 // Mock the tool helpers
 jest.mock('../../tool-helpers', () => ({
@@ -79,12 +85,18 @@ describe('tasks-list-by-date tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Verify structured content
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent.tasks).toHaveLength(hasTasks ? 1 : 0)
-            expect(structuredContent.totalCount).toBe(hasTasks ? 1 : 0)
-            expect(structuredContent.hasMore).toBe(false)
-            expect(structuredContent.nextCursor).toBeNull()
-            expect(structuredContent.appliedFilters.startDate).toBe('overdue')
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    totalCount: hasTasks ? 1 : 0,
+                    hasMore: false,
+                    nextCursor: null,
+                    appliedFilters: expect.objectContaining({
+                        startDate: 'overdue',
+                    }),
+                }),
+            )
         })
     })
 

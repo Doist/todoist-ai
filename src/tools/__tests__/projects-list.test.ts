@@ -6,6 +6,7 @@ import {
     TEST_IDS,
     createMockApiResponse,
     createMockProject,
+    extractStructuredContent,
     extractTextContent,
 } from '../test-helpers.js'
 
@@ -61,7 +62,7 @@ describe('projects-list tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Verify structured content
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     projects: expect.any(Array),
@@ -100,7 +101,7 @@ describe('projects-list tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Verify structured content
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent.projects).toHaveLength(1)
             expect(structuredContent.totalCount).toBe(1)
             expect(structuredContent.hasMore).toBe(true)
@@ -136,7 +137,7 @@ describe('projects-list tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Verify structured content with search filter
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent.projects).toHaveLength(2) // Should match filtered results
             expect(structuredContent.totalCount).toBe(2)
             expect(structuredContent.hasMore).toBe(false)
@@ -169,8 +170,12 @@ describe('projects-list tool', () => {
             expect(extractTextContent(result)).toMatchSnapshot()
 
             // Verify structured content
-            const { structuredContent } = result
-            expect(structuredContent.appliedFilters.search).toBe(search)
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    appliedFilters: expect.objectContaining({ search }),
+                }),
+            )
         })
     })
 

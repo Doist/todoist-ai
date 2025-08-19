@@ -1,7 +1,13 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { sectionsSearch } from '../sections-search.js'
-import { TEST_ERRORS, TEST_IDS, createMockSection, extractTextContent } from '../test-helpers.js'
+import {
+    TEST_ERRORS,
+    TEST_IDS,
+    createMockSection,
+    extractStructuredContent,
+    extractTextContent,
+} from '../test-helpers.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
@@ -64,7 +70,7 @@ describe('sections-search tool', () => {
             expect(textContent).toContain('Backlog Items • id=')
 
             // Verify structured content
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent.sections).toHaveLength(4)
             expect(structuredContent.totalCount).toBe(4)
             expect(structuredContent.appliedFilters).toEqual({
@@ -94,7 +100,7 @@ describe('sections-search tool', () => {
             expect(textContent).toContain('Use sections-manage to create sections')
 
             // Verify structured content
-            const { structuredContent } = result
+            const structuredContent = extractStructuredContent(result)
             expect(structuredContent.sections).toHaveLength(0)
             expect(structuredContent.totalCount).toBe(0)
             expect(structuredContent.appliedFilters).toEqual({
