@@ -50,6 +50,49 @@ describe('tasks-update-multiple tool', () => {
             expect(result).toEqual([mockApiResponse])
         })
 
+        it('should update all tasks when multiple tasks are provided', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093748',
+                content: 'Updated task content',
+                description: 'Updated task description',
+                url: 'https://todoist.com/showTask?id=8485093748',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+
+            const result = await tasksUpdateMultiple.execute(
+                {
+                    tasks: [
+                        {
+                            id: '8485093748',
+                            content: 'Updated task content',
+                            description: 'Updated task description',
+                        },
+                        {
+                            id: '8485093749',
+                            content: 'Updated task content',
+                            description: 'Updated task description',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Verify API was called correctly
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093748', {
+                content: 'Updated task content',
+                description: 'Updated task description',
+            })
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093749', {
+                content: 'Updated task content',
+                description: 'Updated task description',
+            })
+
+            // Verify result matches API response
+            expect(result).toEqual([mockApiResponse, mockApiResponse])
+        })
+
         it('should update task priority and due date', async () => {
             const mockApiResponse: Task = createMockTask({
                 id: '8485093749',
