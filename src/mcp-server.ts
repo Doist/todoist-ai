@@ -17,7 +17,7 @@ import { tasksListCompleted } from './tools/tasks-list-completed.js'
 import { tasksListForContainer } from './tools/tasks-list-for-container.js'
 import { tasksOrganizeMultiple } from './tools/tasks-organize-multiple.js'
 import { tasksSearch } from './tools/tasks-search.js'
-import { tasksUpdateOne } from './tools/tasks-update-one.js'
+import { tasksUpdateMultiple } from './tools/tasks-update-multiple.js'
 
 const instructions = `
 Tools to help you manage your todoist tasks.
@@ -47,7 +47,7 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     registerTool(tasksSearch, server, todoist)
     registerTool(projectsList, server, todoist)
     registerTool(tasksAddMultiple, server, todoist)
-    registerTool(tasksUpdateOne, server, todoist)
+    registerTool(tasksUpdateMultiple, server, todoist)
     registerTool(deleteOne, server, todoist)
     registerTool(tasksCompleteMultiple, server, todoist)
     registerTool(projectsManage, server, todoist)

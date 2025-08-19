@@ -1,6 +1,6 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
-import { tasksUpdateOne } from '../tasks-update-one.js'
+import { tasksUpdateMultiple } from '../tasks-update-multiple.js'
 import { createMockTask } from '../test-helpers.js'
 
 // Mock the Todoist API
@@ -9,7 +9,7 @@ const mockTodoistApi = {
     moveTasks: jest.fn(),
 } as unknown as jest.Mocked<TodoistApi>
 
-describe('tasks-update-one tool', () => {
+describe('tasks-update-multiple tool', () => {
     beforeEach(() => {
         jest.clearAllMocks()
     })
@@ -27,11 +27,15 @@ describe('tasks-update-one tool', () => {
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
 
-            const result = await tasksUpdateOne.execute(
+            const result = await tasksUpdateMultiple.execute(
                 {
-                    id: '8485093748',
-                    content: 'Updated task content',
-                    description: 'Updated task description',
+                    tasks: [
+                        {
+                            id: '8485093748',
+                            content: 'Updated task content',
+                            description: 'Updated task description',
+                        },
+                    ],
                 },
                 mockTodoistApi,
             )
@@ -43,7 +47,7 @@ describe('tasks-update-one tool', () => {
             })
 
             // Verify result matches API response
-            expect(result).toEqual(mockApiResponse)
+            expect(result).toEqual([mockApiResponse])
         })
 
         it('should update task priority and due date', async () => {
@@ -65,8 +69,16 @@ describe('tasks-update-one tool', () => {
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
 
-            const result = await tasksUpdateOne.execute(
-                { id: '8485093749', priority: 3, dueString: 'Aug 20' },
+            const result = await tasksUpdateMultiple.execute(
+                {
+                    tasks: [
+                        {
+                            id: '8485093749',
+                            priority: 3,
+                            dueString: 'Aug 20',
+                        },
+                    ],
+                },
                 mockTodoistApi,
             )
 
@@ -75,7 +87,7 @@ describe('tasks-update-one tool', () => {
                 dueString: 'Aug 20',
             })
 
-            expect(result).toEqual(mockApiResponse)
+            expect(result).toEqual([mockApiResponse])
         })
 
         it('should move task to different project', async () => {
@@ -89,8 +101,15 @@ describe('tasks-update-one tool', () => {
 
             mockTodoistApi.moveTasks.mockResolvedValue([mockApiResponse])
 
-            const result = await tasksUpdateOne.execute(
-                { id: '8485093750', projectId: 'new-project-id' },
+            const result = await tasksUpdateMultiple.execute(
+                {
+                    tasks: [
+                        {
+                            id: '8485093750',
+                            projectId: 'new-project-id',
+                        },
+                    ],
+                },
                 mockTodoistApi,
             )
 
@@ -99,7 +118,7 @@ describe('tasks-update-one tool', () => {
             })
             expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
-            expect(result).toEqual(mockApiResponse)
+            expect(result).toEqual([mockApiResponse])
         })
 
         it('should update task parent (create subtask relationship)', async () => {
@@ -113,8 +132,15 @@ describe('tasks-update-one tool', () => {
 
             mockTodoistApi.moveTasks.mockResolvedValue([mockApiResponse])
 
-            const result = await tasksUpdateOne.execute(
-                { id: '8485093751', parentId: 'parent-task-123' },
+            const result = await tasksUpdateMultiple.execute(
+                {
+                    tasks: [
+                        {
+                            id: '8485093751',
+                            parentId: 'parent-task-123',
+                        },
+                    ],
+                },
                 mockTodoistApi,
             )
 
@@ -123,7 +149,7 @@ describe('tasks-update-one tool', () => {
             })
             expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
-            expect(result).toEqual(mockApiResponse)
+            expect(result).toEqual([mockApiResponse])
         })
 
         it('should move task and update properties at once', async () => {
@@ -153,14 +179,18 @@ describe('tasks-update-one tool', () => {
             mockTodoistApi.moveTasks.mockResolvedValue([movedTask])
             mockTodoistApi.updateTask.mockResolvedValue(updatedTask)
 
-            const result = await tasksUpdateOne.execute(
+            const result = await tasksUpdateMultiple.execute(
                 {
-                    id: '8485093752',
-                    content: 'Completely updated task',
-                    description: 'New description with details',
-                    priority: 4,
-                    dueString: 'every Friday',
-                    projectId: 'different-project-id',
+                    tasks: [
+                        {
+                            id: '8485093752',
+                            content: 'Completely updated task',
+                            description: 'New description with details',
+                            priority: 4,
+                            dueString: 'every Friday',
+                            projectId: 'different-project-id',
+                        },
+                    ],
                 },
                 mockTodoistApi,
             )
@@ -178,7 +208,7 @@ describe('tasks-update-one tool', () => {
                 dueString: 'every Friday',
             })
 
-            expect(result).toEqual(updatedTask)
+            expect(result).toEqual([updatedTask])
         })
 
         it('should update task duration', async () => {
@@ -192,10 +222,14 @@ describe('tasks-update-one tool', () => {
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
 
-            const result = await tasksUpdateOne.execute(
+            const result = await tasksUpdateMultiple.execute(
                 {
-                    id: '8485093753',
-                    duration: '2h30m',
+                    tasks: [
+                        {
+                            id: '8485093753',
+                            duration: '2h30m',
+                        },
+                    ],
                 },
                 mockTodoistApi,
             )
@@ -205,7 +239,7 @@ describe('tasks-update-one tool', () => {
                 durationUnit: 'minute',
             })
 
-            expect(result).toEqual(mockApiResponse)
+            expect(result).toEqual([mockApiResponse])
         })
 
         it('should handle various duration formats', async () => {
@@ -229,10 +263,14 @@ describe('tasks-update-one tool', () => {
             for (const testCase of testCases) {
                 mockTodoistApi.updateTask.mockClear()
 
-                await tasksUpdateOne.execute(
+                await tasksUpdateMultiple.execute(
                     {
-                        id: '8485093754',
-                        duration: testCase.input,
+                        tasks: [
+                            {
+                                id: '8485093754',
+                                duration: testCase.input,
+                            },
+                        ],
                     },
                     mockTodoistApi,
                 )
@@ -264,12 +302,16 @@ describe('tasks-update-one tool', () => {
             mockTodoistApi.moveTasks.mockResolvedValue([movedTask])
             mockTodoistApi.updateTask.mockResolvedValue(updatedTask)
 
-            const result = await tasksUpdateOne.execute(
+            const result = await tasksUpdateMultiple.execute(
                 {
-                    id: '8485093755',
-                    content: 'Updated task with duration',
-                    duration: '2h',
-                    projectId: 'new-project-id',
+                    tasks: [
+                        {
+                            id: '8485093755',
+                            content: 'Updated task with duration',
+                            duration: '2h',
+                            projectId: 'new-project-id',
+                        },
+                    ],
                 },
                 mockTodoistApi,
             )
@@ -286,17 +328,21 @@ describe('tasks-update-one tool', () => {
                 durationUnit: 'minute',
             })
 
-            expect(result).toEqual(updatedTask)
+            expect(result).toEqual([updatedTask])
         })
     })
 
     describe('error handling', () => {
         it('should throw error for invalid duration format', async () => {
             await expect(
-                tasksUpdateOne.execute(
+                tasksUpdateMultiple.execute(
                     {
-                        id: '8485093756',
-                        duration: 'invalid',
+                        tasks: [
+                            {
+                                id: '8485093756',
+                                duration: 'invalid',
+                            },
+                        ],
                     },
                     mockTodoistApi,
                 ),
@@ -305,10 +351,14 @@ describe('tasks-update-one tool', () => {
 
         it('should throw error for duration exceeding 24 hours', async () => {
             await expect(
-                tasksUpdateOne.execute(
+                tasksUpdateMultiple.execute(
                     {
-                        id: '8485093757',
-                        duration: '25h',
+                        tasks: [
+                            {
+                                id: '8485093757',
+                                duration: '25h',
+                            },
+                        ],
                     },
                     mockTodoistApi,
                 ),
@@ -318,8 +368,16 @@ describe('tasks-update-one tool', () => {
         })
         it('should throw error when multiple move parameters are provided', async () => {
             await expect(
-                tasksUpdateOne.execute(
-                    { id: '8485093748', projectId: 'new-project', sectionId: 'new-section' },
+                tasksUpdateMultiple.execute(
+                    {
+                        tasks: [
+                            {
+                                id: '8485093748',
+                                projectId: 'new-project',
+                                sectionId: 'new-section',
+                            },
+                        ],
+                    },
                     mockTodoistApi,
                 ),
             ).rejects.toThrow(
@@ -330,8 +388,17 @@ describe('tasks-update-one tool', () => {
 
         it('should throw error when all three move parameters are provided', async () => {
             await expect(
-                tasksUpdateOne.execute(
-                    { id: '8485093748', projectId: 'p1', sectionId: 's1', parentId: 't1' },
+                tasksUpdateMultiple.execute(
+                    {
+                        tasks: [
+                            {
+                                id: '8485093748',
+                                projectId: 'p1',
+                                sectionId: 's1',
+                                parentId: 't1',
+                            },
+                        ],
+                    },
                     mockTodoistApi,
                 ),
             ).rejects.toThrow(
@@ -350,7 +417,14 @@ describe('tasks-update-one tool', () => {
             },
         ])('should propagate $error', async ({ error, params }) => {
             mockTodoistApi.updateTask.mockRejectedValue(new Error(error))
-            await expect(tasksUpdateOne.execute(params, mockTodoistApi)).rejects.toThrow(error)
+            await expect(
+                tasksUpdateMultiple.execute(
+                    {
+                        tasks: [params],
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(error)
         })
     })
 })
