@@ -3,9 +3,9 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { formatNextSteps } from '../utils/response-builders.js'
-import { TOOL_NAMES } from '../utils/tool-names.js'
+import { ToolNames } from '../utils/tool-names.js'
 
-const { TASKS_ADD_MULTIPLE, TASKS_LIST_FOR_CONTAINER, OVERVIEW, SECTIONS_SEARCH } = TOOL_NAMES
+const { TASKS_ADD_MULTIPLE, TASKS_LIST_FOR_CONTAINER, OVERVIEW, SECTIONS_SEARCH } = ToolNames
 
 const ArgsSchema = {
     id: z
@@ -26,7 +26,7 @@ const ArgsSchema = {
 }
 
 const sectionsManage = {
-    name: TOOL_NAMES.SECTIONS_MANAGE,
+    name: ToolNames.SECTIONS_MANAGE,
     description:
         'Add a new section to a project or update an existing section. If id is provided, updates the section. If id is omitted, creates a new section (requires projectId).',
     parameters: ArgsSchema,

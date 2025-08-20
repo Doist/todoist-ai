@@ -3,8 +3,8 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { type Project, isPersonalProject, mapTask } from '../tool-helpers.js'
-import { API_LIMITS } from '../utils/constants.js'
-import { TOOL_NAMES } from '../utils/tool-names.js'
+import { ApiLimits } from '../utils/constants.js'
+import { ToolNames } from '../utils/tool-names.js'
 
 const ArgsSchema = {
     projectId: z
@@ -130,7 +130,7 @@ function renderTaskTreeMarkdown(tasks: TaskTreeNode[], indent = ''): string[] {
     return lines
 }
 
-interface ProjectStructure {
+type ProjectStructure = {
     id: string
     name: string
     parentId: string | null
@@ -138,7 +138,7 @@ interface ProjectStructure {
     children: ProjectStructure[]
 }
 
-interface AccountOverviewStructured extends Record<string, unknown> {
+type AccountOverviewStructured = Record<string, unknown> & {
     type: 'account_overview'
     inbox: {
         id: string
@@ -185,7 +185,7 @@ async function getAllTasksForProject(client: TodoistApi, projectId: string): Pro
     do {
         const { results, nextCursor } = await client.getTasks({
             projectId,
-            limit: API_LIMITS.TASKS_BATCH_SIZE,
+            limit: ApiLimits.TASKS_BATCH_SIZE,
             cursor: cursor ?? undefined,
         })
         allTasks = allTasks.concat(results.map(mapTask))
@@ -322,7 +322,7 @@ async function generateProjectOverview(
 }
 
 const overview = {
-    name: TOOL_NAMES.OVERVIEW,
+    name: ToolNames.OVERVIEW,
     description:
         'Get a Markdown overview. If no projectId is provided, shows all projects with hierarchy and sections (useful for navigation). If projectId is provided, shows detailed overview of that specific project including all tasks grouped by sections.',
     parameters: ArgsSchema,

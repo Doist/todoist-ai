@@ -2,14 +2,14 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { summarizeBatch } from '../utils/response-builders.js'
-import { TOOL_NAMES } from '../utils/tool-names.js'
+import { ToolNames } from '../utils/tool-names.js'
 
 const ArgsSchema = {
     ids: z.array(z.string().min(1)).min(1).describe('The IDs of the tasks to complete.'),
 }
 
 const tasksCompleteMultiple = {
-    name: TOOL_NAMES.TASKS_COMPLETE_MULTIPLE,
+    name: ToolNames.TASKS_COMPLETE_MULTIPLE,
     description: 'Complete one or more tasks by their IDs.',
     parameters: ArgsSchema,
     async execute(args, client) {

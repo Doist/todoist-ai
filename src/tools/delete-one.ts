@@ -2,10 +2,10 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { formatNextSteps } from '../utils/response-builders.js'
-import { TOOL_NAMES } from '../utils/tool-names.js'
+import { ToolNames } from '../utils/tool-names.js'
 
 const { PROJECTS_LIST, OVERVIEW, SECTIONS_SEARCH, TASKS_LIST_FOR_CONTAINER, TASKS_LIST_BY_DATE } =
-    TOOL_NAMES
+    ToolNames
 
 const ArgsSchema = {
     type: z.enum(['project', 'section', 'task']).describe('The type of entity to delete.'),
@@ -13,7 +13,7 @@ const ArgsSchema = {
 }
 
 const deleteOne = {
-    name: TOOL_NAMES.DELETE_ONE,
+    name: ToolNames.DELETE_ONE,
     description: 'Delete a project, section, or task by its ID.',
     parameters: ArgsSchema,
     async execute(args, client) {

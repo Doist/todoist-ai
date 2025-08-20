@@ -126,8 +126,8 @@ describe('tasks-search tool', () => {
                         hasMore: false,
                         nextCursor: null,
                         appliedFilters: expect.objectContaining({
+                            searchText: params.searchText,
                             limit: expectedLimit,
-                            cursor: expectedCursor,
                         }),
                     }),
                 )

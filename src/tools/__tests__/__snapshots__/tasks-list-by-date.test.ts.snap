@@ -43,6 +43,7 @@ Preview:
 Next:
 - Use tasks-update-multiple to modify priorities or due dates
 - Use tasks-complete-multiple to mark finished tasks
+- Focus on overdue items first to get back on track
 - Pass cursor 'next-page-cursor' to fetch more results."
 `;
 
@@ -53,7 +54,8 @@ Preview:
     Specific date task • due 2025-08-20 • P1 • id=8485093748
 Next:
 - Use tasks-update-multiple to modify priorities or due dates
-- Use tasks-complete-multiple to mark finished tasks"
+- Use tasks-complete-multiple to mark finished tasks
+- Focus on overdue items first to get back on track"
 `;
 
 exports[`tasks-list-by-date tool next steps logic should provide helpful suggestions for empty date range results 1`] = `

@@ -3,9 +3,14 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { getTasksByFilter } from '../tool-helpers.js'
-import { API_LIMITS } from '../utils/constants.js'
-import { generateTaskNextSteps, previewTasks, summarizeList } from '../utils/response-builders.js'
-import { TOOL_NAMES } from '../utils/tool-names.js'
+import { ApiLimits } from '../utils/constants.js'
+import {
+    generateTaskNextSteps,
+    getDateString,
+    previewTasks,
+    summarizeList,
+} from '../utils/response-builders.js'
+import { ToolNames } from '../utils/tool-names.js'
 
 const ArgsSchema = {
     startDate: z
@@ -27,8 +32,8 @@ const ArgsSchema = {
         .number()
         .int()
         .min(1)
-        .max(API_LIMITS.TASKS_MAX)
-        .default(API_LIMITS.TASKS_DEFAULT)
+        .max(ApiLimits.TASKS_MAX)
+        .default(ApiLimits.TASKS_DEFAULT)
         .describe('The maximum number of tasks to return.'),
     cursor: z
         .string()
@@ -39,7 +44,7 @@ const ArgsSchema = {
 }
 
 const tasksListByDate = {
-    name: TOOL_NAMES.TASKS_LIST_BY_DATE,
+    name: ToolNames.TASKS_LIST_BY_DATE,
     description:
         "Get tasks by date range or overdue tasks. Use startDate 'overdue' for overdue tasks, or provide a date/date range.",
     parameters: ArgsSchema,
@@ -78,12 +83,7 @@ const tasksListByDate = {
                 nextCursor: result.nextCursor,
                 totalCount: result.tasks.length,
                 hasMore: Boolean(result.nextCursor),
-                appliedFilters: {
-                    startDate: args.startDate,
-                    daysCount: args.daysCount,
-                    limit: args.limit,
-                    cursor: args.cursor,
-                },
+                appliedFilters: args,
             },
         })
     },
@@ -106,7 +106,7 @@ function generateTextContent({
         filterHints.push(`today${args.daysCount > 1 ? ` + ${args.daysCount - 1} more days` : ''}`)
     } else {
         filterHints.push(
-            `${args.startDate}${args.daysCount > 1 ? ` to ${addDays(args.startDate, args.daysCount).toISOString().split('T')[0]}` : ''}`,
+            `${args.startDate}${args.daysCount > 1 ? ` to ${getDateString(addDays(args.startDate, args.daysCount))}` : ''}`,
         )
     }
 
@@ -132,7 +132,7 @@ function generateTextContent({
 
     // Generate contextual next steps
     const now = new Date()
-    const todayStr = now.toISOString().split('T')[0]
+    const todayStr = getDateString(now)
     const nextSteps = generateTaskNextSteps('listed', tasks, {
         hasToday: args.startDate === 'today' || tasks.some((task) => task.dueDate === todayStr),
         hasOverdue:

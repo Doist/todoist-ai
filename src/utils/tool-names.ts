@@ -6,7 +6,7 @@
  * This prevents outdated references when tool names change.
  */
 
-export const TOOL_NAMES = {
+export const ToolNames = {
     // Task management tools
     TASKS_ADD_MULTIPLE: 'tasks-add-multiple',
     TASKS_COMPLETE_MULTIPLE: 'tasks-complete-multiple',
@@ -30,4 +30,4 @@ export const TOOL_NAMES = {
 } as const
 
 // Type for all tool names
-export type ToolName = (typeof TOOL_NAMES)[keyof typeof TOOL_NAMES]
+export type ToolName = (typeof ToolNames)[keyof typeof ToolNames]

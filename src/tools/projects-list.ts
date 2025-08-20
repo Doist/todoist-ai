@@ -2,11 +2,11 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapProject } from '../tool-helpers.js'
-import { API_LIMITS } from '../utils/constants.js'
+import { ApiLimits } from '../utils/constants.js'
 import { formatProjectPreview, summarizeList } from '../utils/response-builders.js'
-import { TOOL_NAMES } from '../utils/tool-names.js'
+import { ToolNames } from '../utils/tool-names.js'
 
-const { PROJECTS_MANAGE, TASKS_LIST_FOR_CONTAINER } = TOOL_NAMES
+const { PROJECTS_MANAGE, TASKS_LIST_FOR_CONTAINER } = ToolNames
 
 const ArgsSchema = {
     search: z
@@ -19,8 +19,8 @@ const ArgsSchema = {
         .number()
         .int()
         .min(1)
-        .max(API_LIMITS.PROJECTS_MAX)
-        .default(API_LIMITS.PROJECTS_DEFAULT)
+        .max(ApiLimits.PROJECTS_MAX)
+        .default(ApiLimits.PROJECTS_DEFAULT)
         .describe('The maximum number of projects to return.'),
     cursor: z
         .string()
@@ -31,7 +31,7 @@ const ArgsSchema = {
 }
 
 const projectsList = {
-    name: TOOL_NAMES.PROJECTS_LIST,
+    name: ToolNames.PROJECTS_LIST,
     description:
         'List all projects or search for projects by name. If search parameter is omitted, all projects are returned.',
     parameters: ArgsSchema,
@@ -57,11 +57,7 @@ const projectsList = {
                 nextCursor,
                 totalCount: projects.length,
                 hasMore: Boolean(nextCursor),
-                appliedFilters: {
-                    search: args.search,
-                    limit: args.limit,
-                    cursor: args.cursor,
-                },
+                appliedFilters: args,
             },
         })
     },

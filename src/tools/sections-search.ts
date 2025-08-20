@@ -3,9 +3,9 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { summarizeList } from '../utils/response-builders.js'
-import { TOOL_NAMES } from '../utils/tool-names.js'
+import { ToolNames } from '../utils/tool-names.js'
 
-const { SECTIONS_MANAGE, TASKS_LIST_FOR_CONTAINER, TASKS_UPDATE_MULTIPLE } = TOOL_NAMES
+const { SECTIONS_MANAGE, TASKS_LIST_FOR_CONTAINER, TASKS_UPDATE_MULTIPLE } = ToolNames
 
 const ArgsSchema = {
     projectId: z.string().min(1).describe('The ID of the project to search sections in.'),
@@ -17,13 +17,13 @@ const ArgsSchema = {
         ),
 }
 
-interface SectionSummary {
+type SectionSummary = {
     id: string
     name: string
 }
 
 const sectionsSearch = {
-    name: TOOL_NAMES.SECTIONS_SEARCH,
+    name: ToolNames.SECTIONS_SEARCH,
     description: 'Search for sections by name or other criteria in a project.',
     parameters: ArgsSchema,
     async execute(args, client) {
@@ -51,10 +51,7 @@ const sectionsSearch = {
             structuredContent: {
                 sections,
                 totalCount: sections.length,
-                appliedFilters: {
-                    projectId: args.projectId,
-                    search: args.search,
-                },
+                appliedFilters: args,
             },
         })
     },

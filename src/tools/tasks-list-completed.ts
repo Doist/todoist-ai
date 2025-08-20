@@ -2,9 +2,9 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask } from '../tool-helpers.js'
-import { API_LIMITS } from '../utils/constants.js'
+import { ApiLimits } from '../utils/constants.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
-import { TOOL_NAMES } from '../utils/tool-names.js'
+import { ToolNames } from '../utils/tool-names.js'
 
 const ArgsSchema = {
     getBy: z
@@ -31,8 +31,8 @@ const ArgsSchema = {
         .number()
         .int()
         .min(1)
-        .max(API_LIMITS.COMPLETED_TASKS_MAX)
-        .default(API_LIMITS.COMPLETED_TASKS_DEFAULT)
+        .max(ApiLimits.COMPLETED_TASKS_MAX)
+        .default(ApiLimits.COMPLETED_TASKS_DEFAULT)
         .describe('The maximum number of tasks to return.'),
     cursor: z
         .string()
@@ -43,7 +43,7 @@ const ArgsSchema = {
 }
 
 const tasksListCompleted = {
-    name: TOOL_NAMES.TASKS_LIST_COMPLETED,
+    name: ToolNames.TASKS_LIST_COMPLETED,
     description: 'Get completed tasks.',
     parameters: ArgsSchema,
     async execute(args, client) {
@@ -67,17 +67,7 @@ const tasksListCompleted = {
                 nextCursor,
                 totalCount: mappedTasks.length,
                 hasMore: Boolean(nextCursor),
-                appliedFilters: {
-                    getBy: args.getBy,
-                    since: args.since,
-                    until: args.until,
-                    workspaceId: args.workspaceId,
-                    projectId: args.projectId,
-                    sectionId: args.sectionId,
-                    parentId: args.parentId,
-                    limit: args.limit,
-                    cursor: args.cursor,
-                },
+                appliedFilters: args,
             },
         })
     },

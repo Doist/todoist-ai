@@ -5,7 +5,7 @@ import type { TodoistTool } from '../todoist-tool.js'
 import { createMoveTaskArgs, mapTask } from '../tool-helpers.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
 import { summarizeTaskOperation } from '../utils/response-builders.js'
-import { TOOL_NAMES } from '../utils/tool-names.js'
+import { ToolNames } from '../utils/tool-names.js'
 
 const TasksUpdateSchema = z.object({
     id: z.string().min(1).describe('The ID of the task to update.'),
@@ -41,7 +41,7 @@ const ArgsSchema = {
 }
 
 const tasksUpdateMultiple = {
-    name: TOOL_NAMES.TASKS_UPDATE_MULTIPLE,
+    name: ToolNames.TASKS_UPDATE_MULTIPLE,
     description: 'Update multiple existing tasks with new values.',
     parameters: ArgsSchema,
     async execute(args, client) {

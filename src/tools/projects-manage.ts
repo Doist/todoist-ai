@@ -2,10 +2,10 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { formatNextSteps } from '../utils/response-builders.js'
-import { TOOL_NAMES } from '../utils/tool-names.js'
+import { ToolNames } from '../utils/tool-names.js'
 
 const { SECTIONS_MANAGE, TASKS_ADD_MULTIPLE, PROJECTS_LIST, TASKS_LIST_FOR_CONTAINER, OVERVIEW } =
-    TOOL_NAMES
+    ToolNames
 
 const ArgsSchema = {
     id: z
@@ -19,7 +19,7 @@ const ArgsSchema = {
 }
 
 const projectsManage = {
-    name: TOOL_NAMES.PROJECTS_MANAGE,
+    name: ToolNames.PROJECTS_MANAGE,
     description:
         'Add a new project or update an existing project. If id is provided, updates the project. If id is omitted, creates a new project.',
     parameters: ArgsSchema,

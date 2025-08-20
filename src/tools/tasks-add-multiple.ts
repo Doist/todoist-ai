@@ -4,8 +4,12 @@ import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask } from '../tool-helpers.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
-import { generateTaskNextSteps, summarizeTaskOperation } from '../utils/response-builders.js'
-import { TOOL_NAMES } from '../utils/tool-names.js'
+import {
+    generateTaskNextSteps,
+    getDateString,
+    summarizeTaskOperation,
+} from '../utils/response-builders.js'
+import { ToolNames } from '../utils/tool-names.js'
 
 const TaskSchema = z.object({
     content: z.string().min(1).describe('The content of the task to create.'),
@@ -28,7 +32,7 @@ const ArgsSchema = {
 }
 
 const tasksAddMultiple = {
-    name: TOOL_NAMES.TASKS_ADD_MULTIPLE,
+    name: ToolNames.TASKS_ADD_MULTIPLE,
     description: 'Add one or more tasks to a project, section, or parent.',
     parameters: ArgsSchema,
     async execute(args, client) {
@@ -85,7 +89,8 @@ function generateTextContent({
     args: z.infer<z.ZodObject<typeof ArgsSchema>>
 }) {
     // Get context for smart next steps
-    const hasToday = tasks.some((task) => task.dueDate === new Date().toISOString().split('T')[0])
+    const todayStr = getDateString()
+    const hasToday = tasks.some((task) => task.dueDate === todayStr)
 
     // Generate context description without API calls
     let projectContext = ''

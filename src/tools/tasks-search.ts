@@ -2,9 +2,14 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { getTasksByFilter } from '../tool-helpers.js'
-import { API_LIMITS } from '../utils/constants.js'
-import { generateTaskNextSteps, previewTasks, summarizeList } from '../utils/response-builders.js'
-import { TOOL_NAMES } from '../utils/tool-names.js'
+import { ApiLimits } from '../utils/constants.js'
+import {
+    generateTaskNextSteps,
+    getDateString,
+    previewTasks,
+    summarizeList,
+} from '../utils/response-builders.js'
+import { ToolNames } from '../utils/tool-names.js'
 
 const ArgsSchema = {
     searchText: z.string().min(1).describe('The text to search for in tasks.'),
@@ -12,8 +17,8 @@ const ArgsSchema = {
         .number()
         .int()
         .min(1)
-        .max(API_LIMITS.TASKS_MAX)
-        .default(API_LIMITS.TASKS_DEFAULT)
+        .max(ApiLimits.TASKS_MAX)
+        .default(ApiLimits.TASKS_DEFAULT)
         .describe('The maximum number of tasks to return.'),
     cursor: z
         .string()
@@ -24,7 +29,7 @@ const ArgsSchema = {
 }
 
 const tasksSearch = {
-    name: TOOL_NAMES.TASKS_SEARCH,
+    name: ToolNames.TASKS_SEARCH,
     description: "Search tasks by text using Todoist's filter query.",
     parameters: ArgsSchema,
     async execute(args, client) {
@@ -48,11 +53,7 @@ const tasksSearch = {
                 nextCursor: result.nextCursor,
                 totalCount: result.tasks.length,
                 hasMore: Boolean(result.nextCursor),
-                appliedFilters: {
-                    searchText: args.searchText,
-                    limit: args.limit,
-                    cursor: args.cursor,
-                },
+                appliedFilters: args,
                 searchQuery: `search: ${args.searchText}`,
             },
         })
@@ -81,7 +82,7 @@ function generateTextContent({
 
     // Generate contextual next steps
     const now = new Date()
-    const todayDateString = now.toISOString().split('T')[0]
+    const todayDateString = getDateString(now)
     const nextSteps = generateTaskNextSteps('listed', tasks, {
         hasToday: tasks.some((task) => task.dueDate === todayDateString),
         hasOverdue: tasks.some((task) => task.dueDate && new Date(task.dueDate) < now),

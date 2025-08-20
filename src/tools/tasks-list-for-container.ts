@@ -3,11 +3,16 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask } from '../tool-helpers.js'
-import { API_LIMITS } from '../utils/constants.js'
-import { generateTaskNextSteps, previewTasks, summarizeList } from '../utils/response-builders.js'
-import { TOOL_NAMES } from '../utils/tool-names.js'
+import { ApiLimits } from '../utils/constants.js'
+import {
+    generateTaskNextSteps,
+    getDateString,
+    previewTasks,
+    summarizeList,
+} from '../utils/response-builders.js'
+import { ToolNames } from '../utils/tool-names.js'
 
-const { TASKS_ADD_MULTIPLE } = TOOL_NAMES
+const { TASKS_ADD_MULTIPLE } = ToolNames
 
 const ArgsSchema = {
     type: z
@@ -18,8 +23,8 @@ const ArgsSchema = {
         .number()
         .int()
         .min(1)
-        .max(API_LIMITS.TASKS_MAX)
-        .default(API_LIMITS.TASKS_DEFAULT)
+        .max(ApiLimits.TASKS_MAX)
+        .default(ApiLimits.TASKS_DEFAULT)
         .describe('The maximum number of tasks to return.'),
     cursor: z
         .string()
@@ -30,7 +35,7 @@ const ArgsSchema = {
 }
 
 const tasksListForContainer = {
-    name: TOOL_NAMES.TASKS_LIST_FOR_CONTAINER,
+    name: ToolNames.TASKS_LIST_FOR_CONTAINER,
     description: 'Get tasks for a specific project, section, or parent task (subtasks).',
     parameters: ArgsSchema,
     async execute(args, client) {
@@ -69,12 +74,7 @@ const tasksListForContainer = {
                 nextCursor,
                 totalCount: mappedTasks.length,
                 hasMore: Boolean(nextCursor),
-                appliedFilters: {
-                    type: args.type,
-                    id: args.id,
-                    limit: args.limit,
-                    cursor: args.cursor,
-                },
+                appliedFilters: args,
                 containerInfo: {
                     type: args.type,
                     id: args.id,
@@ -129,7 +129,7 @@ function generateTextContent({
 
     // Generate contextual next steps
     const now = new Date()
-    const todayStr = now.toISOString().split('T')[0]
+    const todayStr = getDateString(now)
     const nextSteps = generateTaskNextSteps('listed', tasks, {
         hasToday: tasks.some((task) => task.dueDate === todayStr),
         hasOverdue: tasks.some((task) => task.dueDate && new Date(task.dueDate) < now),

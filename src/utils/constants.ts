@@ -6,7 +6,7 @@
  */
 
 // API Pagination Limits
-export const API_LIMITS = {
+export const ApiLimits = {
     /** Default limit for task listings */
     TASKS_DEFAULT: 10,
     /** Maximum limit for task search and list operations */
@@ -24,7 +24,7 @@ export const API_LIMITS = {
 } as const
 
 // UI Display Limits
-export const DISPLAY_LIMITS = {
+export const DisplayLimits = {
     /** Maximum number of failures to show in detailed error messages */
     MAX_FAILURES_SHOWN: 3,
     /** Threshold for suggesting batch operations */
@@ -32,7 +32,7 @@ export const DISPLAY_LIMITS = {
 } as const
 
 // Response Builder Configuration
-export const RESPONSE_CONFIG = {
+export const ResponseConfig = {
     /** Maximum characters per line in text responses */
     MAX_LINE_LENGTH: 100,
     /** Indentation for nested items */
