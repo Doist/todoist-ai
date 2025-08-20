@@ -5,28 +5,26 @@
  * Each tool should import its own name from this module to avoid hardcoded strings.
  * This prevents outdated references when tool names change.
  */
-
 export const ToolNames = {
     // Task management tools
-    TASKS_ADD_MULTIPLE: 'tasks-add-multiple',
-    TASKS_COMPLETE_MULTIPLE: 'tasks-complete-multiple',
-    TASKS_UPDATE_MULTIPLE: 'tasks-update-multiple',
-    TASKS_SEARCH: 'tasks-search',
-    TASKS_LIST_BY_DATE: 'tasks-list-by-date',
-    TASKS_LIST_COMPLETED: 'tasks-list-completed',
-    TASKS_LIST_FOR_CONTAINER: 'tasks-list-for-container',
+    ADD_TASKS: 'add-tasks',
+    COMPLETE_TASKS: 'complete-tasks',
+    UPDATE_TASKS: 'update-tasks',
+    FIND_TASKS: 'find-tasks',
+    FIND_TASKS_BY_DATE: 'find-tasks-by-date',
+    FIND_COMPLETED_TASKS: 'find-completed-tasks',
 
     // Project management tools
-    PROJECTS_LIST: 'projects-list',
-    PROJECTS_MANAGE: 'projects-manage',
+    FIND_PROJECTS: 'find-projects',
+    MANAGE_PROJECTS: 'manage-projects',
 
     // Section management tools
-    SECTIONS_SEARCH: 'sections-search',
-    SECTIONS_MANAGE: 'sections-manage',
+    FIND_SECTIONS: 'find-sections',
+    MANAGE_SECTIONS: 'manage-sections',
 
     // General tools
-    OVERVIEW: 'overview',
-    DELETE_ONE: 'delete-one',
+    GET_OVERVIEW: 'get-overview',
+    DELETE_OBJECT: 'delete-object',
 } as const
 
 // Type for all tool names

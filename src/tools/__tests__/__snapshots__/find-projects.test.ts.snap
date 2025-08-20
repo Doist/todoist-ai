@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`find-projects tool listing all projects should handle pagination with limit and cursor 1`] = `
+"Projects: 1 (limit 10), more available.
+Preview:
+    First Project • id=project-1
+Next:
+- Use find-tasks with projectId to see tasks in specific projects.
+- Pass cursor 'next-page-cursor' to fetch more results."
+`;
+
+exports[`find-projects tool listing all projects should list all projects when no search parameter is provided 1`] = `
+"Projects: 3 (limit 50).
+Preview:
+    Inbox • Inbox • id=inbox-project-id
+    test-abc123def456-project • id=6cfCcrrCFg2xP94Q
+    Work Project • ⭐ • Shared • board • id=work-project-id
+Next:
+- Use find-tasks with projectId to see tasks in specific projects.
+- Favorite projects appear first in most Todoist views."
+`;
+
+exports[`find-projects tool searching projects should filter projects by search term (case insensitive) 1`] = `
+"Projects matching "work": 2 (limit 50).
+Filter: search: "work".
+Preview:
+    Work Project • id=work-project-id
+    Hobby Work • id=hobby-project-id
+Next:
+- Use find-tasks with projectId to see tasks in specific projects."
+`;
+
+exports[`find-projects tool searching projects should handle search with case insensitive matching 1`] = `
+"Projects matching "IMPORTANT": 1 (limit 50).
+Filter: search: "IMPORTANT".
+Preview:
+    Important Project • id=6cfCcrrCFg2xP94Q
+Next:
+- Use find-tasks with projectId to see tasks in specific projects."
+`;
+
+exports[`find-projects tool searching projects should handle search with no matches 1`] = `
+"Projects matching "nonexistent": 0 (limit 50).
+Filter: search: "nonexistent".
+No results. Try broader search terms; Check spelling; Remove search to see all projects."
+`;

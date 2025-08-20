@@ -9,13 +9,7 @@ export function getDateString(date: Date = new Date()): string {
     return parts[0] ?? ''
 }
 
-const {
-    TASKS_LIST_BY_DATE,
-    TASKS_ADD_MULTIPLE,
-    TASKS_UPDATE_MULTIPLE,
-    TASKS_COMPLETE_MULTIPLE,
-    OVERVIEW,
-} = ToolNames
+const { FIND_TASKS_BY_DATE, ADD_TASKS, UPDATE_TASKS, COMPLETE_TASKS, GET_OVERVIEW } = ToolNames
 
 type TaskLike = {
     id?: string
@@ -250,21 +244,21 @@ export function generateTaskNextSteps(
             // Context-aware suggestions for newly added tasks
             if (context?.hasToday) {
                 nextSteps.push(
-                    `Use ${TASKS_LIST_BY_DATE}('today') to review today's updated schedule`,
+                    `Use ${FIND_TASKS_BY_DATE}('today') to review today's updated schedule`,
                 )
             } else if (context?.hasOverdue) {
-                nextSteps.push(`Use ${TASKS_LIST_BY_DATE}('overdue') to prioritize past-due items`)
+                nextSteps.push(`Use ${FIND_TASKS_BY_DATE}('overdue') to prioritize past-due items`)
             } else if (context?.projectName) {
                 nextSteps.push(
-                    `Use ${OVERVIEW} with projectId to see ${context.projectName} structure`,
+                    `Use ${GET_OVERVIEW} with projectId to see ${context.projectName} structure`,
                 )
             } else {
-                nextSteps.push(`Use ${OVERVIEW} to see your updated project organization`)
+                nextSteps.push(`Use ${GET_OVERVIEW} to see your updated project organization`)
             }
 
             // Time-based suggestions
             if (context?.timeOfDay === 'morning') {
-                nextSteps.push(`Use ${TASKS_LIST_BY_DATE}('today') to plan your day`)
+                nextSteps.push(`Use ${FIND_TASKS_BY_DATE}('today') to plan your day`)
             }
             break
 
@@ -272,44 +266,42 @@ export function generateTaskNextSteps(
         case 'organized':
             if (context?.hasToday) {
                 nextSteps.push(
-                    `Use ${TASKS_LIST_BY_DATE}('today') to see your prioritized schedule`,
+                    `Use ${FIND_TASKS_BY_DATE}('today') to see your prioritized schedule`,
                 )
             } else if (context?.hasHighPriority) {
                 nextSteps.push(
-                    `Use ${TASKS_LIST_BY_DATE} with filter to focus on high-priority items`,
+                    `Use ${FIND_TASKS_BY_DATE} with filter to focus on high-priority items`,
                 )
             } else {
-                nextSteps.push(`Use ${OVERVIEW} to see your updated project structure`)
+                nextSteps.push(`Use ${GET_OVERVIEW} to see your updated project structure`)
             }
             break
 
         case 'completed':
             if (context?.timeOfDay === 'evening') {
-                nextSteps.push(`Use ${TASKS_LIST_BY_DATE}('tomorrow') to plan upcoming work`)
+                nextSteps.push(`Use ${FIND_TASKS_BY_DATE}('tomorrow') to plan upcoming work`)
             } else if (context?.hasOverdue) {
                 nextSteps.push(
-                    `Use ${TASKS_LIST_BY_DATE}('overdue') to tackle remaining past-due items`,
+                    `Use ${FIND_TASKS_BY_DATE}('overdue') to tackle remaining past-due items`,
                 )
             } else {
-                nextSteps.push(`Use ${TASKS_LIST_BY_DATE}('today') to see remaining work`)
+                nextSteps.push(`Use ${FIND_TASKS_BY_DATE}('today') to see remaining work`)
             }
             break
 
         case 'listed':
             if (context?.isEmptyResult) {
-                nextSteps.push(`Use ${TASKS_ADD_MULTIPLE} to add tasks for this timeframe`)
-                nextSteps.push(`Use ${OVERVIEW} with projectId to see tasks in other projects`)
+                nextSteps.push(`Use ${ADD_TASKS} to add tasks for this timeframe`)
+                nextSteps.push(`Use ${GET_OVERVIEW} with projectId to see tasks in other projects`)
             } else if (count > 0) {
                 // Tailor suggestions based on result size
                 if (count > DisplayLimits.BATCH_OPERATION_THRESHOLD) {
-                    nextSteps.push(
-                        `Use ${TASKS_UPDATE_MULTIPLE} to batch-update priorities or dates`,
-                    )
+                    nextSteps.push(`Use ${UPDATE_TASKS} to batch-update priorities or dates`)
                     nextSteps.push('Consider breaking large tasks into subtasks')
                 } else {
-                    nextSteps.push(`Use ${TASKS_UPDATE_MULTIPLE} to modify priorities or due dates`)
+                    nextSteps.push(`Use ${UPDATE_TASKS} to modify priorities or due dates`)
                 }
-                nextSteps.push(`Use ${TASKS_COMPLETE_MULTIPLE} to mark finished tasks`)
+                nextSteps.push(`Use ${COMPLETE_TASKS} to mark finished tasks`)
 
                 // Time-sensitive suggestions
                 if (context?.hasOverdue) {

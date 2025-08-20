@@ -2,21 +2,25 @@ import { TodoistApi } from '@doist/todoist-api-typescript'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { registerTool } from './mcp-helpers.js'
 
-import { deleteOne } from './tools/delete-one.js'
-import { projectsList } from './tools/projects-list.js'
-import { projectsManage } from './tools/projects-manage.js'
+// Task management tools
+import { addTasks } from './tools/add-tasks.js'
+import { completeTasks } from './tools/complete-tasks.js'
+import { findCompletedTasks } from './tools/find-completed-tasks.js'
+import { findTasksByDate } from './tools/find-tasks-by-date.js'
+import { findTasks } from './tools/find-tasks.js'
+import { updateTasks } from './tools/update-tasks.js'
 
-import { sectionsManage } from './tools/sections-manage.js'
-import { sectionsSearch } from './tools/sections-search.js'
+// Project management tools
+import { findProjects } from './tools/find-projects.js'
+import { manageProjects } from './tools/manage-projects.js'
 
-import { overview } from './tools/overview.js'
-import { tasksAddMultiple } from './tools/tasks-add-multiple.js'
-import { tasksCompleteMultiple } from './tools/tasks-complete-multiple.js'
-import { tasksListByDate } from './tools/tasks-list-by-date.js'
-import { tasksListCompleted } from './tools/tasks-list-completed.js'
-import { tasksListForContainer } from './tools/tasks-list-for-container.js'
-import { tasksSearch } from './tools/tasks-search.js'
-import { tasksUpdateMultiple } from './tools/tasks-update-multiple.js'
+// Section management tools
+import { findSections } from './tools/find-sections.js'
+import { manageSections } from './tools/manage-sections.js'
+
+// General tools
+import { deleteObject } from './tools/delete-object.js'
+import { getOverview } from './tools/get-overview.js'
 
 const instructions = `
 Tools to help you manage your todoist tasks.
@@ -41,19 +45,25 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
 
     const todoist = new TodoistApi(todoistApiKey, baseUrl)
 
-    registerTool(tasksListCompleted, server, todoist)
-    registerTool(tasksListByDate, server, todoist)
-    registerTool(tasksSearch, server, todoist)
-    registerTool(projectsList, server, todoist)
-    registerTool(tasksAddMultiple, server, todoist)
-    registerTool(tasksUpdateMultiple, server, todoist)
-    registerTool(deleteOne, server, todoist)
-    registerTool(tasksCompleteMultiple, server, todoist)
-    registerTool(projectsManage, server, todoist)
-    registerTool(sectionsManage, server, todoist)
-    registerTool(sectionsSearch, server, todoist)
-    registerTool(overview, server, todoist)
-    registerTool(tasksListForContainer, server, todoist)
+    // Task management tools
+    registerTool(addTasks, server, todoist)
+    registerTool(completeTasks, server, todoist)
+    registerTool(updateTasks, server, todoist)
+    registerTool(findTasks, server, todoist)
+    registerTool(findTasksByDate, server, todoist)
+    registerTool(findCompletedTasks, server, todoist)
+
+    // Project management tools
+    registerTool(findProjects, server, todoist)
+    registerTool(manageProjects, server, todoist)
+
+    // Section management tools
+    registerTool(findSections, server, todoist)
+    registerTool(manageSections, server, todoist)
+
+    // General tools
+    registerTool(getOverview, server, todoist)
+    registerTool(deleteObject, server, todoist)
 
     return server
 }

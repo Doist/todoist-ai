@@ -1,51 +1,61 @@
 import { getMcpServer } from './mcp-server.js'
 
-import { deleteOne } from './tools/delete-one.js'
-import { projectsList } from './tools/projects-list.js'
-import { projectsManage } from './tools/projects-manage.js'
+// Task management tools
+import { addTasks } from './tools/add-tasks.js'
+import { completeTasks } from './tools/complete-tasks.js'
+import { findCompletedTasks } from './tools/find-completed-tasks.js'
+import { findTasksByDate } from './tools/find-tasks-by-date.js'
+import { findTasks } from './tools/find-tasks.js'
+import { updateTasks } from './tools/update-tasks.js'
 
-import { sectionsManage } from './tools/sections-manage.js'
-import { sectionsSearch } from './tools/sections-search.js'
+// Project management tools
+import { findProjects } from './tools/find-projects.js'
+import { manageProjects } from './tools/manage-projects.js'
 
-import { overview } from './tools/overview.js'
-import { tasksAddMultiple } from './tools/tasks-add-multiple.js'
-import { tasksCompleteMultiple } from './tools/tasks-complete-multiple.js'
-import { tasksListByDate } from './tools/tasks-list-by-date.js'
-import { tasksListCompleted } from './tools/tasks-list-completed.js'
-import { tasksListForContainer } from './tools/tasks-list-for-container.js'
-import { tasksSearch } from './tools/tasks-search.js'
-import { tasksUpdateMultiple } from './tools/tasks-update-multiple.js'
+// Section management tools
+import { findSections } from './tools/find-sections.js'
+import { manageSections } from './tools/manage-sections.js'
+
+// General tools
+import { deleteObject } from './tools/delete-object.js'
+import { getOverview } from './tools/get-overview.js'
 
 const tools = {
-    projectsList,
-    projectsManage,
-    deleteOne,
-    sectionsSearch,
-    sectionsManage,
-    tasksListByDate,
-    tasksListCompleted,
-    tasksListForContainer,
-    tasksCompleteMultiple,
-    tasksSearch,
-    tasksAddMultiple,
-    tasksUpdateMultiple,
-    overview,
+    // Task management tools
+    addTasks,
+    completeTasks,
+    updateTasks,
+    findTasks,
+    findTasksByDate,
+    findCompletedTasks,
+    // Project management tools
+    findProjects,
+    manageProjects,
+    // Section management tools
+    findSections,
+    manageSections,
+    // General tools
+    getOverview,
+    deleteObject,
 }
 
 export { tools, getMcpServer }
 
 export {
-    projectsList,
-    projectsManage,
-    deleteOne,
-    sectionsSearch,
-    sectionsManage,
-    tasksListByDate,
-    tasksListForContainer,
-    tasksListCompleted,
-    tasksCompleteMultiple,
-    tasksSearch,
-    tasksAddMultiple,
-    tasksUpdateMultiple,
-    overview,
+    // Task management tools
+    addTasks,
+    completeTasks,
+    updateTasks,
+    findTasks,
+    findTasksByDate,
+    findCompletedTasks,
+    // Project management tools
+    findProjects,
+    manageProjects,
+    // Section management tools
+    findSections,
+    manageSections,
+    // General tools
+    getOverview,
+    deleteObject,
 }
