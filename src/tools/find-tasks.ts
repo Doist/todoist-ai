@@ -88,11 +88,6 @@ const findTasks = {
                     totalCount: finalTasks.length,
                     hasMore: Boolean(nextCursor),
                     appliedFilters: args,
-                    containerInfo: {
-                        projectId,
-                        sectionId,
-                        parentId,
-                    },
                 },
             })
         }
@@ -120,7 +115,6 @@ const findTasks = {
                 totalCount: result.tasks.length,
                 hasMore: Boolean(result.nextCursor),
                 appliedFilters: args,
-                searchQuery: searchText ? `search: ${searchText}` : undefined,
             },
         })
     },
