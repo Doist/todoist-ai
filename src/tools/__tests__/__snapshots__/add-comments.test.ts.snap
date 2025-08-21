@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`add-comments tool adding comments to projects should add comment to project 1`] = `
+"Added comment to project: This is a project comment • id=98767
+Next:
+- Use find-comments with projectId=project789 to see all comments
+- Use update-comments with id=98767 to edit content
+- Use delete-object with type=comment id=98767 to remove comment"
+`;
+
+exports[`add-comments tool adding comments to tasks should add comment to task without attachment 1`] = `
+"Added comment to task: This is a task comment • id=98765
+Next:
+- Use find-comments with taskId=task456 to see all comments
+- Use update-comments with id=98765 to edit content
+- Use delete-object with type=comment id=98765 to remove comment"
+`;

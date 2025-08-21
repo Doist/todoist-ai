@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`update-comments tool should handle project comment 1`] = `
+"Updated comment: Updated project comment • id=98767
+Next:
+- Use find-comments with projectId=project789 to see all project comments
+- Use delete-object with type=comment id=98767 to remove comment"
+`;
+
+exports[`update-comments tool should update comment content 1`] = `
+"Updated comment: Updated content here • id=98765
+Next:
+- Use find-comments with taskId=task456 to see all task comments
+- Use delete-object with type=comment id=98765 to remove comment"
+`;

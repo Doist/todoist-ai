@@ -4,16 +4,25 @@ import type { TodoistTool } from '../todoist-tool.js'
 import { formatNextSteps } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
-const { FIND_PROJECTS, GET_OVERVIEW, FIND_SECTIONS, FIND_TASKS, FIND_TASKS_BY_DATE } = ToolNames
+const {
+    FIND_PROJECTS,
+    GET_OVERVIEW,
+    FIND_SECTIONS,
+    FIND_TASKS,
+    FIND_TASKS_BY_DATE,
+    FIND_COMMENTS,
+} = ToolNames
 
 const ArgsSchema = {
-    type: z.enum(['project', 'section', 'task']).describe('The type of entity to delete.'),
+    type: z
+        .enum(['project', 'section', 'task', 'comment'])
+        .describe('The type of entity to delete.'),
     id: z.string().min(1).describe('The ID of the entity to delete.'),
 }
 
 const deleteObject = {
     name: ToolNames.DELETE_OBJECT,
-    description: 'Delete a project, section, or task by its ID.',
+    description: 'Delete a project, section, task, or comment by its ID.',
     parameters: ArgsSchema,
     async execute(args, client) {
         switch (args.type) {
@@ -25,6 +34,9 @@ const deleteObject = {
                 break
             case 'task':
                 await client.deleteTask(args.id)
+                break
+            case 'comment':
+                await client.deleteComment(args.id)
                 break
         }
 
@@ -50,7 +62,7 @@ function generateTextContent({
     type,
     id,
 }: {
-    type: 'project' | 'section' | 'task'
+    type: 'project' | 'section' | 'task' | 'comment'
     id: string
 }): string {
     const summary = `Deleted ${type}: id=${id}`
@@ -78,6 +90,12 @@ function generateTextContent({
             nextSteps.push(`Use ${FIND_TASKS_BY_DATE} to see remaining tasks for today`)
             nextSteps.push(`Use ${GET_OVERVIEW} to check if this affects any dependent tasks`)
             nextSteps.push('Note: Any subtasks of this task were also deleted')
+            break
+
+        case 'comment':
+            // Help user understand comment deletion impact
+            nextSteps.push(`Use ${FIND_COMMENTS} to see remaining comments on the task/project`)
+            nextSteps.push('Note: Comment attachments were also deleted')
             break
     }
 

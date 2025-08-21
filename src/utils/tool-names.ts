@@ -24,6 +24,11 @@ export const ToolNames = {
     UPDATE_SECTIONS: 'update-sections',
     FIND_SECTIONS: 'find-sections',
 
+    // Comment management tools
+    ADD_COMMENTS: 'add-comments',
+    UPDATE_COMMENTS: 'update-comments',
+    FIND_COMMENTS: 'find-comments',
+
     // General tools
     GET_OVERVIEW: 'get-overview',
     DELETE_OBJECT: 'delete-object',

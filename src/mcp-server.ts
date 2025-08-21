@@ -20,6 +20,11 @@ import { addSections } from './tools/add-sections.js'
 import { findSections } from './tools/find-sections.js'
 import { updateSections } from './tools/update-sections.js'
 
+// Comment management tools
+import { addComments } from './tools/add-comments.js'
+import { findComments } from './tools/find-comments.js'
+import { updateComments } from './tools/update-comments.js'
+
 // General tools
 import { deleteObject } from './tools/delete-object.js'
 import { getOverview } from './tools/get-overview.js'
@@ -64,6 +69,11 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     registerTool(addSections, server, todoist)
     registerTool(updateSections, server, todoist)
     registerTool(findSections, server, todoist)
+
+    // Comment management tools
+    registerTool(addComments, server, todoist)
+    registerTool(findComments, server, todoist)
+    registerTool(updateComments, server, todoist)
 
     // General tools
     registerTool(getOverview, server, todoist)

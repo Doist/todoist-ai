@@ -21,6 +21,10 @@ export const ApiLimits = {
     PROJECTS_MAX: 100,
     /** Batch size for fetching all tasks in a project */
     TASKS_BATCH_SIZE: 50,
+    /** Default limit for comment listings */
+    COMMENTS_DEFAULT: 10,
+    /** Maximum limit for comment search and list operations */
+    COMMENTS_MAX: 10,
 } as const
 
 // UI Display Limits
