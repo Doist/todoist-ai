@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.0.0](https://github.com/Doist/todoist-ai/compare/v2.2.2...v3.0.0) (2025-08-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* verb-first tool names, unify find-by-container into find-tasks ([#53](https://github.com/Doist/todoist-ai/issues/53))
+* Remove single update task and replace with multiple ([#47](https://github.com/Doist/todoist-ai/issues/47))
+
+### Features
+
+* Improve tool output UX with LLM-readable responses ([#49](https://github.com/Doist/todoist-ai/issues/49)) ([7c25696](https://github.com/Doist/todoist-ai/commit/7c25696926bbaee158482cbc75595e80959e1c12))
+* Remove single update task and replace with multiple ([#47](https://github.com/Doist/todoist-ai/issues/47)) ([8a9b7cf](https://github.com/Doist/todoist-ai/commit/8a9b7cf119a405a2849ab95c437a344961790686))
+* verb-first tool names, unify find-by-container into find-tasks ([#53](https://github.com/Doist/todoist-ai/issues/53)) ([dbada71](https://github.com/Doist/todoist-ai/commit/dbada719d98df4bb91a52a0a7af8afb6ad6f3fae))
+
 ## [2.2.2](https://github.com/Doist/todoist-ai/compare/v2.2.1...v2.2.2) (2025-08-16)
 
 
