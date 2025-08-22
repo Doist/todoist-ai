@@ -29,6 +29,20 @@ npm start
 
 This will build the project and run the MCP inspector for manual testing.
 
+### Creating a Custom MCP Server
+
+For convenience, we also include a function that initializes an MCP Server with all the tools available:
+
+```js
+import { getMcpServer } from "@doist/todoist-ai";
+
+async function main() {
+    const server = getMcpServer({ todoistApiKey: process.env.TODOIST_API_KEY });
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+}
+```
+
 Then, proceed depending on the MCP protocol transport you'll use.
 
 ## Using Standard I/O Transport

@@ -12,7 +12,10 @@ Update the `.env` file with your Todoist token:
 
 ```env
 TODOIST_API_KEY=your-key-goes-here
+TODOIST_BASE_URL=https://local.todoist.com/rest/v2
 ```
+
+The `TODOIST_BASE_URL` is optional and defaults to the official Todoist API endpoint. You may need to change this for development or testing purposes.
 
 ## 3. Run the MCP server with inspector
 

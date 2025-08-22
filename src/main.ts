@@ -4,12 +4,13 @@ import dotenv from 'dotenv'
 import { getMcpServer } from './mcp-server.js'
 
 function main() {
+    const baseUrl = process.env.TODOIST_BASE_URL
     const todoistApiKey = process.env.TODOIST_API_KEY
     if (!todoistApiKey) {
         throw new Error('TODOIST_API_KEY is not set')
     }
 
-    const server = getMcpServer({ todoistApiKey })
+    const server = getMcpServer({ todoistApiKey, baseUrl })
     const transport = new StdioServerTransport()
     server
         .connect(transport)

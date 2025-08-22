@@ -40,17 +40,7 @@ You can run the MCP server directly with npx:
 npx @doist/todoist-ai
 ```
 
-For convenience, we also include a function that initializes an MCP Server with all the tools available:
-
-```js
-import { getMcpServer } from "@doist/todoist-ai";
-
-async function main() {
-    const server = getMcpServer({ todoistApiKey: process.env.TODOIST_API_KEY });
-    const transport = new StdioServerTransport();
-    await server.connect(transport);
-}
-```
+For more details on setting up and using the MCP server, including creating custom servers, see [docs/mcp-server.md](docs/mcp-server.md).
 
 ## Features
 
