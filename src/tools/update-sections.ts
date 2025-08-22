@@ -40,6 +40,40 @@ const updateSections = {
     },
 } satisfies TodoistTool<typeof ArgsSchema>
 
+function generateNextSteps(sections: Section[]): string[] {
+    // Handle empty sections first (early return)
+    if (sections.length === 0) {
+        return [`Use ${FIND_SECTIONS} to see current sections`]
+    }
+
+    // Handle single section case
+    if (sections.length === 1) {
+        const section = sections[0]
+        if (!section) return []
+
+        return [
+            `Use ${FIND_TASKS} with sectionId=${section.id} to see existing tasks`,
+            `Use ${GET_OVERVIEW} with projectId=${section.projectId} to see project structure`,
+            'Consider updating task descriptions if section purpose changed',
+        ]
+    }
+
+    // Handle multiple sections case
+    const projectIds = [...new Set(sections.map((s) => s.projectId))]
+    const steps = [`Use ${FIND_SECTIONS} to see all sections with updated names`]
+
+    if (projectIds.length === 1) {
+        steps.push(
+            `Use ${GET_OVERVIEW} with projectId=${projectIds[0]} to see updated project structure`,
+        )
+    } else {
+        steps.push(`Use ${GET_OVERVIEW} to see updated project structures`)
+    }
+
+    steps.push('Consider updating task descriptions if section purposes changed')
+    return steps
+}
+
 function generateTextContent({
     sections,
 }: {
@@ -52,40 +86,7 @@ function generateTextContent({
 
     const summary = `Updated ${count} section${count === 1 ? '' : 's'}:\n${sectionList}`
 
-    // Context-aware next steps for updated sections
-    const nextSteps: string[] = []
-
-    if (sections.length > 0) {
-        if (count === 1) {
-            const section = sections[0]
-            if (section) {
-                nextSteps.push(
-                    `Use ${FIND_TASKS} with sectionId=${section.id} to see existing tasks`,
-                )
-                nextSteps.push(
-                    `Use ${GET_OVERVIEW} with projectId=${section.projectId} to see project structure`,
-                )
-                nextSteps.push('Consider updating task descriptions if section purpose changed')
-            }
-        } else {
-            // Group sections by project for better guidance
-            const projectIds = [...new Set(sections.map((s) => s.projectId))]
-
-            nextSteps.push(`Use ${FIND_SECTIONS} to see all sections with updated names`)
-
-            if (projectIds.length === 1) {
-                nextSteps.push(
-                    `Use ${GET_OVERVIEW} with projectId=${projectIds[0]} to see updated project structure`,
-                )
-            } else {
-                nextSteps.push(`Use ${GET_OVERVIEW} to see updated project structures`)
-            }
-
-            nextSteps.push('Consider updating task descriptions if section purposes changed')
-        }
-    } else {
-        nextSteps.push(`Use ${FIND_SECTIONS} to see current sections`)
-    }
+    const nextSteps = generateNextSteps(sections)
 
     const next = formatNextSteps(nextSteps)
     return `${summary}\n${next}`

@@ -96,7 +96,7 @@ describe(`${ADD_PROJECTS} tool`, () => {
             expect(textContent).toContain('Added 1 project:')
             expect(textContent).toContain('My Blue Project')
             expect(textContent).toContain('id=project-456')
-            expect(textContent).toContain(`Use ${ADD_SECTIONS} to organize "My Blue Project"`)
+            expect(textContent).toContain(`Use ${ADD_SECTIONS} to organize new project`)
         })
 
         it('should create project with isFavorite and viewStyle options', async () => {

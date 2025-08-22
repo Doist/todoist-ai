@@ -28,16 +28,7 @@ const addProjects = {
     description: 'Add one or more new projects.',
     parameters: ArgsSchema,
     async execute({ projects }, client) {
-        const newProjects = await Promise.all(
-            projects.map((project) =>
-                client.addProject({
-                    name: project.name,
-                    isFavorite: project.isFavorite,
-                    viewStyle: project.viewStyle,
-                }),
-            ),
-        )
-
+        const newProjects = await Promise.all(projects.map((project) => client.addProject(project)))
         const textContent = generateTextContent({ projects: newProjects })
 
         return getToolOutput({
@@ -66,7 +57,7 @@ function generateTextContent({
     if (count === 1) {
         const project = projects[0]
         if (project) {
-            nextSteps.push(`Use ${ADD_SECTIONS} to organize "${project.name}" with sections`)
+            nextSteps.push(`Use ${ADD_SECTIONS} to organize new project with sections`)
             nextSteps.push(`Use ${ADD_TASKS} to add your first tasks to this project`)
             nextSteps.push(
                 `Use ${GET_OVERVIEW} with projectId=${project.id} to see project structure`,
