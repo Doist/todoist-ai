@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.0.0](https://github.com/Doist/todoist-ai/compare/v3.0.0...v4.0.0) (2025-08-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* restructure management tools into specialized add/update tools ([#59](https://github.com/Doist/todoist-ai/issues/59))
+
+### Features
+
+* add comment tools ([#58](https://github.com/Doist/todoist-ai/issues/58)) ([7d6ffca](https://github.com/Doist/todoist-ai/commit/7d6ffcacd326ef755aba691436d44d6b534f6b4b))
+* add todoist base url to dev setup, plus doc improvements ([#62](https://github.com/Doist/todoist-ai/issues/62)) ([e0e5a78](https://github.com/Doist/todoist-ai/commit/e0e5a78d1358b82d5f2661a41ffe193015296154))
+* parallelize add-tasks with per-task context ([#60](https://github.com/Doist/todoist-ai/issues/60)) ([816d099](https://github.com/Doist/todoist-ai/commit/816d099551974bad3e0663c1d77334b692aaa76a))
+* restructure management tools into specialized add/update tools ([#59](https://github.com/Doist/todoist-ai/issues/59)) ([0c4dcf7](https://github.com/Doist/todoist-ai/commit/0c4dcf7c4e420eadea15bf825599f4c3cd72cbfc))
+
 ## [3.0.0](https://github.com/Doist/todoist-ai/compare/v2.2.2...v3.0.0) (2025-08-21)
 
 
