@@ -60,13 +60,7 @@ This project is in its early stages. Expect more and/or better tools soon.
 
 Nevertheless, our goal is to provide a small set of tools that enable complete workflows, rather than just atomic actions, striking a balance between flexibility and efficiency for LLMs.
 
-### Design Philosophy
-
-Our tools follow an **intelligent consolidation** approach that reduces cognitive load on LLMs by providing fewer, more powerful tools that handle complete user workflows rather than requiring multiple API calls for common tasks.
-
-Key principles include workflow-centric design, smart parameter handling, batch operations, and context-aware responses with suggested next steps.
-
-For detailed design guidelines, examples, and development patterns, see [docs/tool-design.md](docs/tool-design.md).
+For our design philosophy, guidelines, and development patterns, see [docs/tool-design.md](docs/tool-design.md).
 
 ### Available Tools
 
