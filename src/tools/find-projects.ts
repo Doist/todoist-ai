@@ -6,7 +6,7 @@ import { ApiLimits } from '../utils/constants.js'
 import { formatProjectPreview, summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
-const { MANAGE_PROJECTS, FIND_TASKS } = ToolNames
+const { ADD_PROJECTS, FIND_TASKS } = ToolNames
 
 const ArgsSchema = {
     search: z
@@ -98,7 +98,7 @@ function generateTextContent({
             zeroReasonHints.push('Remove search to see all projects')
         } else {
             zeroReasonHints.push('No projects created yet')
-            zeroReasonHints.push(`Use ${MANAGE_PROJECTS} to create a project`)
+            zeroReasonHints.push(`Use ${ADD_PROJECTS} to create a project`)
         }
     }
 

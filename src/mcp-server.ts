@@ -11,8 +11,9 @@ import { findTasks } from './tools/find-tasks.js'
 import { updateTasks } from './tools/update-tasks.js'
 
 // Project management tools
+import { addProjects } from './tools/add-projects.js'
 import { findProjects } from './tools/find-projects.js'
-import { manageProjects } from './tools/manage-projects.js'
+import { updateProjects } from './tools/update-projects.js'
 
 // Section management tools
 import { findSections } from './tools/find-sections.js'
@@ -54,8 +55,9 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     registerTool(findCompletedTasks, server, todoist)
 
     // Project management tools
+    registerTool(addProjects, server, todoist)
+    registerTool(updateProjects, server, todoist)
     registerTool(findProjects, server, todoist)
-    registerTool(manageProjects, server, todoist)
 
     // Section management tools
     registerTool(findSections, server, todoist)

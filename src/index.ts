@@ -9,8 +9,9 @@ import { findTasks } from './tools/find-tasks.js'
 import { updateTasks } from './tools/update-tasks.js'
 
 // Project management tools
+import { addProjects } from './tools/add-projects.js'
 import { findProjects } from './tools/find-projects.js'
-import { manageProjects } from './tools/manage-projects.js'
+import { updateProjects } from './tools/update-projects.js'
 
 // Section management tools
 import { findSections } from './tools/find-sections.js'
@@ -29,8 +30,9 @@ const tools = {
     findTasksByDate,
     findCompletedTasks,
     // Project management tools
+    addProjects,
+    updateProjects,
     findProjects,
-    manageProjects,
     // Section management tools
     findSections,
     manageSections,
@@ -50,8 +52,9 @@ export {
     findTasksByDate,
     findCompletedTasks,
     // Project management tools
+    addProjects,
+    updateProjects,
     findProjects,
-    manageProjects,
     // Section management tools
     findSections,
     manageSections,
