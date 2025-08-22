@@ -1,4 +1,4 @@
-import type { AddTaskArgs, Task } from '@doist/todoist-api-typescript'
+import type { AddTaskArgs, Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
@@ -22,12 +22,12 @@ const TaskSchema = z.object({
         .describe(
             'The duration of the task. Use format: "2h" (hours), "90m" (minutes), "2h30m" (combined), or "1.5h" (decimal hours). Max 24h.',
         ),
+    projectId: z.string().optional().describe('The project ID to add this task to.'),
+    sectionId: z.string().optional().describe('The section ID to add this task to.'),
+    parentId: z.string().optional().describe('The parent task ID (for subtasks).'),
 })
 
 const ArgsSchema = {
-    projectId: z.string().optional().describe('The project ID to add the tasks to.'),
-    sectionId: z.string().optional().describe('The section ID to add the tasks to.'),
-    parentId: z.string().optional().describe('The parent task ID (for subtasks).'),
     tasks: z.array(TaskSchema).min(1).describe('The array of tasks to add.'),
 }
 
@@ -35,40 +35,14 @@ const addTasks = {
     name: ToolNames.ADD_TASKS,
     description: 'Add one or more tasks to a project, section, or parent.',
     parameters: ArgsSchema,
-    async execute(args, client) {
-        const { projectId, sectionId, parentId, tasks } = args
-        const newTasks: Task[] = []
-
-        for (const task of tasks) {
-            const { duration: durationStr, ...otherTaskArgs } = task
-
-            let taskArgs: AddTaskArgs = { ...otherTaskArgs, projectId, sectionId, parentId }
-
-            // Parse duration if provided
-            if (durationStr) {
-                try {
-                    const { minutes } = parseDuration(durationStr)
-                    taskArgs = {
-                        ...taskArgs,
-                        duration: minutes,
-                        durationUnit: 'minute',
-                    }
-                } catch (error) {
-                    if (error instanceof DurationParseError) {
-                        throw new Error(`Task "${task.content}": ${error.message}`)
-                    }
-                    throw error
-                }
-            }
-
-            newTasks.push(await client.addTask(taskArgs))
-        }
-
+    async execute({ tasks }, client) {
+        const addTaskPromises = tasks.map((task) => processTask(task, client))
+        const newTasks = await Promise.all(addTaskPromises)
         const mappedTasks = newTasks.map(mapTask)
 
         const textContent = generateTextContent({
             tasks: mappedTasks,
-            args,
+            args: { tasks },
         })
 
         return getToolOutput({
@@ -81,6 +55,31 @@ const addTasks = {
     },
 } satisfies TodoistTool<typeof ArgsSchema>
 
+async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi): Promise<Task> {
+    const { duration: durationStr, projectId, sectionId, parentId, ...otherTaskArgs } = task
+
+    let taskArgs: AddTaskArgs = { ...otherTaskArgs, projectId, sectionId, parentId }
+
+    // Parse duration if provided
+    if (durationStr) {
+        try {
+            const { minutes } = parseDuration(durationStr)
+            taskArgs = {
+                ...taskArgs,
+                duration: minutes,
+                durationUnit: 'minute',
+            }
+        } catch (error) {
+            if (error instanceof DurationParseError) {
+                throw new Error(`Task "${task.content}": ${error.message}`)
+            }
+            throw error
+        }
+    }
+
+    return await client.addTask(taskArgs)
+}
+
 function generateTextContent({
     tasks,
     args,
@@ -92,14 +91,21 @@ function generateTextContent({
     const todayStr = getDateString()
     const hasToday = tasks.some((task) => task.dueDate === todayStr)
 
-    // Generate context description without API calls
+    // Generate context description for mixed contexts
+    const contextTypes = new Set<string>()
+    for (const task of args.tasks) {
+        if (task.projectId) contextTypes.add('projects')
+        else if (task.sectionId) contextTypes.add('sections')
+        else if (task.parentId) contextTypes.add('subtasks')
+        else contextTypes.add('inbox')
+    }
+
     let projectContext = ''
-    if (args.projectId) {
-        projectContext = 'to specified project'
-    } else if (args.sectionId) {
-        projectContext = 'to specified section'
-    } else if (args.parentId) {
-        projectContext = 'as subtasks'
+    if (contextTypes.size === 1) {
+        const contextType = Array.from(contextTypes)[0]
+        projectContext = contextType === 'inbox' ? '' : `to ${contextType}`
+    } else if (contextTypes.size > 1) {
+        projectContext = 'to multiple contexts'
     }
 
     return summarizeTaskOperation('Added', tasks, {

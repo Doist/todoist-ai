@@ -55,14 +55,14 @@ describe(`${ADD_TASKS} tool`, () => {
 
             const result = await addTasks.execute(
                 {
-                    projectId: '6cfCcrrCFg2xP94Q',
                     tasks: [
-                        { content: 'First task content' },
+                        { content: 'First task content', projectId: '6cfCcrrCFg2xP94Q' },
                         {
                             content: 'Second task content',
                             description: 'Task description',
                             priority: 2,
                             dueString: 'Aug 15',
+                            projectId: '6cfCcrrCFg2xP94Q',
                         },
                     ],
                 },
@@ -120,14 +120,14 @@ describe(`${ADD_TASKS} tool`, () => {
 
             const result = await addTasks.execute(
                 {
-                    projectId: '6cfCcrrCFg2xP94Q',
-                    sectionId: 'section-123',
-                    parentId: 'parent-task-456',
                     tasks: [
                         {
                             content: 'Subtask content',
                             description: 'Subtask description',
                             priority: 3,
+                            projectId: '6cfCcrrCFg2xP94Q',
+                            sectionId: 'section-123',
+                            parentId: 'parent-task-456',
                         },
                     ],
                 },
@@ -179,10 +179,17 @@ describe(`${ADD_TASKS} tool`, () => {
 
             const result = await addTasks.execute(
                 {
-                    projectId: '6cfCcrrCFg2xP94Q',
                     tasks: [
-                        { content: 'Task with 2 hour duration', duration: '2h' },
-                        { content: 'Task with 45 minute duration', duration: '45m' },
+                        {
+                            content: 'Task with 2 hour duration',
+                            duration: '2h',
+                            projectId: '6cfCcrrCFg2xP94Q',
+                        },
+                        {
+                            content: 'Task with 45 minute duration',
+                            duration: '45m',
+                            projectId: '6cfCcrrCFg2xP94Q',
+                        },
                     ],
                 },
                 mockTodoistApi,
@@ -364,8 +371,7 @@ describe(`${ADD_TASKS} tool`, () => {
 
             const result = await addTasks.execute(
                 {
-                    projectId: '6cfCcrrCFg2xP94Q',
-                    tasks: [{ content: 'Regular task' }],
+                    tasks: [{ content: 'Regular task', projectId: '6cfCcrrCFg2xP94Q' }],
                 },
                 mockTodoistApi,
             )
