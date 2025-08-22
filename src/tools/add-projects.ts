@@ -9,6 +9,14 @@ const { ADD_SECTIONS, ADD_TASKS, FIND_PROJECTS, GET_OVERVIEW } = ToolNames
 
 const ProjectSchema = z.object({
     name: z.string().min(1).describe('The name of the project.'),
+    isFavorite: z
+        .boolean()
+        .optional()
+        .describe('Whether the project is a favorite. Defaults to false.'),
+    viewStyle: z
+        .enum(['list', 'board', 'calendar'])
+        .optional()
+        .describe('The project view style. Defaults to "list".'),
 })
 
 const ArgsSchema = {
@@ -21,7 +29,13 @@ const addProjects = {
     parameters: ArgsSchema,
     async execute({ projects }, client) {
         const newProjects = await Promise.all(
-            projects.map((project) => client.addProject({ name: project.name })),
+            projects.map((project) =>
+                client.addProject({
+                    name: project.name,
+                    isFavorite: project.isFavorite,
+                    viewStyle: project.viewStyle,
+                }),
+            ),
         )
 
         const textContent = generateTextContent({ projects: newProjects })

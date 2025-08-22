@@ -85,7 +85,11 @@ describe(`${ADD_PROJECTS} tool`, () => {
                 mockTodoistApi,
             )
 
-            expect(mockTodoistApi.addProject).toHaveBeenCalledWith({ name: 'My Blue Project' })
+            expect(mockTodoistApi.addProject).toHaveBeenCalledWith({
+                name: 'My Blue Project',
+                isFavorite: undefined,
+                viewStyle: undefined,
+            })
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
@@ -93,6 +97,34 @@ describe(`${ADD_PROJECTS} tool`, () => {
             expect(textContent).toContain('My Blue Project')
             expect(textContent).toContain('id=project-456')
             expect(textContent).toContain(`Use ${ADD_SECTIONS} to organize "My Blue Project"`)
+        })
+
+        it('should create project with isFavorite and viewStyle options', async () => {
+            const mockApiResponse = createMockProject({
+                id: 'project-789',
+                name: 'Board Project',
+                isFavorite: true,
+                viewStyle: 'board',
+            })
+
+            mockTodoistApi.addProject.mockResolvedValue(mockApiResponse)
+
+            const result = await addProjects.execute(
+                { projects: [{ name: 'Board Project', isFavorite: true, viewStyle: 'board' }] },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addProject).toHaveBeenCalledWith({
+                name: 'Board Project',
+                isFavorite: true,
+                viewStyle: 'board',
+            })
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Added 1 project:')
+            expect(textContent).toContain('Board Project')
+            expect(textContent).toContain('id=project-789')
         })
     })
 

@@ -75,6 +75,57 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
                 }),
             )
         })
+
+        it('should update project with isFavorite and viewStyle options', async () => {
+            const mockApiResponse: PersonalProject = {
+                url: 'https://todoist.com/projects/project-123',
+                id: 'project-123',
+                parentId: null,
+                isDeleted: false,
+                updatedAt: '2025-08-13T22:10:30.000000Z',
+                childOrder: 1,
+                description: '',
+                isCollapsed: false,
+                canAssignTasks: false,
+                color: 'red',
+                isFavorite: true,
+                isFrozen: false,
+                name: 'Updated Favorite Project',
+                viewStyle: 'board',
+                isArchived: false,
+                inboxProject: false,
+                isShared: false,
+                createdAt: '2024-01-01T00:00:00Z',
+                defaultOrder: 0,
+            }
+
+            mockTodoistApi.updateProject.mockResolvedValue(mockApiResponse)
+
+            const result = await updateProjects.execute(
+                {
+                    projects: [
+                        {
+                            id: 'project-123',
+                            name: 'Updated Favorite Project',
+                            isFavorite: true,
+                            viewStyle: 'board',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateProject).toHaveBeenCalledWith('project-123', {
+                name: 'Updated Favorite Project',
+                isFavorite: true,
+                viewStyle: 'board',
+            })
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Updated 1 project:')
+            expect(textContent).toContain('Updated Favorite Project (id=project-123)')
+        })
     })
 
     describe('updating multiple projects', () => {

@@ -9,6 +9,15 @@ Next:
 - Use get-overview with projectId=6cfCcrrCFg2xP94Q to see project structure"
 `;
 
+exports[`add-projects tool creating a single project should create project with isFavorite and viewStyle options 1`] = `
+"Added 1 project:
+• Board Project (id=project-789)
+Next:
+- Use add-sections to organize "Board Project" with sections
+- Use add-tasks to add your first tasks to this project
+- Use get-overview with projectId=project-789 to see project structure"
+`;
+
 exports[`add-projects tool creating a single project should handle different project properties from API 1`] = `
 "Added 1 project:
 • My Blue Project (id=project-456)
