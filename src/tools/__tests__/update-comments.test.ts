@@ -41,8 +41,12 @@ describe(`${UPDATE_COMMENTS} tool`, () => {
 
         const result = await updateComments.execute(
             {
-                id: '98765',
-                content: 'Updated content here',
+                comments: [
+                    {
+                        id: '98765',
+                        content: 'Updated content here',
+                    },
+                ],
             },
             mockTodoistApi,
         )
@@ -58,13 +62,19 @@ describe(`${UPDATE_COMMENTS} tool`, () => {
         const structuredContent = extractStructuredContent(result)
         expect(structuredContent).toEqual(
             expect.objectContaining({
-                comment: expect.objectContaining({
-                    id: '98765',
-                    content: 'Updated content here',
-                    taskId: 'task456',
-                    fileAttachment: null,
-                }),
-                operation: 'updated',
+                comments: [
+                    expect.objectContaining({
+                        id: '98765',
+                        content: 'Updated content here',
+                        taskId: 'task456',
+                        fileAttachment: null,
+                    }),
+                ],
+                totalCount: 1,
+                updatedCommentIds: ['98765'],
+                appliedOperations: {
+                    updateCount: 1,
+                },
             }),
         )
     })
@@ -81,8 +91,12 @@ describe(`${UPDATE_COMMENTS} tool`, () => {
 
         const result = await updateComments.execute(
             {
-                id: '98767',
-                content: 'Updated project comment',
+                comments: [
+                    {
+                        id: '98767',
+                        content: 'Updated project comment',
+                    },
+                ],
             },
             mockTodoistApi,
         )
@@ -94,15 +108,263 @@ describe(`${UPDATE_COMMENTS} tool`, () => {
         const structuredContent = extractStructuredContent(result)
         expect(structuredContent).toEqual(
             expect.objectContaining({
-                comment: expect.objectContaining({
-                    id: '98767',
-                    content: 'Updated project comment',
-                    taskId: undefined,
-                    projectId: 'project789',
-                    fileAttachment: null,
-                }),
-                operation: 'updated',
+                comments: [
+                    expect.objectContaining({
+                        id: '98767',
+                        content: 'Updated project comment',
+                        taskId: undefined,
+                        projectId: 'project789',
+                        fileAttachment: null,
+                    }),
+                ],
+                totalCount: 1,
+                updatedCommentIds: ['98767'],
+                appliedOperations: {
+                    updateCount: 1,
+                },
             }),
         )
+    })
+
+    describe('bulk operations', () => {
+        it('should update multiple comments from different entities (task + project)', async () => {
+            const mockTaskComment = createMockComment({
+                id: '11111',
+                content: 'Updated task comment',
+                taskId: 'task123',
+                projectId: undefined,
+            })
+
+            const mockProjectComment = createMockComment({
+                id: '22222',
+                content: 'Updated project comment',
+                taskId: undefined,
+                projectId: 'project456',
+            })
+
+            mockTodoistApi.updateComment
+                .mockResolvedValueOnce(mockTaskComment)
+                .mockResolvedValueOnce(mockProjectComment)
+
+            const result = await updateComments.execute(
+                {
+                    comments: [
+                        { id: '11111', content: 'Updated task comment' },
+                        { id: '22222', content: 'Updated project comment' },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateComment).toHaveBeenCalledTimes(2)
+            expect(mockTodoistApi.updateComment).toHaveBeenCalledWith('11111', {
+                content: 'Updated task comment',
+            })
+            expect(mockTodoistApi.updateComment).toHaveBeenCalledWith('22222', {
+                content: 'Updated project comment',
+            })
+
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    comments: [
+                        expect.objectContaining({
+                            id: '11111',
+                            content: 'Updated task comment',
+                            taskId: 'task123',
+                        }),
+                        expect.objectContaining({
+                            id: '22222',
+                            content: 'Updated project comment',
+                            projectId: 'project456',
+                        }),
+                    ],
+                    totalCount: 2,
+                    updatedCommentIds: ['11111', '22222'],
+                    appliedOperations: {
+                        updateCount: 2,
+                    },
+                }),
+            )
+        })
+
+        it('should update multiple comments from different tasks', async () => {
+            const mockComment1 = createMockComment({
+                id: '33333',
+                content: 'Updated first task comment',
+                taskId: 'task111',
+            })
+
+            const mockComment2 = createMockComment({
+                id: '44444',
+                content: 'Updated second task comment',
+                taskId: 'task222',
+            })
+
+            mockTodoistApi.updateComment
+                .mockResolvedValueOnce(mockComment1)
+                .mockResolvedValueOnce(mockComment2)
+
+            const result = await updateComments.execute(
+                {
+                    comments: [
+                        { id: '33333', content: 'Updated first task comment' },
+                        { id: '44444', content: 'Updated second task comment' },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateComment).toHaveBeenCalledTimes(2)
+
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    comments: expect.arrayContaining([
+                        expect.objectContaining({
+                            id: '33333',
+                            content: 'Updated first task comment',
+                            taskId: 'task111',
+                        }),
+                        expect.objectContaining({
+                            id: '44444',
+                            content: 'Updated second task comment',
+                            taskId: 'task222',
+                        }),
+                    ]),
+                    totalCount: 2,
+                    updatedCommentIds: ['33333', '44444'],
+                    appliedOperations: {
+                        updateCount: 2,
+                    },
+                }),
+            )
+        })
+
+        it('should update multiple comments from the same task', async () => {
+            const mockComment1 = createMockComment({
+                id: '55555',
+                content: 'Updated first comment on same task',
+                taskId: 'task999',
+            })
+
+            const mockComment2 = createMockComment({
+                id: '66666',
+                content: 'Updated second comment on same task',
+                taskId: 'task999',
+            })
+
+            mockTodoistApi.updateComment
+                .mockResolvedValueOnce(mockComment1)
+                .mockResolvedValueOnce(mockComment2)
+
+            const result = await updateComments.execute(
+                {
+                    comments: [
+                        { id: '55555', content: 'Updated first comment on same task' },
+                        { id: '66666', content: 'Updated second comment on same task' },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateComment).toHaveBeenCalledTimes(2)
+            expect(mockTodoistApi.updateComment).toHaveBeenCalledWith('55555', {
+                content: 'Updated first comment on same task',
+            })
+            expect(mockTodoistApi.updateComment).toHaveBeenCalledWith('66666', {
+                content: 'Updated second comment on same task',
+            })
+
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    comments: expect.arrayContaining([
+                        expect.objectContaining({
+                            id: '55555',
+                            content: 'Updated first comment on same task',
+                            taskId: 'task999',
+                        }),
+                        expect.objectContaining({
+                            id: '66666',
+                            content: 'Updated second comment on same task',
+                            taskId: 'task999',
+                        }),
+                    ]),
+                    totalCount: 2,
+                    updatedCommentIds: ['55555', '66666'],
+                    appliedOperations: {
+                        updateCount: 2,
+                    },
+                }),
+            )
+        })
+
+        it('should update multiple comments from the same project', async () => {
+            const mockComment1 = createMockComment({
+                id: '77777',
+                content: 'Updated first project comment',
+                taskId: undefined,
+                projectId: 'project888',
+            })
+
+            const mockComment2 = createMockComment({
+                id: '88888',
+                content: 'Updated second project comment',
+                taskId: undefined,
+                projectId: 'project888',
+            })
+
+            mockTodoistApi.updateComment
+                .mockResolvedValueOnce(mockComment1)
+                .mockResolvedValueOnce(mockComment2)
+
+            const result = await updateComments.execute(
+                {
+                    comments: [
+                        { id: '77777', content: 'Updated first project comment' },
+                        { id: '88888', content: 'Updated second project comment' },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateComment).toHaveBeenCalledTimes(2)
+
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    comments: expect.arrayContaining([
+                        expect.objectContaining({
+                            id: '77777',
+                            content: 'Updated first project comment',
+                            projectId: 'project888',
+                        }),
+                        expect.objectContaining({
+                            id: '88888',
+                            content: 'Updated second project comment',
+                            projectId: 'project888',
+                        }),
+                    ]),
+                    totalCount: 2,
+                    updatedCommentIds: ['77777', '88888'],
+                    appliedOperations: {
+                        updateCount: 2,
+                    },
+                }),
+            )
+        })
     })
 })

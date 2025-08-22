@@ -7,72 +7,98 @@ import { ToolNames } from '../utils/tool-names.js'
 
 const { FIND_COMMENTS, UPDATE_COMMENTS, DELETE_OBJECT } = ToolNames
 
-const ArgsSchema = {
+const CommentSchema = z.object({
     taskId: z.string().optional().describe('The ID of the task to comment on.'),
     projectId: z.string().optional().describe('The ID of the project to comment on.'),
     content: z.string().min(1).describe('The content of the comment.'),
+})
+
+const ArgsSchema = {
+    comments: z.array(CommentSchema).min(1).describe('The array of comments to add.'),
 }
 
 const addComments = {
     name: ToolNames.ADD_COMMENTS,
-    description: 'Add comments to tasks or projects. Either taskId or projectId is required.',
+    description:
+        'Add multiple comments to tasks or projects. Each comment must specify either taskId or projectId.',
     parameters: ArgsSchema,
     async execute(args, client) {
-        // Validate that exactly one of taskId or projectId is provided
-        if (!args.taskId && !args.projectId) {
-            throw new Error('Either taskId or projectId must be provided.')
+        const { comments } = args
+
+        // Validate each comment
+        for (const [index, comment] of comments.entries()) {
+            if (!comment.taskId && !comment.projectId) {
+                throw new Error(
+                    `Comment ${index + 1}: Either taskId or projectId must be provided.`,
+                )
+            }
+            if (comment.taskId && comment.projectId) {
+                throw new Error(
+                    `Comment ${index + 1}: Cannot provide both taskId and projectId. Choose one.`,
+                )
+            }
         }
-        if (args.taskId && args.projectId) {
-            throw new Error('Cannot provide both taskId and projectId. Choose one.')
-        }
 
-        const commentArgs: AddCommentArgs = {
-            content: args.content,
-            ...(args.taskId ? { taskId: args.taskId } : { projectId: args.projectId }),
-        } as AddCommentArgs
+        const addCommentPromises = comments.map(
+            async ({ content, taskId, projectId }) =>
+                await client.addComment({
+                    content,
+                    ...(taskId ? { taskId } : { projectId }),
+                } as AddCommentArgs),
+        )
 
-        const comment = await client.addComment(commentArgs)
-
-        const textContent = generateTextContent({
-            comment,
-            targetType: args.taskId ? 'task' : 'project',
-            targetId: args.taskId || args.projectId || '',
-        })
+        const newComments = await Promise.all(addCommentPromises)
+        const textContent = generateTextContent({ comments: newComments })
 
         return getToolOutput({
             textContent,
             structuredContent: {
-                comment,
-                targetType: args.taskId ? 'task' : 'project',
-                targetId: args.taskId || args.projectId || '',
+                comments: newComments,
+                totalCount: newComments.length,
+                addedCommentIds: newComments.map((comment) => comment.id),
             },
         })
     },
 } satisfies TodoistTool<typeof ArgsSchema>
 
 function generateTextContent({
-    comment,
-    targetType,
-    targetId,
+    comments,
 }: {
-    comment: Comment
-    targetType: 'task' | 'project'
-    targetId: string
+    comments: Comment[]
 }): string {
-    const hasAttachment = comment.fileAttachment !== null
-    const attachmentInfo = hasAttachment
-        ? ` • Attachment: ${comment.fileAttachment?.fileName || 'file'}`
-        : ''
+    // Group comments by entity type and count
+    const taskComments = comments.filter((c) => c.taskId).length
+    const projectComments = comments.filter((c) => c.projectId).length
 
-    const summary = `Added comment to ${targetType}: ${comment.content}${attachmentInfo} • id=${comment.id}`
+    // Generate summary text
+    const parts: string[] = []
+    if (taskComments > 0) {
+        const commentsLabel = taskComments > 1 ? 'comments' : 'comment'
+        parts.push(`${taskComments} task ${commentsLabel}`)
+    }
+    if (projectComments > 0) {
+        const commentsLabel = projectComments > 1 ? 'comments' : 'comment'
+        parts.push(`${projectComments} project ${commentsLabel}`)
+    }
+    const summary = parts.length > 0 ? `Added ${parts.join(' and ')}` : 'No comments added'
 
     // Context-aware next steps
     const nextSteps: string[] = []
-
-    // Suggest follow-up actions
-    nextSteps.push(`Use ${FIND_COMMENTS} with ${targetType}Id=${targetId} to see all comments`)
-    nextSteps.push(`Use ${UPDATE_COMMENTS} with id=${comment.id} to edit content`)
-    nextSteps.push(`Use ${DELETE_OBJECT} with type=comment id=${comment.id} to remove comment`)
+    if (comments.length > 0) {
+        if (comments.length === 1 && comments[0]) {
+            const comment = comments[0]
+            const targetId = comment.taskId || comment.projectId || ''
+            const targetType = comment.taskId ? 'task' : 'project'
+            nextSteps.push(
+                `Use ${FIND_COMMENTS} with ${targetType}Id=${targetId} to see all comments`,
+            )
+            nextSteps.push(`Use ${UPDATE_COMMENTS} with id=${comment.id} to edit content`)
+        } else {
+            nextSteps.push(`Use ${FIND_COMMENTS} to view comments by task or project`)
+            nextSteps.push(`Use ${UPDATE_COMMENTS} to edit any comment content`)
+        }
+        nextSteps.push(`Use ${DELETE_OBJECT} with type=comment to remove comments`)
+    }
 
     const next = formatNextSteps(nextSteps)
     return `${summary}\n${next}`

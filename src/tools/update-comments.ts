@@ -7,42 +7,65 @@ import { ToolNames } from '../utils/tool-names.js'
 
 const { FIND_COMMENTS, DELETE_OBJECT } = ToolNames
 
-const ArgsSchema = {
+const CommentUpdateSchema = z.object({
     id: z.string().min(1).describe('The ID of the comment to update.'),
     content: z.string().min(1).describe('The new content for the comment.'),
+})
+
+const ArgsSchema = {
+    comments: z.array(CommentUpdateSchema).min(1).describe('The comments to update.'),
 }
 
 const updateComments = {
     name: ToolNames.UPDATE_COMMENTS,
-    description: 'Update the content of an existing comment.',
+    description: 'Update multiple existing comments with new content.',
     parameters: ArgsSchema,
     async execute(args, client) {
-        const comment = await client.updateComment(args.id, { content: args.content })
+        const { comments } = args
 
-        const textContent = generateTextContent({ comment })
+        const updateCommentPromises = comments.map(async (comment) => {
+            return await client.updateComment(comment.id, { content: comment.content })
+        })
+
+        const updatedComments = await Promise.all(updateCommentPromises)
+
+        const textContent = generateTextContent({
+            comments: updatedComments,
+        })
 
         return getToolOutput({
             textContent,
             structuredContent: {
-                comment,
-                operation: 'updated',
+                comments: updatedComments,
+                totalCount: updatedComments.length,
+                updatedCommentIds: updatedComments.map((comment) => comment.id),
+                appliedOperations: {
+                    updateCount: updatedComments.length,
+                },
             },
         })
     },
 } satisfies TodoistTool<typeof ArgsSchema>
 
-function generateTextContent({ comment }: { comment: Comment }): string {
-    const hasAttachment = comment.fileAttachment !== null
-    const attachmentInfo = hasAttachment
-        ? ` • Attachment: ${comment.fileAttachment?.fileName || 'file'}`
-        : ''
-
-    const summary = `Updated comment: ${comment.content}${attachmentInfo} • id=${comment.id}`
-
-    // Context-aware next steps
+function generateNextSteps(comments: Comment[]): string[] {
     const nextSteps: string[] = []
 
-    // Suggest follow-up actions based on comment type
+    // Early return for empty comments
+    if (comments.length === 0) {
+        return nextSteps
+    }
+
+    // Multiple comments case
+    if (comments.length > 1) {
+        nextSteps.push(`Use ${FIND_COMMENTS} to view comments by task or project`)
+        nextSteps.push(`Use ${DELETE_OBJECT} with type=comment to remove comments`)
+        return nextSteps
+    }
+
+    // Single comment case
+    const comment = comments[0]
+    if (!comment) return nextSteps
+
     if (comment.taskId) {
         nextSteps.push(
             `Use ${FIND_COMMENTS} with taskId=${comment.taskId} to see all task comments`,
@@ -52,9 +75,31 @@ function generateTextContent({ comment }: { comment: Comment }): string {
             `Use ${FIND_COMMENTS} with projectId=${comment.projectId} to see all project comments`,
         )
     }
-
     nextSteps.push(`Use ${DELETE_OBJECT} with type=comment id=${comment.id} to remove comment`)
+    return nextSteps
+}
 
+function generateTextContent({
+    comments,
+}: {
+    comments: Comment[]
+}): string {
+    // Group comments by entity type and count
+    const taskComments = comments.filter((c) => c.taskId).length
+    const projectComments = comments.filter((c) => c.projectId).length
+
+    const parts: string[] = []
+    if (taskComments > 0) {
+        const commentsLabel = taskComments > 1 ? 'comments' : 'comment'
+        parts.push(`${taskComments} task ${commentsLabel}`)
+    }
+    if (projectComments > 0) {
+        const commentsLabel = projectComments > 1 ? 'comments' : 'comment'
+        parts.push(`${projectComments} project ${commentsLabel}`)
+    }
+    const summary = parts.length > 0 ? `Updated ${parts.join(' and ')}` : 'No comments updated'
+
+    const nextSteps = generateNextSteps(comments)
     const next = formatNextSteps(nextSteps)
     return `${summary}\n${next}`
 }

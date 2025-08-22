@@ -1,17 +1,41 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`add-comments tool adding comments to projects should add comment to project 1`] = `
-"Added comment to project: This is a project comment • id=98767
+"Added 1 project comment
 Next:
 - Use find-comments with projectId=project789 to see all comments
 - Use update-comments with id=98767 to edit content
-- Use delete-object with type=comment id=98767 to remove comment"
+- Use delete-object with type=comment to remove comments"
 `;
 
-exports[`add-comments tool adding comments to tasks should add comment to task without attachment 1`] = `
-"Added comment to task: This is a task comment • id=98765
+exports[`add-comments tool adding comments to tasks should add comment to task 1`] = `
+"Added 1 task comment
 Next:
 - Use find-comments with taskId=task456 to see all comments
 - Use update-comments with id=98765 to edit content
-- Use delete-object with type=comment id=98765 to remove comment"
+- Use delete-object with type=comment to remove comments"
+`;
+
+exports[`add-comments tool bulk operations should add multiple comments to different entities (task + project) 1`] = `
+"Added 1 task comment and 1 project comment
+Next:
+- Use find-comments to view comments by task or project
+- Use update-comments to edit any comment content
+- Use delete-object with type=comment to remove comments"
+`;
+
+exports[`add-comments tool bulk operations should add multiple comments to different tasks 1`] = `
+"Added 2 task comments
+Next:
+- Use find-comments to view comments by task or project
+- Use update-comments to edit any comment content
+- Use delete-object with type=comment to remove comments"
+`;
+
+exports[`add-comments tool bulk operations should add multiple comments to the same task 1`] = `
+"Added 2 task comments
+Next:
+- Use find-comments to view comments by task or project
+- Use update-comments to edit any comment content
+- Use delete-object with type=comment to remove comments"
 `;
