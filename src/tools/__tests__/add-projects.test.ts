@@ -14,7 +14,7 @@ const mockTodoistApi = {
     addProject: jest.fn(),
 } as unknown as jest.Mocked<TodoistApi>
 
-const { ADD_TASKS, ADD_PROJECTS, MANAGE_SECTIONS } = ToolNames
+const { ADD_TASKS, ADD_PROJECTS, ADD_SECTIONS } = ToolNames
 
 describe(`${ADD_PROJECTS} tool`, () => {
     beforeEach(() => {
@@ -92,7 +92,7 @@ describe(`${ADD_PROJECTS} tool`, () => {
             expect(textContent).toContain('Added 1 project:')
             expect(textContent).toContain('My Blue Project')
             expect(textContent).toContain('id=project-456')
-            expect(textContent).toContain(`Use ${MANAGE_SECTIONS} to organize "My Blue Project"`)
+            expect(textContent).toContain(`Use ${ADD_SECTIONS} to organize "My Blue Project"`)
         })
     })
 
@@ -134,7 +134,7 @@ describe(`${ADD_PROJECTS} tool`, () => {
             expect(textContent).toContain('First Project (id=project-1)')
             expect(textContent).toContain('Second Project (id=project-2)')
             expect(textContent).toContain('Third Project (id=project-3)')
-            expect(textContent).toContain(`Use ${MANAGE_SECTIONS} to organize these projects`)
+            expect(textContent).toContain(`Use ${ADD_SECTIONS} to organize these projects`)
 
             // Verify structured content
             const structuredContent = extractStructuredContent(result)

@@ -14,8 +14,9 @@ import { findProjects } from './tools/find-projects.js'
 import { updateProjects } from './tools/update-projects.js'
 
 // Section management tools
+import { addSections } from './tools/add-sections.js'
 import { findSections } from './tools/find-sections.js'
-import { manageSections } from './tools/manage-sections.js'
+import { updateSections } from './tools/update-sections.js'
 
 // General tools
 import { deleteObject } from './tools/delete-object.js'
@@ -34,8 +35,9 @@ const tools = {
     updateProjects,
     findProjects,
     // Section management tools
+    addSections,
+    updateSections,
     findSections,
-    manageSections,
     // General tools
     getOverview,
     deleteObject,
@@ -56,8 +58,9 @@ export {
     updateProjects,
     findProjects,
     // Section management tools
+    addSections,
+    updateSections,
     findSections,
-    manageSections,
     // General tools
     getOverview,
     deleteObject,

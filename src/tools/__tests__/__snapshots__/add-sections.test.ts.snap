@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`add-sections tool creating a single section should create a section and return mapped result 1`] = `
+"Added 1 section:
+• test-abc123def456-section (id=section-123, projectId=6cfCcrrCFg2xP94Q)
+Next:
+- Use add-tasks with sectionId=section-123 to add your first tasks
+- Use find-tasks with sectionId=section-123 to verify setup
+- Use get-overview with projectId=6cfCcrrCFg2xP94Q to see project organization"
+`;
+
+exports[`add-sections tool creating a single section should handle different section properties from API 1`] = `
+"Added 1 section:
+• My Section Name (id=section-456, projectId=project-789)
+Next:
+- Use add-tasks with sectionId=section-456 to add your first tasks
+- Use find-tasks with sectionId=section-456 to verify setup
+- Use get-overview with projectId=project-789 to see project organization"
+`;
+
+exports[`add-sections tool creating multiple sections should create multiple sections and return mapped results 1`] = `
+"Added 3 sections:
+• First Section (id=section-1, projectId=6cfCcrrCFg2xP94Q)
+• Second Section (id=section-2, projectId=6cfCcrrCFg2xP94Q)
+• Third Section (id=section-3, projectId=different-project)
+Next:
+- Use add-tasks to add tasks to these new sections
+- Use get-overview to see updated project structures
+- Use find-sections to see sections in specific projects"
+`;
+
+exports[`add-sections tool creating multiple sections should handle sections for the same project 1`] = `
+"Added 2 sections:
+• To Do (id=section-1, projectId=6cfCcrrCFg2xP94Q)
+• In Progress (id=section-2, projectId=6cfCcrrCFg2xP94Q)
+Next:
+- Use add-tasks to add tasks to these new sections
+- Use get-overview with projectId=6cfCcrrCFg2xP94Q to see updated project structure
+- Use find-sections with projectId=6cfCcrrCFg2xP94Q to see all sections"
+`;

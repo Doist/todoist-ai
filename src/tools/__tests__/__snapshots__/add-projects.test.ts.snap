@@ -4,7 +4,7 @@ exports[`add-projects tool creating a single project should create a project and
 "Added 1 project:
 • test-abc123def456-project (id=6cfCcrrCFg2xP94Q)
 Next:
-- Use manage-sections to organize "test-abc123def456-project" with sections
+- Use add-sections to organize "test-abc123def456-project" with sections
 - Use add-tasks to add your first tasks to this project
 - Use get-overview with projectId=6cfCcrrCFg2xP94Q to see project structure"
 `;
@@ -13,7 +13,7 @@ exports[`add-projects tool creating a single project should handle different pro
 "Added 1 project:
 • My Blue Project (id=project-456)
 Next:
-- Use manage-sections to organize "My Blue Project" with sections
+- Use add-sections to organize "My Blue Project" with sections
 - Use add-tasks to add your first tasks to this project
 - Use get-overview with projectId=project-456 to see project structure"
 `;
@@ -24,7 +24,7 @@ exports[`add-projects tool creating multiple projects should create multiple pro
 • Second Project (id=project-2)
 • Third Project (id=project-3)
 Next:
-- Use manage-sections to organize these projects with sections
+- Use add-sections to organize these projects with sections
 - Use add-tasks to add tasks to these projects
 - Use find-projects to see all projects including the new ones
 - Use get-overview to see updated project hierarchy"

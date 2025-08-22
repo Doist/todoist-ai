@@ -20,8 +20,9 @@ export const ToolNames = {
     FIND_PROJECTS: 'find-projects',
 
     // Section management tools
+    ADD_SECTIONS: 'add-sections',
+    UPDATE_SECTIONS: 'update-sections',
     FIND_SECTIONS: 'find-sections',
-    MANAGE_SECTIONS: 'manage-sections',
 
     // General tools
     GET_OVERVIEW: 'get-overview',

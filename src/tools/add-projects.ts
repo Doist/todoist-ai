@@ -5,7 +5,7 @@ import type { TodoistTool } from '../todoist-tool.js'
 import { formatNextSteps } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
-const { MANAGE_SECTIONS, ADD_TASKS, FIND_PROJECTS, GET_OVERVIEW } = ToolNames
+const { ADD_SECTIONS, ADD_TASKS, FIND_PROJECTS, GET_OVERVIEW } = ToolNames
 
 const ProjectSchema = z.object({
     name: z.string().min(1).describe('The name of the project.'),
@@ -52,14 +52,14 @@ function generateTextContent({
     if (count === 1) {
         const project = projects[0]
         if (project) {
-            nextSteps.push(`Use ${MANAGE_SECTIONS} to organize "${project.name}" with sections`)
+            nextSteps.push(`Use ${ADD_SECTIONS} to organize "${project.name}" with sections`)
             nextSteps.push(`Use ${ADD_TASKS} to add your first tasks to this project`)
             nextSteps.push(
                 `Use ${GET_OVERVIEW} with projectId=${project.id} to see project structure`,
             )
         }
     } else {
-        nextSteps.push(`Use ${MANAGE_SECTIONS} to organize these projects with sections`)
+        nextSteps.push(`Use ${ADD_SECTIONS} to organize these projects with sections`)
         nextSteps.push(`Use ${ADD_TASKS} to add tasks to these projects`)
         nextSteps.push(`Use ${FIND_PROJECTS} to see all projects including the new ones`)
         nextSteps.push(`Use ${GET_OVERVIEW} to see updated project hierarchy`)

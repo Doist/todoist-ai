@@ -5,7 +5,7 @@ import type { TodoistTool } from '../todoist-tool.js'
 import { summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
-const { MANAGE_SECTIONS, FIND_TASKS, UPDATE_TASKS, DELETE_OBJECT } = ToolNames
+const { ADD_SECTIONS, UPDATE_SECTIONS, FIND_TASKS, UPDATE_TASKS, DELETE_OBJECT } = ToolNames
 
 const ArgsSchema = {
     projectId: z.string().min(1).describe('The ID of the project to search sections in.'),
@@ -74,7 +74,7 @@ function generateTextContent({
         zeroReasonHints.push('Remove search to see all sections')
     } else {
         zeroReasonHints.push('Project has no sections yet')
-        zeroReasonHints.push(`Use ${MANAGE_SECTIONS} to create sections`)
+        zeroReasonHints.push(`Use ${ADD_SECTIONS} to create sections`)
     }
 
     // Data-driven next steps based on results
@@ -85,7 +85,7 @@ function generateTextContent({
         if (sections.length === 1) {
             const sectionId = sections[0]?.id
             nextSteps.push(`Use ${FIND_TASKS} with sectionId=${sectionId} to see tasks`)
-            nextSteps.push(`Use ${MANAGE_SECTIONS} to create additional sections for organization`)
+            nextSteps.push(`Use ${ADD_SECTIONS} to create additional sections for organization`)
         } else if (sections.length > 8) {
             nextSteps.push(
                 'Consider consolidating sections - many small sections can reduce productivity',
@@ -94,7 +94,7 @@ function generateTextContent({
             nextSteps.push(`Use ${DELETE_OBJECT} with type=section to delete empty sections`)
         } else {
             nextSteps.push(`Use ${FIND_TASKS} with sectionId to see tasks in specific sections`)
-            nextSteps.push(`Use ${MANAGE_SECTIONS} to modify section names or order`)
+            nextSteps.push(`Use ${UPDATE_SECTIONS} to modify section names`)
         }
 
         // Search-specific suggestions

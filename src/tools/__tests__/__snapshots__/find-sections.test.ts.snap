@@ -2,7 +2,7 @@
 
 exports[`find-sections tool listing all sections in a project should handle project with no sections 1`] = `
 "Sections in project empty-project-id: 0.
-No results. Project has no sections yet; Use manage-sections to create sections."
+No results. Project has no sections yet; Use add-sections to create sections."
 `;
 
 exports[`find-sections tool listing all sections in a project should list all sections when no search parameter is provided 1`] = `
@@ -14,7 +14,7 @@ Preview:
     Backlog Items • id=section-999
 Next:
 - Use find-tasks with sectionId to see tasks in specific sections
-- Use manage-sections to modify section names or order"
+- Use update-sections to modify section names"
 `;
 
 exports[`find-sections tool searching sections by name should filter sections by search term (case insensitive) 1`] = `
@@ -24,7 +24,7 @@ Preview:
     Progress Review • id=section-999
 Next:
 - Use find-tasks with sectionId to see tasks in specific sections
-- Use manage-sections to modify section names or order
+- Use update-sections to modify section names
 - Remove search parameter to see all sections in this project"
 `;
 
@@ -34,7 +34,7 @@ Preview:
     Important Tasks • id=section-123
 Next:
 - Use find-tasks with sectionId=section-123 to see tasks
-- Use manage-sections to create additional sections for organization
+- Use add-sections to create additional sections for organization
 - Remove search parameter to see all sections in this project"
 `;
 
@@ -45,7 +45,7 @@ Preview:
     Done Soon • id=section-456
 Next:
 - Use find-tasks with sectionId to see tasks in specific sections
-- Use manage-sections to modify section names or order
+- Use update-sections to modify section names
 - Remove search parameter to see all sections in this project"
 `;
 
@@ -56,7 +56,7 @@ Preview:
     Testing Tasks • id=section-456
 Next:
 - Use find-tasks with sectionId to see tasks in specific sections
-- Use manage-sections to modify section names or order
+- Use update-sections to modify section names
 - Remove search parameter to see all sections in this project"
 `;
 

@@ -15,7 +15,7 @@ const mockTodoistApi = {
     getSections: jest.fn(),
 } as unknown as jest.Mocked<TodoistApi>
 
-const { FIND_SECTIONS, MANAGE_SECTIONS } = ToolNames
+const { FIND_SECTIONS, ADD_SECTIONS } = ToolNames
 
 describe(`${FIND_SECTIONS} tool`, () => {
     beforeEach(() => {
@@ -100,7 +100,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Project has no sections yet')
-            expect(textContent).toContain(`Use ${MANAGE_SECTIONS} to create sections`)
+            expect(textContent).toContain(`Use ${ADD_SECTIONS} to create sections`)
 
             // Verify structured content
             const structuredContent = extractStructuredContent(result)
