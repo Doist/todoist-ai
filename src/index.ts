@@ -18,6 +18,11 @@ import { addSections } from './tools/add-sections.js'
 import { findSections } from './tools/find-sections.js'
 import { updateSections } from './tools/update-sections.js'
 
+// Comment management tools
+import { addComments } from './tools/add-comments.js'
+import { findComments } from './tools/find-comments.js'
+import { updateComments } from './tools/update-comments.js'
+
 // General tools
 import { deleteObject } from './tools/delete-object.js'
 import { getOverview } from './tools/get-overview.js'
@@ -38,6 +43,10 @@ const tools = {
     addSections,
     updateSections,
     findSections,
+    // Comment management tools
+    addComments,
+    updateComments,
+    findComments,
     // General tools
     getOverview,
     deleteObject,
@@ -61,6 +70,10 @@ export {
     addSections,
     updateSections,
     findSections,
+    // Comment management tools
+    addComments,
+    updateComments,
+    findComments,
     // General tools
     getOverview,
     deleteObject,
