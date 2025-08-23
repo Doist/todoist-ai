@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0](https://github.com/Doist/todoist-ai/compare/v4.0.0...v4.1.0) (2025-08-23)
+
+
+### Features
+
+* export comment tools ([#63](https://github.com/Doist/todoist-ai/issues/63)) ([cec2999](https://github.com/Doist/todoist-ai/commit/cec2999b8ca1f660f26b37cffb3803e863f60be0))
+
 ## [4.0.0](https://github.com/Doist/todoist-ai/compare/v3.0.0...v4.0.0) (2025-08-22)
 
 
