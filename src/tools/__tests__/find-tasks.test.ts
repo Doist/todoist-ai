@@ -186,7 +186,7 @@ describe(`${FIND_TASKS} tool`, () => {
     describe('validation', () => {
         it('should require at least one filter parameter', async () => {
             await expect(findTasks.execute({ limit: 10 }, mockTodoistApi)).rejects.toThrow(
-                'At least one filter must be provided: searchText, projectId, sectionId, or parentId',
+                'At least one filter must be provided: searchText, projectId, sectionId, parentId, or label',
             )
         })
     })
@@ -210,6 +210,12 @@ describe(`${FIND_TASKS} tool`, () => {
                 params: { parentId: TEST_IDS.TASK_1, limit: 10 },
                 expectedApiParam: { parentId: TEST_IDS.TASK_1 },
                 tasks: [createMockTask({ content: 'Subtask' })],
+            },
+            {
+                name: 'label',
+                params: { label: 'work', limit: 10 },
+                expectedApiParam: { label: 'work' },
+                tasks: [createMockTask({ content: 'Work task', labels: ['work'] })],
             },
         ])('should find tasks in $name', async ({ params, expectedApiParam, tasks }) => {
             mockTodoistApi.getTasks.mockResolvedValue(createMockApiResponse(tasks))
@@ -286,6 +292,125 @@ describe(`${FIND_TASKS} tool`, () => {
             const textContent = extractTextContent(result)
             expect(textContent).toContain('Section is empty')
             expect(textContent).toContain('Tasks may be in other sections of the project')
+        })
+
+        it('should handle combined label and container filtering', async () => {
+            const tasks = [
+                createMockTask({
+                    id: '8485093751',
+                    content: 'project work task',
+                    labels: ['work'],
+                }),
+                createMockTask({
+                    id: '8485093752',
+                    content: 'project personal task',
+                    labels: ['personal'],
+                }),
+            ]
+            mockTodoistApi.getTasks.mockResolvedValue(createMockApiResponse(tasks))
+
+            const result = await findTasks.execute(
+                {
+                    projectId: TEST_IDS.PROJECT_TEST,
+                    label: 'work',
+                    limit: 10,
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.getTasks).toHaveBeenCalledWith({
+                limit: 10,
+                cursor: null,
+                projectId: TEST_IDS.PROJECT_TEST,
+                label: 'work',
+            })
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Tasks in project')
+            expect(textContent).toContain('with label "@work"')
+
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.tasks).toHaveLength(2)
+            expect(structuredContent.appliedFilters).toEqual({
+                projectId: TEST_IDS.PROJECT_TEST,
+                label: 'work',
+                limit: 10,
+            })
+        })
+
+        it('should handle label with search text filtering', async () => {
+            const mockTasks = [
+                createMappedTask({
+                    id: '8485093753',
+                    content: 'important work meeting',
+                    labels: ['work'],
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasks.execute(
+                { label: 'work', searchText: 'meeting', limit: 10 },
+                mockTodoistApi,
+            )
+
+            // Should use text search with label in query
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: 'search: meeting & @work',
+                cursor: undefined,
+                limit: 10,
+            })
+
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.tasks).toHaveLength(1)
+            expect(structuredContent.tasks).toEqual([
+                expect.objectContaining({ content: 'important work meeting' }),
+            ])
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Search results for "meeting"')
+            expect(textContent).toContain('filtered by label "@work"')
+        })
+
+        it('should handle empty label results', async () => {
+            mockTodoistApi.getTasks.mockResolvedValue(createMockApiResponse([]))
+
+            const result = await findTasks.execute(
+                { label: 'nonexistent', limit: 10 },
+                mockTodoistApi,
+            )
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('No tasks with label were found')
+        })
+
+        it('should handle empty label with search text results', async () => {
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasks.execute(
+                { label: 'work', searchText: 'nonexistent', limit: 10 },
+                mockTodoistApi,
+            )
+
+            // Should use text search with label in query
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: 'search: nonexistent & @work',
+                cursor: undefined,
+                limit: 10,
+            })
+
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.tasks).toHaveLength(0)
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Try broader search terms')
         })
 
         it('should handle pagination with containers', async () => {
@@ -409,10 +534,46 @@ describe(`${FIND_TASKS} tool`, () => {
         })
     })
 
+    describe('text search with label filtering', () => {
+        it('should handle text search with label parameter', async () => {
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Important work meeting',
+                    labels: ['work'],
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasks.execute(
+                {
+                    searchText: 'meeting',
+                    label: 'work',
+                    limit: 10,
+                },
+                mockTodoistApi,
+            )
+
+            // Should use text search with label in query
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: 'search: meeting & @work',
+                cursor: undefined,
+                limit: 10,
+            })
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Search results for "meeting"')
+            expect(textContent).toContain('filtered by label "@work"')
+        })
+    })
+
     describe('error handling', () => {
         it.each([
             {
-                error: 'At least one filter must be provided: searchText, projectId, sectionId, or parentId',
+                error: 'At least one filter must be provided: searchText, projectId, sectionId, parentId, or label',
                 params: { limit: 10 },
                 expectValidation: true,
             },

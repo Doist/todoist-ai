@@ -1,4 +1,4 @@
-import { GetTasksArgs } from '@doist/todoist-api-typescript'
+import { GetTasksArgs, TodoistApi } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
@@ -20,6 +20,7 @@ const ArgsSchema = {
     projectId: z.string().optional().describe('Find tasks in this project.'),
     sectionId: z.string().optional().describe('Find tasks in this section.'),
     parentId: z.string().optional().describe('Find subtasks of this parent task.'),
+    label: z.string().optional().describe('Find tasks with this label.'),
     limit: z
         .number()
         .int()
@@ -35,90 +36,85 @@ const ArgsSchema = {
         ),
 }
 
+type Args = z.infer<z.ZodObject<typeof ArgsSchema>>
+
 const findTasks = {
     name: ToolNames.FIND_TASKS,
     description:
         'Find tasks by text search, or by project/section/parent container. At least one filter must be provided.',
     parameters: ArgsSchema,
     async execute(args, client) {
-        const { searchText, projectId, sectionId, parentId, limit, cursor } = args
+        const { searchText, projectId, sectionId, parentId, label } = args
 
         // Validate at least one filter is provided
-        if (!searchText && !projectId && !sectionId && !parentId) {
+        if (!searchText && !projectId && !sectionId && !parentId && !label) {
             throw new Error(
-                'At least one filter must be provided: searchText, projectId, sectionId, or parentId',
+                'At least one filter must be provided: searchText, projectId, sectionId, parentId, or label',
             )
         }
 
-        // If using container-based filtering, use direct API
-        if (projectId || sectionId || parentId) {
-            const taskParams: GetTasksArgs = {
-                limit,
-                cursor: cursor ?? null,
-            }
+        const isContainerSearch = Boolean(
+            projectId || sectionId || parentId || (label && !searchText),
+        )
 
-            if (projectId) taskParams.projectId = projectId
-            if (sectionId) taskParams.sectionId = sectionId
-            if (parentId) taskParams.parentId = parentId
-
-            const { results, nextCursor } = await client.getTasks(taskParams)
-            const mappedTasks = results.map(mapTask)
-
-            // If also has searchText, filter the results
-            const finalTasks = searchText
-                ? mappedTasks.filter(
-                      (task) =>
-                          task.content.toLowerCase().includes(searchText.toLowerCase()) ||
-                          task.description?.toLowerCase().includes(searchText.toLowerCase()),
-                  )
-                : mappedTasks
-
-            const textContent = generateTextContent({
-                tasks: finalTasks,
-                args,
-                nextCursor,
-                isContainerSearch: true,
-            })
-
-            return getToolOutput({
-                textContent,
-                structuredContent: {
-                    tasks: finalTasks,
-                    nextCursor,
-                    totalCount: finalTasks.length,
-                    hasMore: Boolean(nextCursor),
-                    appliedFilters: args,
-                },
-            })
-        }
-
-        // Text-only search using filter query
-        const result = await getTasksByFilter({
-            client,
-            query: `search: ${searchText}`,
-            cursor: args.cursor,
-            limit: args.limit,
-        })
+        const { tasks, nextCursor } = isContainerSearch
+            ? // If using container-based filtering or label, use direct API
+              await findTasksByAttributeFilters(args, client)
+            : // Text-only search using filter query
+              await getTasksByFilter({
+                  client,
+                  query: label ? `search: ${searchText} & @${label}` : `search: ${searchText}`,
+                  cursor: args.cursor,
+                  limit: args.limit,
+              })
 
         const textContent = generateTextContent({
-            tasks: result.tasks,
+            tasks,
             args,
-            nextCursor: result.nextCursor,
-            isContainerSearch: false,
+            nextCursor,
+            isContainerSearch,
         })
 
         return getToolOutput({
             textContent,
             structuredContent: {
-                tasks: result.tasks,
-                nextCursor: result.nextCursor,
-                totalCount: result.tasks.length,
-                hasMore: Boolean(result.nextCursor),
+                tasks,
+                nextCursor,
+                totalCount: tasks.length,
+                hasMore: Boolean(nextCursor),
                 appliedFilters: args,
             },
         })
     },
 } satisfies TodoistTool<typeof ArgsSchema>
+
+async function findTasksByAttributeFilters(
+    { projectId, sectionId, parentId, label, limit, cursor, searchText }: Args,
+    client: TodoistApi,
+) {
+    const taskParams: GetTasksArgs = {
+        limit,
+        cursor: cursor ?? null,
+    }
+
+    if (projectId) taskParams.projectId = projectId
+    if (sectionId) taskParams.sectionId = sectionId
+    if (parentId) taskParams.parentId = parentId
+    if (label) taskParams.label = label
+
+    const { results, nextCursor } = await client.getTasks(taskParams)
+    const mappedTasks = results.map(mapTask)
+
+    // If also has searchText, filter the results
+    const tasks = searchText
+        ? mappedTasks.filter(
+              (task) =>
+                  task.content.toLowerCase().includes(searchText.toLowerCase()) ||
+                  task.description?.toLowerCase().includes(searchText.toLowerCase()),
+          )
+        : mappedTasks
+    return { tasks, nextCursor }
+}
 
 function getContainerZeroReasonHints(args: z.infer<z.ZodObject<typeof ArgsSchema>>): string[] {
     if (args.projectId) {
@@ -144,6 +140,11 @@ function getContainerZeroReasonHints(args: z.infer<z.ZodObject<typeof ArgsSchema
         if (!args.searchText) {
             hints.push(`Use ${ADD_TASKS} with parentId to add subtasks`)
         }
+        return hints
+    }
+
+    if (args.label) {
+        const hints = [args.searchText ? 'No tasks match search' : 'No tasks with label were found']
         return hints
     }
 
@@ -181,6 +182,11 @@ function generateTextContent({
             subject = 'Tasks' // fallback, though this shouldn't happen
         }
 
+        if (args.label) {
+            subject += ` with label "@${args.label}"`
+            filterHints.push(`with label "@${args.label}"`)
+        }
+
         // Add search text filter if present
         if (args.searchText) {
             subject += ` matching "${args.searchText}"`
@@ -195,6 +201,11 @@ function generateTextContent({
         // Text-only search
         subject = `Search results for "${args.searchText}"`
         filterHints.push(`matching "${args.searchText}"`)
+
+        if (args.label) {
+            subject += ` filtered by label "@${args.label}"`
+            filterHints.push(`filtered by label "@${args.label}"`)
+        }
 
         if (tasks.length === 0) {
             zeroReasonHints.push('Try broader search terms')

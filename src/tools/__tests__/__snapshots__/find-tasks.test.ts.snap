@@ -1,5 +1,15 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`find-tasks tool container filtering should find tasks in label 1`] = `
+"Tasks with label "@work": 1 (limit 10).
+Filter: with label "@work".
+Preview:
+    Work task • P1 • id=8485093748
+Next:
+- Use update-tasks to modify priorities or due dates
+- Use complete-tasks to mark finished tasks"
+`;
+
 exports[`find-tasks tool container filtering should find tasks in parent task 1`] = `
 "Subtasks: 1 (limit 10).
 Filter: subtasks of 8485093748.
@@ -30,6 +40,39 @@ Next:
 - Use complete-tasks to mark finished tasks"
 `;
 
+exports[`find-tasks tool container filtering should handle combined label and container filtering 1`] = `
+"Tasks in project with label "@work": 2 (limit 10).
+Filter: in project 6cfCcrrCFg2xP94Q; with label "@work".
+Preview:
+    project work task • P1 • id=8485093751
+    project personal task • P1 • id=8485093752
+Next:
+- Use update-tasks to modify priorities or due dates
+- Use complete-tasks to mark finished tasks"
+`;
+
+exports[`find-tasks tool container filtering should handle empty label results 1`] = `
+"Tasks with label "@nonexistent": 0 (limit 10).
+Filter: with label "@nonexistent".
+No results. No tasks with label were found."
+`;
+
+exports[`find-tasks tool container filtering should handle empty label with search text results 1`] = `
+"Search results for "nonexistent" filtered by label "@work": 0 (limit 10).
+Filter: matching "nonexistent"; filtered by label "@work".
+No results. Try broader search terms; Check completed tasks with find-completed-tasks; Verify spelling and try partial words."
+`;
+
+exports[`find-tasks tool container filtering should handle label with search text filtering 1`] = `
+"Search results for "meeting" filtered by label "@work": 1 (limit 10).
+Filter: matching "meeting"; filtered by label "@work".
+Preview:
+    important work meeting • P1 • id=8485093753
+Next:
+- Use update-tasks to modify priorities or due dates
+- Use complete-tasks to mark finished tasks"
+`;
+
 exports[`find-tasks tool next steps logic should provide different next steps for regular tasks 1`] = `
 "Search results for "future tasks": 1 (limit 10).
 Filter: matching "future tasks".
@@ -37,7 +80,8 @@ Preview:
     Regular future task • due 2025-08-25 • P1 • id=8485093748
 Next:
 - Use update-tasks to modify priorities or due dates
-- Use complete-tasks to mark finished tasks"
+- Use complete-tasks to mark finished tasks
+- Focus on overdue items first to get back on track"
 `;
 
 exports[`find-tasks tool next steps logic should provide helpful suggestions for empty search results 1`] = `
@@ -110,4 +154,14 @@ Next:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks
 - Pass cursor 'cursor-for-next-page' to fetch more results."
+`;
+
+exports[`find-tasks tool text search with label filtering should handle text search with label parameter 1`] = `
+"Search results for "meeting" filtered by label "@work": 1 (limit 10).
+Filter: matching "meeting"; filtered by label "@work".
+Preview:
+    Important work meeting • P1 • id=8485093748
+Next:
+- Use update-tasks to modify priorities or due dates
+- Use complete-tasks to mark finished tasks"
 `;
