@@ -4,6 +4,7 @@ import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { getTasksByFilter } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
+import { LabelsSchema, generateLabelsFilter } from '../utils/labels.js'
 import {
     generateTaskNextSteps,
     getDateString,
@@ -41,6 +42,7 @@ const ArgsSchema = {
         .describe(
             'The cursor to get the next page of tasks (cursor is obtained from the previous call to this tool, with the same parameters).',
         ),
+    ...LabelsSchema,
 }
 
 const findTasksByDate = {
@@ -49,7 +51,7 @@ const findTasksByDate = {
         "Get tasks by date range or overdue tasks. Use startDate 'overdue' for overdue tasks, or provide a date/date range.",
     parameters: ArgsSchema,
     async execute(args, client) {
-        let query: string
+        let query = ''
 
         if (args.startDate === 'overdue') {
             query = 'overdue'
@@ -61,6 +63,14 @@ const findTasksByDate = {
             const endDate = addDays(startDate, args.daysCount + 1)
             const endDateStr = formatISO(endDate, { representation: 'date' })
             query = `(due after: ${startDate} | due: ${startDate}) & due before: ${endDateStr}`
+        }
+
+        if (args.labels.length > 0) {
+            // If there is already a query, we need to append the & operator first
+            if (query.length > 0) query += ' & '
+            const labelsFilter = generateLabelsFilter(args.labels, args.labelsOperator)
+            // Add the labels to the filter
+            query += `(${labelsFilter})`
         }
 
         const result = await getTasksByFilter({

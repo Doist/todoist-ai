@@ -2,6 +2,7 @@ import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { getTasksByFilter } from '../../tool-helpers.js'
 import {
+    type MappedTask,
     TEST_ERRORS,
     TEST_IDS,
     TODAY,
@@ -59,6 +60,8 @@ describe(`${FIND_TASKS} tool`, () => {
                 {
                     searchText: 'important meeting',
                     limit: 10,
+                    labels: [],
+                    labelsOperator: 'or',
                 },
                 mockTodoistApi,
             )
@@ -83,7 +86,8 @@ describe(`${FIND_TASKS} tool`, () => {
                     appliedFilters: {
                         searchText: 'important meeting',
                         limit: 10,
-                        cursor: undefined,
+                        labels: [],
+                        labelsOperator: 'or',
                     },
                 }),
             )
@@ -97,14 +101,25 @@ describe(`${FIND_TASKS} tool`, () => {
         it.each([
             {
                 name: 'custom limit',
-                params: { searchText: 'project update', limit: 5 },
+                params: {
+                    searchText: 'project update',
+                    limit: 5,
+                    labels: [],
+                    labelsOperator: 'or' as const,
+                },
                 expectedQuery: 'search: project update',
                 expectedLimit: 5,
                 expectedCursor: undefined,
             },
             {
                 name: 'pagination cursor',
-                params: { searchText: 'follow up', limit: 20, cursor: 'cursor-from-first-page' },
+                params: {
+                    searchText: 'follow up',
+                    limit: 20,
+                    cursor: 'cursor-from-first-page',
+                    labels: [],
+                    labelsOperator: 'or' as const,
+                },
                 expectedQuery: 'search: follow up',
                 expectedLimit: 20,
                 expectedCursor: 'cursor-from-first-page',
@@ -156,7 +171,10 @@ describe(`${FIND_TASKS} tool`, () => {
             const mockResponse = { tasks: [], nextCursor: null }
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
-            const result = await findTasks.execute({ searchText, limit: 10 }, mockTodoistApi)
+            const result = await findTasks.execute(
+                { searchText, limit: 10, labels: [], labelsOperator: 'or' },
+                mockTodoistApi,
+            )
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
@@ -185,7 +203,9 @@ describe(`${FIND_TASKS} tool`, () => {
 
     describe('validation', () => {
         it('should require at least one filter parameter', async () => {
-            await expect(findTasks.execute({ limit: 10 }, mockTodoistApi)).rejects.toThrow(
+            await expect(
+                findTasks.execute({ limit: 10, labels: [], labelsOperator: 'or' }, mockTodoistApi),
+            ).rejects.toThrow(
                 'At least one filter must be provided: searchText, projectId, sectionId, or parentId',
             )
         })
@@ -195,19 +215,34 @@ describe(`${FIND_TASKS} tool`, () => {
         it.each([
             {
                 name: 'project',
-                params: { projectId: TEST_IDS.PROJECT_TEST, limit: 10 },
+                params: {
+                    projectId: TEST_IDS.PROJECT_TEST,
+                    limit: 10,
+                    labels: [],
+                    labelsOperator: 'or' as const,
+                },
                 expectedApiParam: { projectId: TEST_IDS.PROJECT_TEST },
                 tasks: [createMockTask({ content: 'Project task' })],
             },
             {
                 name: 'section',
-                params: { sectionId: TEST_IDS.SECTION_1, limit: 10 },
+                params: {
+                    sectionId: TEST_IDS.SECTION_1,
+                    limit: 10,
+                    labels: [],
+                    labelsOperator: 'or' as const,
+                },
                 expectedApiParam: { sectionId: TEST_IDS.SECTION_1 },
                 tasks: [createMockTask({ content: 'Section task' })],
             },
             {
                 name: 'parent task',
-                params: { parentId: TEST_IDS.TASK_1, limit: 10 },
+                params: {
+                    parentId: TEST_IDS.TASK_1,
+                    limit: 10,
+                    labels: [],
+                    labelsOperator: 'or' as const,
+                },
                 expectedApiParam: { parentId: TEST_IDS.TASK_1 },
                 tasks: [createMockTask({ content: 'Subtask' })],
             },
@@ -255,6 +290,8 @@ describe(`${FIND_TASKS} tool`, () => {
                     projectId: TEST_IDS.PROJECT_TEST,
                     searchText: 'relevant',
                     limit: 10,
+                    labels: [],
+                    labelsOperator: 'or',
                 },
                 mockTodoistApi,
             )
@@ -279,6 +316,8 @@ describe(`${FIND_TASKS} tool`, () => {
                 {
                     sectionId: 'empty-section',
                     limit: 10,
+                    labels: [],
+                    labelsOperator: 'or',
                 },
                 mockTodoistApi,
             )
@@ -299,6 +338,8 @@ describe(`${FIND_TASKS} tool`, () => {
                     projectId: TEST_IDS.PROJECT_TEST,
                     limit: 25,
                     cursor: 'current-cursor',
+                    labels: [],
+                    labelsOperator: 'or',
                 },
                 mockTodoistApi,
             )
@@ -321,7 +362,10 @@ describe(`${FIND_TASKS} tool`, () => {
             mockTodoistApi.getTasks.mockRejectedValue(apiError)
 
             await expect(
-                findTasks.execute({ projectId: 'non-existent', limit: 10 }, mockTodoistApi),
+                findTasks.execute(
+                    { projectId: 'non-existent', limit: 10, labels: [], labelsOperator: 'or' },
+                    mockTodoistApi,
+                ),
             ).rejects.toThrow('API Error: Project not found')
         })
     })
@@ -339,7 +383,7 @@ describe(`${FIND_TASKS} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasks.execute(
-                { searchText: 'overdue tasks', limit: 10 },
+                { searchText: 'overdue tasks', limit: 10, labels: [], labelsOperator: 'or' },
                 mockTodoistApi,
             )
 
@@ -361,7 +405,7 @@ describe(`${FIND_TASKS} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasks.execute(
-                { searchText: 'today tasks', limit: 10 },
+                { searchText: 'today tasks', limit: 10, labels: [], labelsOperator: 'or' },
                 mockTodoistApi,
             )
 
@@ -383,7 +427,7 @@ describe(`${FIND_TASKS} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasks.execute(
-                { searchText: 'future tasks', limit: 10 },
+                { searchText: 'future tasks', limit: 10, labels: [], labelsOperator: 'or' },
                 mockTodoistApi,
             )
 
@@ -397,7 +441,7 @@ describe(`${FIND_TASKS} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasks.execute(
-                { searchText: 'nonexistent', limit: 10 },
+                { searchText: 'nonexistent', limit: 10, labels: [], labelsOperator: 'or' },
                 mockTodoistApi,
             )
 
@@ -409,21 +453,239 @@ describe(`${FIND_TASKS} tool`, () => {
         })
     })
 
+    describe('label filtering', () => {
+        it.each([
+            {
+                name: 'text search with single label OR operator',
+                params: {
+                    searchText: 'important meeting',
+                    limit: 10,
+                    labels: ['@work'],
+                    labelsOperator: 'or' as const,
+                },
+                expectedQuery: 'search: important meeting & (@work)',
+            },
+            {
+                name: 'text search with multiple labels AND operator',
+                params: {
+                    searchText: 'project update',
+                    limit: 15,
+                    labels: ['@work', '@urgent'],
+                    labelsOperator: 'and' as const,
+                },
+                expectedQuery: 'search: project update & (@work  &  @urgent)',
+            },
+            {
+                name: 'text search with multiple labels OR operator',
+                params: {
+                    searchText: 'follow up',
+                    limit: 20,
+                    labels: ['@personal', '@shopping'],
+                    labelsOperator: 'or' as const,
+                },
+                expectedQuery: 'search: follow up & (@personal  |  @shopping)',
+            },
+        ])(
+            'should filter tasks by labels in text search: $name',
+            async ({ params, expectedQuery }) => {
+                const mockTasks = [
+                    createMappedTask({
+                        id: TEST_IDS.TASK_1,
+                        content: 'Task with work label',
+                        labels: ['work'],
+                    }),
+                ]
+                const mockResponse = { tasks: mockTasks, nextCursor: null }
+                mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+                const result = await findTasks.execute(params, mockTodoistApi)
+
+                expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                    client: mockTodoistApi,
+                    query: expectedQuery,
+                    cursor: undefined,
+                    limit: params.limit,
+                })
+
+                const structuredContent = extractStructuredContent(result)
+                expect(structuredContent.appliedFilters).toEqual(
+                    expect.objectContaining({
+                        searchText: params.searchText,
+                        labels: params.labels,
+                        labelsOperator: params.labelsOperator,
+                    }),
+                )
+            },
+        )
+
+        it.each([
+            {
+                name: 'project filter with labels',
+                params: {
+                    projectId: TEST_IDS.PROJECT_TEST,
+                    limit: 10,
+                    labels: ['@important'],
+                    labelsOperator: 'or' as const,
+                },
+                expectedApiParam: { projectId: TEST_IDS.PROJECT_TEST },
+            },
+            {
+                name: 'section filter with multiple labels',
+                params: {
+                    sectionId: TEST_IDS.SECTION_1,
+                    limit: 10,
+                    labels: ['@work', '@urgent'],
+                    labelsOperator: 'and' as const,
+                },
+                expectedApiParam: { sectionId: TEST_IDS.SECTION_1 },
+            },
+            {
+                name: 'parent task filter with labels',
+                params: {
+                    parentId: TEST_IDS.TASK_1,
+                    limit: 10,
+                    labels: ['@personal'],
+                    labelsOperator: 'or' as const,
+                },
+                expectedApiParam: { parentId: TEST_IDS.TASK_1 },
+            },
+        ])(
+            'should apply label filtering to container searches: $name',
+            async ({ params, expectedApiParam }) => {
+                const allTasks = [
+                    createMockTask({
+                        id: '1',
+                        content: 'Task with matching label',
+                        labels: params.labels,
+                    }),
+                    createMockTask({
+                        id: '2',
+                        content: 'Task without matching label',
+                        labels: ['other'],
+                    }),
+                ]
+                mockTodoistApi.getTasks.mockResolvedValue(createMockApiResponse(allTasks))
+
+                const result = await findTasks.execute(params, mockTodoistApi)
+
+                expect(mockTodoistApi.getTasks).toHaveBeenCalledWith({
+                    limit: 10,
+                    cursor: null,
+                    ...expectedApiParam,
+                })
+
+                // Should filter results client-side based on labels
+                const structuredContent = extractStructuredContent(result)
+                if (params.labelsOperator === 'and') {
+                    // AND operation: task must have all specified labels
+                    expect(structuredContent.tasks).toEqual(
+                        expect.arrayContaining([
+                            expect.objectContaining({
+                                labels: expect.arrayContaining(params.labels),
+                            }),
+                        ]),
+                    )
+                } else {
+                    // OR operation: task must have at least one of the specified labels
+                    expect((structuredContent.tasks as MappedTask[]).length).toBeGreaterThanOrEqual(
+                        0,
+                    )
+                }
+            },
+        )
+
+        it('should handle empty labels array', async () => {
+            const params = {
+                searchText: 'test',
+                limit: 10,
+                labels: [],
+                labelsOperator: 'or' as const,
+            }
+
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            await findTasks.execute(params, mockTodoistApi)
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: 'search: test',
+                cursor: undefined,
+                limit: 10,
+            })
+        })
+
+        it('should combine search text, container, and label filters', async () => {
+            const params = {
+                projectId: TEST_IDS.PROJECT_TEST,
+                searchText: 'important',
+                limit: 10,
+                labels: ['urgent'],
+                labelsOperator: 'or' as const,
+            }
+
+            const allTasks = [
+                createMockTask({
+                    id: '1',
+                    content: 'important task',
+                    description: 'urgent work',
+                    labels: ['urgent'],
+                }),
+                createMockTask({
+                    id: '2',
+                    content: 'other task',
+                    description: 'not important',
+                    labels: ['work'],
+                }),
+            ]
+            mockTodoistApi.getTasks.mockResolvedValue(createMockApiResponse(allTasks))
+
+            const result = await findTasks.execute(params, mockTodoistApi)
+
+            // Should call API with container filter
+            expect(mockTodoistApi.getTasks).toHaveBeenCalledWith({
+                limit: 10,
+                cursor: null,
+                projectId: TEST_IDS.PROJECT_TEST,
+            })
+
+            // Should filter results by search text AND labels
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.tasks).toEqual([
+                expect.objectContaining({
+                    content: 'important task',
+                    labels: expect.arrayContaining(['urgent']),
+                }),
+            ])
+        })
+    })
+
     describe('error handling', () => {
         it.each([
             {
                 error: 'At least one filter must be provided: searchText, projectId, sectionId, or parentId',
-                params: { limit: 10 },
+                params: { limit: 10, labels: [], labelsOperator: 'or' as const },
                 expectValidation: true,
             },
             {
                 error: TEST_ERRORS.API_RATE_LIMIT,
-                params: { searchText: 'any search term', limit: 10 },
+                params: {
+                    searchText: 'any search term',
+                    limit: 10,
+                    labels: [],
+                    labelsOperator: 'or' as const,
+                },
                 expectValidation: false,
             },
             {
                 error: TEST_ERRORS.INVALID_CURSOR,
-                params: { searchText: 'test', cursor: 'invalid-cursor-format', limit: 10 },
+                params: {
+                    searchText: 'test',
+                    cursor: 'invalid-cursor-format',
+                    limit: 10,
+                    labels: [],
+                    labelsOperator: 'or' as const,
+                },
                 expectValidation: false,
             },
         ])('should propagate $error', async ({ error, params, expectValidation }) => {

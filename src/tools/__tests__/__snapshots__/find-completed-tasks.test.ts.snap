@@ -26,3 +26,39 @@ Next:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity.
 - Recurring tasks will automatically create new instances."
 `;
+
+exports[`find-completed-tasks tool label filtering should combine other filters with label filters 1`] = `
+"Completed tasks (by due date): 1 (limit 25).
+Filter: due date: 2025-08-01 to 2025-08-31; project: test-project-id; section: test-section-id.
+Preview:
+    Important completed task • P1 • id=8485093748
+Next:
+- Use find-tasks-by-date for active tasks or get-overview for current productivity."
+`;
+
+exports[`find-completed-tasks tool label filtering should filter completed tasks by labels: multiple labels with AND operator 1`] = `
+"Completed tasks (by due date): 1 (limit 50).
+Filter: due date: 2025-08-01 to 2025-08-31.
+Preview:
+    Completed task with label • P1 • id=8485093748
+Next:
+- Use find-tasks-by-date for active tasks or get-overview for current productivity."
+`;
+
+exports[`find-completed-tasks tool label filtering should filter completed tasks by labels: multiple labels with OR operator 1`] = `
+"Completed tasks (by completed date): 1 (limit 25).
+Filter: completed date: 2025-08-10 to 2025-08-20.
+Preview:
+    Completed task with label • P1 • id=8485093748
+Next:
+- Use find-tasks-by-date for active tasks or get-overview for current productivity."
+`;
+
+exports[`find-completed-tasks tool label filtering should filter completed tasks by labels: single label with OR operator 1`] = `
+"Completed tasks (by completed date): 1 (limit 50).
+Filter: completed date: 2025-08-01 to 2025-08-31.
+Preview:
+    Completed task with label • P1 • id=8485093748
+Next:
+- Use find-tasks-by-date for active tasks or get-overview for current productivity."
+`;

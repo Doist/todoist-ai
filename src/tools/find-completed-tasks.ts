@@ -3,6 +3,7 @@ import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
+import { LabelsSchema, generateLabelsFilter } from '../utils/labels.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -29,6 +30,7 @@ const ArgsSchema = {
     projectId: z.string().optional().describe('The ID of the project to get the tasks for.'),
     sectionId: z.string().optional().describe('The ID of the section to get the tasks for.'),
     parentId: z.string().optional().describe('The ID of the parent task to get the tasks for.'),
+
     limit: z
         .number()
         .int()
@@ -42,6 +44,7 @@ const ArgsSchema = {
         .describe(
             'The cursor to get the next page of tasks (cursor is obtained from the previous call to this tool, with the same parameters).',
         ),
+    ...LabelsSchema,
 }
 
 const findCompletedTasks = {
@@ -49,11 +52,18 @@ const findCompletedTasks = {
     description: 'Get completed tasks.',
     parameters: ArgsSchema,
     async execute(args, client) {
-        const { getBy, ...rest } = args
+        const { getBy, labels, labelsOperator, ...rest } = args
+        const labelsFilter = generateLabelsFilter(labels, labelsOperator)
         const { items, nextCursor } =
             getBy === 'completion'
-                ? await client.getCompletedTasksByCompletionDate(rest)
-                : await client.getCompletedTasksByDueDate(rest)
+                ? await client.getCompletedTasksByCompletionDate({
+                      ...rest,
+                      ...(labelsFilter ? { filterQuery: labelsFilter, filterLang: 'en' } : {}),
+                  })
+                : await client.getCompletedTasksByDueDate({
+                      ...rest,
+                      ...(labelsFilter ? { filterQuery: labelsFilter, filterLang: 'en' } : {}),
+                  })
         const mappedTasks = items.map(mapTask)
 
         const textContent = generateTextContent({

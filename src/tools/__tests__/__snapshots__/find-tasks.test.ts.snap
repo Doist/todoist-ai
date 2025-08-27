@@ -37,7 +37,8 @@ Preview:
     Regular future task • due 2025-08-25 • P1 • id=8485093748
 Next:
 - Use update-tasks to modify priorities or due dates
-- Use complete-tasks to mark finished tasks"
+- Use complete-tasks to mark finished tasks
+- Focus on overdue items first to get back on track"
 `;
 
 exports[`find-tasks tool next steps logic should provide helpful suggestions for empty search results 1`] = `

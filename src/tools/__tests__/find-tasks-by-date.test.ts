@@ -74,7 +74,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'overdue', limit: 50, daysCount },
+                { startDate: 'overdue', limit: 50, daysCount, labels: [], labelsOperator: 'or' },
                 mockTodoistApi,
             )
 
@@ -110,7 +110,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'today', limit: 50, daysCount: 7 },
+                { startDate: 'today', limit: 50, daysCount: 7, labels: [], labelsOperator: 'or' },
                 mockTodoistApi,
             )
 
@@ -158,7 +158,10 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             const mockResponse = { tasks, nextCursor: cursor }
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
-            const result = await findTasksByDate.execute(params, mockTodoistApi)
+            const result = await findTasksByDate.execute(
+                { ...params, labels: [], labelsOperator: 'or' },
+                mockTodoistApi,
+            )
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
@@ -194,7 +197,10 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             const mockResponse = { tasks: [], nextCursor: null }
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
-            await findTasksByDate.execute(params, mockTodoistApi)
+            await findTasksByDate.execute(
+                { ...params, labels: [], labelsOperator: 'or' },
+                mockTodoistApi,
+            )
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
@@ -216,7 +222,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
 
             const startDate = daysCount === 7 ? 'today' : '2025-08-15'
             const result = await findTasksByDate.execute(
-                { startDate, limit: 50, daysCount },
+                { startDate, limit: 50, daysCount, labels: [], labelsOperator: 'or' },
                 mockTodoistApi,
             )
 
@@ -241,7 +247,13 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: '2025-08-15', limit: 10, daysCount: 1 },
+                {
+                    startDate: '2025-08-15',
+                    limit: 10,
+                    daysCount: 1,
+                    labels: [],
+                    labelsOperator: 'or',
+                },
                 mockTodoistApi,
             )
 
@@ -262,7 +274,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'today', limit: 10, daysCount: 1 },
+                { startDate: 'today', limit: 10, daysCount: 1, labels: [], labelsOperator: 'or' },
                 mockTodoistApi,
             )
 
@@ -283,7 +295,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'overdue', limit: 10, daysCount: 1 },
+                { startDate: 'overdue', limit: 10, daysCount: 1, labels: [], labelsOperator: 'or' },
                 mockTodoistApi,
             )
 
@@ -297,7 +309,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'overdue', limit: 10, daysCount: 1 },
+                { startDate: 'overdue', limit: 10, daysCount: 1, labels: [], labelsOperator: 'or' },
                 mockTodoistApi,
             )
 
@@ -312,7 +324,13 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: '2025-08-20', limit: 10, daysCount: 1 },
+                {
+                    startDate: '2025-08-20',
+                    limit: 10,
+                    daysCount: 1,
+                    labels: [],
+                    labelsOperator: 'or',
+                },
                 mockTodoistApi,
             )
 
@@ -320,6 +338,138 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain("Expand date range with larger 'daysCount'")
             expect(textContent).toContain("Check 'overdue' for past-due items")
+        })
+    })
+
+    describe('label filtering', () => {
+        it.each([
+            {
+                name: 'single label with OR operator',
+                params: {
+                    startDate: 'today',
+                    daysCount: 1,
+                    limit: 50,
+                    labels: ['@work'],
+                    labelsOperator: 'or' as const,
+                },
+                expectedQueryPattern: '((@work))', // Will be combined with date query
+            },
+            {
+                name: 'multiple labels with AND operator',
+                params: {
+                    startDate: 'overdue',
+                    daysCount: 1,
+                    limit: 50,
+                    labels: ['@work', '@urgent'],
+                    labelsOperator: 'and' as const,
+                },
+                expectedQueryPattern: 'overdue & ((@work  &  @urgent))',
+            },
+            {
+                name: 'multiple labels with OR operator',
+                params: {
+                    startDate: '2025-08-20',
+                    daysCount: 3,
+                    limit: 50,
+                    labels: ['@personal', '@shopping'],
+                    labelsOperator: 'or' as const,
+                },
+                expectedQueryPattern: '((@personal  |  @shopping))',
+            },
+        ])('should filter tasks by labels: $name', async ({ params, expectedQueryPattern }) => {
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Task with work label',
+                    labels: ['work'],
+                    dueDate: '2025-08-20',
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasksByDate.execute(params, mockTodoistApi)
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: expect.stringContaining('(@'),
+                cursor: undefined,
+                limit: 50,
+            })
+
+            // For overdue specifically, check the exact pattern
+            if (params.startDate === 'overdue') {
+                expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                    client: mockTodoistApi,
+                    query: expectedQueryPattern,
+                    cursor: undefined,
+                    limit: 50,
+                })
+            }
+
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.appliedFilters).toEqual(
+                expect.objectContaining({
+                    labels: params.labels,
+                    labelsOperator: params.labelsOperator,
+                }),
+            )
+        })
+
+        it('should handle empty labels array', async () => {
+            const params = {
+                startDate: 'today' as const,
+                daysCount: 1,
+                limit: 50,
+                labels: [],
+                labelsOperator: 'or' as const,
+            }
+
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            await findTasksByDate.execute(params, mockTodoistApi)
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: expect.not.stringContaining('@'),
+                cursor: undefined,
+                limit: 50,
+            })
+        })
+
+        it('should combine date filters with label filters', async () => {
+            const params = {
+                startDate: '2025-08-15' as const,
+                daysCount: 1,
+                limit: 25,
+                labels: ['@important'],
+                labelsOperator: 'or' as const,
+            }
+
+            const mockTasks = [
+                createMappedTask({
+                    content: 'Important task for specific date',
+                    labels: ['important'],
+                    dueDate: '2025-08-15',
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasksByDate.execute(params, mockTodoistApi)
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query:
+                    expect.stringContaining('due after:') &&
+                    expect.stringContaining('(@important)'),
+                cursor: undefined,
+                limit: 25,
+            })
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
         })
     })
 
@@ -344,7 +494,12 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             },
         ])('should propagate $error', async ({ error, params }) => {
             mockGetTasksByFilter.mockRejectedValue(new Error(error))
-            await expect(findTasksByDate.execute(params, mockTodoistApi)).rejects.toThrow(error)
+            await expect(
+                findTasksByDate.execute(
+                    { ...params, labels: [], labelsOperator: 'or' },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(error)
         })
     })
 })

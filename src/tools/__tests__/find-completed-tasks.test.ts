@@ -45,7 +45,14 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
             })
 
             const result = await findCompletedTasks.execute(
-                { getBy: 'completion', limit: 50, since: '2025-08-10', until: '2025-08-15' },
+                {
+                    getBy: 'completion',
+                    limit: 50,
+                    since: '2025-08-10',
+                    until: '2025-08-15',
+                    labels: [],
+                    labelsOperator: 'or' as const,
+                },
                 mockTodoistApi,
             )
 
@@ -72,6 +79,8 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                     until: '2025-08-31',
                     projectId: 'specific-project-id',
                     cursor: 'current-cursor',
+                    labels: [],
+                    labelsOperator: 'or' as const,
                 },
                 mockTodoistApi,
             )
@@ -121,6 +130,8 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                     limit: 50,
                     since: '2025-08-10',
                     until: '2025-08-20',
+                    labels: [],
+                    labelsOperator: 'or' as const,
                 },
                 mockTodoistApi,
             )
@@ -136,6 +147,143 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
         })
     })
 
+    describe('label filtering', () => {
+        it.each([
+            {
+                name: 'single label with OR operator',
+                params: {
+                    getBy: 'completion' as const,
+                    since: '2025-08-01',
+                    until: '2025-08-31',
+                    limit: 50,
+                    labels: ['@work'],
+                    labelsOperator: 'or' as const,
+                },
+                expectedMethod: 'getCompletedTasksByCompletionDate',
+                expectedFilter: '(@work)',
+            },
+            {
+                name: 'multiple labels with AND operator',
+                params: {
+                    getBy: 'due' as const,
+                    since: '2025-08-01',
+                    until: '2025-08-31',
+                    limit: 50,
+                    labels: ['@work', '@urgent'],
+                    labelsOperator: 'and' as const,
+                },
+                expectedMethod: 'getCompletedTasksByDueDate',
+                expectedFilter: '(@work  &  @urgent)',
+            },
+            {
+                name: 'multiple labels with OR operator',
+                params: {
+                    getBy: 'completion' as const,
+                    since: '2025-08-10',
+                    until: '2025-08-20',
+                    limit: 25,
+                    labels: ['@personal', '@shopping'],
+                    labelsOperator: 'or' as const,
+                },
+                expectedMethod: 'getCompletedTasksByCompletionDate',
+                expectedFilter: '(@personal  |  @shopping)',
+            },
+        ])(
+            'should filter completed tasks by labels: $name',
+            async ({ params, expectedMethod, expectedFilter }) => {
+                const mockCompletedTasks = [
+                    createMockTask({
+                        id: '8485093748',
+                        content: 'Completed task with label',
+                        labels: params.labels,
+                        completedAt: '2024-01-01T00:00:00Z',
+                    }),
+                ]
+
+                const mockResponse = { items: mockCompletedTasks, nextCursor: null }
+                const mockMethod = mockTodoistApi[
+                    expectedMethod as keyof typeof mockTodoistApi
+                ] as jest.MockedFunction<
+                    (...args: never[]) => Promise<{ items: unknown[]; nextCursor: string | null }>
+                >
+                mockMethod.mockResolvedValue(mockResponse)
+
+                const result = await findCompletedTasks.execute(params, mockTodoistApi)
+
+                expect(mockMethod).toHaveBeenCalledWith({
+                    since: params.since,
+                    until: params.until,
+                    limit: params.limit,
+                    filterQuery: expectedFilter,
+                    filterLang: 'en',
+                })
+
+                const textContent = extractTextContent(result)
+                expect(textContent).toMatchSnapshot()
+            },
+        )
+
+        it('should handle empty labels array', async () => {
+            const params = {
+                getBy: 'completion' as const,
+                since: '2025-08-01',
+                until: '2025-08-31',
+                limit: 50,
+                labels: [],
+                labelsOperator: 'or' as const,
+            }
+
+            const mockResponse = { items: [], nextCursor: null }
+            mockTodoistApi.getCompletedTasksByCompletionDate.mockResolvedValue(mockResponse)
+
+            await findCompletedTasks.execute(params, mockTodoistApi)
+
+            expect(mockTodoistApi.getCompletedTasksByCompletionDate).toHaveBeenCalledWith({
+                since: params.since,
+                until: params.until,
+                limit: params.limit,
+            })
+        })
+
+        it('should combine other filters with label filters', async () => {
+            const params = {
+                getBy: 'due' as const,
+                since: '2025-08-01',
+                until: '2025-08-31',
+                limit: 25,
+                projectId: 'test-project-id',
+                sectionId: 'test-section-id',
+                labels: ['@important'],
+                labelsOperator: 'or' as const,
+            }
+
+            const mockTasks = [
+                createMockTask({
+                    content: 'Important completed task',
+                    labels: ['important'],
+                    completedAt: '2024-01-01T00:00:00Z',
+                }),
+            ]
+            const mockResponse = { items: mockTasks, nextCursor: null }
+            mockTodoistApi.getCompletedTasksByDueDate.mockResolvedValue(mockResponse)
+
+            const result = await findCompletedTasks.execute(params, mockTodoistApi)
+
+            expect(mockTodoistApi.getCompletedTasksByDueDate).toHaveBeenCalledWith({
+                since: params.since,
+                until: params.until,
+                limit: params.limit,
+                projectId: params.projectId,
+                sectionId: params.sectionId,
+                filterQuery: '(@important)',
+                filterLang: 'en',
+            })
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+        })
+    })
+
     describe('error handling', () => {
         it('should propagate completion date API errors', async () => {
             const apiError = new Error('API Error: Invalid date range')
@@ -144,7 +292,14 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
             await expect(
                 findCompletedTasks.execute(
                     // invalid date range
-                    { getBy: 'completion', limit: 50, since: '2025-08-31', until: '2025-08-01' },
+                    {
+                        getBy: 'completion',
+                        limit: 50,
+                        since: '2025-08-31',
+                        until: '2025-08-01',
+                        labels: [],
+                        labelsOperator: 'or' as const,
+                    },
                     mockTodoistApi,
                 ),
             ).rejects.toThrow('API Error: Invalid date range')
@@ -162,6 +317,8 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                         since: '2025-08-01',
                         until: '2025-08-31',
                         projectId: 'non-existent-project',
+                        labels: [],
+                        labelsOperator: 'or',
                     },
                     mockTodoistApi,
                 ),
