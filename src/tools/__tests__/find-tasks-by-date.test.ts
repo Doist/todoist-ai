@@ -349,7 +349,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     startDate: 'today',
                     daysCount: 1,
                     limit: 50,
-                    labels: ['@work'],
+                    labels: ['work'],
                     labelsOperator: 'or' as const,
                 },
                 expectedQueryPattern: '((@work))', // Will be combined with date query
@@ -360,7 +360,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     startDate: 'overdue',
                     daysCount: 1,
                     limit: 50,
-                    labels: ['@work', '@urgent'],
+                    labels: ['work', 'urgent'],
                     labelsOperator: 'and' as const,
                 },
                 expectedQueryPattern: 'overdue & ((@work  &  @urgent))',
@@ -371,7 +371,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     startDate: '2025-08-20',
                     daysCount: 3,
                     limit: 50,
-                    labels: ['@personal', '@shopping'],
+                    labels: ['personal', 'shopping'],
                     labelsOperator: 'or' as const,
                 },
                 expectedQueryPattern: '((@personal  |  @shopping))',
@@ -443,7 +443,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 startDate: '2025-08-15' as const,
                 daysCount: 1,
                 limit: 25,
-                labels: ['@important'],
+                labels: ['important'],
                 labelsOperator: 'or' as const,
             }
 

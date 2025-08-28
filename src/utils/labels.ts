@@ -9,7 +9,7 @@ export const LabelsSchema = {
         .array()
         .optional()
         .default([])
-        .describe('The labels to filter the tasks by. Each label should begin with an "@" symbol.'),
+        .describe('The labels to filter the tasks by. Do not include the "@" symbol prefix.'),
     labelsOperator: z
         .enum(LABELS_OPERATORS)
         .optional()
@@ -22,6 +22,8 @@ export const LabelsSchema = {
 export function generateLabelsFilter(labels: string[], labelOperator: LabelsOperator) {
     if (labels.length === 0) return ''
     const operator = labelOperator === 'and' ? ' & ' : ' | '
-    const labelStr = labels.join(` ${operator} `)
+    // Add @ prefix to labels for Todoist API query
+    const prefixedLabels = labels.map((label) => (label.startsWith('@') ? label : `@${label}`))
+    const labelStr = prefixedLabels.join(` ${operator} `)
     return `(${labelStr})`
 }

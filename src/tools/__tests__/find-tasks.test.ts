@@ -460,7 +460,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 params: {
                     searchText: 'important meeting',
                     limit: 10,
-                    labels: ['@work'],
+                    labels: ['work'],
                     labelsOperator: 'or' as const,
                 },
                 expectedQuery: 'search: important meeting & (@work)',
@@ -470,7 +470,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 params: {
                     searchText: 'project update',
                     limit: 15,
-                    labels: ['@work', '@urgent'],
+                    labels: ['work', 'urgent'],
                     labelsOperator: 'and' as const,
                 },
                 expectedQuery: 'search: project update & (@work  &  @urgent)',
@@ -480,7 +480,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 params: {
                     searchText: 'follow up',
                     limit: 20,
-                    labels: ['@personal', '@shopping'],
+                    labels: ['personal', 'shopping'],
                     labelsOperator: 'or' as const,
                 },
                 expectedQuery: 'search: follow up & (@personal  |  @shopping)',
@@ -524,7 +524,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 params: {
                     projectId: TEST_IDS.PROJECT_TEST,
                     limit: 10,
-                    labels: ['@important'],
+                    labels: ['important'],
                     labelsOperator: 'or' as const,
                 },
                 expectedApiParam: { projectId: TEST_IDS.PROJECT_TEST },
@@ -534,7 +534,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 params: {
                     sectionId: TEST_IDS.SECTION_1,
                     limit: 10,
-                    labels: ['@work', '@urgent'],
+                    labels: ['work', 'urgent'],
                     labelsOperator: 'and' as const,
                 },
                 expectedApiParam: { sectionId: TEST_IDS.SECTION_1 },
@@ -544,7 +544,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 params: {
                     parentId: TEST_IDS.TASK_1,
                     limit: 10,
-                    labels: ['@personal'],
+                    labels: ['personal'],
                     labelsOperator: 'or' as const,
                 },
                 expectedApiParam: { parentId: TEST_IDS.TASK_1 },
