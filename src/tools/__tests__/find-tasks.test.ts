@@ -60,8 +60,6 @@ describe(`${FIND_TASKS} tool`, () => {
                 {
                     searchText: 'important meeting',
                     limit: 10,
-                    labels: [],
-                    labelsOperator: 'or',
                 },
                 mockTodoistApi,
             )
@@ -86,8 +84,6 @@ describe(`${FIND_TASKS} tool`, () => {
                     appliedFilters: {
                         searchText: 'important meeting',
                         limit: 10,
-                        labels: [],
-                        labelsOperator: 'or',
                     },
                 }),
             )
@@ -104,8 +100,6 @@ describe(`${FIND_TASKS} tool`, () => {
                 params: {
                     searchText: 'project update',
                     limit: 5,
-                    labels: [],
-                    labelsOperator: 'or' as const,
                 },
                 expectedQuery: 'search: project update',
                 expectedLimit: 5,
@@ -117,8 +111,6 @@ describe(`${FIND_TASKS} tool`, () => {
                     searchText: 'follow up',
                     limit: 20,
                     cursor: 'cursor-from-first-page',
-                    labels: [],
-                    labelsOperator: 'or' as const,
                 },
                 expectedQuery: 'search: follow up',
                 expectedLimit: 20,
@@ -171,10 +163,7 @@ describe(`${FIND_TASKS} tool`, () => {
             const mockResponse = { tasks: [], nextCursor: null }
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
-            const result = await findTasks.execute(
-                { searchText, limit: 10, labels: [], labelsOperator: 'or' },
-                mockTodoistApi,
-            )
+            const result = await findTasks.execute({ searchText, limit: 10 }, mockTodoistApi)
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
@@ -203,9 +192,7 @@ describe(`${FIND_TASKS} tool`, () => {
 
     describe('validation', () => {
         it('should require at least one filter parameter', async () => {
-            await expect(
-                findTasks.execute({ limit: 10, labels: [], labelsOperator: 'or' }, mockTodoistApi),
-            ).rejects.toThrow(
+            await expect(findTasks.execute({ limit: 10 }, mockTodoistApi)).rejects.toThrow(
                 'At least one filter must be provided: searchText, projectId, sectionId, or parentId',
             )
         })
@@ -218,8 +205,6 @@ describe(`${FIND_TASKS} tool`, () => {
                 params: {
                     projectId: TEST_IDS.PROJECT_TEST,
                     limit: 10,
-                    labels: [],
-                    labelsOperator: 'or' as const,
                 },
                 expectedApiParam: { projectId: TEST_IDS.PROJECT_TEST },
                 tasks: [createMockTask({ content: 'Project task' })],
@@ -229,8 +214,6 @@ describe(`${FIND_TASKS} tool`, () => {
                 params: {
                     sectionId: TEST_IDS.SECTION_1,
                     limit: 10,
-                    labels: [],
-                    labelsOperator: 'or' as const,
                 },
                 expectedApiParam: { sectionId: TEST_IDS.SECTION_1 },
                 tasks: [createMockTask({ content: 'Section task' })],
@@ -240,8 +223,6 @@ describe(`${FIND_TASKS} tool`, () => {
                 params: {
                     parentId: TEST_IDS.TASK_1,
                     limit: 10,
-                    labels: [],
-                    labelsOperator: 'or' as const,
                 },
                 expectedApiParam: { parentId: TEST_IDS.TASK_1 },
                 tasks: [createMockTask({ content: 'Subtask' })],
@@ -290,8 +271,6 @@ describe(`${FIND_TASKS} tool`, () => {
                     projectId: TEST_IDS.PROJECT_TEST,
                     searchText: 'relevant',
                     limit: 10,
-                    labels: [],
-                    labelsOperator: 'or',
                 },
                 mockTodoistApi,
             )
@@ -316,8 +295,6 @@ describe(`${FIND_TASKS} tool`, () => {
                 {
                     sectionId: 'empty-section',
                     limit: 10,
-                    labels: [],
-                    labelsOperator: 'or',
                 },
                 mockTodoistApi,
             )
@@ -338,8 +315,6 @@ describe(`${FIND_TASKS} tool`, () => {
                     projectId: TEST_IDS.PROJECT_TEST,
                     limit: 25,
                     cursor: 'current-cursor',
-                    labels: [],
-                    labelsOperator: 'or',
                 },
                 mockTodoistApi,
             )
@@ -362,10 +337,7 @@ describe(`${FIND_TASKS} tool`, () => {
             mockTodoistApi.getTasks.mockRejectedValue(apiError)
 
             await expect(
-                findTasks.execute(
-                    { projectId: 'non-existent', limit: 10, labels: [], labelsOperator: 'or' },
-                    mockTodoistApi,
-                ),
+                findTasks.execute({ projectId: 'non-existent', limit: 10 }, mockTodoistApi),
             ).rejects.toThrow('API Error: Project not found')
         })
     })
@@ -383,7 +355,7 @@ describe(`${FIND_TASKS} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasks.execute(
-                { searchText: 'overdue tasks', limit: 10, labels: [], labelsOperator: 'or' },
+                { searchText: 'overdue tasks', limit: 10 },
                 mockTodoistApi,
             )
 
@@ -405,7 +377,7 @@ describe(`${FIND_TASKS} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasks.execute(
-                { searchText: 'today tasks', limit: 10, labels: [], labelsOperator: 'or' },
+                { searchText: 'today tasks', limit: 10 },
                 mockTodoistApi,
             )
 
@@ -427,7 +399,7 @@ describe(`${FIND_TASKS} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasks.execute(
-                { searchText: 'future tasks', limit: 10, labels: [], labelsOperator: 'or' },
+                { searchText: 'future tasks', limit: 10 },
                 mockTodoistApi,
             )
 
@@ -441,7 +413,7 @@ describe(`${FIND_TASKS} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasks.execute(
-                { searchText: 'nonexistent', limit: 10, labels: [], labelsOperator: 'or' },
+                { searchText: 'nonexistent', limit: 10 },
                 mockTodoistApi,
             )
 
@@ -461,7 +433,6 @@ describe(`${FIND_TASKS} tool`, () => {
                     searchText: 'important meeting',
                     limit: 10,
                     labels: ['work'],
-                    labelsOperator: 'or' as const,
                 },
                 expectedQuery: 'search: important meeting & (@work)',
             },
@@ -481,7 +452,6 @@ describe(`${FIND_TASKS} tool`, () => {
                     searchText: 'follow up',
                     limit: 20,
                     labels: ['personal', 'shopping'],
-                    labelsOperator: 'or' as const,
                 },
                 expectedQuery: 'search: follow up & (@personal  |  @shopping)',
             },
@@ -512,7 +482,7 @@ describe(`${FIND_TASKS} tool`, () => {
                     expect.objectContaining({
                         searchText: params.searchText,
                         labels: params.labels,
-                        labelsOperator: params.labelsOperator,
+                        ...(params.labelsOperator ? { labelsOperator: params.labelsOperator } : {}),
                     }),
                 )
             },
@@ -525,7 +495,6 @@ describe(`${FIND_TASKS} tool`, () => {
                     projectId: TEST_IDS.PROJECT_TEST,
                     limit: 10,
                     labels: ['important'],
-                    labelsOperator: 'or' as const,
                 },
                 expectedApiParam: { projectId: TEST_IDS.PROJECT_TEST },
             },
@@ -545,7 +514,6 @@ describe(`${FIND_TASKS} tool`, () => {
                     parentId: TEST_IDS.TASK_1,
                     limit: 10,
                     labels: ['personal'],
-                    labelsOperator: 'or' as const,
                 },
                 expectedApiParam: { parentId: TEST_IDS.TASK_1 },
             },
@@ -598,8 +566,6 @@ describe(`${FIND_TASKS} tool`, () => {
             const params = {
                 searchText: 'test',
                 limit: 10,
-                labels: [],
-                labelsOperator: 'or' as const,
             }
 
             const mockResponse = { tasks: [], nextCursor: null }
@@ -621,7 +587,6 @@ describe(`${FIND_TASKS} tool`, () => {
                 searchText: 'important',
                 limit: 10,
                 labels: ['urgent'],
-                labelsOperator: 'or' as const,
             }
 
             const allTasks = [
@@ -664,7 +629,7 @@ describe(`${FIND_TASKS} tool`, () => {
         it.each([
             {
                 error: 'At least one filter must be provided: searchText, projectId, sectionId, or parentId',
-                params: { limit: 10, labels: [], labelsOperator: 'or' as const },
+                params: { limit: 10 },
                 expectValidation: true,
             },
             {
@@ -672,8 +637,6 @@ describe(`${FIND_TASKS} tool`, () => {
                 params: {
                     searchText: 'any search term',
                     limit: 10,
-                    labels: [],
-                    labelsOperator: 'or' as const,
                 },
                 expectValidation: false,
             },
@@ -683,8 +646,6 @@ describe(`${FIND_TASKS} tool`, () => {
                     searchText: 'test',
                     cursor: 'invalid-cursor-format',
                     limit: 10,
-                    labels: [],
-                    labelsOperator: 'or' as const,
                 },
                 expectValidation: false,
             },

@@ -65,10 +65,10 @@ const findTasksByDate = {
             query = `(due after: ${startDate} | due: ${startDate}) & due before: ${endDateStr}`
         }
 
-        if (args.labels.length > 0) {
+        const labelsFilter = generateLabelsFilter(args.labels, args.labelsOperator)
+        if (labelsFilter.length > 0) {
             // If there is already a query, we need to append the & operator first
             if (query.length > 0) query += ' & '
-            const labelsFilter = generateLabelsFilter(args.labels, args.labelsOperator)
             // Add the labels to the filter
             query += `(${labelsFilter})`
         }

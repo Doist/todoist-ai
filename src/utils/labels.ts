@@ -8,18 +8,16 @@ export const LabelsSchema = {
         .string()
         .array()
         .optional()
-        .default([])
         .describe('The labels to filter the tasks by. Do not include the "@" symbol prefix.'),
     labelsOperator: z
         .enum(LABELS_OPERATORS)
         .optional()
-        .default('or')
         .describe(
-            'The operator to use when filtering by labels. This will dictate whether a task has all labels, or some of them.',
+            'The operator to use when filtering by labels. This will dictate whether a task has all labels, or some of them. Default is "or".',
         ),
 }
 
-export function generateLabelsFilter(labels: string[], labelOperator: LabelsOperator) {
+export function generateLabelsFilter(labels: string[] = [], labelOperator: LabelsOperator = 'or') {
     if (labels.length === 0) return ''
     const operator = labelOperator === 'and' ? ' & ' : ' | '
     // Add @ prefix to labels for Todoist API query

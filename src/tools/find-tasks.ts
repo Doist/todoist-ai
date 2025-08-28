@@ -85,7 +85,7 @@ const findTasks = {
                 : mappedTasks
 
             // If labels have also been provided, filter the results for those
-            if (labels.length > 0) {
+            if (labels && labels.length > 0) {
                 finalTasks =
                     labelsOperator === 'and'
                         ? finalTasks.filter((task) =>
@@ -118,8 +118,9 @@ const findTasks = {
         let query = `search: ${searchText}`
 
         // Now apply labels filtering
-        if (labels.length > 0) {
-            query += ` & ${generateLabelsFilter(labels, labelsOperator)}`
+        const labelsFilter = generateLabelsFilter(labels, labelsOperator)
+        if (labelsFilter.length > 0) {
+            query += ` & ${labelsFilter}`
         }
 
         // Text-only search using filter query

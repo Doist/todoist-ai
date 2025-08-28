@@ -74,7 +74,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'overdue', limit: 50, daysCount, labels: [], labelsOperator: 'or' },
+                { startDate: 'overdue', limit: 50, daysCount },
                 mockTodoistApi,
             )
 
@@ -110,7 +110,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'today', limit: 50, daysCount: 7, labels: [], labelsOperator: 'or' },
+                { startDate: 'today', limit: 50, daysCount: 7 },
                 mockTodoistApi,
             )
 
@@ -158,10 +158,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             const mockResponse = { tasks, nextCursor: cursor }
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
-            const result = await findTasksByDate.execute(
-                { ...params, labels: [], labelsOperator: 'or' },
-                mockTodoistApi,
-            )
+            const result = await findTasksByDate.execute({ ...params }, mockTodoistApi)
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
@@ -197,10 +194,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             const mockResponse = { tasks: [], nextCursor: null }
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
-            await findTasksByDate.execute(
-                { ...params, labels: [], labelsOperator: 'or' },
-                mockTodoistApi,
-            )
+            await findTasksByDate.execute({ ...params }, mockTodoistApi)
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
@@ -222,7 +216,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
 
             const startDate = daysCount === 7 ? 'today' : '2025-08-15'
             const result = await findTasksByDate.execute(
-                { startDate, limit: 50, daysCount, labels: [], labelsOperator: 'or' },
+                { startDate, limit: 50, daysCount },
                 mockTodoistApi,
             )
 
@@ -251,8 +245,6 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     startDate: '2025-08-15',
                     limit: 10,
                     daysCount: 1,
-                    labels: [],
-                    labelsOperator: 'or',
                 },
                 mockTodoistApi,
             )
@@ -274,7 +266,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'today', limit: 10, daysCount: 1, labels: [], labelsOperator: 'or' },
+                { startDate: 'today', limit: 10, daysCount: 1 },
                 mockTodoistApi,
             )
 
@@ -295,7 +287,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'overdue', limit: 10, daysCount: 1, labels: [], labelsOperator: 'or' },
+                { startDate: 'overdue', limit: 10, daysCount: 1 },
                 mockTodoistApi,
             )
 
@@ -309,7 +301,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'overdue', limit: 10, daysCount: 1, labels: [], labelsOperator: 'or' },
+                { startDate: 'overdue', limit: 10, daysCount: 1 },
                 mockTodoistApi,
             )
 
@@ -328,8 +320,6 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     startDate: '2025-08-20',
                     limit: 10,
                     daysCount: 1,
-                    labels: [],
-                    labelsOperator: 'or',
                 },
                 mockTodoistApi,
             )
@@ -350,7 +340,6 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     daysCount: 1,
                     limit: 50,
                     labels: ['work'],
-                    labelsOperator: 'or' as const,
                 },
                 expectedQueryPattern: '((@work))', // Will be combined with date query
             },
@@ -411,7 +400,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             expect(structuredContent.appliedFilters).toEqual(
                 expect.objectContaining({
                     labels: params.labels,
-                    labelsOperator: params.labelsOperator,
+                    ...(params.labelsOperator ? { labelsOperator: params.labelsOperator } : {}),
                 }),
             )
         })
@@ -421,8 +410,6 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 startDate: 'today' as const,
                 daysCount: 1,
                 limit: 50,
-                labels: [],
-                labelsOperator: 'or' as const,
             }
 
             const mockResponse = { tasks: [], nextCursor: null }
@@ -444,7 +431,6 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 daysCount: 1,
                 limit: 25,
                 labels: ['important'],
-                labelsOperator: 'or' as const,
             }
 
             const mockTasks = [
@@ -494,12 +480,9 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             },
         ])('should propagate $error', async ({ error, params }) => {
             mockGetTasksByFilter.mockRejectedValue(new Error(error))
-            await expect(
-                findTasksByDate.execute(
-                    { ...params, labels: [], labelsOperator: 'or' },
-                    mockTodoistApi,
-                ),
-            ).rejects.toThrow(error)
+            await expect(findTasksByDate.execute({ ...params }, mockTodoistApi)).rejects.toThrow(
+                error,
+            )
         })
     })
 })
