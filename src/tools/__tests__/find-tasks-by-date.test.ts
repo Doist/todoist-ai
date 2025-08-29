@@ -158,7 +158,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             const mockResponse = { tasks, nextCursor: cursor }
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
-            const result = await findTasksByDate.execute({ ...params }, mockTodoistApi)
+            const result = await findTasksByDate.execute(params, mockTodoistApi)
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
@@ -194,7 +194,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             const mockResponse = { tasks: [], nextCursor: null }
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
-            await findTasksByDate.execute({ ...params }, mockTodoistApi)
+            await findTasksByDate.execute(params, mockTodoistApi)
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
@@ -480,9 +480,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             },
         ])('should propagate $error', async ({ error, params }) => {
             mockGetTasksByFilter.mockRejectedValue(new Error(error))
-            await expect(findTasksByDate.execute({ ...params }, mockTodoistApi)).rejects.toThrow(
-                error,
-            )
+            await expect(findTasksByDate.execute(params, mockTodoistApi)).rejects.toThrow(error)
         })
     })
 })

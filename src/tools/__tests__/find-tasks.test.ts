@@ -623,6 +623,73 @@ describe(`${FIND_TASKS} tool`, () => {
                 }),
             ])
         })
+
+        it('should handle labels-only filtering', async () => {
+            const params = {
+                limit: 10,
+                labels: ['work'],
+            }
+
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Task with work label',
+                    labels: ['work'],
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasks.execute(params, mockTodoistApi)
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: '(@work)',
+                cursor: undefined,
+                limit: 10,
+            })
+
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.appliedFilters).toEqual(
+                expect.objectContaining({
+                    labels: ['work'],
+                }),
+            )
+        })
+
+        it('should handle labels with @ symbol', async () => {
+            const params = {
+                limit: 10,
+                labels: ['@work', 'personal'], // Mix of with and without @
+            }
+
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Task with work label',
+                    labels: ['work', 'personal'],
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasks.execute(params, mockTodoistApi)
+
+            // Should handle both @work (already has @) and personal (needs @ added)
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: '(@work  |  @personal)',
+                cursor: undefined,
+                limit: 10,
+            })
+
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.appliedFilters).toEqual(
+                expect.objectContaining({
+                    labels: ['@work', 'personal'],
+                }),
+            )
+        })
     })
 
     describe('error handling', () => {
