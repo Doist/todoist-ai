@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.0](https://github.com/Doist/todoist-ai/compare/v4.1.0...v4.2.0) (2025-08-29)
+
+
+### Features
+
+* Add support for filtering by label ([#71](https://github.com/Doist/todoist-ai/issues/71)) ([b608d32](https://github.com/Doist/todoist-ai/commit/b608d32f7636a175dc62ca388892e9aef0834712))
+
 ## [4.1.0](https://github.com/Doist/todoist-ai/compare/v4.0.0...v4.1.0) (2025-08-23)
 
 
