@@ -8,7 +8,7 @@ No results. Expand date range with larger 'daysCount'; Check 'overdue' for past-
 
 exports[`find-tasks-by-date tool label filtering should combine date filters with label filters 1`] = `
 "Tasks for 2025-08-15: 1 (limit 25).
-Filter: 2025-08-15.
+Filter: 2025-08-15; labels: @important.
 Preview:
     Important task for specific date • due 2025-08-15 • P1 • id=8485093748
 Next:

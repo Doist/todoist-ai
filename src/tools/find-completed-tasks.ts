@@ -106,6 +106,14 @@ function generateTextContent({
     if (args.parentId) filterHints.push(`parent: ${args.parentId}`)
     if (args.workspaceId) filterHints.push(`workspace: ${args.workspaceId}`)
 
+    // Add label filter information
+    if (args.labels && args.labels.length > 0) {
+        const labelText = args.labels
+            .map((label) => `@${label}`)
+            .join(args.labelsOperator === 'and' ? ' & ' : ' | ')
+        filterHints.push(`labels: ${labelText}`)
+    }
+
     // Generate helpful suggestions for empty results
     const zeroReasonHints: string[] = []
     if (tasks.length === 0) {

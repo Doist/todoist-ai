@@ -55,9 +55,10 @@ const findTasks = {
         } = args
 
         // Validate at least one filter is provided
-        if (!searchText && !projectId && !sectionId && !parentId) {
+        const hasLabels = labels && labels.length > 0
+        if (!searchText && !projectId && !sectionId && !parentId && !hasLabels) {
             throw new Error(
-                'At least one filter must be provided: searchText, projectId, sectionId, or parentId',
+                'At least one filter must be provided: searchText, projectId, sectionId, parentId, or labels',
             )
         }
 
@@ -115,15 +116,25 @@ const findTasks = {
             })
         }
 
-        let query = `search: ${searchText}`
+        // Handle search text and/or labels using filter query
+        let query = ''
 
-        // Now apply labels filtering
-        const labelsFilter = generateLabelsFilter(labels, labelsOperator)
-        if (labelsFilter.length > 0) {
-            query += ` & ${labelsFilter}`
+        // Add search text component
+        if (searchText) {
+            query = `search: ${searchText}`
         }
 
-        // Text-only search using filter query
+        // Add labels component
+        const labelsFilter = generateLabelsFilter(labels, labelsOperator)
+        if (labelsFilter.length > 0) {
+            if (query.length > 0) {
+                query += ` & ${labelsFilter}`
+            } else {
+                query = labelsFilter
+            }
+        }
+
+        // Execute filter query
         const result = await getTasksByFilter({
             client,
             query,
@@ -218,14 +229,42 @@ function generateTextContent({
             filterHints.push(`containing "${args.searchText}"`)
         }
 
+        // Add label filter information
+        if (args.labels && args.labels.length > 0) {
+            const labelText = args.labels
+                .map((label) => `@${label}`)
+                .join(args.labelsOperator === 'and' ? ' & ' : ' | ')
+            filterHints.push(`labels: ${labelText}`)
+        }
+
         // Container-specific zero result hints
         if (tasks.length === 0) {
             zeroReasonHints.push(...getContainerZeroReasonHints(args))
         }
     } else {
-        // Text-only search
-        subject = `Search results for "${args.searchText}"`
-        filterHints.push(`matching "${args.searchText}"`)
+        // Text-only search or labels-only search
+        if (args.searchText) {
+            subject = `Search results for "${args.searchText}"`
+            filterHints.push(`matching "${args.searchText}"`)
+        } else if (args.labels && args.labels.length > 0) {
+            // Labels-only search
+            const labelText = args.labels
+                .map((label) => `@${label}`)
+                .join(args.labelsOperator === 'and' ? ' & ' : ' | ')
+            subject = `Tasks with labels: ${labelText}`
+            filterHints.push(`labels: ${labelText}`)
+        } else {
+            // Fallback (shouldn't happen given validation)
+            subject = 'Tasks'
+        }
+
+        // Add label filter information for text search with labels
+        if (args.searchText && args.labels && args.labels.length > 0) {
+            const labelText = args.labels
+                .map((label) => `@${label}`)
+                .join(args.labelsOperator === 'and' ? ' & ' : ' | ')
+            filterHints.push(`labels: ${labelText}`)
+        }
 
         if (tasks.length === 0) {
             zeroReasonHints.push('Try broader search terms')

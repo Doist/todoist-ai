@@ -120,6 +120,14 @@ function generateTextContent({
         )
     }
 
+    // Add label filter information
+    if (args.labels && args.labels.length > 0) {
+        const labelText = args.labels
+            .map((label) => `@${label}`)
+            .join(args.labelsOperator === 'and' ? ' & ' : ' | ')
+        filterHints.push(`labels: ${labelText}`)
+    }
+
     // Generate subject description
     const subject =
         args.startDate === 'overdue'
