@@ -6,7 +6,28 @@
 npm run setup
 ```
 
-## 2. Configure environment variables
+## 2. Configure credentials
+
+You have two options for configuring your Todoist credentials:
+
+### Option A: Using Keychain (Recommended)
+
+Store your API key securely in the user keychain:
+
+```sh
+npm run setup-keychain
+```
+
+This will securely prompt you for your API key (hidden input with asterisks) and store it in your user's keychain (Keychain on macOS, Credential Manager on Windows, Secret Service on Linux).
+
+The server will automatically use the keychain API key when no `TODOIST_API_KEY` environment variable is set. You can still set the base URL if needed:
+
+```env
+# Optional: Set custom base URL
+TODOIST_BASE_URL=https://local.todoist.com/rest/v2
+```
+
+### Option B: Using Environment Variables
 
 Update the `.env` file with your Todoist token:
 
