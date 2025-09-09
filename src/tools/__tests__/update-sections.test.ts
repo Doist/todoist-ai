@@ -34,6 +34,7 @@ describe(`${UPDATE_SECTIONS} tool`, () => {
                 isDeleted: false,
                 isCollapsed: false,
                 name: 'Updated Section Name',
+                url: 'https://todoist.com/sections/existing-section-123',
             }
 
             mockTodoistApi.updateSection.mockResolvedValue(mockApiResponse)
