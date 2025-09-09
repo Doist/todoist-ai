@@ -32,6 +32,7 @@ export const ToolNames = {
     // General tools
     GET_OVERVIEW: 'get-overview',
     DELETE_OBJECT: 'delete-object',
+    USER_INFO: 'user-info',
 } as const
 
 // Type for all tool names

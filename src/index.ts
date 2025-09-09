@@ -26,6 +26,7 @@ import { updateComments } from './tools/update-comments.js'
 // General tools
 import { deleteObject } from './tools/delete-object.js'
 import { getOverview } from './tools/get-overview.js'
+import { userInfo } from './tools/user-info.js'
 
 const tools = {
     // Task management tools
@@ -50,6 +51,7 @@ const tools = {
     // General tools
     getOverview,
     deleteObject,
+    userInfo,
 }
 
 export { tools, getMcpServer }
@@ -77,4 +79,5 @@ export {
     // General tools
     getOverview,
     deleteObject,
+    userInfo,
 }

@@ -28,6 +28,7 @@ import { updateComments } from './tools/update-comments.js'
 // General tools
 import { deleteObject } from './tools/delete-object.js'
 import { getOverview } from './tools/get-overview.js'
+import { userInfo } from './tools/user-info.js'
 
 const instructions = `
 Tools to help you manage your todoist tasks.
@@ -78,6 +79,7 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     // General tools
     registerTool(getOverview, server, todoist)
     registerTool(deleteObject, server, todoist)
+    registerTool(userInfo, server, todoist)
 
     return server
 }
