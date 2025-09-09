@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
+import { type Project } from '../tool-helpers.js'
 import { summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 import { type ProjectCollaborator, userResolver } from '../utils/user-resolver.js'
@@ -8,7 +9,7 @@ import { type ProjectCollaborator, userResolver } from '../utils/user-resolver.j
 const { FIND_PROJECTS, ADD_TASKS, UPDATE_TASKS } = ToolNames
 
 const ArgsSchema = {
-    projectId: z.string().min(1).describe('The ID of the project to search sections in.'),
+    projectId: z.string().min(1).describe('The ID of the project to search for collaborators in.'),
     searchTerm: z
         .string()
         .optional()
@@ -26,14 +27,12 @@ const findProjectCollaborators = {
 
         // First, validate that the project exists and get basic info
         let projectName = projectId
+        let project: Project
         try {
-            const { results: projects } = await client.getProjects({})
-            const project = projects.find((p) => p.id === projectId)
-
+            project = await client.getProject(projectId)
             if (!project) {
                 throw new Error(`Project with ID "${projectId}" not found or not accessible`)
             }
-
             projectName = project.name
 
             if (!project.isShared) {

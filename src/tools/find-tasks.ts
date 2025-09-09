@@ -22,7 +22,7 @@ const ArgsSchema = {
     projectId: z.string().optional().describe('Find tasks in this project.'),
     sectionId: z.string().optional().describe('Find tasks in this section.'),
     parentId: z.string().optional().describe('Find subtasks of this parent task.'),
-    responsibleUid: z
+    responsibleUser: z
         .string()
         .optional()
         .describe('Find tasks assigned to this user. Can be a user ID, name, or email address.'),
@@ -53,7 +53,7 @@ const findTasks = {
             projectId,
             sectionId,
             parentId,
-            responsibleUid,
+            responsibleUser,
             limit,
             cursor,
             labels,
@@ -62,23 +62,30 @@ const findTasks = {
 
         // Validate at least one filter is provided
         const hasLabels = labels && labels.length > 0
-        if (!searchText && !projectId && !sectionId && !parentId && !responsibleUid && !hasLabels) {
+        if (
+            !searchText &&
+            !projectId &&
+            !sectionId &&
+            !parentId &&
+            !responsibleUser &&
+            !hasLabels
+        ) {
             throw new Error(
-                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUid, or labels',
+                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, or labels',
             )
         }
 
         // Resolve assignee name to user ID if provided
-        let resolvedAssigneeId: string | undefined = responsibleUid
+        let resolvedAssigneeId: string | undefined = responsibleUser
         let assigneeDisplayName: string | undefined
-        if (responsibleUid) {
-            const resolved = await resolveUserNameToId(client, responsibleUid)
+        if (responsibleUser) {
+            const resolved = await resolveUserNameToId(client, responsibleUser)
             if (resolved) {
                 resolvedAssigneeId = resolved.userId
                 assigneeDisplayName = resolved.displayName
             } else {
                 throw new Error(
-                    `Could not find user: "${responsibleUid}". Make sure the user is a collaborator on a shared project.`,
+                    `Could not find user: "${responsibleUser}". Make sure the user is a collaborator on a shared project.`,
                 )
             }
         }
@@ -106,7 +113,7 @@ const findTasks = {
                   )
                 : mappedTasks
 
-            // Apply assignee filter
+            // Apply responsibleUid filter
             if (resolvedAssigneeId) {
                 filteredTasks = filteredTasks.filter(
                     (task) => task.responsibleUid === resolvedAssigneeId,
@@ -145,55 +152,21 @@ const findTasks = {
             })
         }
 
-        // If only responsibleUid is provided (without containers), get all tasks and filter
+        // If only responsibleUid is provided (without containers), use assignee filter
         if (resolvedAssigneeId && !searchText && !hasLabels) {
-            const allFilteredTasks: MappedTask[] = []
-            let currentCursor = cursor ?? null
-            let retrievedCount = 0
-            let finalNextCursor: string | null = null
+            const tasks = await client.getTasksByFilter({
+                query: `assigned to: ${assigneeDisplayName}`,
+                lang: 'en',
+                limit,
+                cursor: cursor ?? null,
+            })
 
-            // Iterate through all tasks until we find enough matching assignee or hit the end
-            let safetyCounter = 0
-            const MAX_ITERATIONS = 10
-            while (retrievedCount < limit && safetyCounter < MAX_ITERATIONS) {
-                safetyCounter++
-                const batchSize = Math.min(50, limit - retrievedCount + 50) // Get extra to account for filtering
-                const { results, nextCursor } = await client.getTasks({
-                    limit: batchSize,
-                    cursor: currentCursor,
-                })
-
-                const mappedTasks = results.map(mapTask)
-                const batchFilteredTasks = mappedTasks.filter(
-                    (task) => task.responsibleUid === resolvedAssigneeId,
-                )
-
-                allFilteredTasks.push(...batchFilteredTasks)
-                retrievedCount += batchFilteredTasks.length
-
-                // If we have enough results or no more pages, stop
-                if (!nextCursor || retrievedCount >= limit) {
-                    finalNextCursor = nextCursor
-                    break
-                }
-
-                // Add additional exit condition if no matches found in batch and results are small
-                if (batchFilteredTasks.length === 0 && results.length < batchSize) {
-                    // No more potential matches, exit early
-                    break
-                }
-
-                currentCursor = nextCursor
-            }
-
-            // Trim to requested limit
-            const filteredTasks = allFilteredTasks.slice(0, limit)
-            const hasMore = allFilteredTasks.length > limit || Boolean(finalNextCursor)
+            const mappedTasks = tasks.results.map(mapTask)
 
             const textContent = generateTextContent({
-                tasks: filteredTasks,
+                tasks: mappedTasks,
                 args,
-                nextCursor: finalNextCursor,
+                nextCursor: tasks.nextCursor,
                 isContainerSearch: false,
                 assigneeDisplayName,
             })
@@ -201,16 +174,16 @@ const findTasks = {
             return getToolOutput({
                 textContent,
                 structuredContent: {
-                    tasks: filteredTasks,
-                    nextCursor: finalNextCursor,
-                    totalCount: filteredTasks.length,
-                    hasMore,
+                    tasks: mappedTasks,
+                    nextCursor: tasks.nextCursor,
+                    totalCount: mappedTasks.length,
+                    hasMore: Boolean(tasks.nextCursor),
                     appliedFilters: args,
                 },
             })
         }
 
-        // Handle search text and/or labels using filter query (assignee filtering done client-side)
+        // Handle search text and/or labels using filter query (responsibleUid filtering done client-side)
         let query = ''
 
         // Add search text component
@@ -236,7 +209,7 @@ const findTasks = {
             limit: args.limit,
         })
 
-        // Always filter by assignee client-side (API doesn't reliably support assignee filtering)
+        // Always filter by responsibleUid client-side (API doesn't reliably support responsibleUid filtering)
         let tasks = result.tasks
         if (resolvedAssigneeId) {
             tasks = result.tasks.filter((task) => task.responsibleUid === resolvedAssigneeId)
@@ -332,9 +305,9 @@ function generateTextContent({
             filterHints.push(`containing "${args.searchText}"`)
         }
 
-        // Add assignee filter if present
-        if (args.responsibleUid) {
-            const displayName = assigneeDisplayName || args.responsibleUid
+        // Add responsibleUid filter if present
+        if (args.responsibleUser) {
+            const displayName = assigneeDisplayName || args.responsibleUser
             subject += ` assigned to ${displayName}`
             filterHints.push(`assigned to ${displayName}`)
         }
@@ -352,15 +325,15 @@ function generateTextContent({
             zeroReasonHints.push(...getContainerZeroReasonHints(args))
         }
     } else {
-        // Text, assignee, or labels search
-        const displayName = assigneeDisplayName || args.responsibleUid
+        // Text, responsibleUid, or labels search
+        const displayName = assigneeDisplayName || args.responsibleUser
 
         // Build subject based on filters
         const subjectParts = []
         if (args.searchText) {
             subjectParts.push(`"${args.searchText}"`)
         }
-        if (args.responsibleUid) {
+        if (args.responsibleUser) {
             subjectParts.push(`assigned to ${displayName}`)
         }
         if (args.labels && args.labels.length > 0) {
@@ -373,9 +346,9 @@ function generateTextContent({
         if (args.searchText) {
             subject = `Search results for ${subjectParts.join(' ')}`
             filterHints.push(`matching "${args.searchText}"`)
-        } else if (args.responsibleUid && (!args.labels || args.labels.length === 0)) {
+        } else if (args.responsibleUser && (!args.labels || args.labels.length === 0)) {
             subject = `Tasks assigned to ${displayName}`
-        } else if (args.labels && args.labels.length > 0 && !args.responsibleUid) {
+        } else if (args.labels && args.labels.length > 0 && !args.responsibleUser) {
             const labelText = args.labels
                 .map((label) => `@${label}`)
                 .join(args.labelsOperator === 'and' ? ' & ' : ' | ')
@@ -385,7 +358,7 @@ function generateTextContent({
         }
 
         // Add filter hints
-        if (args.responsibleUid) {
+        if (args.responsibleUser) {
             filterHints.push(`assigned to ${displayName}`)
         }
         if (args.labels && args.labels.length > 0) {
@@ -396,8 +369,8 @@ function generateTextContent({
         }
 
         if (tasks.length === 0) {
-            if (args.responsibleUid) {
-                const displayName = assigneeDisplayName || args.responsibleUid
+            if (args.responsibleUser) {
+                const displayName = assigneeDisplayName || args.responsibleUser
                 zeroReasonHints.push(`No tasks assigned to ${displayName}`)
                 zeroReasonHints.push('Check if the user name is correct')
                 zeroReasonHints.push(`Check completed tasks with ${FIND_COMPLETED_TASKS}`)
@@ -405,7 +378,7 @@ function generateTextContent({
             if (args.searchText) {
                 zeroReasonHints.push('Try broader search terms')
                 zeroReasonHints.push('Verify spelling and try partial words')
-                if (!args.responsibleUid) {
+                if (!args.responsibleUser) {
                     zeroReasonHints.push(`Check completed tasks with ${FIND_COMPLETED_TASKS}`)
                 }
             }

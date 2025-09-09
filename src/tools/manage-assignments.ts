@@ -383,7 +383,7 @@ function generateTextContent({
     // Add operational info
     if (!dryRun && successful.length > 0) {
         summary += '**Next steps:**\n'
-        summary += `• Use ${FIND_TASKS} with responsibleUid to see ${operation === 'unassign' ? 'unassigned' : 'newly assigned'} tasks\n`
+        summary += `• Use ${FIND_TASKS} with responsibleUser to see ${operation === 'unassign' ? 'unassigned' : 'newly assigned'} tasks\n`
         summary += `• Use ${UPDATE_TASKS} for individual assignment changes\n`
 
         if (failed.length > 0) {

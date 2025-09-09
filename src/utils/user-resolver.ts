@@ -1,11 +1,11 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 
-export interface ResolvedUser {
+export type ResolvedUser = {
     userId: string
     displayName: string
 }
 
-export interface ProjectCollaborator {
+export type ProjectCollaborator = {
     id: string
     name: string
     email: string
@@ -191,22 +191,26 @@ export class UserResolver {
                 return result
             }
 
-            // Collect all collaborators from shared projects
+            // Collect all collaborators from shared projects in parallel
             const allCollaborators: ProjectCollaborator[] = []
             const seenIds = new Set<string>()
 
-            for (const project of sharedProjects) {
-                try {
-                    const collaborators = await this.getProjectCollaborators(client, project.id)
-                    for (const collaborator of collaborators) {
+            const collaboratorPromises = sharedProjects.map((project) =>
+                this.getProjectCollaborators(client, project.id),
+            )
+
+            const collaboratorResults = await Promise.allSettled(collaboratorPromises)
+
+            for (const result of collaboratorResults) {
+                if (result.status === 'fulfilled') {
+                    for (const collaborator of result.value) {
                         if (collaborator && !seenIds.has(collaborator.id)) {
                             allCollaborators.push(collaborator)
                             seenIds.add(collaborator.id)
                         }
                     }
-                } catch (_error) {
-                    // Skip failed project, continue with others
                 }
+                // Skip failed projects, continue with others
             }
 
             collaboratorsCache.set(cacheKey, {

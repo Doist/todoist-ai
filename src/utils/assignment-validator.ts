@@ -1,4 +1,5 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
+import { type Project } from '../tool-helpers.js'
 import { type ResolvedUser, userResolver } from './user-resolver.js'
 
 export const AssignmentErrorType = {
@@ -13,13 +14,13 @@ export const AssignmentErrorType = {
 
 export type AssignmentErrorType = (typeof AssignmentErrorType)[keyof typeof AssignmentErrorType]
 
-export interface ValidationError {
+export type ValidationError = {
     type: AssignmentErrorType
     message: string
     suggestions?: string[]
 }
 
-export interface ValidationResult {
+export type ValidationResult = {
     isValid: boolean
     resolvedUser?: ResolvedUser
     error?: ValidationError
@@ -27,7 +28,7 @@ export interface ValidationResult {
     projectId?: string
 }
 
-export interface Assignment {
+export type Assignment = {
     taskId?: string
     projectId: string
     responsibleUid: string
@@ -64,25 +65,7 @@ export class AssignmentValidator {
 
         // Validate the project exists and is accessible
         try {
-            const { results: projects } = await client.getProjects({})
-            const targetProject = projects.find((p) => p.id === projectId)
-
-            if (!targetProject) {
-                return {
-                    isValid: false,
-                    taskId,
-                    projectId,
-                    resolvedUser,
-                    error: {
-                        type: AssignmentErrorType.PROJECT_NOT_FOUND,
-                        message: `Project "${projectId}" not found or not accessible`,
-                        suggestions: [
-                            'Verify the project ID is correct',
-                            'Check if you have access to this project',
-                        ],
-                    },
-                }
-            }
+            const targetProject = await client.getProject(projectId)
 
             // Check if project is shared (required for assignments)
             if (!targetProject.isShared) {
@@ -274,10 +257,10 @@ export class AssignmentValidator {
         let canAssign = false
 
         // Get project information
-        const { results: projects } = await client.getProjects({})
-        const project = projects.find((p) => p.id === projectId)
-
-        if (!project) {
+        let project: Project
+        try {
+            project = await client.getProject(projectId)
+        } catch {
             return {
                 canAssign: false,
                 projectInfo: {

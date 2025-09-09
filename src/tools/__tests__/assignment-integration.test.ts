@@ -80,6 +80,7 @@ describe('Assignment Integration Tests', () => {
             updateTask: jest.fn(),
             getTask: jest.fn(),
             getProjects: jest.fn(),
+            getProject: jest.fn(),
         } as unknown as jest.Mocked<TodoistApi>
 
         // Mock assignment validator responses
@@ -112,6 +113,7 @@ describe('Assignment Integration Tests', () => {
             results: [mockProject],
             nextCursor: null,
         })
+        mockTodoistApi.getProject.mockResolvedValue(mockProject)
         mockTodoistApi.addTask.mockResolvedValue({ ...mockTask, responsibleUid: 'user-123' })
         mockTodoistApi.updateTask.mockResolvedValue({ ...mockTask, responsibleUid: 'user-123' })
         mockTodoistApi.getTask.mockResolvedValue(mockTask)
@@ -413,10 +415,7 @@ describe('Assignment Integration Tests', () => {
         })
 
         it('should handle non-shared projects', async () => {
-            mockTodoistApi.getProjects.mockResolvedValueOnce({
-                results: [{ ...mockProject, isShared: false }],
-                nextCursor: null,
-            })
+            mockTodoistApi.getProject.mockResolvedValueOnce({ ...mockProject, isShared: false })
 
             const result = await findProjectCollaborators.execute(
                 {
@@ -430,10 +429,7 @@ describe('Assignment Integration Tests', () => {
         })
 
         it('should handle project not found', async () => {
-            mockTodoistApi.getProjects.mockResolvedValueOnce({
-                results: [],
-                nextCursor: null,
-            })
+            mockTodoistApi.getProject.mockRejectedValueOnce(new Error('Project not found'))
 
             await expect(
                 findProjectCollaborators.execute(
@@ -442,7 +438,7 @@ describe('Assignment Integration Tests', () => {
                     },
                     mockTodoistApi,
                 ),
-            ).rejects.toThrow('Project with ID "nonexistent-project" not found or not accessible')
+            ).rejects.toThrow('Failed to access project "nonexistent-project"')
         })
     })
 

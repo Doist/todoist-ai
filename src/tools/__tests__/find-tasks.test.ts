@@ -193,7 +193,7 @@ describe(`${FIND_TASKS} tool`, () => {
     describe('validation', () => {
         it('should require at least one filter parameter', async () => {
             await expect(findTasks.execute({ limit: 10 }, mockTodoistApi)).rejects.toThrow(
-                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUid, or labels',
+                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, or labels',
             )
         })
     })
@@ -695,7 +695,7 @@ describe(`${FIND_TASKS} tool`, () => {
     describe('error handling', () => {
         it.each([
             {
-                error: 'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUid, or labels',
+                error: 'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, or labels',
                 params: { limit: 10 },
                 expectValidation: true,
             },
