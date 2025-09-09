@@ -29,6 +29,10 @@ import { updateComments } from './tools/update-comments.js'
 import { deleteObject } from './tools/delete-object.js'
 import { getOverview } from './tools/get-overview.js'
 
+// Assignment and collaboration tools
+import { findProjectCollaborators } from './tools/find-project-collaborators.js'
+import { manageAssignments } from './tools/manage-assignments.js'
+
 const instructions = `
 Tools to help you manage your todoist tasks.
 `
@@ -78,6 +82,10 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     // General tools
     registerTool(getOverview, server, todoist)
     registerTool(deleteObject, server, todoist)
+
+    // Assignment and collaboration tools
+    registerTool(findProjectCollaborators, server, todoist)
+    registerTool(manageAssignments, server, todoist)
 
     return server
 }

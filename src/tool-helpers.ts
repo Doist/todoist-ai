@@ -75,6 +75,8 @@ function mapTask(task: Task) {
         parentId: task.parentId,
         labels: task.labels,
         duration: task.duration ? formatDuration(task.duration.amount) : null,
+        responsibleUid: task.responsibleUid,
+        assignedByUid: task.assignedByUid,
     }
 }
 

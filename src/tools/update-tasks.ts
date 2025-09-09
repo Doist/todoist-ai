@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { createMoveTaskArgs, mapTask } from '../tool-helpers.js'
+import { assignmentValidator } from '../utils/assignment-validator.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
 import { summarizeTaskOperation } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -34,6 +35,13 @@ const TasksUpdateSchema = z.object({
         .describe(
             'The duration of the task. Use format: "2h" (hours), "90m" (minutes), "2h30m" (combined), or "1.5h" (decimal hours). Max 24h.',
         ),
+    responsibleUid: z
+        .string()
+        .nullable()
+        .optional()
+        .describe(
+            'Change task assignment. Use null to unassign. User must be a project collaborator.',
+        ),
 })
 
 type TaskUpdate = z.infer<typeof TasksUpdateSchema>
@@ -44,7 +52,7 @@ const ArgsSchema = {
 
 const updateTasks = {
     name: ToolNames.UPDATE_TASKS,
-    description: 'Update multiple existing tasks with new values.',
+    description: 'Update existing tasks including content, dates, priorities, and assignments.',
     parameters: ArgsSchema,
     async execute(args, client) {
         const { tasks } = args
@@ -59,6 +67,7 @@ const updateTasks = {
                 sectionId,
                 parentId,
                 duration: durationStr,
+                responsibleUid,
                 ...otherUpdateArgs
             } = task
 
@@ -78,6 +87,32 @@ const updateTasks = {
                         throw new Error(`Task ${id}: ${error.message}`)
                     }
                     throw error
+                }
+            }
+
+            // Handle assignment changes if provided
+            if (responsibleUid !== undefined) {
+                if (responsibleUid === null) {
+                    // Unassign task - no validation needed
+                    updateArgs = { ...updateArgs, assigneeId: null }
+                } else {
+                    // Validate assignment using comprehensive validator
+                    const validation = await assignmentValidator.validateTaskUpdateAssignment(
+                        client,
+                        id,
+                        responsibleUid,
+                    )
+
+                    if (!validation.isValid) {
+                        const errorMsg = validation.error?.message || 'Assignment validation failed'
+                        const suggestions = validation.error?.suggestions?.join('. ') || ''
+                        throw new Error(
+                            `Task ${id}: ${errorMsg}${suggestions ? `. ${suggestions}` : ''}`,
+                        )
+                    }
+
+                    // Use the validated assignee ID
+                    updateArgs = { ...updateArgs, assigneeId: validation.resolvedUser?.userId }
                 }
             }
 

@@ -164,7 +164,7 @@ function generateTextContent({
         limit: args.limit,
         nextCursor: nextCursor ?? undefined,
         filterHints,
-        previewLines: previewTasks(tasks),
+        previewLines: previewTasks(tasks, Math.min(tasks.length, args.limit)),
         zeroReasonHints,
         nextSteps,
     })

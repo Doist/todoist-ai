@@ -17,6 +17,8 @@ export type MappedTask = {
     parentId: string | null
     labels: string[]
     duration: string | null
+    responsibleUid: string | null
+    assignedByUid: string | null
 }
 
 /**
@@ -137,6 +139,8 @@ export function createMappedTask(overrides: Partial<MappedTask> = {}): MappedTas
         parentId: null,
         labels: [],
         duration: null,
+        responsibleUid: null,
+        assignedByUid: null,
         ...overrides,
     }
 }

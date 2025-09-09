@@ -150,7 +150,16 @@ export function formatProjectPreview(project: ProjectLike): string {
  * Creates preview lines for task lists
  */
 export function previewTasks(tasks: TaskLike[], limit = 5): string {
-    return tasks.slice(0, limit).map(formatTaskPreview).join('\n')
+    const previewTasks = tasks.slice(0, limit)
+    const lines = previewTasks.map(formatTaskPreview).join('\n')
+
+    // If we're showing fewer tasks than the total, add an indicator
+    if (tasks.length > limit) {
+        const remaining = tasks.length - limit
+        return `${lines}\n    ... and ${remaining} more task${remaining === 1 ? '' : 's'}`
+    }
+
+    return lines
 }
 
 interface SummarizeListParams {

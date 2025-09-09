@@ -27,6 +27,10 @@ import { updateComments } from './tools/update-comments.js'
 import { deleteObject } from './tools/delete-object.js'
 import { getOverview } from './tools/get-overview.js'
 
+// Assignment and collaboration tools
+import { findProjectCollaborators } from './tools/find-project-collaborators.js'
+import { manageAssignments } from './tools/manage-assignments.js'
+
 const tools = {
     // Task management tools
     addTasks,
@@ -50,6 +54,9 @@ const tools = {
     // General tools
     getOverview,
     deleteObject,
+    // Assignment and collaboration tools
+    findProjectCollaborators,
+    manageAssignments,
 }
 
 export { tools, getMcpServer }
@@ -77,4 +84,7 @@ export {
     // General tools
     getOverview,
     deleteObject,
+    // Assignment and collaboration tools
+    findProjectCollaborators,
+    manageAssignments,
 }

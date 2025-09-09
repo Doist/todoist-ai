@@ -29,6 +29,10 @@ export const ToolNames = {
     UPDATE_COMMENTS: 'update-comments',
     FIND_COMMENTS: 'find-comments',
 
+    // Assignment and collaboration tools
+    FIND_PROJECT_COLLABORATORS: 'find-project-collaborators',
+    MANAGE_ASSIGNMENTS: 'manage-assignments',
+
     // General tools
     GET_OVERVIEW: 'get-overview',
     DELETE_OBJECT: 'delete-object',
