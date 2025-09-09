@@ -15,45 +15,51 @@ const mockTodoistApi = {
 
 const { USER_INFO } = ToolNames
 
+// Helper function to create a mock user with default values that can be overridden
+function createMockUser(overrides: Partial<CurrentUser> = {}): CurrentUser {
+    return {
+        id: '123',
+        fullName: 'Test User',
+        email: 'test@example.com',
+        isPremium: true,
+        completedToday: 12,
+        dailyGoal: 10,
+        weeklyGoal: 100,
+        startDay: 1, // Monday
+        tzInfo: {
+            timezone: 'Europe/Madrid',
+            gmtString: '+02:00',
+            hours: 2,
+            minutes: 0,
+            isDst: 1,
+        },
+        lang: 'en',
+        avatarBig: 'https://example.com/avatar.jpg',
+        avatarMedium: null,
+        avatarS640: null,
+        avatarSmall: null,
+        karma: 86394.0,
+        karmaTrend: 'up',
+        nextWeek: 1,
+        weekendStartDay: 6,
+        timeFormat: 0,
+        dateFormat: 0,
+        daysOff: [6, 7],
+        businessAccountId: null,
+        completedCount: 102920,
+        inboxProjectId: '6PVw8cMf7m8fWwRp',
+        startPage: 'overdue',
+        ...overrides,
+    }
+}
+
 describe(`${USER_INFO} tool`, () => {
     beforeEach(() => {
         jest.clearAllMocks()
     })
 
     it('should generate user info with all required fields', async () => {
-        const mockUser: CurrentUser = {
-            id: '123',
-            fullName: 'Test User',
-            email: 'test@example.com',
-            isPremium: true,
-            completedToday: 12,
-            dailyGoal: 10,
-            weeklyGoal: 100,
-            startDay: 1, // Monday
-            tzInfo: {
-                timezone: 'Europe/Madrid',
-                gmtString: '+02:00',
-                hours: 2,
-                minutes: 0,
-                isDst: 1,
-            },
-            lang: 'en',
-            avatarBig: 'https://example.com/avatar.jpg',
-            avatarMedium: null,
-            avatarS640: null,
-            avatarSmall: null,
-            karma: 86394.0,
-            karmaTrend: 'up',
-            nextWeek: 1,
-            weekendStartDay: 6,
-            timeFormat: 0,
-            dateFormat: 0,
-            daysOff: [6, 7],
-            businessAccountId: null,
-            completedCount: 102920,
-            inboxProjectId: '6PVw8cMf7m8fWwRp',
-            startPage: 'overdue',
-        }
+        const mockUser = createMockUser()
 
         mockTodoistApi.getUser.mockResolvedValue(mockUser)
 
@@ -100,15 +106,8 @@ describe(`${USER_INFO} tool`, () => {
     })
 
     it('should handle missing timezone info', async () => {
-        const mockUser: CurrentUser = {
-            id: '789',
-            fullName: 'Anonymous User',
-            email: 'anonymous@example.com',
+        const mockUser = createMockUser({
             isPremium: false,
-            completedToday: 0,
-            dailyGoal: 5,
-            weeklyGoal: 35,
-            startDay: 1, // Default to Monday since it can't be null
             tzInfo: {
                 timezone: 'UTC',
                 gmtString: '+00:00',
@@ -116,23 +115,7 @@ describe(`${USER_INFO} tool`, () => {
                 minutes: 0,
                 isDst: 0,
             },
-            lang: 'en',
-            avatarBig: null,
-            avatarMedium: null,
-            avatarS640: null,
-            avatarSmall: null,
-            karma: 500.0,
-            karmaTrend: 'up',
-            nextWeek: 1,
-            weekendStartDay: 6,
-            timeFormat: 0,
-            dateFormat: 0,
-            daysOff: [6, 7],
-            businessAccountId: null,
-            completedCount: 100,
-            inboxProjectId: 'inbox456',
-            startPage: 'overdue',
-        }
+        })
 
         mockTodoistApi.getUser.mockResolvedValue(mockUser)
 
@@ -151,14 +134,7 @@ describe(`${USER_INFO} tool`, () => {
     })
 
     it('should handle invalid timezone and fallback to UTC', async () => {
-        const mockUser: CurrentUser = {
-            id: '456',
-            fullName: 'User with Invalid Timezone',
-            email: 'invalid-tz@example.com',
-            isPremium: false,
-            completedToday: 3,
-            dailyGoal: 8,
-            weeklyGoal: 50,
+        const mockUser = createMockUser({
             startDay: 2, // Tuesday
             tzInfo: {
                 timezone: 'Invalid/Timezone',
@@ -167,23 +143,7 @@ describe(`${USER_INFO} tool`, () => {
                 minutes: 30,
                 isDst: 0,
             },
-            lang: 'en',
-            avatarBig: null,
-            avatarMedium: null,
-            avatarS640: null,
-            avatarSmall: null,
-            karma: 1000.0,
-            karmaTrend: 'up',
-            nextWeek: 1,
-            weekendStartDay: 6,
-            timeFormat: 0,
-            dateFormat: 0,
-            daysOff: [6, 7],
-            businessAccountId: null,
-            completedCount: 200,
-            inboxProjectId: 'inbox789',
-            startPage: 'overdue',
-        }
+        })
 
         mockTodoistApi.getUser.mockResolvedValue(mockUser)
 
