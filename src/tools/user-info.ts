@@ -5,6 +5,8 @@ import { ToolNames } from '../utils/tool-names.js'
 
 const ArgsSchema = {}
 
+type UserPlan = 'Todoist Free' | 'Todoist Pro' | 'Todoist Business'
+
 type UserInfoStructured = Record<string, unknown> & {
     type: 'user_info'
     fullName: string
@@ -19,10 +21,10 @@ type UserInfoStructured = Record<string, unknown> & {
     dailyGoal: number
     weeklyGoal: number
     email: string
-    plan: string
+    plan: UserPlan
 }
 
-function getUserPlan(user: { isPremium: boolean; businessAccountId?: string | null }): string {
+function getUserPlan(user: { isPremium: boolean; businessAccountId?: string | null }): UserPlan {
     if (user.businessAccountId) {
         return 'Todoist Business'
     }
