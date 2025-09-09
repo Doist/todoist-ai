@@ -150,6 +150,58 @@ describe(`${USER_INFO} tool`, () => {
         expect(structuredContent.plan).toBe('Todoist Free')
     })
 
+    it('should handle invalid timezone and fallback to UTC', async () => {
+        const mockUser: CurrentUser = {
+            id: '456',
+            fullName: 'User with Invalid Timezone',
+            email: 'invalid-tz@example.com',
+            isPremium: false,
+            completedToday: 3,
+            dailyGoal: 8,
+            weeklyGoal: 50,
+            startDay: 2, // Tuesday
+            tzInfo: {
+                timezone: 'Invalid/Timezone',
+                gmtString: '+05:30',
+                hours: 5,
+                minutes: 30,
+                isDst: 0,
+            },
+            lang: 'en',
+            avatarBig: null,
+            avatarMedium: null,
+            avatarS640: null,
+            avatarSmall: null,
+            karma: 1000.0,
+            karmaTrend: 'up',
+            nextWeek: 1,
+            weekendStartDay: 6,
+            timeFormat: 0,
+            dateFormat: 0,
+            daysOff: [6, 7],
+            businessAccountId: null,
+            completedCount: 200,
+            inboxProjectId: 'inbox789',
+            startPage: 'overdue',
+        }
+
+        mockTodoistApi.getUser.mockResolvedValue(mockUser)
+
+        const result = await userInfo.execute({}, mockTodoistApi)
+
+        const textContent = extractTextContent(result)
+        expect(textContent).toContain('UTC') // Should fallback to UTC
+        expect(textContent).toContain('Tuesday (2)')
+
+        const structuredContent = extractStructuredContent(result)
+        expect(structuredContent.timezone).toBe('UTC') // Should be UTC, not the invalid timezone
+        expect(structuredContent.startDay).toBe(2)
+        expect(structuredContent.startDayName).toBe('Tuesday')
+        expect(structuredContent.currentLocalTime).toMatch(
+            /^\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}:\d{2}$/,
+        )
+    })
+
     it('should propagate API errors', async () => {
         const apiError = new Error(TEST_ERRORS.API_UNAUTHORIZED)
         mockTodoistApi.getUser.mockRejectedValue(apiError)

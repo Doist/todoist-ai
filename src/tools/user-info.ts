@@ -66,9 +66,24 @@ function formatDate(date: Date): string {
     return date.toISOString().split('T')[0] ?? ''
 }
 
+function isValidTimezone(timezone: string): boolean {
+    try {
+        // Test if the timezone is valid by attempting to format a date with it
+        new Intl.DateTimeFormat('en-US', { timeZone: timezone })
+        return true
+    } catch {
+        return false
+    }
+}
+
+function getSafeTimezone(timezone: string): string {
+    return isValidTimezone(timezone) ? timezone : 'UTC'
+}
+
 function formatLocalTime(date: Date, timezone: string): string {
+    const safeTimezone = getSafeTimezone(timezone)
     return date.toLocaleString('en-US', {
-        timeZone: timezone,
+        timeZone: safeTimezone,
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
@@ -85,8 +100,9 @@ async function generateUserInfo(
     // Get user information from Todoist API
     const user = await client.getUser()
 
-    // Parse timezone from user data
-    const timezone = user.tzInfo?.timezone ?? 'UTC'
+    // Parse timezone from user data and ensure it's valid
+    const rawTimezone = user.tzInfo?.timezone ?? 'UTC'
+    const timezone = getSafeTimezone(rawTimezone)
 
     // Get current time in user's timezone
     const now = new Date()
