@@ -238,16 +238,19 @@ const manageAssignments = {
             }
         }
 
-        // Helper function to map assignments to operation results
-        const mapAssignmentResults = (
+        // Helper function to process assignments for both dry run and execution
+        const processAssignments = async (
             assignments: { assignment: Assignment; validation: ValidationResult }[],
-        ): OperationResult[] =>
-            assignments
-                .filter(
-                    (item): item is { assignment: Assignment; validation: ValidationResult } =>
-                        item.assignment != null && item.validation != null,
-                )
-                .map(({ assignment, validation }) => {
+            execute: boolean,
+        ): Promise<OperationResult[]> => {
+            const filteredAssignments = assignments.filter(
+                (item): item is { assignment: Assignment; validation: ValidationResult } =>
+                    item.assignment != null && item.validation != null,
+            )
+
+            if (!execute) {
+                // Dry run: just map to successful results
+                return filteredAssignments.map(({ assignment, validation }) => {
                     const task = validTasks.find((t: Task) => t.id === assignment.taskId)
                     if (!assignment.taskId || !validation.resolvedUser?.userId) {
                         throw new Error(
@@ -261,78 +264,55 @@ const manageAssignments = {
                         newAssigneeId: validation.resolvedUser.userId,
                     }
                 })
+            }
 
-        // Handle assign/reassign operations - validate then execute
-        if (dryRun) {
-            const successResults = mapAssignmentResults(validAssignments)
+            // Execute: perform actual updates
+            const executePromises = filteredAssignments.map(
+                async ({ assignment, validation }): Promise<OperationResult> => {
+                    const task = validTasks.find((t: Task) => t.id === assignment.taskId)
 
-            const allResults = [...successResults, ...validationErrors, ...taskErrors]
+                    if (!assignment.taskId || !validation.resolvedUser?.userId) {
+                        return {
+                            taskId: assignment.taskId || 'unknown-task',
+                            success: false,
+                            error: 'Invalid assignment data - missing task ID or resolved user',
+                            originalAssigneeId: task?.responsibleUid || null,
+                        }
+                    }
 
-            const textContent = generateTextContent({
-                operation,
-                results: allResults,
-                dryRun: true,
-            })
+                    try {
+                        await client.updateTask(assignment.taskId, {
+                            assigneeId: validation.resolvedUser.userId,
+                        })
 
-            return getToolOutput({
-                textContent,
-                structuredContent: {
-                    operation,
-                    results: allResults,
-                    totalRequested: taskIds.length,
-                    successful: successResults.length,
-                    failed: allResults.filter((r) => !r.success).length,
-                    dryRun: true,
+                        return {
+                            taskId: assignment.taskId,
+                            success: true,
+                            originalAssigneeId: task?.responsibleUid || null,
+                            newAssigneeId: validation.resolvedUser.userId,
+                        }
+                    } catch (error) {
+                        return {
+                            taskId: assignment.taskId,
+                            success: false,
+                            error: error instanceof Error ? error.message : 'Update failed',
+                            originalAssigneeId: task?.responsibleUid || null,
+                        }
+                    }
                 },
-            })
+            )
+
+            return Promise.all(executePromises)
         }
 
-        // Execute valid assignments
-        const executePromises = validAssignments
-            .filter(
-                (item): item is { assignment: Assignment; validation: ValidationResult } =>
-                    item.assignment != null && item.validation != null,
-            )
-            .map(async ({ assignment, validation }): Promise<OperationResult> => {
-                const task = validTasks.find((t: Task) => t.id === assignment.taskId)
-
-                if (!assignment.taskId || !validation.resolvedUser?.userId) {
-                    return {
-                        taskId: assignment.taskId || 'unknown-task',
-                        success: false,
-                        error: 'Invalid assignment data - missing task ID or resolved user',
-                        originalAssigneeId: task?.responsibleUid || null,
-                    }
-                }
-
-                try {
-                    await client.updateTask(assignment.taskId, {
-                        assigneeId: validation.resolvedUser.userId,
-                    })
-
-                    return {
-                        taskId: assignment.taskId,
-                        success: true,
-                        originalAssigneeId: task?.responsibleUid || null,
-                        newAssigneeId: validation.resolvedUser.userId,
-                    }
-                } catch (error) {
-                    return {
-                        taskId: assignment.taskId,
-                        success: false,
-                        error: error instanceof Error ? error.message : 'Update failed',
-                        originalAssigneeId: task?.responsibleUid || null,
-                    }
-                }
-            })
-
-        const executeResults = await Promise.all(executePromises)
-        const allResults = [...executeResults, ...validationErrors, ...taskErrors]
+        // Handle assign/reassign operations - validate then execute
+        const assignmentResults = await processAssignments(validAssignments, !dryRun)
+        const allResults = [...assignmentResults, ...validationErrors, ...taskErrors]
 
         const textContent = generateTextContent({
             operation,
             results: allResults,
-            dryRun: false,
+            dryRun,
         })
 
         return getToolOutput({
@@ -341,9 +321,9 @@ const manageAssignments = {
                 operation,
                 results: allResults,
                 totalRequested: taskIds.length,
-                successful: executeResults.filter((r) => r.success).length,
+                successful: assignmentResults.filter((r) => r.success).length,
                 failed: allResults.filter((r) => !r.success).length,
-                dryRun: false,
+                dryRun,
             },
         })
     },
