@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.0](https://github.com/Doist/todoist-ai/compare/v4.3.0...v4.4.0) (2025-09-10)
+
+
+### Features
+
+* Add user's id to user_info tool ([#84](https://github.com/Doist/todoist-ai/issues/84)) ([706ed8f](https://github.com/Doist/todoist-ai/commit/706ed8fdfd11199808ca9824d4c66e8211d773c1))
+
 ## [4.3.0](https://github.com/Doist/todoist-ai/compare/v4.2.0...v4.3.0) (2025-09-09)
 
 
