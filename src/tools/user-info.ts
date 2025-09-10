@@ -9,6 +9,7 @@ type UserPlan = 'Todoist Free' | 'Todoist Pro' | 'Todoist Business'
 
 type UserInfoStructured = Record<string, unknown> & {
     type: 'user_info'
+    userId: string
     fullName: string
     timezone: string
     currentLocalTime: string
@@ -125,6 +126,7 @@ async function generateUserInfo(
     const lines: string[] = [
         '# User Information',
         '',
+        `**User ID:** ${user.id}`,
         `**Full Name:** ${user.fullName}`,
         `**Email:** ${user.email}`,
         `**Timezone:** ${timezone}`,
@@ -150,6 +152,7 @@ async function generateUserInfo(
     // Generate structured content
     const structuredContent: UserInfoStructured = {
         type: 'user_info',
+        userId: user.id,
         fullName: user.fullName,
         timezone: timezone,
         currentLocalTime: localTime,
@@ -171,7 +174,7 @@ async function generateUserInfo(
 const userInfo = {
     name: ToolNames.USER_INFO,
     description:
-        'Get comprehensive user information including full name, email, timezone with current local time, week start day preferences, current week dates, daily/weekly goal progress, and user plan (Free/Pro/Business).',
+        'Get comprehensive user information including user ID, full name, email, timezone with current local time, week start day preferences, current week dates, daily/weekly goal progress, and user plan (Free/Pro/Business).',
     parameters: ArgsSchema,
     async execute(_args, client) {
         const result = await generateUserInfo(client)

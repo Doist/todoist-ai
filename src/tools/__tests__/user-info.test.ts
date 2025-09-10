@@ -69,6 +69,7 @@ describe(`${USER_INFO} tool`, () => {
 
         // Test text content contains expected information
         const textContent = extractTextContent(result)
+        expect(textContent).toContain('User ID:** 123')
         expect(textContent).toContain('Test User')
         expect(textContent).toContain('test@example.com')
         expect(textContent).toContain('Europe/Madrid')
@@ -81,6 +82,7 @@ describe(`${USER_INFO} tool`, () => {
         expect(structuredContent).toEqual(
             expect.objectContaining({
                 type: 'user_info',
+                userId: '123',
                 fullName: 'Test User',
                 email: 'test@example.com',
                 timezone: 'Europe/Madrid',
