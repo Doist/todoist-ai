@@ -43,7 +43,7 @@ const ArgsSchema = {
         .describe('If true, validates operations without executing them.'),
 }
 
-export interface OperationResult {
+export type OperationResult = {
     taskId: string
     success: boolean
     error?: string
