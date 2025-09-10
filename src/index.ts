@@ -26,6 +26,7 @@ import { updateComments } from './tools/update-comments.js'
 // General tools
 import { deleteObject } from './tools/delete-object.js'
 import { getOverview } from './tools/get-overview.js'
+import { userInfo } from './tools/user-info.js'
 
 // Assignment and collaboration tools
 import { findProjectCollaborators } from './tools/find-project-collaborators.js'
@@ -54,6 +55,7 @@ const tools = {
     // General tools
     getOverview,
     deleteObject,
+    userInfo,
     // Assignment and collaboration tools
     findProjectCollaborators,
     manageAssignments,
@@ -84,6 +86,7 @@ export {
     // General tools
     getOverview,
     deleteObject,
+    userInfo,
     // Assignment and collaboration tools
     findProjectCollaborators,
     manageAssignments,

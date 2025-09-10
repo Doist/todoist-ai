@@ -74,6 +74,7 @@ export function createMockSection(overrides: Partial<Section> = {}): Section {
         isDeleted: false,
         isCollapsed: false,
         name: 'Test Section',
+        url: 'https://todoist.com/sections/section-123',
         ...overrides,
     }
 }

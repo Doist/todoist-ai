@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.3.0](https://github.com/Doist/todoist-ai/compare/v4.2.0...v4.3.0) (2025-09-09)
+
+
+### Features
+
+* Add user-info tool and upgrade Todoist API ([#82](https://github.com/Doist/todoist-ai/issues/82)) ([b583fe1](https://github.com/Doist/todoist-ai/commit/b583fe1045ea38fbe25dfa804df9ebe958f2881d))
+
 ## [4.2.0](https://github.com/Doist/todoist-ai/compare/v4.1.0...v4.2.0) (2025-08-29)
 
 

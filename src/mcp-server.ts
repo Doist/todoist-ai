@@ -28,6 +28,7 @@ import { updateComments } from './tools/update-comments.js'
 // General tools
 import { deleteObject } from './tools/delete-object.js'
 import { getOverview } from './tools/get-overview.js'
+import { userInfo } from './tools/user-info.js'
 
 // Assignment and collaboration tools
 import { findProjectCollaborators } from './tools/find-project-collaborators.js'
@@ -82,6 +83,7 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     // General tools
     registerTool(getOverview, server, todoist)
     registerTool(deleteObject, server, todoist)
+    registerTool(userInfo, server, todoist)
 
     // Assignment and collaboration tools
     registerTool(findProjectCollaborators, server, todoist)
