@@ -45,7 +45,7 @@ const ArgsSchema = {
 const findTasks = {
     name: ToolNames.FIND_TASKS,
     description:
-        'Find tasks by text search, or by project/section/parent container/assignee. At least one filter must be provided.',
+        'Find tasks by text search, or by project/section/parent container/responsible user. At least one filter must be provided.',
     parameters: ArgsSchema,
     async execute(args, client) {
         const {

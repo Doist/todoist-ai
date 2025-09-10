@@ -24,15 +24,17 @@ const ArgsSchema = {
         .min(1)
         .max(MAX_TASKS_PER_OPERATION)
         .describe('The IDs of the tasks to operate on (max 50).'),
-    responsibleUid: z
-        .string()
-        .optional()
-        .describe('The user to assign tasks to. Required for assign and reassign operations.'),
-    fromAssigneeId: z
+    responsibleUser: z
         .string()
         .optional()
         .describe(
-            'For reassign operations: the current assignee to reassign from. Optional - if not provided, reassigns from any current assignee.',
+            'The user to assign tasks to. Can be user ID, name, or email. Required for assign and reassign operations.',
+        ),
+    fromAssigneeUser: z
+        .string()
+        .optional()
+        .describe(
+            'For reassign operations: the current assignee to reassign from. Can be user ID, name, or email. Optional - if not provided, reassigns from any current assignee.',
         ),
     dryRun: z
         .boolean()
@@ -55,11 +57,11 @@ const manageAssignments = {
         'Bulk assignment operations for multiple tasks. Supports assign, unassign, and reassign operations with atomic rollback on failures.',
     parameters: ArgsSchema,
     async execute(args, client) {
-        const { operation, taskIds, responsibleUid, fromAssigneeId, dryRun } = args
+        const { operation, taskIds, responsibleUser, fromAssigneeUser, dryRun } = args
 
         // Validate required parameters based on operation
-        if ((operation === 'assign' || operation === 'reassign') && !responsibleUid) {
-            throw new Error(`${operation} operation requires responsibleUid parameter`)
+        if ((operation === 'assign' || operation === 'reassign') && !responsibleUser) {
+            throw new Error(`${operation} operation requires responsibleUser parameter`)
         }
 
         // Fetch all tasks first to validate they exist and get project information
@@ -82,13 +84,13 @@ const manageAssignments = {
                 validTasks.push(result.value)
             } else if (result && result.status === 'rejected') {
                 taskErrors.push({
-                    taskId: taskIds[i] || 'unknown',
+                    taskId: taskIds[i] || 'invalid-task-id',
                     success: false,
                     error: result.reason?.message || 'Task not accessible',
                 })
             } else {
                 taskErrors.push({
-                    taskId: taskIds[i] || 'unknown',
+                    taskId: taskIds[i] || 'invalid-task-id',
                     success: false,
                     error: 'Task not accessible',
                 })
@@ -115,17 +117,20 @@ const manageAssignments = {
             })
         }
 
+        // Pre-resolve fromAssigneeUser once for reassign operations
+        let resolvedFromUserId: string | undefined
+        if (operation === 'reassign' && fromAssigneeUser) {
+            const fromUser = await userResolver.resolveUser(client, fromAssigneeUser)
+            resolvedFromUserId = fromUser?.userId || fromAssigneeUser
+        }
+
         // Build assignments for validation
         const assignments: Assignment[] = []
         for (const task of validTasks) {
             // For reassign operations, check if we need to filter by current assignee
-            if (operation === 'reassign' && fromAssigneeId) {
-                // Resolve the fromAssigneeId to handle names/emails
-                const fromUser = await userResolver.resolveUser(client, fromAssigneeId)
-                const targetUserId = fromUser?.userId || fromAssigneeId
-
+            if (operation === 'reassign' && resolvedFromUserId) {
                 // Skip tasks not assigned to the specified user
-                if (task.responsibleUid !== targetUserId) {
+                if (task.responsibleUid !== resolvedFromUserId) {
                     continue
                 }
             }
@@ -133,7 +138,7 @@ const manageAssignments = {
             assignments.push({
                 taskId: task.id,
                 projectId: task.projectId,
-                responsibleUid: responsibleUid || '', // Will be validated appropriately
+                responsibleUid: responsibleUser || '', // Will be validated appropriately
             })
         }
 
@@ -224,30 +229,42 @@ const manageAssignments = {
 
             if (assignment && validation && validation.isValid) {
                 validAssignments.push({ assignment, validation })
-            } else {
+            } else if (assignment?.taskId) {
                 validationErrors.push({
-                    taskId: assignment?.taskId || 'unknown',
+                    taskId: assignment.taskId,
                     success: false,
                     error: validation?.error?.message || 'Validation failed',
                 })
             }
         }
 
-        if (dryRun) {
-            const successResults: OperationResult[] = validAssignments
+        // Helper function to map assignments to operation results
+        const mapAssignmentResults = (
+            assignments: { assignment: Assignment; validation: ValidationResult }[],
+        ): OperationResult[] =>
+            assignments
                 .filter(
                     (item): item is { assignment: Assignment; validation: ValidationResult } =>
                         item.assignment != null && item.validation != null,
                 )
                 .map(({ assignment, validation }) => {
                     const task = validTasks.find((t: Task) => t.id === assignment.taskId)
+                    if (!assignment.taskId || !validation.resolvedUser?.userId) {
+                        throw new Error(
+                            'Invalid assignment or validation data - this should not happen',
+                        )
+                    }
                     return {
-                        taskId: assignment.taskId || 'unknown',
+                        taskId: assignment.taskId,
                         success: true,
                         originalAssigneeId: task?.responsibleUid || null,
-                        newAssigneeId: validation.resolvedUser?.userId || 'unknown',
+                        newAssigneeId: validation.resolvedUser.userId,
                     }
                 })
+
+        // Handle assign/reassign operations - validate then execute
+        if (dryRun) {
+            const successResults = mapAssignmentResults(validAssignments)
 
             const allResults = [...successResults, ...validationErrors, ...taskErrors]
 
@@ -279,20 +296,29 @@ const manageAssignments = {
             .map(async ({ assignment, validation }): Promise<OperationResult> => {
                 const task = validTasks.find((t: Task) => t.id === assignment.taskId)
 
+                if (!assignment.taskId || !validation.resolvedUser?.userId) {
+                    return {
+                        taskId: assignment.taskId || 'unknown-task',
+                        success: false,
+                        error: 'Invalid assignment data - missing task ID or resolved user',
+                        originalAssigneeId: task?.responsibleUid || null,
+                    }
+                }
+
                 try {
-                    await client.updateTask(assignment.taskId || 'unknown', {
-                        assigneeId: validation.resolvedUser?.userId || 'unknown',
+                    await client.updateTask(assignment.taskId, {
+                        assigneeId: validation.resolvedUser.userId,
                     })
 
                     return {
-                        taskId: assignment.taskId || 'unknown',
+                        taskId: assignment.taskId,
                         success: true,
                         originalAssigneeId: task?.responsibleUid || null,
-                        newAssigneeId: validation.resolvedUser?.userId || 'unknown',
+                        newAssigneeId: validation.resolvedUser.userId,
                     }
                 } catch (error) {
                     return {
-                        taskId: assignment.taskId || 'unknown',
+                        taskId: assignment.taskId,
                         success: false,
                         error: error instanceof Error ? error.message : 'Update failed',
                         originalAssigneeId: task?.responsibleUid || null,

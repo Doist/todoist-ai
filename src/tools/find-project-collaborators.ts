@@ -164,8 +164,8 @@ function generateTextContent({
 
     const nextSteps: string[] = []
     if (collaborators.length > 0) {
-        nextSteps.push(`Use ${ADD_TASKS} with responsibleUid to assign new tasks`)
-        nextSteps.push(`Use ${UPDATE_TASKS} with responsibleUid to reassign existing tasks`)
+        nextSteps.push(`Use ${ADD_TASKS} with responsibleUser to assign new tasks`)
+        nextSteps.push(`Use ${UPDATE_TASKS} with responsibleUser to reassign existing tasks`)
         nextSteps.push('Use collaborator names, emails, or IDs for assignments')
     } else {
         nextSteps.push(`Use ${FIND_PROJECTS} to find other projects`)

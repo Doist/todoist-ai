@@ -35,12 +35,12 @@ const TasksUpdateSchema = z.object({
         .describe(
             'The duration of the task. Use format: "2h" (hours), "90m" (minutes), "2h30m" (combined), or "1.5h" (decimal hours). Max 24h.',
         ),
-    responsibleUid: z
+    responsibleUser: z
         .string()
         .nullable()
         .optional()
         .describe(
-            'Change task assignment. Use null to unassign. User must be a project collaborator.',
+            'Change task assignment. Use null to unassign. Can be user ID, name, or email. User must be a project collaborator.',
         ),
 })
 
@@ -67,7 +67,7 @@ const updateTasks = {
                 sectionId,
                 parentId,
                 duration: durationStr,
-                responsibleUid,
+                responsibleUser,
                 ...otherUpdateArgs
             } = task
 
@@ -91,8 +91,8 @@ const updateTasks = {
             }
 
             // Handle assignment changes if provided
-            if (responsibleUid !== undefined) {
-                if (responsibleUid === null) {
+            if (responsibleUser !== undefined) {
+                if (responsibleUser === null) {
                     // Unassign task - no validation needed
                     updateArgs = { ...updateArgs, assigneeId: null }
                 } else {
@@ -100,7 +100,7 @@ const updateTasks = {
                     const validation = await assignmentValidator.validateTaskUpdateAssignment(
                         client,
                         id,
-                        responsibleUid,
+                        responsibleUser,
                     )
 
                     if (!validation.isValid) {

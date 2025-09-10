@@ -26,7 +26,7 @@ const TaskSchema = z.object({
     projectId: z.string().optional().describe('The project ID to add this task to.'),
     sectionId: z.string().optional().describe('The section ID to add this task to.'),
     parentId: z.string().optional().describe('The parent task ID (for subtasks).'),
-    responsibleUid: z
+    responsibleUser: z
         .string()
         .optional()
         .describe(
@@ -69,7 +69,7 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
         projectId,
         sectionId,
         parentId,
-        responsibleUid,
+        responsibleUser,
         ...otherTaskArgs
     } = task
 
@@ -93,11 +93,11 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
     }
 
     // Handle assignment if provided
-    if (responsibleUid) {
-        // Prevent assignment to inbox tasks
+    if (responsibleUser) {
+        // Prevent assignment to tasks without sufficient project context
         if (!projectId && !sectionId && !parentId) {
             throw new Error(
-                `Task "${task.content}": Cannot assign tasks in inbox. Please specify a project.`,
+                `Task "${task.content}": Cannot assign tasks without specifying project context. Please specify a projectId, sectionId, or parentId.`,
             )
         }
 
@@ -129,7 +129,7 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
         const validation = await assignmentValidator.validateTaskCreationAssignment(
             client,
             targetProjectId,
-            responsibleUid,
+            responsibleUser,
         )
 
         if (!validation.isValid) {

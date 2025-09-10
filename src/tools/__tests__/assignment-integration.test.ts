@@ -127,7 +127,7 @@ describe('Assignment Integration Tests', () => {
                         {
                             content: 'New assigned task',
                             projectId: 'project-123',
-                            responsibleUid: 'john@example.com',
+                            responsibleUser: 'john@example.com',
                         },
                     ],
                 },
@@ -163,7 +163,7 @@ describe('Assignment Integration Tests', () => {
                             {
                                 content: 'Invalid assignment task',
                                 projectId: 'project-123',
-                                responsibleUid: 'nonexistent@example.com',
+                                responsibleUser: 'nonexistent@example.com',
                             },
                         ],
                     },
@@ -189,7 +189,7 @@ describe('Assignment Integration Tests', () => {
                         {
                             content: 'Subtask with assignment',
                             parentId: 'parent-123',
-                            responsibleUid: 'john@example.com',
+                            responsibleUser: 'john@example.com',
                         },
                     ],
                 },
@@ -213,7 +213,7 @@ describe('Assignment Integration Tests', () => {
                     tasks: [
                         {
                             id: 'task-123',
-                            responsibleUid: 'jane@example.com',
+                            responsibleUser: 'jane@example.com',
                         },
                     ],
                 },
@@ -230,13 +230,13 @@ describe('Assignment Integration Tests', () => {
             expect(extractTextContent(result)).toContain('Updated 1 task')
         })
 
-        it('should unassign task when responsibleUid is null', async () => {
+        it('should unassign task when responsibleUser is null', async () => {
             await updateTasks.execute(
                 {
                     tasks: [
                         {
                             id: 'task-123',
-                            responsibleUid: null,
+                            responsibleUser: null,
                         },
                     ],
                 },
@@ -267,7 +267,7 @@ describe('Assignment Integration Tests', () => {
                         tasks: [
                             {
                                 id: 'task-123',
-                                responsibleUid: 'invalid@example.com',
+                                responsibleUser: 'invalid@example.com',
                             },
                         ],
                     },
@@ -292,7 +292,7 @@ describe('Assignment Integration Tests', () => {
                 {
                     operation: 'assign',
                     taskIds: ['task-1', 'task-2', 'task-3'],
-                    responsibleUid: 'john@example.com',
+                    responsibleUser: 'john@example.com',
                     dryRun: false,
                 },
                 mockTodoistApi,
@@ -346,7 +346,7 @@ describe('Assignment Integration Tests', () => {
                 {
                     operation: 'assign',
                     taskIds: ['task-1', 'task-2'],
-                    responsibleUid: 'john@example.com',
+                    responsibleUser: 'john@example.com',
                     dryRun: true,
                 },
                 mockTodoistApi,
@@ -375,7 +375,7 @@ describe('Assignment Integration Tests', () => {
                 {
                     operation: 'assign',
                     taskIds: ['task-1', 'task-2', 'task-3'],
-                    responsibleUid: 'john@example.com',
+                    responsibleUser: 'john@example.com',
                     dryRun: false,
                 },
                 mockTodoistApi,
@@ -461,7 +461,7 @@ describe('Assignment Integration Tests', () => {
                             {
                                 content: 'Task in unshared project',
                                 projectId: 'project-123',
-                                responsibleUid: 'john@example.com',
+                                responsibleUser: 'john@example.com',
                             },
                         ],
                     },
@@ -479,14 +479,14 @@ describe('Assignment Integration Tests', () => {
                         tasks: [
                             {
                                 content: 'Inbox task with assignment',
-                                responsibleUid: 'john@example.com',
+                                responsibleUser: 'john@example.com',
                             },
                         ],
                     },
                     mockTodoistApi,
                 ),
             ).rejects.toThrow(
-                'Task "Inbox task with assignment": Cannot assign tasks in inbox. Please specify a project.',
+                'Task "Inbox task with assignment": Cannot assign tasks without specifying project context. Please specify a projectId, sectionId, or parentId.',
             )
         })
 
@@ -500,7 +500,7 @@ describe('Assignment Integration Tests', () => {
                             {
                                 content: 'Subtask with bad parent',
                                 parentId: 'nonexistent-parent',
-                                responsibleUid: 'john@example.com',
+                                responsibleUser: 'john@example.com',
                             },
                         ],
                     },
@@ -511,7 +511,7 @@ describe('Assignment Integration Tests', () => {
             )
         })
 
-        it('should require responsibleUid for assign operations', async () => {
+        it('should require responsibleUser for assign operations', async () => {
             await expect(
                 manageAssignments.execute(
                     {
@@ -521,10 +521,10 @@ describe('Assignment Integration Tests', () => {
                     },
                     mockTodoistApi,
                 ),
-            ).rejects.toThrow('assign operation requires responsibleUid parameter')
+            ).rejects.toThrow('assign operation requires responsibleUser parameter')
         })
 
-        it('should require responsibleUid for reassign operations', async () => {
+        it('should require responsibleUser for reassign operations', async () => {
             await expect(
                 manageAssignments.execute(
                     {
@@ -534,7 +534,7 @@ describe('Assignment Integration Tests', () => {
                     },
                     mockTodoistApi,
                 ),
-            ).rejects.toThrow('reassign operation requires responsibleUid parameter')
+            ).rejects.toThrow('reassign operation requires responsibleUser parameter')
         })
     })
 
@@ -547,7 +547,7 @@ describe('Assignment Integration Tests', () => {
                         {
                             content: 'Task for lifecycle test',
                             projectId: 'project-123',
-                            responsibleUid: 'john@example.com',
+                            responsibleUser: 'john@example.com',
                         },
                     ],
                 },
@@ -562,7 +562,7 @@ describe('Assignment Integration Tests', () => {
                     tasks: [
                         {
                             id: 'task-123',
-                            responsibleUid: 'jane@example.com',
+                            responsibleUser: 'jane@example.com',
                         },
                     ],
                 },
@@ -577,7 +577,7 @@ describe('Assignment Integration Tests', () => {
                     tasks: [
                         {
                             id: 'task-123',
-                            responsibleUid: null,
+                            responsibleUser: null,
                         },
                     ],
                 },
