@@ -101,7 +101,7 @@ const manageAssignments = {
             const textContent = generateTextContent({
                 operation,
                 results: taskErrors,
-                dryRun: true, // Show as dry run since nothing was executed
+                dryRun,
             })
 
             return getToolOutput({
@@ -112,7 +112,7 @@ const manageAssignments = {
                     totalRequested: taskIds.length,
                     successful: 0,
                     failed: taskErrors.length,
-                    dryRun: true,
+                    dryRun,
                 },
             })
         }
