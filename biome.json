@@ -1,5 +1,5 @@
 {
-    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
     "formatter": {
         "enabled": true,
         "formatWithErrors": false,
@@ -9,14 +9,14 @@
         "lineWidth": 100,
         "attributePosition": "auto"
     },
-    "organizeImports": { "enabled": true },
+    "assist": { "actions": { "source": { "organizeImports": "on" } } },
     "linter": {
         "enabled": true,
         "rules": {
             "recommended": true,
             "style": {
                 "useImportType": "off",
-                "noNamespaceImport": "error"
+                "noEnum": "error"
             },
             "correctness": {
                 "noUnusedVariables": "error",
@@ -24,8 +24,9 @@
                 "noUnusedPrivateClassMembers": "error",
                 "noUnusedFunctionParameters": "error"
             },
-            "nursery": {
-                "noEnum": "error"
+            "nursery": {},
+            "performance": {
+                "noNamespaceImport": "error"
             }
         }
     },
@@ -51,6 +52,6 @@
         "useIgnoreFile": true
     },
     "files": {
-        "ignore": ["test/fixtures/**/*", "package.json"]
+        "includes": ["**", "!**/test/fixtures/**/*", "!**/package.json"]
     }
 }
