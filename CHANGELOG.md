@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.0](https://github.com/Doist/todoist-ai/compare/v4.4.0...v4.5.0) (2025-09-11)
+
+
+### Features
+
+* add task assignment management ([#81](https://github.com/Doist/todoist-ai/issues/81)) ([b9b1691](https://github.com/Doist/todoist-ai/commit/b9b16916dec8f18efc37631d77f97354fae2194a))
+
 ## [4.4.0](https://github.com/Doist/todoist-ai/compare/v4.3.0...v4.4.0) (2025-09-10)
 
 
