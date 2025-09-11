@@ -239,10 +239,10 @@ const manageAssignments = {
         }
 
         // Helper function to process assignments for both dry run and execution
-        const processAssignments = async (
+        async function processAssignments(
             assignments: { assignment: Assignment; validation: ValidationResult }[],
             execute: boolean,
-        ): Promise<OperationResult[]> => {
+        ): Promise<OperationResult[]> {
             const filteredAssignments = assignments.filter(
                 (item): item is { assignment: Assignment; validation: ValidationResult } =>
                     item.assignment != null && item.validation != null,

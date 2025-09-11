@@ -74,6 +74,13 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
     } = task
 
     let taskArgs: AddTaskArgs = { ...otherTaskArgs, projectId, sectionId, parentId }
+        
+    // Prevent assignment to tasks without sufficient project context
+    if (!projectId && !sectionId && !parentId) {
+        throw new Error(
+            `Task "${task.content}": Cannot assign tasks without specifying project context. Please specify a projectId, sectionId, or parentId.`,
+        )
+    }
 
     // Parse duration if provided
     if (durationStr) {
@@ -94,13 +101,6 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
 
     // Handle assignment if provided
     if (responsibleUser) {
-        // Prevent assignment to tasks without sufficient project context
-        if (!projectId && !sectionId && !parentId) {
-            throw new Error(
-                `Task "${task.content}": Cannot assign tasks without specifying project context. Please specify a projectId, sectionId, or parentId.`,
-            )
-        }
-
         // Resolve target project for validation
         let targetProjectId = projectId
         if (!targetProjectId && parentId) {
