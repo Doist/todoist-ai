@@ -17,7 +17,7 @@ You'll need to set your Todoist API key as an environment variable `TODOIST_API_
 Start by cloning this repository and setting it up locally, if you haven't done so yet.
 
 ```sh
-git clone https://github.com/doist/todoist-ai-tools
+git clone https://github.com/Doist/todoist-ai
 npm run setup
 ```
 
