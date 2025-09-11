@@ -153,7 +153,7 @@ export function previewTasks(tasks: TaskLike[], limit = 5): string {
     return tasks.slice(0, limit).map(formatTaskPreview).join('\n')
 }
 
-interface SummarizeListParams {
+type SummarizeListParams = {
     subject: string
     count: number
     limit?: number

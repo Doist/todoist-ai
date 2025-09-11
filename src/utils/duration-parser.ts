@@ -10,7 +10,7 @@
  * - Supports optional spaces: "2h 30m"
  */
 
-interface ParsedDuration {
+type ParsedDuration = {
     minutes: number
 }
 

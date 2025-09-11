@@ -151,7 +151,7 @@ type AccountOverviewStructured = Record<string, unknown> & {
     hasNestedProjects: boolean
 }
 
-interface ProjectOverviewStructured extends Record<string, unknown> {
+type ProjectOverviewStructured = Record<string, unknown> & {
     type: 'project_overview'
     project: {
         id: string
