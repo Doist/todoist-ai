@@ -1,20 +1,14 @@
 import { TodoistApi } from '@doist/todoist-api-typescript'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { registerTool } from './mcp-helpers.js'
-// Comment management tools
 import { addComments } from './tools/add-comments.js'
-// Project management tools
 import { addProjects } from './tools/add-projects.js'
-// Section management tools
 import { addSections } from './tools/add-sections.js'
-// Task management tools
 import { addTasks } from './tools/add-tasks.js'
 import { completeTasks } from './tools/complete-tasks.js'
-// General tools
 import { deleteObject } from './tools/delete-object.js'
 import { findComments } from './tools/find-comments.js'
 import { findCompletedTasks } from './tools/find-completed-tasks.js'
-// Assignment and collaboration tools
 import { findProjectCollaborators } from './tools/find-project-collaborators.js'
 import { findProjects } from './tools/find-projects.js'
 import { findSections } from './tools/find-sections.js'
