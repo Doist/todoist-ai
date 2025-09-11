@@ -253,7 +253,15 @@ describe(`${ADD_TASKS} tool`, () => {
                 mockTodoistApi.addTask.mockClear()
 
                 await addTasks.execute(
-                    { tasks: [{ content: 'Test task', duration: testCase.input, projectId: '6cfCcrrCFg2xP94Q' }] },
+                    {
+                        tasks: [
+                            {
+                                content: 'Test task',
+                                duration: testCase.input,
+                                projectId: '6cfCcrrCFg2xP94Q',
+                            },
+                        ],
+                    },
                     mockTodoistApi,
                 )
 
@@ -271,7 +279,15 @@ describe(`${ADD_TASKS} tool`, () => {
         it('should throw error for invalid duration format', async () => {
             await expect(
                 addTasks.execute(
-                    { tasks: [{ content: 'Task with invalid duration', duration: 'invalid', projectId: '6cfCcrrCFg2xP94Q' }] },
+                    {
+                        tasks: [
+                            {
+                                content: 'Task with invalid duration',
+                                duration: 'invalid',
+                                projectId: '6cfCcrrCFg2xP94Q',
+                            },
+                        ],
+                    },
                     mockTodoistApi,
                 ),
             ).rejects.toThrow(
@@ -282,7 +298,15 @@ describe(`${ADD_TASKS} tool`, () => {
         it('should throw error for duration exceeding 24 hours', async () => {
             await expect(
                 addTasks.execute(
-                    { tasks: [{ content: 'Task with too long duration', duration: '25h', projectId: '6cfCcrrCFg2xP94Q' }] },
+                    {
+                        tasks: [
+                            {
+                                content: 'Task with too long duration',
+                                duration: '25h',
+                                projectId: '6cfCcrrCFg2xP94Q',
+                            },
+                        ],
+                    },
                     mockTodoistApi,
                 ),
             ).rejects.toThrow(
@@ -295,7 +319,10 @@ describe(`${ADD_TASKS} tool`, () => {
             mockTodoistApi.addTask.mockRejectedValue(apiError)
 
             await expect(
-                addTasks.execute({ tasks: [{ content: '', projectId: '6cfCcrrCFg2xP94Q' }] }, mockTodoistApi),
+                addTasks.execute(
+                    { tasks: [{ content: '', projectId: '6cfCcrrCFg2xP94Q' }] },
+                    mockTodoistApi,
+                ),
             ).rejects.toThrow(apiError.message)
         })
 
@@ -333,7 +360,7 @@ describe(`${ADD_TASKS} tool`, () => {
         it('should suggest find-tasks-by-date for today when hasToday is true', async () => {
             // Clear any leftover mocks from previous tests
             mockTodoistApi.addTask.mockClear()
-            
+
             const mockApiResponse: Task = createMockTask({
                 id: '8485093755',
                 content: 'Task due today',
@@ -351,7 +378,15 @@ describe(`${ADD_TASKS} tool`, () => {
             mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
 
             const result = await addTasks.execute(
-                { tasks: [{ content: 'Task due today', dueString: 'today', projectId: '6cfCcrrCFg2xP94Q' }] },
+                {
+                    tasks: [
+                        {
+                            content: 'Task due today',
+                            dueString: 'today',
+                            projectId: '6cfCcrrCFg2xP94Q',
+                        },
+                    ],
+                },
                 mockTodoistApi,
             )
 
@@ -365,7 +400,7 @@ describe(`${ADD_TASKS} tool`, () => {
         it('should suggest overview tool when no hasToday context', async () => {
             // Clear any leftover mocks from previous tests
             mockTodoistApi.addTask.mockClear()
-            
+
             const mockApiResponse: Task = createMockTask({
                 id: '8485093756',
                 content: 'Regular task',
