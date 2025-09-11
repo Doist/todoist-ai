@@ -74,7 +74,7 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
     } = task
 
     let taskArgs: AddTaskArgs = { ...otherTaskArgs, projectId, sectionId, parentId }
-        
+
     // Prevent assignment to tasks without sufficient project context
     if (!projectId && !sectionId && !parentId) {
         throw new Error(
