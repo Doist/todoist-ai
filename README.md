@@ -40,6 +40,25 @@ You can run the MCP server directly with npx:
 npx @doist/todoist-ai
 ```
 
+### Secure Credential Storage
+
+For enhanced security, you can store your Todoist API key in your system's keychain instead of using environment variables:
+
+```bash
+# Store API key securely in keychain (prompts for hidden input)
+npx todoist-ai-setup-keychain
+
+# Run - automatically uses keychain when no TODOIST_API_KEY env var is set
+npx @doist/todoist-ai
+```
+
+This stores your API key securely in:
+- **macOS**: Keychain Access
+- **Windows**: Windows Credential Manager  
+- **Linux**: Secret Service (GNOME Keyring, KWallet, etc.)
+
+The base URL can still be configured via `TODOIST_BASE_URL` environment variable if needed.
+
 For more details on setting up and using the MCP server, including creating custom servers, see [docs/mcp-server.md](docs/mcp-server.md).
 
 ## Features

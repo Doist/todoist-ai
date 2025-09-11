@@ -10,7 +10,7 @@ The easiest way to use this MCP server is with npx:
 npx @doist/todoist-ai
 ```
 
-You'll need to set your Todoist API key as an environment variable `TODOIST_API_KEY`.
+You'll need to set your Todoist API key as an environment variable `TODOIST_API_KEY`, or store it securely in keychain (automatically used when no environment variable is set).
 
 ## Local Development Setup
 
@@ -51,6 +51,7 @@ Then, proceed depending on the MCP protocol transport you'll use.
 
 Add this section to your `mcp.json` config in Claude, Cursor, etc.:
 
+#### Using Environment Variables
 ```json
 {
     "mcpServers": {
@@ -66,10 +67,30 @@ Add this section to your `mcp.json` config in Claude, Cursor, etc.:
 }
 ```
 
+#### Using Keychain (Recommended)
+First, store your API key securely:
+```bash
+npx todoist-ai-setup-keychain
+```
+
+Then configure without any environment variables (automatically uses keychain):
+```json
+{
+    "mcpServers": {
+        "todoist-ai": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["@doist/todoist-ai"]
+        }
+    }
+}
+```
+
 ### Using local installation
 
 Add this `todoist-ai-tools` section to your `mcp.json` config in Cursor, Claude, Raycast, etc.
 
+#### Using Environment Variables
 ```json
 {
     "mcpServers": {
@@ -87,9 +108,24 @@ Add this `todoist-ai-tools` section to your `mcp.json` config in Cursor, Claude,
 }
 ```
 
-Update the configuration above as follows
+#### Using Keychain (Recommended)
+```json
+{
+    "mcpServers": {
+        "todoist-ai-tools": {
+            "type": "stdio",
+            "command": "node",
+            "args": [
+                "/Users/<your_user_name>/code/todoist-ai-tools/dist/main.js"
+            ]
+        }
+    }
+}
+```
 
-- Replace `TODOIST_API_KEY` with your Todoist API token.
+Update the configuration above as follows:
+- For environment variable setup: Replace `TODOIST_API_KEY` with your Todoist API token.
+- For keychain setup: Run `npm run setup-keychain` first to store your API key securely.
 - Replace the path in the `args` array with the correct path to where you cloned the repository
 
 > [!NOTE]
