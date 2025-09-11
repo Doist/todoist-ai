@@ -27,7 +27,7 @@ Next:
 `;
 
 exports[`add-tasks tool next steps logic should suggest find-tasks-by-date for today when hasToday is true 1`] = `
-"Added 1 task.
+"Added 1 task to projects.
 Tasks:
     Task due today • due 2025-08-17 • P1 • id=8485093755.
 Next:
