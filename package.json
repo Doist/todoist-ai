@@ -3,6 +3,7 @@
     "version": "4.5.0",
     "type": "module",
     "main": "./dist/index.js",
+    "module": "src/index.ts",
     "types": "./dist/index.d.ts",
     "bin": {
         "todoist-ai": "dist/main.js"
@@ -52,6 +53,7 @@
     },
     "devDependencies": {
         "@biomejs/biome": "1.9.4",
+        "@smithery/cli": "^1.2.22",
         "@types/express": "^5.0.2",
         "@types/jest": "30.0.0",
         "@types/morgan": "^1.9.9",
@@ -65,6 +67,7 @@
         "nodemon": "^3.1.10",
         "rimraf": "^6.0.1",
         "ts-jest": "29.4.1",
+        "tsx": "^4.20.5",
         "typescript": "^5.8.3"
     },
     "lint-staged": {

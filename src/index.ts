@@ -1,4 +1,18 @@
+import { z } from 'zod'
 import { getMcpServer } from './mcp-server.js'
+
+// Smithery-compatible entry point
+export default function createServer({ config }: { config: { todoistApiKey: string } }) {
+    const server = getMcpServer({
+        todoistApiKey: config.todoistApiKey,
+    })
+
+    return server.server
+}
+
+export const configSchema = z.object({
+    todoistApiKey: z.string().describe('The API key for the Todoist server.'),
+})
 
 // Task management tools
 import { addTasks } from './tools/add-tasks.js'

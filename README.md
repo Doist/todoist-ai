@@ -42,6 +42,19 @@ npx @doist/todoist-ai
 
 For more details on setting up and using the MCP server, including creating custom servers, see [docs/mcp-server.md](docs/mcp-server.md).
 
+### Using with Smithery
+
+This MCP server can be deployed via [Smithery](https://smithery.ai) using the included `smithery.yaml` configuration. The server exports a `createServer` function and `configSchema` for Smithery compatibility.
+
+To test locally with Smithery's playground:
+
+```bash
+npm install
+npx @smithery/cli dev
+```
+
+Note: The `tsx` dev dependency is required by Smithery CLI for TypeScript execution during development.
+
 ## Features
 
 A key feature of this project is that tools can be reused, and are not written specifically for use in an MCP server. They can be hooked up as tools to other conversational AI interfaces (e.g. Vercel's AI SDK).
