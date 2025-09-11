@@ -34,11 +34,7 @@ const addSections = {
     },
 } satisfies TodoistTool<typeof ArgsSchema>
 
-function generateTextContent({
-    sections,
-}: {
-    sections: Section[]
-}) {
+function generateTextContent({ sections }: { sections: Section[] }) {
     const count = sections.length
     const sectionList = sections
         .map((section) => `• ${section.name} (id=${section.id}, projectId=${section.projectId})`)

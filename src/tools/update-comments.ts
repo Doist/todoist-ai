@@ -79,11 +79,7 @@ function generateNextSteps(comments: Comment[]): string[] {
     return nextSteps
 }
 
-function generateTextContent({
-    comments,
-}: {
-    comments: Comment[]
-}): string {
+function generateTextContent({ comments }: { comments: Comment[] }): string {
     // Group comments by entity type and count
     const taskComments = comments.filter((c) => c.taskId).length
     const projectComments = comments.filter((c) => c.projectId).length

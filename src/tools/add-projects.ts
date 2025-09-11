@@ -41,11 +41,7 @@ const addProjects = {
     },
 } satisfies TodoistTool<typeof ArgsSchema>
 
-function generateTextContent({
-    projects,
-}: {
-    projects: (PersonalProject | WorkspaceProject)[]
-}) {
+function generateTextContent({ projects }: { projects: (PersonalProject | WorkspaceProject)[] }) {
     const count = projects.length
     const projectList = projects.map((project) => `• ${project.name} (id=${project.id})`).join('\n')
 

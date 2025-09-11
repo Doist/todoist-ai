@@ -30,7 +30,10 @@ const USE_STRUCTURED_CONTENT =
 function getToolOutput<StructuredContent extends Record<string, unknown>>({
     textContent,
     structuredContent,
-}: { textContent: string; structuredContent: StructuredContent }) {
+}: {
+    textContent: string
+    structuredContent: StructuredContent
+}) {
     if (USE_STRUCTURED_CONTENT) {
         return {
             content: [{ type: 'text' as const, text: textContent }],
@@ -65,7 +68,7 @@ function registerTool<Params extends z.ZodRawShape>(
     server: McpServer,
     client: TodoistApi,
 ) {
-    // @ts-ignore I give up
+    // @ts-expect-error I give up
     const cb: ToolCallback<Params> = async (
         args: z.objectOutputType<Params, ZodTypeAny>,
         _context,
