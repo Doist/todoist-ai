@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "v*"
+  # triggered by `release-please.yml`
+  workflow_dispatch:
 
 permissions:
   # Enable the use of OIDC for npm provenance
@@ -12,8 +14,8 @@ permissions:
 
 jobs:
   publish:
-    # Only run if release-please created a release
-    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    # Allow both tag pushes and workflow_dispatch events
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     # Based on historical data
     timeout-minutes: 60
