@@ -14,18 +14,3 @@ Tasks:
   - Quick task with reminder
 "
 `;
-
-exports[`quick-add-task tool should handle quick add with reminder and meta 1`] = `
-"Quick added 1 task.
-Tasks:
-  - Quick task with reminder
-"
-`;
-
-exports[`quick-add-task tool should quick add multiple tasks and return mapped results 1`] = `
-"Quick added 2 tasks.
-Tasks:
-  - Quick task 1
-  - Quick task 2
-"
-`;
