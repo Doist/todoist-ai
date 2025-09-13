@@ -1,39 +1,28 @@
 import { getMcpServer } from './mcp-server.js'
-
-// Task management tools
+import { addComments } from './tools/add-comments.js'
+import { addProjects } from './tools/add-projects.js'
+import { addSections } from './tools/add-sections.js'
 import { addTasks } from './tools/add-tasks.js'
 import { completeTasks } from './tools/complete-tasks.js'
-import { findCompletedTasks } from './tools/find-completed-tasks.js'
-import { findTasksByDate } from './tools/find-tasks-by-date.js'
-import { findTasks } from './tools/find-tasks.js'
-import { updateTasks } from './tools/update-tasks.js'
-
-// Project management tools
-import { addProjects } from './tools/add-projects.js'
-import { findProjects } from './tools/find-projects.js'
-import { updateProjects } from './tools/update-projects.js'
-
-// Section management tools
-import { addSections } from './tools/add-sections.js'
-import { findSections } from './tools/find-sections.js'
-import { updateSections } from './tools/update-sections.js'
-
-// Comment management tools
-import { addComments } from './tools/add-comments.js'
-import { findComments } from './tools/find-comments.js'
-import { updateComments } from './tools/update-comments.js'
-
-// General tools
 import { deleteObject } from './tools/delete-object.js'
+import { findComments } from './tools/find-comments.js'
+import { findCompletedTasks } from './tools/find-completed-tasks.js'
+import { findProjectCollaborators } from './tools/find-project-collaborators.js'
+import { findProjects } from './tools/find-projects.js'
+import { findSections } from './tools/find-sections.js'
+import { findTasks } from './tools/find-tasks.js'
+import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { getOverview } from './tools/get-overview.js'
+import { manageAssignments } from './tools/manage-assignments.js'
+import { quickAddTask } from './tools/quick-add-task.js'
+import { updateComments } from './tools/update-comments.js'
+import { updateProjects } from './tools/update-projects.js'
+import { updateSections } from './tools/update-sections.js'
+import { updateTasks } from './tools/update-tasks.js'
 import { userInfo } from './tools/user-info.js'
 
-// Assignment and collaboration tools
-import { findProjectCollaborators } from './tools/find-project-collaborators.js'
-import { manageAssignments } from './tools/manage-assignments.js'
-
 const tools = {
-    // Task management tools
+    quickAddTask,
     addTasks,
     completeTasks,
     updateTasks,
@@ -65,6 +54,7 @@ export { tools, getMcpServer }
 
 export {
     // Task management tools
+    quickAddTask,
     addTasks,
     completeTasks,
     updateTasks,
