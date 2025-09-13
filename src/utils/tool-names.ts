@@ -37,6 +37,7 @@ export const ToolNames = {
     GET_OVERVIEW: 'get-overview',
     DELETE_OBJECT: 'delete-object',
     USER_INFO: 'user-info',
+    QUICK_ADD_TASK: 'quick-add-task',
 } as const
 
 // Type for all tool names
