@@ -1,10 +1,10 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import {
-    TEST_IDS,
     createMockTask,
     extractStructuredContent,
     extractTextContent,
+    TEST_IDS,
 } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { updateTasks } from '../update-tasks.js'
@@ -436,6 +436,106 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 }),
             )
             expect(structuredContent.tasks).toHaveLength(1)
+        })
+    })
+
+    describe('updating labels', () => {
+        it('should update task labels', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093750',
+                content: 'Task with updated labels',
+                labels: ['work', 'important'],
+                url: 'https://todoist.com/showTask?id=8485093750',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+
+            const result = await updateTasks.execute(
+                {
+                    tasks: [
+                        {
+                            id: '8485093750',
+                            labels: ['work', 'important'],
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093750', {
+                labels: ['work', 'important'],
+            })
+
+            // Verify structured content includes updated labels
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.tasks).toHaveLength(1)
+            expect((structuredContent.tasks as any[])[0]).toEqual(
+                expect.objectContaining({
+                    labels: ['work', 'important'],
+                }),
+            )
+        })
+
+        it('should clear task labels with empty array', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093751',
+                content: 'Task with cleared labels',
+                labels: [],
+                url: 'https://todoist.com/showTask?id=8485093751',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+
+            await updateTasks.execute(
+                {
+                    tasks: [
+                        {
+                            id: '8485093751',
+                            labels: [],
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093751', {
+                labels: [],
+            })
+        })
+
+        it('should update task with labels along with other fields', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093752',
+                content: 'Updated content',
+                labels: ['personal', 'todo'],
+                priority: 2,
+                url: 'https://todoist.com/showTask?id=8485093752',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+
+            await updateTasks.execute(
+                {
+                    tasks: [
+                        {
+                            id: '8485093752',
+                            content: 'Updated content',
+                            labels: ['personal', 'todo'],
+                            priority: 2,
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093752', {
+                content: 'Updated content',
+                labels: ['personal', 'todo'],
+                priority: 2,
+            })
         })
     })
 

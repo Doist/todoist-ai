@@ -1,10 +1,10 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import {
-    TODAY,
     createMockTask,
     extractStructuredContent,
     extractTextContent,
+    TODAY,
 } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { addTasks } from '../add-tasks.js'
@@ -272,6 +272,176 @@ describe(`${ADD_TASKS} tool`, () => {
                     }),
                 )
             }
+        })
+
+        it('should add task with labels', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093755',
+                content: 'Task with labels',
+                labels: ['urgent', 'work'],
+                url: 'https://todoist.com/showTask?id=8485093755',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
+
+            const result = await addTasks.execute(
+                {
+                    tasks: [
+                        {
+                            content: 'Task with labels',
+                            labels: ['urgent', 'work'],
+                            projectId: '6cfCcrrCFg2xP94Q',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
+                content: 'Task with labels',
+                labels: ['urgent', 'work'],
+                projectId: '6cfCcrrCFg2xP94Q',
+                sectionId: undefined,
+                parentId: undefined,
+            })
+
+            // Verify structured content includes labels
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.tasks).toHaveLength(1)
+            expect((structuredContent.tasks as any[])[0]).toEqual(
+                expect.objectContaining({
+                    labels: ['urgent', 'work'],
+                }),
+            )
+        })
+
+        it('should add task with empty labels array', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093756',
+                content: 'Task with empty labels',
+                labels: [],
+                url: 'https://todoist.com/showTask?id=8485093756',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
+
+            await addTasks.execute(
+                {
+                    tasks: [
+                        {
+                            content: 'Task with empty labels',
+                            labels: [],
+                            projectId: '6cfCcrrCFg2xP94Q',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
+                content: 'Task with empty labels',
+                labels: [],
+                projectId: '6cfCcrrCFg2xP94Q',
+                sectionId: undefined,
+                parentId: undefined,
+            })
+        })
+
+        it('should add task without labels field', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093757',
+                content: 'Task without labels',
+                url: 'https://todoist.com/showTask?id=8485093757',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
+
+            await addTasks.execute(
+                {
+                    tasks: [
+                        {
+                            content: 'Task without labels',
+                            projectId: '6cfCcrrCFg2xP94Q',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
+                content: 'Task without labels',
+                labels: undefined,
+                projectId: '6cfCcrrCFg2xP94Q',
+                sectionId: undefined,
+                parentId: undefined,
+            })
+        })
+
+        it('should add multiple tasks with different label configurations', async () => {
+            const mockApiResponse1: Task = createMockTask({
+                id: '8485093758',
+                content: 'Task with labels',
+                labels: ['personal'],
+            })
+            const mockApiResponse2: Task = createMockTask({
+                id: '8485093759',
+                content: 'Task without labels',
+            })
+            const mockApiResponse3: Task = createMockTask({
+                id: '8485093760',
+                content: 'Task with multiple labels',
+                labels: ['work', 'urgent', 'review'],
+            })
+
+            mockTodoistApi.addTask
+                .mockResolvedValueOnce(mockApiResponse1)
+                .mockResolvedValueOnce(mockApiResponse2)
+                .mockResolvedValueOnce(mockApiResponse3)
+
+            await addTasks.execute(
+                {
+                    tasks: [
+                        {
+                            content: 'Task with labels',
+                            labels: ['personal'],
+                            projectId: '6cfCcrrCFg2xP94Q',
+                        },
+                        {
+                            content: 'Task without labels',
+                            projectId: '6cfCcrrCFg2xP94Q',
+                        },
+                        {
+                            content: 'Task with multiple labels',
+                            labels: ['work', 'urgent', 'review'],
+                            projectId: '6cfCcrrCFg2xP94Q',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addTask).toHaveBeenCalledTimes(3)
+            expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(
+                1,
+                expect.objectContaining({
+                    labels: ['personal'],
+                }),
+            )
+            expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(
+                2,
+                expect.objectContaining({
+                    labels: undefined,
+                }),
+            )
+            expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(
+                3,
+                expect.objectContaining({
+                    labels: ['work', 'urgent', 'review'],
+                }),
+            )
         })
     })
 

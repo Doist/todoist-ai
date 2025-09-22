@@ -23,6 +23,7 @@ const TaskSchema = z.object({
         .describe(
             'The duration of the task. Use format: "2h" (hours), "90m" (minutes), "2h30m" (combined), or "1.5h" (decimal hours). Max 24h.',
         ),
+    labels: z.array(z.string()).optional().describe('The labels to attach to the task.'),
     projectId: z.string().optional().describe('The project ID to add this task to.'),
     sectionId: z.string().optional().describe('The section ID to add this task to.'),
     parentId: z.string().optional().describe('The parent task ID (for subtasks).'),
@@ -70,10 +71,11 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
         sectionId,
         parentId,
         responsibleUser,
+        labels,
         ...otherTaskArgs
     } = task
 
-    let taskArgs: AddTaskArgs = { ...otherTaskArgs, projectId, sectionId, parentId }
+    let taskArgs: AddTaskArgs = { ...otherTaskArgs, projectId, sectionId, parentId, labels }
 
     // Prevent assignment to tasks without sufficient project context
     if (!projectId && !sectionId && !parentId) {
