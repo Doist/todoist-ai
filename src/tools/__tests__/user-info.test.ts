@@ -1,9 +1,9 @@
 import type { CurrentUser, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import {
-    TEST_ERRORS,
     extractStructuredContent,
     extractTextContent,
+    TEST_ERRORS,
 } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { userInfo } from '../user-info.js'

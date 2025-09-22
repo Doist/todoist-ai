@@ -1,10 +1,10 @@
 import {
+    getSanitizedContent,
     type MoveTaskArgs,
     type PersonalProject,
     type Task,
     type TodoistApi,
     type WorkspaceProject,
-    getSanitizedContent,
 } from '@doist/todoist-api-typescript'
 import z from 'zod'
 import { formatDuration } from './utils/duration-parser.js'
