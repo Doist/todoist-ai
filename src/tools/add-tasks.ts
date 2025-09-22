@@ -5,6 +5,7 @@ import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask } from '../tool-helpers.js'
 import { assignmentValidator } from '../utils/assignment-validator.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
+import { convertPriorityToNumber, PrioritySchema } from '../utils/priorities.js'
 import {
     generateTaskNextSteps,
     getDateString,
@@ -15,7 +16,9 @@ import { ToolNames } from '../utils/tool-names.js'
 const TaskSchema = z.object({
     content: z.string().min(1).describe('The content of the task to create.'),
     description: z.string().optional().describe('The description of the task.'),
-    priority: z.number().int().min(1).max(4).optional().describe('The priority of the task (1-4).'),
+    priority: PrioritySchema.optional().describe(
+        'The priority of the task: p1 (highest), p2 (high), p3 (medium), p4 (lowest/default).',
+    ),
     dueString: z.string().optional().describe('The due date for the task, in natural language.'),
     duration: z
         .string()
@@ -70,10 +73,16 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
         sectionId,
         parentId,
         responsibleUser,
+        priority,
         ...otherTaskArgs
     } = task
 
     let taskArgs: AddTaskArgs = { ...otherTaskArgs, projectId, sectionId, parentId }
+
+    // Handle priority conversion if provided
+    if (priority) {
+        taskArgs.priority = convertPriorityToNumber(priority)
+    }
 
     // Prevent assignment to tasks without sufficient project context
     if (!projectId && !sectionId && !parentId) {
