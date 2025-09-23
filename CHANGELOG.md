@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.1](https://github.com/Doist/todoist-ai/compare/v4.5.0...v4.5.1) (2025-09-23)
+
+
+### Bug Fixes
+
+* fix priority levels ([#98](https://github.com/Doist/todoist-ai/issues/98)) ([64db2ff](https://github.com/Doist/todoist-ai/commit/64db2ff97f3ede0c5cff14d1c58f8fed63a9d742))
+
 ## [4.5.0](https://github.com/Doist/todoist-ai/compare/v4.4.0...v4.5.0) (2025-09-11)
 
 
