@@ -4,6 +4,7 @@
     "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
+    "mcpName": "net.todoist/mcp",
     "bin": {
         "todoist-ai": "dist/main.js"
     },
