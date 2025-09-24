@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.6.1](https://github.com/Doist/todoist-ai/compare/v4.6.0...v4.6.1) (2025-09-24)
+
+
+### Bug Fixes
+
+* Update package.json with `mcpName` ([#106](https://github.com/Doist/todoist-ai/issues/106)) ([df19306](https://github.com/Doist/todoist-ai/commit/df19306adb13ff6416a37e4b49a6d2e5ab5c459f))
+
 ## [4.6.0](https://github.com/Doist/todoist-ai/compare/v4.5.2...v4.6.0) (2025-09-24)
 
 
