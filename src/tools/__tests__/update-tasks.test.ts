@@ -510,7 +510,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 id: '8485093752',
                 content: 'Updated content',
                 labels: ['personal', 'todo'],
-                priority: 2,
+                priority: 3,
                 url: 'https://todoist.com/showTask?id=8485093752',
                 addedAt: '2025-08-13T22:09:56.123456Z',
             })
@@ -534,7 +534,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
             expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093752', {
                 content: 'Updated content',
                 labels: ['personal', 'todo'],
-                priority: 2,
+                priority: 3,
             })
         })
     })
