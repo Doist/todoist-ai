@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.2](https://github.com/Doist/todoist-ai/compare/v4.5.1...v4.5.2) (2025-09-24)
+
+
+### Miscellaneous Chores
+
+* Release 4.5.2 ([11df6f2](https://github.com/Doist/todoist-ai/commit/11df6f2c03e31bffd02a6c4f1a5176158e434e05))
+
 ## [4.5.1](https://github.com/Doist/todoist-ai/compare/v4.5.0...v4.5.1) (2025-09-23)
 
 
