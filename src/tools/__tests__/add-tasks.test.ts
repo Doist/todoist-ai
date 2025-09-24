@@ -312,10 +312,8 @@ describe(`${ADD_TASKS} tool`, () => {
             // Verify structured content includes labels
             const structuredContent = extractStructuredContent(result)
             expect(structuredContent.tasks).toHaveLength(1)
-            expect((structuredContent.tasks as any[])[0]).toEqual(
-                expect.objectContaining({
-                    labels: ['urgent', 'work'],
-                }),
+            expect(structuredContent.tasks).toEqual(
+                expect.arrayContaining([expect.objectContaining({ labels: ['urgent', 'work'] })]),
             )
         })
 
