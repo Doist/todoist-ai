@@ -56,11 +56,14 @@ describe(`${ADD_TASKS} tool`, () => {
             const result = await addTasks.execute(
                 {
                     tasks: [
-                        { content: 'First task content', projectId: '6cfCcrrCFg2xP94Q' },
+                        {
+                            content: 'First task content',
+                            projectId: '6cfCcrrCFg2xP94Q',
+                        },
                         {
                             content: 'Second task content',
                             description: 'Task description',
-                            priority: 2,
+                            priority: 'p2',
                             dueString: 'Aug 15',
                             projectId: '6cfCcrrCFg2xP94Q',
                         },
@@ -80,7 +83,7 @@ describe(`${ADD_TASKS} tool`, () => {
             expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(2, {
                 content: 'Second task content',
                 description: 'Task description',
-                priority: 2,
+                priority: 3,
                 dueString: 'Aug 15',
                 projectId: '6cfCcrrCFg2xP94Q',
                 sectionId: undefined,
@@ -124,7 +127,7 @@ describe(`${ADD_TASKS} tool`, () => {
                         {
                             content: 'Subtask content',
                             description: 'Subtask description',
-                            priority: 3,
+                            priority: 'p3',
                             projectId: '6cfCcrrCFg2xP94Q',
                             sectionId: 'section-123',
                             parentId: 'parent-task-456',
@@ -137,7 +140,7 @@ describe(`${ADD_TASKS} tool`, () => {
             expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
                 content: 'Subtask content',
                 description: 'Subtask description',
-                priority: 3,
+                priority: 2,
                 projectId: '6cfCcrrCFg2xP94Q',
                 sectionId: 'section-123',
                 parentId: 'parent-task-456',

@@ -3,7 +3,7 @@ import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
-import { LabelsSchema, generateLabelsFilter } from '../utils/labels.js'
+import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 

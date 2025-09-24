@@ -56,7 +56,7 @@ export class UserResolver {
             /^[0-9]+$/.test(trimmedInput) ||
             (/^[a-f0-9-]{8,}$/i.test(trimmedInput) && trimmedInput.includes('-')) ||
             (/^[a-z0-9_]{6,}$/i.test(trimmedInput) &&
-                !/^[a-z]+[\s\-]/.test(trimmedInput) &&
+                !/^[a-z]+[\s-]/.test(trimmedInput) &&
                 /[0-9_]/.test(trimmedInput))
         ) {
             const result = { userId: trimmedInput, displayName: trimmedInput }

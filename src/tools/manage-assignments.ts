@@ -4,8 +4,8 @@ import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import {
     type Assignment,
-    type ValidationResult,
     assignmentValidator,
+    type ValidationResult,
 } from '../utils/assignment-validator.js'
 import { ToolNames } from '../utils/tool-names.js'
 import { userResolver } from '../utils/user-resolver.js'

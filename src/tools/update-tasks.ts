@@ -5,6 +5,7 @@ import type { TodoistTool } from '../todoist-tool.js'
 import { createMoveTaskArgs, mapTask } from '../tool-helpers.js'
 import { assignmentValidator } from '../utils/assignment-validator.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
+import { convertPriorityToNumber, PrioritySchema } from '../utils/priorities.js'
 import { summarizeTaskOperation } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -18,13 +19,9 @@ const TasksUpdateSchema = z.object({
     sectionId: z.string().optional().describe('The new section ID for the task.'),
     parentId: z.string().optional().describe('The new parent task ID (for subtasks).'),
     order: z.number().optional().describe('The new order of the task within its parent/section.'),
-    priority: z
-        .number()
-        .int()
-        .min(1)
-        .max(4)
-        .optional()
-        .describe('The new priority of the task (1-4).'),
+    priority: PrioritySchema.optional().describe(
+        'The new priority of the task: p1 (highest), p2 (high), p3 (medium), p4 (lowest/default).',
+    ),
     dueString: z
         .string()
         .optional()
@@ -72,6 +69,7 @@ const updateTasks = {
                 parentId,
                 duration: durationStr,
                 responsibleUser,
+                priority,
                 labels,
                 ...otherUpdateArgs
             } = task
@@ -79,6 +77,11 @@ const updateTasks = {
             let updateArgs: UpdateTaskArgs = {
                 ...otherUpdateArgs,
                 ...(labels !== undefined && { labels }),
+            }
+
+            // Handle priority conversion if provided
+            if (priority) {
+                updateArgs.priority = convertPriorityToNumber(priority)
             }
 
             // Parse duration if provided

@@ -142,7 +142,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                     tasks: [
                         {
                             id: '8485093749',
-                            priority: 3,
+                            priority: 'p3',
                             dueString: 'Aug 20',
                         },
                     ],
@@ -151,7 +151,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
             )
 
             expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093749', {
-                priority: 3,
+                priority: 2,
                 dueString: 'Aug 20',
             })
 
@@ -266,7 +266,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                             id: '8485093752',
                             content: 'Completely updated task',
                             description: 'New description with details',
-                            priority: 4,
+                            priority: 'p4',
                             dueString: 'every Friday',
                             projectId: 'different-project-id',
                         },
@@ -284,7 +284,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
             expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093752', {
                 content: 'Completely updated task',
                 description: 'New description with details',
-                priority: 4,
+                priority: 1,
                 dueString: 'every Friday',
             })
 
@@ -620,7 +620,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
             },
             {
                 error: 'API Error: Invalid priority value',
-                params: { id: '8485093748', priority: 5 },
+                params: { id: '8485093748', content: 'Test task' },
             },
         ])('should propagate $error', async ({ error, params }) => {
             mockTodoistApi.updateTask.mockRejectedValue(new Error(error))

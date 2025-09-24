@@ -1,9 +1,8 @@
 name: Release @doist/todoist-ai package
 
 on:
-  push:
-    tags:
-      - "v*"
+  release:
+    types: [published]
 
 permissions:
   # Enable the use of OIDC for npm provenance
@@ -12,8 +11,8 @@ permissions:
 
 jobs:
   publish:
-    # Only run if release-please created a release
-    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    # Only run if a release was published
+    if: ${{ github.event.action == 'published' }}
     runs-on: ubuntu-latest
     # Based on historical data
     timeout-minutes: 60

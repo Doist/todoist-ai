@@ -37,7 +37,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 ### Tool Usage Guidelines:
 
 **Task Management:**
-- **add-tasks**: Create tasks with content, description, priority (1=P1/urgent, 2=P2/high, 3=P3/normal, 4=P4/low), dueString (natural language like "tomorrow", "next Friday", "2024-12-25"), duration (formats like "2h", "90m", "2h30m"), and assignments to project collaborators
+- **add-tasks**: Create tasks with content, description, priority (p1=highest, p2=high, p3=medium, p4=lowest/default), dueString (natural language like "tomorrow", "next Friday", "2024-12-25"), duration (formats like "2h", "90m", "2h30m"), and assignments to project collaborators
 - **update-tasks**: Modify existing tasks - get task IDs from search results first, only include fields that need changes
 - **complete-tasks**: Mark tasks as done using task IDs
 - **find-tasks**: Search by text, project/section/parent container, responsible user, or labels. Requires at least one search parameter

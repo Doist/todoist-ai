@@ -2,7 +2,7 @@ import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { type Project, isPersonalProject, mapTask } from '../tool-helpers.js'
+import { isPersonalProject, mapTask, type Project } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -181,7 +181,7 @@ function buildProjectStructure(
 
 async function getAllTasksForProject(client: TodoistApi, projectId: string): Promise<MappedTask[]> {
     let allTasks: MappedTask[] = []
-    let cursor: string | undefined = undefined
+    let cursor: string | undefined
     do {
         const { results, nextCursor } = await client.getTasks({
             projectId,
