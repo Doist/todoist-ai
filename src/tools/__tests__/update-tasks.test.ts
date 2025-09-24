@@ -524,7 +524,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                             id: '8485093752',
                             content: 'Updated content',
                             labels: ['personal', 'todo'],
-                            priority: 2,
+                            priority: 'p2',
                         },
                     ],
                 },
