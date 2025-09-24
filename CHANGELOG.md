@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.6.0](https://github.com/Doist/todoist-ai/compare/v4.5.2...v4.6.0) (2025-09-24)
+
+
+### Features
+
+* add label support for add-tasks and update-tasks tools ([#103](https://github.com/Doist/todoist-ai/issues/103)) ([a4bc708](https://github.com/Doist/todoist-ai/commit/a4bc7085b5a63402970841e586ce985cab9022d0))
+
 ## [4.5.2](https://github.com/Doist/todoist-ai/compare/v4.5.1...v4.5.2) (2025-09-24)
 
 
