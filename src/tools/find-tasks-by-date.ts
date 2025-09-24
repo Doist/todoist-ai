@@ -16,19 +16,15 @@ import { ToolNames } from '../utils/tool-names.js'
 const ArgsSchema = {
     startDate: z
         .string()
-        .regex(/^(\d{4}-\d{2}-\d{2}|today|overdue)$/)
-        .describe(
-            "The start date to get the tasks for. Format: YYYY-MM-DD, 'today', or 'overdue'.",
-        ),
+        .regex(/^(\d{4}-\d{2}-\d{2}|today)$/)
+        .describe("The start date to get the tasks for. Format: YYYY-MM-DD or 'today'."),
     daysCount: z
         .number()
         .int()
         .min(1)
         .max(30)
         .default(1)
-        .describe(
-            "The number of days to get the tasks for, starting from the start date. Ignored when startDate is 'overdue'.",
-        ),
+        .describe('The number of days to get the tasks for, starting from the start date.'),
     limit: z
         .number()
         .int()
@@ -48,18 +44,15 @@ const ArgsSchema = {
 const findTasksByDate = {
     name: ToolNames.FIND_TASKS_BY_DATE,
     description:
-        "Get tasks by date range or overdue tasks. Use startDate 'overdue' for overdue tasks, or provide a date/date range.",
+        "Get tasks by date range. Use startDate 'today' to get today's tasks including overdue items, or provide a specific date/date range.",
     parameters: ArgsSchema,
     async execute(args, client) {
         let query = ''
 
-        if (args.startDate === 'overdue') {
-            query = 'overdue'
+        if (args.startDate === 'today') {
+            query = 'today | overdue'
         } else {
-            const startDate =
-                args.startDate === 'today'
-                    ? formatISO(new Date(), { representation: 'date' })
-                    : args.startDate
+            const startDate = args.startDate
             const endDate = addDays(startDate, args.daysCount + 1)
             const endDateStr = formatISO(endDate, { representation: 'date' })
             query = `(due after: ${startDate} | due: ${startDate}) & due before: ${endDateStr}`
@@ -110,10 +103,10 @@ function generateTextContent({
 }) {
     // Generate filter description
     const filterHints: string[] = []
-    if (args.startDate === 'overdue') {
-        filterHints.push('overdue tasks only')
-    } else if (args.startDate === 'today') {
-        filterHints.push(`today${args.daysCount > 1 ? ` + ${args.daysCount - 1} more days` : ''}`)
+    if (args.startDate === 'today') {
+        filterHints.push(
+            `today + overdue tasks${args.daysCount > 1 ? ` + ${args.daysCount - 1} more days` : ''}`,
+        )
     } else {
         filterHints.push(
             `${args.startDate}${args.daysCount > 1 ? ` to ${getDateString(addDays(args.startDate, args.daysCount))}` : ''}`,
@@ -130,21 +123,16 @@ function generateTextContent({
 
     // Generate subject description
     const subject =
-        args.startDate === 'overdue'
-            ? 'Overdue tasks'
-            : args.startDate === 'today'
-              ? `Today's tasks`
-              : `Tasks for ${args.startDate}`
+        args.startDate === 'today' ? `Today's tasks + overdue` : `Tasks for ${args.startDate}`
 
     // Generate helpful suggestions for empty results
     const zeroReasonHints: string[] = []
     if (tasks.length === 0) {
-        if (args.startDate === 'overdue') {
-            zeroReasonHints.push('Great job! No overdue tasks')
-            zeroReasonHints.push("Check today's tasks with startDate='today'")
+        if (args.startDate === 'today') {
+            zeroReasonHints.push('Great job! No tasks for today or overdue')
         } else {
             zeroReasonHints.push("Expand date range with larger 'daysCount'")
-            zeroReasonHints.push("Check 'overdue' for past-due items")
+            zeroReasonHints.push("Check today's tasks with startDate='today'")
         }
     }
 
@@ -154,7 +142,7 @@ function generateTextContent({
     const nextSteps = generateTaskNextSteps('listed', tasks, {
         hasToday: args.startDate === 'today' || tasks.some((task) => task.dueDate === todayStr),
         hasOverdue:
-            args.startDate === 'overdue' ||
+            args.startDate === 'today' ||
             tasks.some((task) => task.dueDate && new Date(task.dueDate) < now),
     })
 

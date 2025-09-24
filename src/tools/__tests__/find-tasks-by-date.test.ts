@@ -53,58 +53,8 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
         jest.restoreAllMocks()
     })
 
-    describe('listing overdue tasks', () => {
-        it.each([
-            { daysCount: 7, hasTasks: true, description: 'with tasks' },
-            { daysCount: 5, hasTasks: false, description: 'ignoring daysCount' },
-        ])('should handle overdue tasks $description', async ({ daysCount, hasTasks }) => {
-            const mockTasks = hasTasks
-                ? [
-                      createMappedTask({
-                          id: TEST_IDS.TASK_1,
-                          content: 'Overdue task',
-                          dueDate: '2025-08-10',
-                          priority: 2,
-                          labels: ['urgent'],
-                      }),
-                  ]
-                : []
-
-            const mockResponse = { tasks: mockTasks, nextCursor: null }
-            mockGetTasksByFilter.mockResolvedValue(mockResponse)
-
-            const result = await findTasksByDate.execute(
-                { startDate: 'overdue', limit: 50, daysCount },
-                mockTodoistApi,
-            )
-
-            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
-                client: mockTodoistApi,
-                query: 'overdue',
-                cursor: undefined,
-                limit: 50,
-            })
-            // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
-
-            // Verify structured content
-            const structuredContent = extractStructuredContent(result)
-            expect(structuredContent.tasks).toHaveLength(hasTasks ? 1 : 0)
-            expect(structuredContent).toEqual(
-                expect.objectContaining({
-                    totalCount: hasTasks ? 1 : 0,
-                    hasMore: false,
-                    nextCursor: null,
-                    appliedFilters: expect.objectContaining({
-                        startDate: 'overdue',
-                    }),
-                }),
-            )
-        })
-    })
-
     describe('listing tasks by date range', () => {
-        it('should get tasks for today when startDate is "today"', async () => {
+        it('should get tasks for today when startDate is "today" (includes overdue)', async () => {
             const mockTasks = [createMappedTask({ content: 'Today task', dueDate: '2025-08-15' })]
             const mockResponse = { tasks: mockTasks, nextCursor: null }
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
@@ -116,8 +66,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query:
-                    expect.stringContaining('due after:') && expect.stringContaining('due before:'),
+                query: 'today | overdue',
                 cursor: undefined,
                 limit: 50,
             })
@@ -275,40 +224,18 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             expect(textContent).toContain(`Use ${UPDATE_TASKS} to modify priorities or due dates`)
         })
 
-        it('should suggest appropriate actions when startDate is overdue', async () => {
-            const mockTasks = [
-                createMappedTask({
-                    id: TEST_IDS.TASK_1,
-                    content: 'Overdue task',
-                    dueDate: '2025-08-10',
-                }),
-            ]
-            const mockResponse = { tasks: mockTasks, nextCursor: null }
-            mockGetTasksByFilter.mockResolvedValue(mockResponse)
-
-            const result = await findTasksByDate.execute(
-                { startDate: 'overdue', limit: 10, daysCount: 1 },
-                mockTodoistApi,
-            )
-
-            const textContent = extractTextContent(result)
-            expect(textContent).toMatchSnapshot()
-            expect(textContent).toContain(`Use ${UPDATE_TASKS} to modify priorities or due dates`)
-        })
-
-        it('should provide helpful suggestions for empty overdue results', async () => {
+        it('should provide helpful suggestions for empty today results', async () => {
             const mockResponse = { tasks: [], nextCursor: null }
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'overdue', limit: 10, daysCount: 1 },
+                { startDate: 'today', limit: 10, daysCount: 1 },
                 mockTodoistApi,
             )
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
-            expect(textContent).toContain('Great job! No overdue tasks')
-            expect(textContent).toContain("Check today's tasks with startDate='today'")
+            expect(textContent).toContain('Great job! No tasks for today or overdue')
         })
 
         it('should provide helpful suggestions for empty date range results', async () => {
@@ -327,7 +254,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain("Expand date range with larger 'daysCount'")
-            expect(textContent).toContain("Check 'overdue' for past-due items")
+            expect(textContent).toContain("Check today's tasks with startDate='today'")
         })
     })
 
@@ -341,18 +268,18 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     limit: 50,
                     labels: ['work'],
                 },
-                expectedQueryPattern: '((@work))', // Will be combined with date query
+                expectedQueryPattern: 'today | overdue & ((@work))', // Will be combined with date query
             },
             {
                 name: 'multiple labels with AND operator',
                 params: {
-                    startDate: 'overdue',
+                    startDate: 'today',
                     daysCount: 1,
                     limit: 50,
                     labels: ['work', 'urgent'],
                     labelsOperator: 'and' as const,
                 },
-                expectedQueryPattern: 'overdue & ((@work  &  @urgent))',
+                expectedQueryPattern: 'today | overdue & ((@work  &  @urgent))',
             },
             {
                 name: 'multiple labels with OR operator',
@@ -386,8 +313,8 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 limit: 50,
             })
 
-            // For overdue specifically, check the exact pattern
-            if (params.startDate === 'overdue') {
+            // For today specifically, check the exact pattern
+            if (params.startDate === 'today') {
                 expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                     client: mockTodoistApi,
                     query: expectedQueryPattern,
@@ -467,7 +394,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             },
             {
                 error: TEST_ERRORS.API_RATE_LIMIT,
-                params: { startDate: 'overdue', limit: 50, daysCount: 7 },
+                params: { startDate: 'today', limit: 50, daysCount: 7 },
             },
             {
                 error: TEST_ERRORS.INVALID_CURSOR,

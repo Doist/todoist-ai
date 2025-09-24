@@ -41,7 +41,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **update-tasks**: Modify existing tasks - get task IDs from search results first, only include fields that need changes
 - **complete-tasks**: Mark tasks as done using task IDs
 - **find-tasks**: Search by text, project/section/parent container, responsible user, or labels. Requires at least one search parameter
-- **find-tasks-by-date**: Get tasks by date range (startDate: YYYY-MM-DD, 'today', or 'overdue') or specific day counts
+- **find-tasks-by-date**: Get tasks by date range (startDate: YYYY-MM-DD or 'today' which includes overdue tasks) or specific day counts
 - **find-completed-tasks**: View completed tasks by completion date or original due date
 
 **Project & Organization:**
@@ -68,7 +68,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 4. **Bulk Operations**: When working with multiple items, prefer bulk tools (complete-tasks, manage-assignments) over individual operations for better performance.
 
-5. **Date Handling**: All dates respect user timezone settings. Use 'today' and 'overdue' keywords for dynamic date filtering.
+5. **Date Handling**: All dates respect user timezone settings. Use 'today' keyword for dynamic date filtering (includes overdue tasks).
 
 6. **Labels**: Use label filtering with AND/OR operators for advanced task organization. Most search tools support labels parameter.
 

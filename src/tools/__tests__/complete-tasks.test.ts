@@ -204,7 +204,7 @@ describe(`${COMPLETE_TASKS} tool`, () => {
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
-            expect(textContent).toContain("Use find-tasks-by-date('overdue')")
+            expect(textContent).toContain("Use find-tasks-by-date('today')")
         })
 
         it('should suggest reviewing failures when mixed results', async () => {

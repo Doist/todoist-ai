@@ -52,7 +52,7 @@ function generateNextSteps(completed: number, failures: number): string[] {
     if (completed > 0) {
         const moveResult =
             failures === 0
-                ? "Use find-tasks-by-date('overdue') to tackle remaining overdue items."
+                ? "Use find-tasks-by-date('today') to tackle remaining overdue items."
                 : 'Review failed completions and retry if needed.'
         return [moveResult]
     }

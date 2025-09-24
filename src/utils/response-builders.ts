@@ -257,7 +257,7 @@ export function generateTaskNextSteps(
                     `Use ${FIND_TASKS_BY_DATE}('today') to review today's updated schedule`,
                 )
             } else if (context?.hasOverdue) {
-                nextSteps.push(`Use ${FIND_TASKS_BY_DATE}('overdue') to prioritize past-due items`)
+                nextSteps.push(`Use ${FIND_TASKS_BY_DATE}('today') to prioritize past-due items`)
             } else if (context?.projectName) {
                 nextSteps.push(
                     `Use ${GET_OVERVIEW} with projectId to see ${context.projectName} structure`,
@@ -292,7 +292,7 @@ export function generateTaskNextSteps(
                 nextSteps.push(`Use ${FIND_TASKS_BY_DATE}('tomorrow') to plan upcoming work`)
             } else if (context?.hasOverdue) {
                 nextSteps.push(
-                    `Use ${FIND_TASKS_BY_DATE}('overdue') to tackle remaining past-due items`,
+                    `Use ${FIND_TASKS_BY_DATE}('today') to tackle remaining past-due items`,
                 )
             } else {
                 nextSteps.push(`Use ${FIND_TASKS_BY_DATE}('today') to see remaining work`)

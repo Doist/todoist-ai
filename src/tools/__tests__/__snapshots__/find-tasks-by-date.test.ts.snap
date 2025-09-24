@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`find-tasks-by-date tool edge cases should handle empty results 1`] = `
-"Today's tasks: 0 (limit 50).
-Filter: today + 6 more days.
-No results. Expand date range with larger 'daysCount'; Check 'overdue' for past-due items."
+"Today's tasks + overdue: 0 (limit 50).
+Filter: today + overdue tasks + 6 more days.
+No results. Great job! No tasks for today or overdue."
 `;
 
 exports[`find-tasks-by-date tool label filtering should combine date filters with label filters 1`] = `
@@ -17,26 +17,9 @@ Next:
 - Focus on overdue items first to get back on track"
 `;
 
-exports[`find-tasks-by-date tool listing overdue tasks should handle overdue tasks ignoring daysCount 1`] = `
-"Overdue tasks: 0 (limit 50).
-Filter: overdue tasks only.
-No results. Great job! No overdue tasks; Check today's tasks with startDate='today'."
-`;
-
-exports[`find-tasks-by-date tool listing overdue tasks should handle overdue tasks with tasks 1`] = `
-"Overdue tasks: 1 (limit 50).
-Filter: overdue tasks only.
-Preview:
-    Overdue task • due 2025-08-10 • P3 • id=8485093748
-Next:
-- Use update-tasks to modify priorities or due dates
-- Use complete-tasks to mark finished tasks
-- Focus on overdue items first to get back on track"
-`;
-
-exports[`find-tasks-by-date tool listing tasks by date range should get tasks for today when startDate is "today" 1`] = `
-"Today's tasks: 1 (limit 50).
-Filter: today + 6 more days.
+exports[`find-tasks-by-date tool listing tasks by date range should get tasks for today when startDate is "today" (includes overdue) 1`] = `
+"Today's tasks + overdue: 1 (limit 50).
+Filter: today + overdue tasks + 6 more days.
 Preview:
     Today task • due 2025-08-15 • P4 • id=8485093748
 Next:
@@ -72,13 +55,13 @@ Next:
 exports[`find-tasks-by-date tool next steps logic should provide helpful suggestions for empty date range results 1`] = `
 "Tasks for 2025-08-20: 0 (limit 10).
 Filter: 2025-08-20.
-No results. Expand date range with larger 'daysCount'; Check 'overdue' for past-due items."
+No results. Expand date range with larger 'daysCount'; Check today's tasks with startDate='today'."
 `;
 
-exports[`find-tasks-by-date tool next steps logic should provide helpful suggestions for empty overdue results 1`] = `
-"Overdue tasks: 0 (limit 10).
-Filter: overdue tasks only.
-No results. Great job! No overdue tasks; Check today's tasks with startDate='today'."
+exports[`find-tasks-by-date tool next steps logic should provide helpful suggestions for empty today results 1`] = `
+"Today's tasks + overdue: 0 (limit 10).
+Filter: today + overdue tasks.
+No results. Great job! No tasks for today or overdue."
 `;
 
 exports[`find-tasks-by-date tool next steps logic should suggest appropriate actions when hasOverdue is true 1`] = `
@@ -92,20 +75,9 @@ Next:
 - Focus on overdue items first to get back on track"
 `;
 
-exports[`find-tasks-by-date tool next steps logic should suggest appropriate actions when startDate is overdue 1`] = `
-"Overdue tasks: 1 (limit 10).
-Filter: overdue tasks only.
-Preview:
-    Overdue task • due 2025-08-10 • P4 • id=8485093748
-Next:
-- Use update-tasks to modify priorities or due dates
-- Use complete-tasks to mark finished tasks
-- Focus on overdue items first to get back on track"
-`;
-
 exports[`find-tasks-by-date tool next steps logic should suggest today-focused actions when startDate is today 1`] = `
-"Today's tasks: 1 (limit 10).
-Filter: today.
+"Today's tasks + overdue: 1 (limit 10).
+Filter: today + overdue tasks.
 Preview:
     Today's task • due 2025-08-15 • P4 • id=8485093748
 Next:

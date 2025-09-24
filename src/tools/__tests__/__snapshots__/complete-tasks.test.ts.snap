@@ -7,7 +7,7 @@ Completed:
     task-2
     task-3.
 Next:
-- Use find-tasks-by-date('overdue') to tackle remaining overdue items."
+- Use find-tasks-by-date('today') to tackle remaining overdue items."
 `;
 
 exports[`complete-tasks tool completing multiple tasks should complete single task 1`] = `
@@ -15,7 +15,7 @@ exports[`complete-tasks tool completing multiple tasks should complete single ta
 Completed:
     8485093748.
 Next:
-- Use find-tasks-by-date('overdue') to tackle remaining overdue items."
+- Use find-tasks-by-date('today') to tackle remaining overdue items."
 `;
 
 exports[`complete-tasks tool completing multiple tasks should continue processing remaining tasks after failures 1`] = `
@@ -66,7 +66,7 @@ exports[`complete-tasks tool edge cases should handle empty task completion (min
 Completed:
     single-task.
 Next:
-- Use find-tasks-by-date('overdue') to tackle remaining overdue items."
+- Use find-tasks-by-date('today') to tackle remaining overdue items."
 `;
 
 exports[`complete-tasks tool edge cases should handle tasks with special ID formats 1`] = `
@@ -76,7 +76,7 @@ Completed:
     task-with-dashes
     1234567890.
 Next:
-- Use find-tasks-by-date('overdue') to tackle remaining overdue items."
+- Use find-tasks-by-date('today') to tackle remaining overdue items."
 `;
 
 exports[`complete-tasks tool error message truncation should not show truncation message for exactly 3 errors 1`] = `
@@ -127,7 +127,7 @@ Completed:
     task-1
     task-2.
 Next:
-- Use find-tasks-by-date('overdue') to tackle remaining overdue items."
+- Use find-tasks-by-date('today') to tackle remaining overdue items."
 `;
 
 exports[`complete-tasks tool next steps logic validation should suggest reviewing failures when mixed results 1`] = `
