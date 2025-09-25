@@ -34,10 +34,70 @@ const result = streamText({
 
 ## Using as an MCP server
 
+### Quick Start
+
 You can run the MCP server directly with npx:
 
 ```bash
 npx @doist/todoist-ai
+```
+
+### Setup Guide
+
+The Todoist AI MCP server is available as a streamable HTTP service for easy integration with various AI clients:
+
+**Primary URL (Streamable HTTP):** `https://ai.todoist.net/mcp`
+
+#### Claude Desktop
+
+1. Open Settings → Connectors → Add custom connector
+2. Enter `https://ai.todoist.net/mcp` and complete OAuth authentication
+
+#### Cursor
+
+Create a configuration file:
+- **Global:** `~/.cursor/mcp.json`
+- **Project-specific:** `.cursor/mcp.json`
+
+```json
+{
+  "mcpServers": {
+    "todoist": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://ai.todoist.net/mcp"]
+    }
+  }
+}
+```
+
+Then enable the server in Cursor settings if prompted.
+
+#### Claude Code (CLI)
+
+```bash
+claude mcp add --transport http todoist https://ai.todoist.net/mcp
+```
+
+#### Visual Studio Code
+
+1. Open Command Palette → MCP: Add Server
+2. Select HTTP transport and use:
+
+```json
+{
+  "servers": {
+    "todoist": {
+      "type": "http",
+      "url": "https://ai.todoist.net/mcp"
+    }
+  }
+}
+```
+
+#### Other MCP Clients
+
+```bash
+npx -y mcp-remote https://ai.todoist.net/mcp
 ```
 
 For more details on setting up and using the MCP server, including creating custom servers, see [docs/mcp-server.md](docs/mcp-server.md).
