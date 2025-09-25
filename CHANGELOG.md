@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.7.0](https://github.com/Doist/todoist-ai/compare/v4.6.1...v4.7.0) (2025-09-25)
+
+
+### Features
+
+* Document the MCP setup better, including the remote endpoint ([#109](https://github.com/Doist/todoist-ai/issues/109)) ([e1e69e2](https://github.com/Doist/todoist-ai/commit/e1e69e27e91675775e7f4ea0bef709a17722131c))
+
 ## [4.6.1](https://github.com/Doist/todoist-ai/compare/v4.6.0...v4.6.1) (2025-09-24)
 
 
