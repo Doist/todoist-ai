@@ -27,6 +27,8 @@ npm run dev
 
 This command starts the TypeScript compiler in watch mode and automatically restarts the [MCP inspector](https://modelcontextprotocol.io/docs/tools/inspector) whenever you make changes to the source code.
 
+In MCP Inspector, ensure that the Transport type is `STDIO`, the command is `npx` and the arguments `nodemon --quiet --watch dist --ext js --exec node dist/main.js`, this will make sure that the MCP inspector is pointing at your locally running setup.
+
 ### For testing the built version:
 
 ```sh
