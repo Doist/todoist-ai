@@ -21,3 +21,12 @@ jobs:
                   release-type: node
                   config-file: .github/release-please-config.json
                   manifest-file: .github/release-please-manifest.json
+
+            - name: Publish draft release
+              if: ${{ steps.release.outputs.release_created }}
+              run: |
+                  RELEASE_TAG="${{ steps.release.outputs.tag_name }}"
+                  echo "Publishing release $RELEASE_TAG"
+                  gh release edit "$RELEASE_TAG" --draft=false
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
