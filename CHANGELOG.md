@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.7.1](https://github.com/Doist/todoist-ai/compare/v4.7.0...v4.7.1) (2025-09-29)
+
+
+### Bug Fixes
+
+* Convert the API priorities into a consumable priority ([#115](https://github.com/Doist/todoist-ai/issues/115)) ([e4cc62f](https://github.com/Doist/todoist-ai/commit/e4cc62f5e456c517995aaf9b8e22153923a55ff7))
+
 ## [4.7.0](https://github.com/Doist/todoist-ai/compare/v4.6.1...v4.7.0) (2025-09-25)
 
 
