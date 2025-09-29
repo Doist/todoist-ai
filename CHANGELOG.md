@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.8.0](https://github.com/Doist/todoist-ai/compare/v4.7.1...v4.8.0) (2025-09-29)
+
+
+### Features
+
+* merge overdue into today's tasks in find-tasks-by-date tool ([#108](https://github.com/Doist/todoist-ai/issues/108)) ([f86e69d](https://github.com/Doist/todoist-ai/commit/f86e69d3ac4861a1b99ebdc8f25f135c6d6adeeb))
+
 ## [4.7.1](https://github.com/Doist/todoist-ai/compare/v4.7.0...v4.7.1) (2025-09-29)
 
 
