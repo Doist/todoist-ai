@@ -4,7 +4,7 @@ exports[`find-completed-tasks tool getting completed tasks by completion date (d
 "Completed tasks (by completed date): 1 (limit 50).
 Filter: completed date: 2025-08-10 to 2025-08-15.
 Preview:
-    Completed task 1 • due 2025-08-14 • P2 • id=8485093748
+    Completed task 1 • due 2025-08-14 • P3 • id=8485093748
 Next:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
@@ -21,7 +21,7 @@ exports[`find-completed-tasks tool getting completed tasks by due date should ge
 "Completed tasks (by due date): 1 (limit 50).
 Filter: due date: 2025-08-10 to 2025-08-20.
 Preview:
-    Task completed by due date • due 2025-08-15 • P3 • id=8485093750
+    Task completed by due date • due 2025-08-15 • P2 • id=8485093750
 Next:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity.
 - Recurring tasks will automatically create new instances."
@@ -31,7 +31,7 @@ exports[`find-completed-tasks tool label filtering should combine other filters 
 "Completed tasks (by due date): 1 (limit 25).
 Filter: due date: 2025-08-01 to 2025-08-31; project: test-project-id; section: test-section-id; labels: @important.
 Preview:
-    Important completed task • P1 • id=8485093748
+    Important completed task • P4 • id=8485093748
 Next:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
@@ -40,7 +40,7 @@ exports[`find-completed-tasks tool label filtering should filter completed tasks
 "Completed tasks (by due date): 1 (limit 50).
 Filter: due date: 2025-08-01 to 2025-08-31; labels: @work & @urgent.
 Preview:
-    Completed task with label • P1 • id=8485093748
+    Completed task with label • P4 • id=8485093748
 Next:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
@@ -49,7 +49,7 @@ exports[`find-completed-tasks tool label filtering should filter completed tasks
 "Completed tasks (by completed date): 1 (limit 25).
 Filter: completed date: 2025-08-10 to 2025-08-20; labels: @personal | @shopping.
 Preview:
-    Completed task with label • P1 • id=8485093748
+    Completed task with label • P4 • id=8485093748
 Next:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
@@ -58,7 +58,7 @@ exports[`find-completed-tasks tool label filtering should filter completed tasks
 "Completed tasks (by completed date): 1 (limit 50).
 Filter: completed date: 2025-08-01 to 2025-08-31; labels: @work.
 Preview:
-    Completed task with label • P1 • id=8485093748
+    Completed task with label • P4 • id=8485093748
 Next:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;

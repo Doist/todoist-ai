@@ -3,8 +3,8 @@
 exports[`add-tasks tool adding multiple tasks should add multiple tasks and return mapped results 1`] = `
 "Added 2 tasks to projects.
 Tasks:
-    First task content • P1 • id=8485093748
-    Second task content • due 2025-08-15 • P2 • id=8485093749.
+    First task content • P4 • id=8485093748
+    Second task content • due 2025-08-15 • P3 • id=8485093749.
 Next:
 - Use get-overview to see your updated project organization"
 `;
@@ -12,8 +12,8 @@ Next:
 exports[`add-tasks tool adding multiple tasks should add tasks with duration 1`] = `
 "Added 2 tasks to projects.
 Tasks:
-    Task with 2 hour duration • P1 • id=8485093752
-    Task with 45 minute duration • P1 • id=8485093753.
+    Task with 2 hour duration • P4 • id=8485093752
+    Task with 45 minute duration • P4 • id=8485093753.
 Next:
 - Use get-overview to see your updated project organization"
 `;
@@ -21,7 +21,7 @@ Next:
 exports[`add-tasks tool adding multiple tasks should handle tasks with section and parent IDs 1`] = `
 "Added 1 task to projects.
 Tasks:
-    Subtask content • P3 • id=8485093750.
+    Subtask content • P2 • id=8485093750.
 Next:
 - Use get-overview to see your updated project organization"
 `;
@@ -29,7 +29,7 @@ Next:
 exports[`add-tasks tool next steps logic should suggest find-tasks-by-date for today when hasToday is true 1`] = `
 "Added 1 task to projects.
 Tasks:
-    Task due today • due 2025-08-17 • P1 • id=8485093755.
+    Task due today • due 2025-08-17 • P4 • id=8485093755.
 Next:
 - Use get-overview to see your updated project organization"
 `;
@@ -37,7 +37,7 @@ Next:
 exports[`add-tasks tool next steps logic should suggest overview tool when no hasToday context 1`] = `
 "Added 1 task to projects.
 Tasks:
-    Regular task • P1 • id=8485093756.
+    Regular task • P4 • id=8485093756.
 Next:
 - Use get-overview to see your updated project organization"
 `;

@@ -10,7 +10,7 @@ exports[`find-tasks-by-date tool label filtering should combine date filters wit
 "Tasks for 2025-08-15: 1 (limit 25).
 Filter: 2025-08-15; labels: @important.
 Preview:
-    Important task for specific date • due 2025-08-15 • P1 • id=8485093748
+    Important task for specific date • due 2025-08-15 • P4 • id=8485093748
 Next:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks
@@ -27,7 +27,7 @@ exports[`find-tasks-by-date tool listing overdue tasks should handle overdue tas
 "Overdue tasks: 1 (limit 50).
 Filter: overdue tasks only.
 Preview:
-    Overdue task • due 2025-08-10 • P2 • id=8485093748
+    Overdue task • due 2025-08-10 • P3 • id=8485093748
 Next:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks
@@ -38,7 +38,7 @@ exports[`find-tasks-by-date tool listing tasks by date range should get tasks fo
 "Today's tasks: 1 (limit 50).
 Filter: today + 6 more days.
 Preview:
-    Today task • due 2025-08-15 • P1 • id=8485093748
+    Today task • due 2025-08-15 • P4 • id=8485093748
 Next:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks
@@ -49,8 +49,8 @@ exports[`find-tasks-by-date tool listing tasks by date range should handle multi
 "Tasks for 2025-08-20: 2 (limit 20), more available.
 Filter: 2025-08-20 to 2025-08-16.
 Preview:
-    Multi-day task 1 • due 2025-08-20 • P1 • id=8485093749
-    Multi-day task 2 • due 2025-08-21 • P1 • id=8485093750
+    Multi-day task 1 • due 2025-08-20 • P4 • id=8485093749
+    Multi-day task 2 • due 2025-08-21 • P4 • id=8485093750
 Next:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks
@@ -62,7 +62,7 @@ exports[`find-tasks-by-date tool listing tasks by date range should handle speci
 "Tasks for 2025-08-20: 1 (limit 50).
 Filter: 2025-08-20 to 2025-08-16.
 Preview:
-    Specific date task • due 2025-08-20 • P1 • id=8485093748
+    Specific date task • due 2025-08-20 • P4 • id=8485093748
 Next:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks
@@ -85,7 +85,7 @@ exports[`find-tasks-by-date tool next steps logic should suggest appropriate act
 "Tasks for 2025-08-15: 1 (limit 10).
 Filter: 2025-08-15.
 Preview:
-    Overdue task from list • due 2025-08-10 • P1 • id=8485093748
+    Overdue task from list • due 2025-08-10 • P4 • id=8485093748
 Next:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks
@@ -96,7 +96,7 @@ exports[`find-tasks-by-date tool next steps logic should suggest appropriate act
 "Overdue tasks: 1 (limit 10).
 Filter: overdue tasks only.
 Preview:
-    Overdue task • due 2025-08-10 • P1 • id=8485093748
+    Overdue task • due 2025-08-10 • P4 • id=8485093748
 Next:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks
@@ -107,7 +107,7 @@ exports[`find-tasks-by-date tool next steps logic should suggest today-focused a
 "Today's tasks: 1 (limit 10).
 Filter: today.
 Preview:
-    Today's task • due 2025-08-15 • P1 • id=8485093748
+    Today's task • due 2025-08-15 • P4 • id=8485093748
 Next:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks
