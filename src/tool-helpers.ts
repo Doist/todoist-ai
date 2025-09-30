@@ -8,6 +8,9 @@ import type {
 import z from 'zod'
 import { formatDuration } from './utils/duration-parser.js'
 
+export const RESPONSIBLE_USER_FILTERING = ['assigned', 'unassignedOrMe', 'all'] as const
+export type ResponsibleUserFiltering = (typeof RESPONSIBLE_USER_FILTERING)[number]
+
 export type Project = PersonalProject | WorkspaceProject
 
 export function isPersonalProject(project: Project): project is PersonalProject {
@@ -31,17 +34,21 @@ export function filterTasksByResponsibleUser<T extends { responsibleUid: string 
     tasks,
     resolvedAssigneeId,
     currentUserId,
+    responsibleUserFiltering = 'unassignedOrMe',
 }: {
     tasks: T[]
     resolvedAssigneeId: string | undefined
     currentUserId: string
+    responsibleUserFiltering?: ResponsibleUserFiltering
 }): T[] {
     if (resolvedAssigneeId) {
         // If responsibleUser provided, only return tasks assigned to that user
         return tasks.filter((task) => task.responsibleUid === resolvedAssigneeId)
     } else {
         // If no responsibleUser, only return unassigned tasks or tasks assigned to current user
-        return tasks.filter((task) => !task.responsibleUid || task.responsibleUid === currentUserId)
+        return responsibleUserFiltering === 'unassignedOrMe'
+            ? tasks.filter((task) => !task.responsibleUid || task.responsibleUid === currentUserId)
+            : tasks
     }
 }
 
