@@ -9,6 +9,10 @@ const { ADD_SECTIONS, ADD_TASKS, FIND_PROJECTS, GET_OVERVIEW } = ToolNames
 
 const ProjectSchema = z.object({
     name: z.string().min(1).describe('The name of the project.'),
+    parentId: z
+        .string()
+        .optional()
+        .describe('The ID of the parent project. If provided, creates this as a sub-project.'),
     isFavorite: z
         .boolean()
         .optional()

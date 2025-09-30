@@ -18,6 +18,15 @@ Next:
 - Use get-overview with projectId=project-789 to see project structure"
 `;
 
+exports[`add-projects tool creating a single project should create project with parentId to create a sub-project 1`] = `
+"Added 1 project:
+• Child Project (id=project-child)
+Next:
+- Use add-sections to organize new project with sections
+- Use add-tasks to add your first tasks to this project
+- Use get-overview with projectId=project-child to see project structure"
+`;
+
 exports[`add-projects tool creating a single project should handle different project properties from API 1`] = `
 "Added 1 project:
 • My Blue Project (id=project-456)

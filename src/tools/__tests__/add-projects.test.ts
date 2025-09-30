@@ -126,6 +126,32 @@ describe(`${ADD_PROJECTS} tool`, () => {
             expect(textContent).toContain('Board Project')
             expect(textContent).toContain('id=project-789')
         })
+
+        it('should create project with parentId to create a sub-project', async () => {
+            const mockApiResponse = createMockProject({
+                id: 'project-child',
+                name: 'Child Project',
+                parentId: 'project-parent',
+            })
+
+            mockTodoistApi.addProject.mockResolvedValue(mockApiResponse)
+
+            const result = await addProjects.execute(
+                { projects: [{ name: 'Child Project', parentId: 'project-parent' }] },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addProject).toHaveBeenCalledWith({
+                name: 'Child Project',
+                parentId: 'project-parent',
+            })
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Added 1 project:')
+            expect(textContent).toContain('Child Project')
+            expect(textContent).toContain('id=project-child')
+        })
     })
 
     describe('creating multiple projects', () => {
