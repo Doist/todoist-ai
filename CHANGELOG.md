@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.9.0](https://github.com/Doist/todoist-ai/compare/v4.8.0...v4.9.0) (2025-09-30)
+
+
+### Features
+
+* add parentId support to add-projects tool ([#122](https://github.com/Doist/todoist-ai/issues/122)) ([84019d1](https://github.com/Doist/todoist-ai/commit/84019d1403fff67d33de5bf756a40da28b88171e))
+
 ## [4.8.0](https://github.com/Doist/todoist-ai/compare/v4.7.1...v4.8.0) (2025-09-29)
 
 
