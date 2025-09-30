@@ -88,6 +88,58 @@ describe('shared utilities', () => {
 
             expect(result.duration).toBe('2h30m')
         })
+
+        it('should preserve markdown links and formatting in content and description', () => {
+            const mockTask = {
+                id: '123',
+                content: 'Task with **bold** and [link](https://example.com)',
+                description: `Rich markdown description:
+
+### Links
+[Wikipedia](https://en.wikipedia.org/wiki/Test)
+[GitHub](https://github.com/example/repo)
+
+### Formatting
+**Bold text**
+*Italic text*
+\`code block\`
+
+End of description.`,
+                projectId: 'proj-1',
+                sectionId: null,
+                parentId: null,
+                labels: [],
+                priority: 1,
+            } as unknown as Task
+
+            const result = mapTask(mockTask)
+
+            // Verify exact preservation of markdown content
+            expect(result.content).toBe('Task with **bold** and [link](https://example.com)')
+            expect(result.description).toBe(`Rich markdown description:
+
+### Links
+[Wikipedia](https://en.wikipedia.org/wiki/Test)
+[GitHub](https://github.com/example/repo)
+
+### Formatting
+**Bold text**
+*Italic text*
+\`code block\`
+
+End of description.`)
+
+            // Verify specific URLs are preserved
+            expect(result.content).toContain('[link](https://example.com)')
+            expect(result.description).toContain('[Wikipedia](https://en.wikipedia.org/wiki/Test)')
+            expect(result.description).toContain('[GitHub](https://github.com/example/repo)')
+
+            // Verify other markdown formatting is preserved
+            expect(result.content).toContain('**bold**')
+            expect(result.description).toContain('**Bold text**')
+            expect(result.description).toContain('*Italic text*')
+            expect(result.description).toContain('`code block`')
+        })
     })
 
     describe('mapProject', () => {

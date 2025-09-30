@@ -1,10 +1,9 @@
-import {
-    getSanitizedContent,
-    type MoveTaskArgs,
-    type PersonalProject,
-    type Task,
-    type TodoistApi,
-    type WorkspaceProject,
+import type {
+    MoveTaskArgs,
+    PersonalProject,
+    Task,
+    TodoistApi,
+    WorkspaceProject,
 } from '@doist/todoist-api-typescript'
 import z from 'zod'
 import { formatDuration } from './utils/duration-parser.js'
@@ -65,8 +64,8 @@ export function createMoveTaskArgs(
 function mapTask(task: Task) {
     return {
         id: task.id,
-        content: getSanitizedContent(task.content),
-        description: getSanitizedContent(task.description),
+        content: task.content,
+        description: task.description,
         dueDate: task.due?.date,
         recurring: task.due?.isRecurring && task.due.string ? task.due.string : false,
         priority: task.priority,

@@ -692,6 +692,91 @@ describe(`${FIND_TASKS} tool`, () => {
         })
     })
 
+    describe('markdown content preservation', () => {
+        it('should preserve markdown links and formatting in task content and description', async () => {
+            const richMarkdownContent = 'Test **bold** task with [link](https://example.com)'
+            const richMarkdownDescription = `This is a **comprehensive test** of markdown syntax in Todoist task descriptions:
+
+### Links
+[Wikipedia - Test Link](https://en.wikipedia.org/wiki/Test)
+[GitHub Repository](https://github.com/Doist/todoist-ai)
+[Google Search](https://www.google.com)
+
+### Text Formatting
+**Bold text here**
+*Italic text here*
+***Bold and italic***
+\`inline code\`
+
+### Lists
+- Bullet point 1
+- Bullet point 2
+  - Nested item
+
+1. Numbered item 1
+2. Numbered item 2
+
+End of test content.`
+
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: richMarkdownContent,
+                    description: richMarkdownDescription,
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasks.execute(
+                { searchText: 'markdown test', limit: 10 },
+                mockTodoistApi,
+            )
+
+            const structuredContent = extractStructuredContent(result)
+
+            // Verify that markdown links and formatting are preserved exactly as provided
+            expect(structuredContent.tasks).toHaveLength(1)
+            expect(structuredContent.tasks).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        content: richMarkdownContent,
+                        description: richMarkdownDescription,
+                    }),
+                ]),
+            )
+        })
+
+        it('should preserve markdown links in container-based searches', async () => {
+            const taskWithLinks = createMockTask({
+                id: TEST_IDS.TASK_1,
+                content: 'Task with [external link](https://todoist.com)',
+                description: 'See this [documentation](https://docs.example.com) for details.',
+            })
+
+            mockTodoistApi.getTasks.mockResolvedValue(createMockApiResponse([taskWithLinks]))
+
+            const result = await findTasks.execute(
+                { projectId: TEST_IDS.PROJECT_TEST, limit: 10 },
+                mockTodoistApi,
+            )
+
+            const structuredContent = extractStructuredContent(result)
+
+            // Verify URLs are preserved in container-based searches too
+            expect(structuredContent.tasks).toHaveLength(1)
+            expect(structuredContent.tasks).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        content: 'Task with [external link](https://todoist.com)',
+                        description:
+                            'See this [documentation](https://docs.example.com) for details.',
+                    }),
+                ]),
+            )
+        })
+    })
+
     describe('error handling', () => {
         it.each([
             {
