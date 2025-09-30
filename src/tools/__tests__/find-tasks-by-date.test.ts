@@ -3,8 +3,10 @@ import { jest } from '@jest/globals'
 import { getTasksByFilter } from '../../tool-helpers.js'
 import {
     createMappedTask,
+    createMockUser,
     extractStructuredContent,
     extractTextContent,
+    type MappedTask,
     TEST_ERRORS,
     TEST_IDS,
 } from '../../utils/test-helpers.js'
@@ -12,14 +14,23 @@ import { ToolNames } from '../../utils/tool-names.js'
 import { findTasksByDate } from '../find-tasks-by-date.js'
 
 // Mock the tool helpers
-jest.mock('../../tool-helpers', () => ({
-    getTasksByFilter: jest.fn(),
-}))
+jest.mock('../../tool-helpers', () => {
+    const actual = jest.requireActual('../../tool-helpers') as typeof import('../../tool-helpers')
+    return {
+        getTasksByFilter: jest.fn(),
+        filterTasksByResponsibleUser: actual.filterTasksByResponsibleUser,
+    }
+})
 
 const mockGetTasksByFilter = getTasksByFilter as jest.MockedFunction<typeof getTasksByFilter>
 
 // Mock the Todoist API (not directly used by find-tasks-by-date, but needed for type)
-const mockTodoistApi = {} as TodoistApi
+const mockTodoistApi = {
+    getUser: jest.fn(),
+} as unknown as jest.Mocked<TodoistApi>
+
+// Mock the Todoist User
+const mockTodoistUser = createMockUser()
 
 // Mock date-fns functions to make tests deterministic
 jest.mock('date-fns', () => ({
@@ -45,6 +56,8 @@ const { FIND_TASKS_BY_DATE, UPDATE_TASKS } = ToolNames
 describe(`${FIND_TASKS_BY_DATE} tool`, () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        mockTodoistApi.getUser.mockResolvedValue(mockTodoistUser)
+
         // Mock current date to make tests deterministic
         jest.spyOn(Date, 'now').mockReturnValue(new Date('2025-08-15T10:00:00Z').getTime())
     })
@@ -383,6 +396,86 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
+        })
+    })
+
+    describe('responsible user filtering', () => {
+        it('should filter results to show only unassigned tasks or tasks assigned to current user', async () => {
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'My task',
+                    dueDate: '2025-08-15',
+                    responsibleUid: TEST_IDS.USER_ID, // Assigned to current user
+                }),
+                createMappedTask({
+                    id: TEST_IDS.TASK_2,
+                    content: 'Unassigned task',
+                    dueDate: '2025-08-15',
+                    responsibleUid: null, // Unassigned
+                }),
+                createMappedTask({
+                    id: TEST_IDS.TASK_3,
+                    content: 'Someone else task',
+                    dueDate: '2025-08-15',
+                    responsibleUid: 'other-user-id', // Assigned to someone else
+                }),
+            ]
+
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasksByDate.execute(
+                { startDate: 'today', daysCount: 1, limit: 50 },
+                mockTodoistApi,
+            )
+
+            const structuredContent = extractStructuredContent(result)
+            // Should only return tasks 1 and 2, not task 3
+            expect(structuredContent.tasks as MappedTask[]).toHaveLength(2)
+            expect((structuredContent.tasks as MappedTask[]).map((t: MappedTask) => t.id)).toEqual([
+                TEST_IDS.TASK_1,
+                TEST_IDS.TASK_2,
+            ])
+        })
+
+        it('should filter overdue results to show only unassigned tasks or tasks assigned to current user', async () => {
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'My overdue task',
+                    dueDate: '2025-08-10',
+                    responsibleUid: TEST_IDS.USER_ID, // Assigned to current user
+                }),
+                createMappedTask({
+                    id: TEST_IDS.TASK_2,
+                    content: 'Unassigned overdue task',
+                    dueDate: '2025-08-10',
+                    responsibleUid: null, // Unassigned
+                }),
+                createMappedTask({
+                    id: TEST_IDS.TASK_3,
+                    content: 'Someone else overdue task',
+                    dueDate: '2025-08-10',
+                    responsibleUid: 'other-user-id', // Assigned to someone else
+                }),
+            ]
+
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasksByDate.execute(
+                { startDate: 'overdue', daysCount: 1, limit: 50 },
+                mockTodoistApi,
+            )
+
+            const structuredContent = extractStructuredContent(result)
+            // Should only return tasks 1 and 2, not task 3
+            expect(structuredContent.tasks).toHaveLength(2)
+            expect((structuredContent.tasks as MappedTask[]).map((t: MappedTask) => t.id)).toEqual([
+                TEST_IDS.TASK_1,
+                TEST_IDS.TASK_2,
+            ])
         })
     })
 

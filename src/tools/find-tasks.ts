@@ -2,7 +2,7 @@ import { GetTasksArgs } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { getTasksByFilter, mapTask } from '../tool-helpers.js'
+import { filterTasksByResponsibleUser, getTasksByFilter, mapTask } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import {
@@ -60,6 +60,8 @@ const findTasks = {
             labelsOperator,
         } = args
 
+        const todoistUser = await client.getUser()
+
         // Validate at least one filter is provided
         const hasLabels = labels && labels.length > 0
         if (
@@ -114,11 +116,11 @@ const findTasks = {
                 : mappedTasks
 
             // Apply responsibleUid filter
-            if (resolvedAssigneeId) {
-                filteredTasks = filteredTasks.filter(
-                    (task) => task.responsibleUid === resolvedAssigneeId,
-                )
-            }
+            filteredTasks = filterTasksByResponsibleUser({
+                tasks: filteredTasks,
+                resolvedAssigneeId,
+                currentUserId: todoistUser.id,
+            })
 
             // Apply label filter
             if (labels && labels.length > 0) {
@@ -209,11 +211,11 @@ const findTasks = {
             limit: args.limit,
         })
 
-        // Always filter by responsibleUid client-side (API doesn't reliably support responsibleUid filtering)
-        let tasks = result.tasks
-        if (resolvedAssigneeId) {
-            tasks = result.tasks.filter((task) => task.responsibleUid === resolvedAssigneeId)
-        }
+        const tasks = filterTasksByResponsibleUser({
+            tasks: result.tasks,
+            resolvedAssigneeId,
+            currentUserId: todoistUser.id,
+        })
 
         const textContent = generateTextContent({
             tasks,

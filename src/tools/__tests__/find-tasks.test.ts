@@ -5,6 +5,7 @@ import {
     createMappedTask,
     createMockApiResponse,
     createMockTask,
+    createMockUser,
     extractStructuredContent,
     extractTextContent,
     type MappedTask,
@@ -13,6 +14,7 @@ import {
     TODAY,
 } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
+import { resolveUserNameToId } from '../../utils/user-resolver.js'
 import { findTasks } from '../find-tasks.js'
 
 jest.mock('../../tool-helpers', () => {
@@ -20,20 +22,33 @@ jest.mock('../../tool-helpers', () => {
     return {
         getTasksByFilter: jest.fn(),
         mapTask: actual.mapTask,
+        filterTasksByResponsibleUser: actual.filterTasksByResponsibleUser,
     }
 })
+
+jest.mock('../../utils/user-resolver', () => ({
+    resolveUserNameToId: jest.fn(),
+}))
 
 const { FIND_TASKS, UPDATE_TASKS, FIND_COMPLETED_TASKS } = ToolNames
 
 const mockGetTasksByFilter = getTasksByFilter as jest.MockedFunction<typeof getTasksByFilter>
+const mockResolveUserNameToId = resolveUserNameToId as jest.MockedFunction<
+    typeof resolveUserNameToId
+>
 
 // Mock the Todoist API
 const mockTodoistApi = {
     getTasks: jest.fn(),
+    getUser: jest.fn(),
 } as unknown as jest.Mocked<TodoistApi>
+
+// Mock the Todoist User
+const mockTodoistUser = createMockUser()
 
 describe(`${FIND_TASKS} tool`, () => {
     beforeEach(() => {
+        mockTodoistApi.getUser.mockResolvedValue(mockTodoistUser)
         jest.clearAllMocks()
     })
 
@@ -774,6 +789,156 @@ End of test content.`
                     }),
                 ]),
             )
+        })
+    })
+
+    describe('responsible user filtering', () => {
+        describe('when no responsibleUser is provided', () => {
+            it('should filter text search results to show only unassigned tasks or tasks assigned to current user', async () => {
+                const mockTasks = [
+                    createMappedTask({
+                        id: TEST_IDS.TASK_1,
+                        content: 'My task',
+                        responsibleUid: TEST_IDS.USER_ID, // Assigned to current user
+                    }),
+                    createMappedTask({
+                        id: TEST_IDS.TASK_2,
+                        content: 'Unassigned task',
+                        responsibleUid: null, // Unassigned
+                    }),
+                    createMappedTask({
+                        id: TEST_IDS.TASK_3,
+                        content: 'Someone else task',
+                        responsibleUid: 'other-user-id', // Assigned to someone else
+                    }),
+                ]
+
+                const mockResponse = { tasks: mockTasks, nextCursor: null }
+                mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+                const result = await findTasks.execute(
+                    { searchText: 'task', limit: 10 },
+                    mockTodoistApi,
+                )
+
+                const structuredContent = extractStructuredContent(result)
+                // Should only return tasks 1 and 2, not task 3
+                expect(structuredContent.tasks).toHaveLength(2)
+                expect(
+                    (structuredContent.tasks as MappedTask[]).map((t: MappedTask) => t.id),
+                ).toEqual([TEST_IDS.TASK_1, TEST_IDS.TASK_2])
+            })
+
+            it('should filter container-based results to show only unassigned tasks or tasks assigned to current user', async () => {
+                const mockTasks = [
+                    createMockTask({
+                        id: TEST_IDS.TASK_1,
+                        content: 'My project task',
+                        responsibleUid: TEST_IDS.USER_ID, // Assigned to current user
+                    }),
+                    createMockTask({
+                        id: TEST_IDS.TASK_2,
+                        content: 'Unassigned project task',
+                        responsibleUid: null, // Unassigned
+                    }),
+                    createMockTask({
+                        id: TEST_IDS.TASK_3,
+                        content: 'Someone else project task',
+                        responsibleUid: 'other-user-id', // Assigned to someone else
+                    }),
+                ]
+
+                mockTodoistApi.getTasks.mockResolvedValue(createMockApiResponse(mockTasks))
+
+                const result = await findTasks.execute(
+                    { projectId: TEST_IDS.PROJECT_WORK, limit: 10 },
+                    mockTodoistApi,
+                )
+
+                const structuredContent = extractStructuredContent(result)
+                // Should only return tasks 1 and 2, not task 3
+                expect(structuredContent.tasks).toHaveLength(2)
+                expect(
+                    (structuredContent.tasks as MappedTask[]).map((t: MappedTask) => t.id),
+                ).toEqual([TEST_IDS.TASK_1, TEST_IDS.TASK_2])
+            })
+        })
+
+        describe('when responsibleUser is provided', () => {
+            it('should filter text search results to show only tasks assigned to specified user', async () => {
+                const mockTasks = [
+                    createMappedTask({
+                        id: TEST_IDS.TASK_1,
+                        content: 'Task for John',
+                        responsibleUid: 'specific-user-id', // Assigned to specified user
+                    }),
+                    createMappedTask({
+                        id: TEST_IDS.TASK_2,
+                        content: 'My task',
+                        responsibleUid: TEST_IDS.USER_ID, // Assigned to current user
+                    }),
+                    createMappedTask({
+                        id: TEST_IDS.TASK_3,
+                        content: 'Unassigned task',
+                        responsibleUid: null, // Unassigned
+                    }),
+                ]
+
+                const mockResponse = { tasks: mockTasks, nextCursor: null }
+                mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+                mockResolveUserNameToId.mockResolvedValue({
+                    userId: 'specific-user-id',
+                    displayName: 'John Doe',
+                })
+
+                const result = await findTasks.execute(
+                    { searchText: 'task', responsibleUser: 'John Doe', limit: 10 },
+                    mockTodoistApi,
+                )
+
+                const structuredContent = extractStructuredContent(result)
+                // Should only return task 1 (assigned to John)
+                expect(structuredContent.tasks).toHaveLength(1)
+                expect((structuredContent.tasks as MappedTask[])[0]?.id).toBe(TEST_IDS.TASK_1)
+            })
+
+            it('should filter container-based results to show only tasks assigned to specified user', async () => {
+                const mockTasks = [
+                    createMockTask({
+                        id: TEST_IDS.TASK_1,
+                        content: 'Task for John',
+                        responsibleUid: 'specific-user-id', // Assigned to specified user
+                    }),
+                    createMockTask({
+                        id: TEST_IDS.TASK_2,
+                        content: 'My task',
+                        responsibleUid: TEST_IDS.USER_ID, // Assigned to current user
+                    }),
+                    createMockTask({
+                        id: TEST_IDS.TASK_3,
+                        content: 'Unassigned task',
+                        responsibleUid: null, // Unassigned
+                    }),
+                ]
+
+                mockTodoistApi.getTasks.mockResolvedValue(createMockApiResponse(mockTasks))
+
+                mockResolveUserNameToId.mockResolvedValue({
+                    userId: 'specific-user-id',
+                    displayName: 'John Doe',
+                })
+
+                const result = await findTasks.execute(
+                    { projectId: TEST_IDS.PROJECT_WORK, responsibleUser: 'John Doe', limit: 10 },
+                    mockTodoistApi,
+                )
+
+                const structuredContent = extractStructuredContent(result)
+                // Should only return task 1 (assigned to John)
+                expect(structuredContent.tasks).toHaveLength(1)
+                expect((structuredContent.tasks as MappedTask[])[0]?.id).toBe(TEST_IDS.TASK_1)
+            })
         })
     })
 

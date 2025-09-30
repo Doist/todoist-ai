@@ -2,7 +2,7 @@ import { addDays, formatISO } from 'date-fns'
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { getTasksByFilter } from '../tool-helpers.js'
+import { filterTasksByResponsibleUser, getTasksByFilter } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import {
@@ -49,6 +49,8 @@ const findTasksByDate = {
     async execute(args, client) {
         let query = ''
 
+        const todoistUser = await client.getUser()
+
         if (args.startDate === 'today') {
             query = 'today | overdue'
         } else {
@@ -73,8 +75,15 @@ const findTasksByDate = {
             limit: args.limit,
         })
 
-        const textContent = generateTextContent({
+        // Apply responsible user filtering - only show unassigned tasks or tasks assigned to current user
+        const filteredTasks = filterTasksByResponsibleUser({
             tasks: result.tasks,
+            resolvedAssigneeId: undefined,
+            currentUserId: todoistUser.id,
+        })
+
+        const textContent = generateTextContent({
+            tasks: filteredTasks,
             args,
             nextCursor: result.nextCursor,
         })
@@ -82,9 +91,9 @@ const findTasksByDate = {
         return getToolOutput({
             textContent,
             structuredContent: {
-                tasks: result.tasks,
+                tasks: filteredTasks,
                 nextCursor: result.nextCursor,
-                totalCount: result.tasks.length,
+                totalCount: filteredTasks.length,
                 hasMore: Boolean(result.nextCursor),
                 appliedFilters: args,
             },

@@ -19,6 +19,33 @@ export function isWorkspaceProject(project: Project): project is WorkspaceProjec
 }
 
 /**
+ * Filters tasks based on responsible user logic:
+ * - If resolvedAssigneeId is provided: returns only tasks assigned to that user
+ * - If no resolvedAssigneeId: returns only unassigned tasks or tasks assigned to current user
+ * @param tasks - Array of tasks to filter (must have responsibleUid property)
+ * @param resolvedAssigneeId - The resolved assignee ID to filter by (optional)
+ * @param currentUserId - The current authenticated user's ID
+ * @returns Filtered array of tasks
+ */
+export function filterTasksByResponsibleUser<T extends { responsibleUid: string | null }>({
+    tasks,
+    resolvedAssigneeId,
+    currentUserId,
+}: {
+    tasks: T[]
+    resolvedAssigneeId: string | undefined
+    currentUserId: string
+}): T[] {
+    if (resolvedAssigneeId) {
+        // If responsibleUser provided, only return tasks assigned to that user
+        return tasks.filter((task) => task.responsibleUid === resolvedAssigneeId)
+    } else {
+        // If no responsibleUser, only return unassigned tasks or tasks assigned to current user
+        return tasks.filter((task) => !task.responsibleUid || task.responsibleUid === currentUserId)
+    }
+}
+
+/**
  * Creates a MoveTaskArgs object from move parameters, validating that exactly one is provided.
  * @param taskId - The task ID (used for error messages)
  * @param projectId - Optional project ID to move to

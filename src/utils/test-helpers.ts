@@ -1,4 +1,4 @@
-import type { PersonalProject, Section, Task } from '@doist/todoist-api-typescript'
+import type { CurrentUser, PersonalProject, Section, Task } from '@doist/todoist-api-typescript'
 import { getToolOutput } from '../mcp-helpers'
 
 /**
@@ -243,3 +243,44 @@ export const TEST_IDS = {
  * Use this instead of new Date() in tests to avoid snapshot drift.
  */
 export const TODAY = '2025-08-17' as const
+
+/**
+ * Creates a mock CurrentUser with all required properties and sensible defaults.
+ * Pass only the properties you want to override for your specific test.
+ */
+export function createMockUser(overrides: Partial<CurrentUser> = {}): CurrentUser {
+    return {
+        id: TEST_IDS.USER_ID,
+        email: 'test@example.com',
+        fullName: 'Test User',
+        businessAccountId: null,
+        isPremium: false,
+        dateFormat: 0,
+        timeFormat: 0,
+        weeklyGoal: 5,
+        dailyGoal: 5,
+        completedCount: 0,
+        completedToday: 0,
+        daysOff: [],
+        inboxProjectId: TEST_IDS.PROJECT_INBOX,
+        karma: 0,
+        karmaTrend: 'up' as const,
+        lang: 'en',
+        nextWeek: 1,
+        startDay: 1,
+        startPage: 'today',
+        weekendStartDay: 6,
+        tzInfo: {
+            timezone: 'UTC',
+            gmtString: '+00:00',
+            hours: 0,
+            minutes: 0,
+            isDst: 0,
+        },
+        avatarBig: null,
+        avatarMedium: null,
+        avatarS640: null,
+        avatarSmall: null,
+        ...overrides,
+    }
+}
