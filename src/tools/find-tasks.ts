@@ -35,7 +35,7 @@ const ArgsSchema = {
         .enum(RESPONSIBLE_USER_FILTERING)
         .optional()
         .describe(
-            'How to filter by responsible user when responsibleUser is not provided. "assigned" = only tasks assigned to others; "unassignedOrMe" = only unassigned tasks or tasks assigned to me; "all" = all tasks regardless of assignment.',
+            'How to filter by responsible user when responsibleUser is not provided. "assigned" = only tasks assigned to others; "unassignedOrMe" = only unassigned tasks or tasks assigned to me; "all" = all tasks regardless of assignment. Default value will be `unassignedOrMe`.',
         ),
     limit: z
         .number()
