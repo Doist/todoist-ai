@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.9.1](https://github.com/Doist/todoist-ai/compare/v4.9.0...v4.9.1) (2025-10-01)
+
+
+### Bug Fixes
+
+* Enhance task filtering by responsible user and update related tools ([#121](https://github.com/Doist/todoist-ai/issues/121)) ([cea0917](https://github.com/Doist/todoist-ai/commit/cea0917a8b2bd1f056e1b08f14e9cb858b9711a5))
+* preserve markdown in tasks content and description ([#124](https://github.com/Doist/todoist-ai/issues/124)) ([0cc48fe](https://github.com/Doist/todoist-ai/commit/0cc48fe93595213729d794b7b6c92d54072cf6d5))
+
 ## [4.9.0](https://github.com/Doist/todoist-ai/compare/v4.8.0...v4.9.0) (2025-09-30)
 
 
