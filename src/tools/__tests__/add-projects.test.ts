@@ -198,7 +198,11 @@ describe(`${ADD_PROJECTS} tool`, () => {
             const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
-                    projects: mockProjects,
+                    projects: expect.arrayContaining([
+                        expect.objectContaining({ id: 'project-1', name: 'First Project' }),
+                        expect.objectContaining({ id: 'project-2', name: 'Second Project' }),
+                        expect.objectContaining({ id: 'project-3', name: 'Third Project' }),
+                    ]),
                     totalCount: 3,
                 }),
             )

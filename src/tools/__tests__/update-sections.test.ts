@@ -60,7 +60,12 @@ describe(`${UPDATE_SECTIONS} tool`, () => {
             const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
-                    sections: [mockApiResponse],
+                    sections: expect.arrayContaining([
+                        expect.objectContaining({
+                            id: 'existing-section-123',
+                            name: 'Updated Section Name',
+                        }),
+                    ]),
                     totalCount: 1,
                     updatedSectionIds: ['existing-section-123'],
                 }),
@@ -134,7 +139,14 @@ describe(`${UPDATE_SECTIONS} tool`, () => {
             const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
-                    sections: mockSections,
+                    sections: expect.arrayContaining([
+                        expect.objectContaining({ id: 'section-1', name: 'Updated First Section' }),
+                        expect.objectContaining({
+                            id: 'section-2',
+                            name: 'Updated Second Section',
+                        }),
+                        expect.objectContaining({ id: 'section-3', name: 'Updated Third Section' }),
+                    ]),
                     totalCount: 3,
                     updatedSectionIds: ['section-1', 'section-2', 'section-3'],
                 }),

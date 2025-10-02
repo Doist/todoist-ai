@@ -71,7 +71,6 @@ describe(`${FIND_PROJECTS} tool`, () => {
                     projects: expect.any(Array),
                     totalCount: 3,
                     hasMore: false,
-                    nextCursor: null,
                     appliedFilters: {
                         search: undefined,
                         limit: 50,
@@ -144,7 +143,6 @@ describe(`${FIND_PROJECTS} tool`, () => {
             expect(structuredContent.projects).toHaveLength(2) // Should match filtered results
             expect(structuredContent.totalCount).toBe(2)
             expect(structuredContent.hasMore).toBe(false)
-            expect(structuredContent.nextCursor).toBeNull()
             expect(structuredContent.appliedFilters).toEqual({
                 search: 'work',
                 limit: 50,

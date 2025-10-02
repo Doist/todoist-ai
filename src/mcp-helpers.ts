@@ -2,6 +2,7 @@ import type { TodoistApi } from '@doist/todoist-api-typescript'
 import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/mcp.js'
 import type { ZodTypeAny, z } from 'zod'
 import type { TodoistTool } from './todoist-tool.js'
+import { removeNullFields } from './utils/sanitize-data.js'
 
 /**
  * Wether to return the structured content directly, vs. in the `content` part of the output.
@@ -34,14 +35,17 @@ function getToolOutput<StructuredContent extends Record<string, unknown>>({
     textContent: string
     structuredContent: StructuredContent
 }) {
+    // Remove null fields from structured content before returning
+    const sanitizedContent = removeNullFields(structuredContent)
+
     if (USE_STRUCTURED_CONTENT) {
         return {
             content: [{ type: 'text' as const, text: textContent }],
-            structuredContent,
+            structuredContent: sanitizedContent,
         }
     }
 
-    const json = JSON.stringify(structuredContent)
+    const json = JSON.stringify(sanitizedContent)
     return {
         content: [
             { type: 'text' as const, text: textContent },

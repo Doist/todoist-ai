@@ -103,7 +103,6 @@ describe(`${GET_OVERVIEW} tool`, () => {
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     type: 'account_overview',
-                    inbox: null,
                     projects: [],
                     totalProjects: 0,
                     totalSections: 0,
