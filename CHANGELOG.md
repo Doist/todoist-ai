@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.9.3](https://github.com/Doist/todoist-ai/compare/v4.9.2...v4.9.3) (2025-10-02)
+
+
+### Bug Fixes
+
+* dayCount and overdue only fixes ([#128](https://github.com/Doist/todoist-ai/issues/128)) ([d020c06](https://github.com/Doist/todoist-ai/commit/d020c0622fb5c9a71b5f666406529236db76bdef))
+
 ## [4.9.2](https://github.com/Doist/todoist-ai/compare/v4.9.1...v4.9.2) (2025-10-02)
 
 
