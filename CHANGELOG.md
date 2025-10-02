@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.9.2](https://github.com/Doist/todoist-ai/compare/v4.9.1...v4.9.2) (2025-10-02)
+
+
+### Bug Fixes
+
+* allow add-tasks to work with only content parameter ([#126](https://github.com/Doist/todoist-ai/issues/126)) ([27bda34](https://github.com/Doist/todoist-ai/commit/27bda346f465a1a2ab7a0ab833c151093a4d7044))
+
 ## [4.9.1](https://github.com/Doist/todoist-ai/compare/v4.9.0...v4.9.1) (2025-10-01)
 
 
