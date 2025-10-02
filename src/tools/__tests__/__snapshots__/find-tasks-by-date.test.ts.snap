@@ -17,6 +17,17 @@ Next:
 - Focus on overdue items first to get back on track"
 `;
 
+exports[`find-tasks-by-date tool listing tasks by date range only returns tasks for the startDate when daysCount is 1 1`] = `
+"Tasks for 2025-08-20: 1 (limit 50).
+Filter: 2025-08-20.
+Preview:
+    Task for specific date • due 2025-08-20 • P4 • id=8485093748
+Next:
+- Use update-tasks to modify priorities or due dates
+- Use complete-tasks to mark finished tasks
+- Focus on overdue items first to get back on track"
+`;
+
 exports[`find-tasks-by-date tool listing tasks by date range should get tasks for today when startDate is "today" (includes overdue) 1`] = `
 "Today's tasks + overdue: 1 (limit 50).
 Filter: today + overdue tasks + 6 more days.
@@ -30,7 +41,7 @@ Next:
 
 exports[`find-tasks-by-date tool listing tasks by date range should handle multiple days with pagination 1`] = `
 "Tasks for 2025-08-20: 2 (limit 20), more available.
-Filter: 2025-08-20 to 2025-08-16.
+Filter: 2025-08-20 to 2025-08-23.
 Preview:
     Multi-day task 1 • due 2025-08-20 • P4 • id=8485093749
     Multi-day task 2 • due 2025-08-21 • P4 • id=8485093750
@@ -43,7 +54,7 @@ Next:
 
 exports[`find-tasks-by-date tool listing tasks by date range should handle specific date 1`] = `
 "Tasks for 2025-08-20: 1 (limit 50).
-Filter: 2025-08-20 to 2025-08-16.
+Filter: 2025-08-20 to 2025-08-27.
 Preview:
     Specific date task • due 2025-08-20 • P4 • id=8485093748
 Next:

@@ -24,7 +24,9 @@ const ArgsSchema = {
         .min(1)
         .max(30)
         .default(1)
-        .describe('The number of days to get the tasks for, starting from the start date.'),
+        .describe(
+            'The number of days to get the tasks for, starting from the start date. Default is 1 which means only tasks for the start date.',
+        ),
     limit: z
         .number()
         .int()
@@ -55,7 +57,7 @@ const findTasksByDate = {
             query = 'today | overdue'
         } else {
             const startDate = args.startDate
-            const endDate = addDays(startDate, args.daysCount + 1)
+            const endDate = addDays(startDate, args.daysCount)
             const endDateStr = formatISO(endDate, { representation: 'date' })
             query = `(due after: ${startDate} | due: ${startDate}) & due before: ${endDateStr}`
         }

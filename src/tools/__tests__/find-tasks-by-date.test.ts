@@ -34,20 +34,19 @@ const mockTodoistUser = createMockUser()
 
 // Mock date-fns functions to make tests deterministic
 jest.mock('date-fns', () => ({
-    addDays: jest.fn(() => new Date('2025-08-16')), // Return predictable end date
-    formatISO: jest.fn((date, options) => {
+    addDays: jest.fn((date: string | Date, amount: number) => {
+        const d = new Date(date)
+        d.setDate(d.getDate() + amount)
+        return d
+    }),
+    formatISO: jest.fn((date: string | Date, options?: { representation?: string }) => {
         if (typeof date === 'string') {
             return date // Return string dates as-is
         }
-        if (
-            options &&
-            typeof options === 'object' &&
-            'representation' in options &&
-            options.representation === 'date'
-        ) {
-            return '2025-08-15' // Return predictable date for 'today'
+        if (options?.representation === 'date') {
+            return date.toISOString().split('T')[0]
         }
-        return '2025-08-16' // Return predictable end date
+        return date.toISOString()
     }),
 }))
 
@@ -67,6 +66,30 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
     })
 
     describe('listing tasks by date range', () => {
+        it('only returns tasks for the startDate when daysCount is 1', async () => {
+            const mockTasks = [
+                createMappedTask({ content: 'Task for specific date', dueDate: '2025-08-20' }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasksByDate.execute(
+                { startDate: '2025-08-20', limit: 50, daysCount: 1 },
+                mockTodoistApi,
+            )
+
+            // Verify the query uses daysCount=1 by checking the end date calculation
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: '(due after: 2025-08-20 | due: 2025-08-20) & due before: 2025-08-21',
+                cursor: undefined,
+                limit: 50,
+            })
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+        })
+
         it('should get tasks for today when startDate is "today" (includes overdue)', async () => {
             const mockTasks = [createMappedTask({ content: 'Today task', dueDate: '2025-08-15' })]
             const mockResponse = { tasks: mockTasks, nextCursor: null }
