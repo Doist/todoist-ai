@@ -86,8 +86,8 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
         taskArgs.priority = convertPriorityToNumber(priority)
     }
 
-    // Prevent assignment to tasks without sufficient project context
-    if (!projectId && !sectionId && !parentId) {
+    // Only prevent assignment (not task creation) without sufficient project context
+    if (responsibleUser && !projectId && !sectionId && !parentId) {
         throw new Error(
             `Task "${task.content}": Cannot assign tasks without specifying project context. Please specify a projectId, sectionId, or parentId.`,
         )

@@ -595,4 +595,58 @@ describe(`${ADD_TASKS} tool`, () => {
             )
         })
     })
+
+    describe('tasks without project context', () => {
+        it('should allow creating tasks with only content (goes to Inbox)', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093758',
+                content: 'Simple inbox task',
+                url: 'https://todoist.com/showTask?id=8485093758',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
+
+            const result = await addTasks.execute(
+                {
+                    tasks: [
+                        {
+                            content: 'Simple inbox task',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
+                content: 'Simple inbox task',
+                labels: undefined,
+                projectId: undefined,
+                sectionId: undefined,
+                parentId: undefined,
+            })
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('Added 1 task')
+            expect(textContent).toContain('Simple inbox task')
+        })
+
+        it('should prevent assignment without project context', async () => {
+            await expect(
+                addTasks.execute(
+                    {
+                        tasks: [
+                            {
+                                content: 'Task with assignment but no project',
+                                responsibleUser: 'user@example.com',
+                            },
+                        ],
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(
+                'Task "Task with assignment but no project": Cannot assign tasks without specifying project context. Please specify a projectId, sectionId, or parentId.',
+            )
+        })
+    })
 })
