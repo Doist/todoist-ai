@@ -17,7 +17,14 @@ const ArgsSchema = {
     startDate: z
         .string()
         .regex(/^(\d{4}-\d{2}-\d{2}|today)$/)
+        .optional()
         .describe("The start date to get the tasks for. Format: YYYY-MM-DD or 'today'."),
+    overdueOption: z
+        .enum(['overdue-only', 'include-overdue', 'exclude-overdue'])
+        .optional()
+        .describe(
+            "How to handle overdue tasks. 'overdue-only' to get only overdue tasks, 'include-overdue' to include overdue tasks along with tasks for the specified date(s), and 'exclude-overdue' to exclude overdue tasks. Default is 'include-overdue'.",
+        ),
     daysCount: z
         .number()
         .int()
@@ -49,13 +56,22 @@ const findTasksByDate = {
         "Get tasks by date range. Use startDate 'today' to get today's tasks including overdue items, or provide a specific date/date range.",
     parameters: ArgsSchema,
     async execute(args, client) {
-        let query = ''
+        if (!args.startDate && args.overdueOption !== 'overdue-only') {
+            throw new Error(
+                'Either startDate must be provided or overdueOption must be set to overdue-only',
+            )
+        }
 
+        let query = ''
         const todoistUser = await client.getUser()
 
-        if (args.startDate === 'today') {
-            query = 'today | overdue'
-        } else {
+        if (args.overdueOption === 'overdue-only') {
+            query = 'overdue'
+        } else if (args.startDate === 'today') {
+            // For 'today', include overdue unless explicitly excluded
+            query = args.overdueOption === 'exclude-overdue' ? 'today' : 'today | overdue'
+        } else if (args.startDate) {
+            // For specific dates, never include overdue tasks
             const startDate = args.startDate
             const endDate = addDays(startDate, args.daysCount)
             const endDateStr = formatISO(endDate, { representation: 'date' })
@@ -114,14 +130,20 @@ function generateTextContent({
 }) {
     // Generate filter description
     const filterHints: string[] = []
-    if (args.startDate === 'today') {
+
+    if (args.overdueOption === 'overdue-only') {
+        filterHints.push('overdue tasks only')
+    } else if (args.startDate === 'today') {
+        const overdueText = args.overdueOption === 'exclude-overdue' ? '' : ' + overdue tasks'
         filterHints.push(
-            `today + overdue tasks${args.daysCount > 1 ? ` + ${args.daysCount - 1} more days` : ''}`,
+            `today${overdueText}${args.daysCount > 1 ? ` + ${args.daysCount - 1} more days` : ''}`,
         )
-    } else {
-        filterHints.push(
-            `${args.startDate}${args.daysCount > 1 ? ` to ${getDateString(addDays(args.startDate, args.daysCount))}` : ''}`,
-        )
+    } else if (args.startDate) {
+        const dateRange =
+            args.daysCount > 1
+                ? ` to ${getDateString(addDays(args.startDate, args.daysCount))}`
+                : ''
+        filterHints.push(`${args.startDate}${dateRange}`)
     }
 
     // Add label filter information
@@ -133,14 +155,26 @@ function generateTextContent({
     }
 
     // Generate subject description
-    const subject =
-        args.startDate === 'today' ? `Today's tasks + overdue` : `Tasks for ${args.startDate}`
+    let subject = ''
+    if (args.overdueOption === 'overdue-only') {
+        subject = 'Overdue tasks'
+    } else if (args.startDate === 'today') {
+        subject =
+            args.overdueOption === 'exclude-overdue' ? `Today's tasks` : `Today's tasks + overdue`
+    } else if (args.startDate) {
+        subject = `Tasks for ${args.startDate}`
+    } else {
+        subject = 'Tasks'
+    }
 
     // Generate helpful suggestions for empty results
     const zeroReasonHints: string[] = []
     if (tasks.length === 0) {
-        if (args.startDate === 'today') {
-            zeroReasonHints.push('Great job! No tasks for today or overdue')
+        if (args.overdueOption === 'overdue-only') {
+            zeroReasonHints.push('Great job! No overdue tasks')
+        } else if (args.startDate === 'today') {
+            const overdueNote = args.overdueOption === 'exclude-overdue' ? '' : ' or overdue'
+            zeroReasonHints.push(`Great job! No tasks for today${overdueNote}`)
         } else {
             zeroReasonHints.push("Expand date range with larger 'daysCount'")
             zeroReasonHints.push("Check today's tasks with startDate='today'")
@@ -150,11 +184,13 @@ function generateTextContent({
     // Generate contextual next steps
     const now = new Date()
     const todayStr = getDateString(now)
+    const hasOverdue =
+        args.overdueOption === 'overdue-only' ||
+        args.startDate === 'today' ||
+        tasks.some((task) => task.dueDate && new Date(task.dueDate) < now)
     const nextSteps = generateTaskNextSteps('listed', tasks, {
         hasToday: args.startDate === 'today' || tasks.some((task) => task.dueDate === todayStr),
-        hasOverdue:
-            args.startDate === 'today' ||
-            tasks.some((task) => task.dueDate && new Date(task.dueDate) < now),
+        hasOverdue,
     })
 
     return summarizeList({

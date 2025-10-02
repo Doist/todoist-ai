@@ -488,7 +488,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'overdue', daysCount: 1, limit: 50 },
+                { overdueOption: 'overdue-only', daysCount: 1, limit: 50 },
                 mockTodoistApi,
             )
 
