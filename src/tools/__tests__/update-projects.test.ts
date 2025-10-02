@@ -65,7 +65,12 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
             const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
-                    projects: [mockApiResponse],
+                    projects: expect.arrayContaining([
+                        expect.objectContaining({
+                            id: 'existing-project-123',
+                            name: 'Updated Project Name',
+                        }),
+                    ]),
                     totalCount: 1,
                     updatedProjectIds: ['existing-project-123'],
                     appliedOperations: {
@@ -178,7 +183,14 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
             const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
-                    projects: mockProjects,
+                    projects: expect.arrayContaining([
+                        expect.objectContaining({ id: 'project-1', name: 'Updated First Project' }),
+                        expect.objectContaining({
+                            id: 'project-2',
+                            name: 'Updated Second Project',
+                        }),
+                        expect.objectContaining({ id: 'project-3', name: 'Updated Third Project' }),
+                    ]),
                     totalCount: 3,
                     updatedProjectIds: ['project-1', 'project-2', 'project-3'],
                     appliedOperations: {

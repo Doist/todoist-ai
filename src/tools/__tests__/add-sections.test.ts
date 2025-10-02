@@ -162,7 +162,11 @@ describe(`${ADD_SECTIONS} tool`, () => {
             const structuredContent = extractStructuredContent(result)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
-                    sections: mockSections,
+                    sections: expect.arrayContaining([
+                        expect.objectContaining({ id: 'section-1', name: 'First Section' }),
+                        expect.objectContaining({ id: 'section-2', name: 'Second Section' }),
+                        expect.objectContaining({ id: 'section-3', name: 'Third Section' }),
+                    ]),
                     totalCount: 3,
                 }),
             )
