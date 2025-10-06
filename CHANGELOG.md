@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.9.4](https://github.com/Doist/todoist-ai/compare/v4.9.3...v4.9.4) (2025-10-06)
+
+
+### Bug Fixes
+
+* Ensures null fields are not returned ([#130](https://github.com/Doist/todoist-ai/issues/130)) ([a016011](https://github.com/Doist/todoist-ai/commit/a0160115b6fff4b96751056506494e43f582527c))
+
 ## [4.9.3](https://github.com/Doist/todoist-ai/compare/v4.9.2...v4.9.3) (2025-10-02)
 
 
