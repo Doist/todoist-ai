@@ -425,7 +425,7 @@ describe('Assignment Integration Tests', () => {
             )
 
             expect(extractTextContent(result)).toContain('is not shared and has no collaborators')
-            expect(extractStructuredContent(result).collaborators).toHaveLength(0)
+            expect(extractStructuredContent(result).collaborators).toBeUndefined() // Empty arrays are removed
         })
 
         it('should handle project not found', async () => {

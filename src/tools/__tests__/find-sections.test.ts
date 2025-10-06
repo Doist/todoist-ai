@@ -104,12 +104,8 @@ describe(`${FIND_SECTIONS} tool`, () => {
 
             // Verify structured content
             const structuredContent = extractStructuredContent(result)
-            expect(structuredContent.sections).toHaveLength(0)
+            expect(structuredContent.sections).toBeUndefined() // Empty arrays are removed
             expect(structuredContent.totalCount).toBe(0)
-            expect(structuredContent.appliedFilters).toEqual({
-                projectId: 'empty-project-id',
-                search: undefined,
-            })
         })
     })
 

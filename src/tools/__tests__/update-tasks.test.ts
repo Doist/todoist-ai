@@ -881,7 +881,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 const textContent = extractTextContent(result)
                 expect(textContent).toContain('Updated 0 tasks')
                 const structuredContent = extractStructuredContent(result)
-                expect(structuredContent.tasks).toHaveLength(0)
+                expect(structuredContent.tasks).toBeUndefined() // Empty arrays are removed
                 expect(structuredContent.totalCount).toBe(0)
             })
         })

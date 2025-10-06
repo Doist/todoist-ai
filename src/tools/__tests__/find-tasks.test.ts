@@ -190,16 +190,14 @@ describe(`${FIND_TASKS} tool`, () => {
 
             // Verify structured content for empty results
             const structuredContent = extractStructuredContent(result)
-            expect(structuredContent).toEqual(
-                expect.objectContaining({
-                    tasks: [],
-                    totalCount: 0,
-                    hasMore: false,
-                    appliedFilters: expect.objectContaining({
-                        searchText: searchText,
-                    }),
+            expect(structuredContent).toEqual({
+                // tasks array is removed when empty
+                totalCount: 0,
+                hasMore: false,
+                appliedFilters: expect.objectContaining({
+                    searchText: searchText,
                 }),
-            )
+            })
         })
     })
 

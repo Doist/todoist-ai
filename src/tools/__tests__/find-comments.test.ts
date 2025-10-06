@@ -299,15 +299,13 @@ describe(`${FIND_COMMENTS} tool`, () => {
 
             // Verify structured content
             const structuredContent = extractStructuredContent(result)
-            expect(structuredContent).toEqual(
-                expect.objectContaining({
-                    comments: [],
-                    searchType: 'task',
-                    searchId: 'task123',
-                    hasMore: false,
-                    totalCount: 0,
-                }),
-            )
+            expect(structuredContent).toEqual({
+                searchType: 'task',
+                searchId: 'task123',
+                hasMore: false,
+                totalCount: 0,
+                // comments array is removed when empty
+            })
         })
     })
 })

@@ -36,15 +36,13 @@ describe(`${COMPLETE_TASKS} tool`, () => {
 
             // Verify structured content
             const { structuredContent } = result
-            expect(structuredContent).toEqual(
-                expect.objectContaining({
-                    completed: ['task-1', 'task-2', 'task-3'],
-                    failures: [],
-                    totalRequested: 3,
-                    successCount: 3,
-                    failureCount: 0,
-                }),
-            )
+            expect(structuredContent).toEqual({
+                completed: ['task-1', 'task-2', 'task-3'],
+                // failures array is removed when empty
+                totalRequested: 3,
+                successCount: 3,
+                failureCount: 0,
+            })
         })
 
         it('should complete single task', async () => {
@@ -59,15 +57,13 @@ describe(`${COMPLETE_TASKS} tool`, () => {
 
             // Verify structured content
             const { structuredContent } = result
-            expect(structuredContent).toEqual(
-                expect.objectContaining({
-                    completed: ['8485093748'],
-                    failures: [],
-                    totalRequested: 1,
-                    successCount: 1,
-                    failureCount: 0,
-                }),
-            )
+            expect(structuredContent).toEqual({
+                completed: ['8485093748'],
+                // failures array is removed when empty
+                totalRequested: 1,
+                successCount: 1,
+                failureCount: 0,
+            })
         })
 
         it('should handle partial failures gracefully', async () => {

@@ -79,7 +79,7 @@ describe(`${GET_OVERVIEW} tool`, () => {
                     inbox: expect.objectContaining({
                         id: TEST_IDS.PROJECT_INBOX,
                         name: 'Inbox',
-                        sections: expect.any(Array),
+                        // sections array removed if empty
                     }),
                     projects: expect.any(Array),
                     totalProjects: 2,
@@ -100,15 +100,13 @@ describe(`${GET_OVERVIEW} tool`, () => {
 
             // Test structured content sanity checks
             const structuredContent = extractStructuredContent(result)
-            expect(structuredContent).toEqual(
-                expect.objectContaining({
-                    type: 'account_overview',
-                    projects: [],
-                    totalProjects: 0,
-                    totalSections: 0,
-                    hasNestedProjects: false,
-                }),
-            )
+            expect(structuredContent).toEqual({
+                type: 'account_overview',
+                // projects array is removed when empty
+                totalProjects: 0,
+                totalSections: 0,
+                hasNestedProjects: false,
+            })
         })
     })
 
@@ -235,22 +233,19 @@ describe(`${GET_OVERVIEW} tool`, () => {
 
             // Test structured content sanity checks
             const structuredContent = extractStructuredContent(result)
-            expect(structuredContent).toEqual(
-                expect.objectContaining({
-                    type: 'project_overview',
-                    project: expect.objectContaining({
-                        id: 'empty-project-id',
-                        name: 'Empty Project',
-                    }),
-                    sections: [],
-                    tasks: [],
-                    stats: expect.objectContaining({
-                        totalTasks: 0,
-                        totalSections: 0,
-                        tasksWithoutSection: 0,
-                    }),
+            expect(structuredContent).toEqual({
+                type: 'project_overview',
+                project: expect.objectContaining({
+                    id: 'empty-project-id',
+                    name: 'Empty Project',
                 }),
-            )
+                // sections and tasks arrays are removed when empty
+                stats: expect.objectContaining({
+                    totalTasks: 0,
+                    totalSections: 0,
+                    tasksWithoutSection: 0,
+                }),
+            })
         })
     })
 
