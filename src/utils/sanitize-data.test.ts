@@ -46,4 +46,64 @@ describe('removeNullFields', () => {
         const result = removeNullFields(null)
         expect(result).toBeNull()
     })
+
+    it('should remove empty objects and empty arrays', () => {
+        const input = {
+            something: 'hello',
+            another: {},
+            yetAnother: [],
+        }
+
+        const result = removeNullFields(input)
+
+        expect(result).toEqual({
+            something: 'hello',
+        })
+    })
+
+    it('should remove empty objects and empty arrays in nested structures', () => {
+        const input = {
+            name: 'Test',
+            metadata: {},
+            tags: [],
+            nested: {
+                data: 'value',
+                emptyObj: {},
+                emptyArr: [],
+                deepNested: {
+                    anotherEmpty: {},
+                },
+            },
+            items: [
+                { id: 1, data: 'test', empty: {} },
+                { id: 2, list: [] },
+            ],
+        }
+
+        const result = removeNullFields(input)
+
+        expect(result).toEqual({
+            name: 'Test',
+            nested: {
+                data: 'value',
+            },
+            items: [{ id: 1, data: 'test' }, { id: 2 }],
+        })
+    })
+
+    it('should keep arrays with values and objects with properties', () => {
+        const input = {
+            emptyArray: [],
+            arrayWithValues: [1, 2, 3],
+            emptyObject: {},
+            objectWithProps: { key: 'value' },
+        }
+
+        const result = removeNullFields(input)
+
+        expect(result).toEqual({
+            arrayWithValues: [1, 2, 3],
+            objectWithProps: { key: 'value' },
+        })
+    })
 })
