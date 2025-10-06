@@ -52,7 +52,7 @@
         "zod": "^3.25.7"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.2.4",
+        "@biomejs/biome": "2.2.5",
         "@types/express": "^5.0.2",
         "@types/jest": "30.0.0",
         "@types/morgan": "^1.9.9",
