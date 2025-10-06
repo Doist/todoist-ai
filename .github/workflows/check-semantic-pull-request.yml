@@ -20,6 +20,6 @@ jobs:
         timeout-minutes: 5
         steps:
             - name: Validate pull request title
-              uses: amannn/action-semantic-pull-request@0723387faaf9b38adef4775cd42cfd5155ed6017
+              uses: amannn/action-semantic-pull-request@e49f57ce06c1747542fce2243c7a98682384bc0e
               with:
                   validateSingleCommit: true
