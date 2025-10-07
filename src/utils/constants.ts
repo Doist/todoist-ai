@@ -10,7 +10,7 @@ export const ApiLimits = {
     /** Default limit for task listings */
     TASKS_DEFAULT: 10,
     /** Maximum limit for task search and list operations */
-    TASKS_MAX: 50,
+    TASKS_MAX: 100,
     /** Default limit for completed tasks */
     COMPLETED_TASKS_DEFAULT: 50,
     /** Maximum limit for completed tasks */

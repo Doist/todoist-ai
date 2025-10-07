@@ -36,11 +36,12 @@ const search = {
             const { query } = args
 
             // Search both tasks and projects in parallel
+            // Use TASKS_MAX for search since this tool doesn't support pagination
             const [tasksResult, projectsResponse] = await Promise.all([
                 getTasksByFilter({
                     client,
                     query: `search: ${query}`,
-                    limit: ApiLimits.TASKS_DEFAULT,
+                    limit: ApiLimits.TASKS_MAX,
                     cursor: undefined,
                 }),
                 client.getProjects({ limit: ApiLimits.PROJECTS_MAX }),

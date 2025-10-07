@@ -64,11 +64,11 @@ describe(`${SEARCH} tool`, () => {
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
                 query: 'search: important',
-                limit: 10,
+                limit: 100, // TASKS_MAX
                 cursor: undefined,
             })
             expect(mockTodoistApi.getProjects).toHaveBeenCalledWith({
-                limit: 100,
+                limit: 100, // PROJECTS_MAX
             })
 
             // Verify result structure
