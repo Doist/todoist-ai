@@ -60,6 +60,15 @@ return getToolOutput({
 -   **Smart defaults**: Optional parameters, auto-detect intent
 -   **Rich responses**: Structured data + human text + next steps
 
+## OpenAI MCP Tools
+
+**Exception to the Design Philosophy**: The `search` and `fetch` tools follow the [OpenAI MCP specification](https://platform.openai.com/docs/mcp) which requires specific return formats:
+
+- **`search`**: Returns JSON-encoded array of results with `id`, `title`, `url`
+- **`fetch`**: Returns JSON-encoded object with `id`, `title`, `text`, `url`, `metadata`
+
+These tools return raw JSON strings instead of rich responses with next steps, as required by OpenAI's protocol. They use composite IDs (`task:{id}` or `project:{id}`) to distinguish between entity types.
+
 ## Anti-Patterns ❌
 
 -   One-to-one API mapping without added value

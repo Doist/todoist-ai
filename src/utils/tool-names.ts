@@ -37,6 +37,10 @@ export const ToolNames = {
     GET_OVERVIEW: 'get-overview',
     DELETE_OBJECT: 'delete-object',
     USER_INFO: 'user-info',
+
+    // OpenAI MCP tools
+    SEARCH: 'search',
+    FETCH: 'fetch',
 } as const
 
 // Type for all tool names

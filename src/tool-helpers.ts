@@ -152,16 +152,9 @@ async function getTasksByFilter({
     cursor: string | undefined
 }) {
     try {
-        const { results, nextCursor } = await client.getTasksByFilter({
-            query,
-            cursor,
-            limit,
-        })
-
-        return {
-            tasks: results.map(mapTask),
-            nextCursor,
-        }
+        const { results, nextCursor } = await client.getTasksByFilter({ query, cursor, limit })
+        const tasks = results.map(mapTask)
+        return { tasks, nextCursor }
     } catch (error) {
         const parsedError = ErrorSchema.safeParse(error)
         if (!parsedError.success) {
@@ -177,4 +170,14 @@ async function getTasksByFilter({
     }
 }
 
-export { getTasksByFilter, mapTask, mapProject }
+/**
+ * Build a Todoist URL for a task or project.
+ * @param type - The type of object ('task' or 'project')
+ * @param id - The ID of the object
+ * @returns The URL string
+ */
+function buildTodoistUrl(type: 'task' | 'project', id: string): string {
+    return `https://app.todoist.com/app/${type}/${id}`
+}
+
+export { getTasksByFilter, mapTask, mapProject, buildTodoistUrl }

@@ -7,6 +7,7 @@ import { addSections } from './tools/add-sections.js'
 import { addTasks } from './tools/add-tasks.js'
 import { completeTasks } from './tools/complete-tasks.js'
 import { deleteObject } from './tools/delete-object.js'
+import { fetch } from './tools/fetch.js'
 import { findComments } from './tools/find-comments.js'
 import { findCompletedTasks } from './tools/find-completed-tasks.js'
 import { findProjectCollaborators } from './tools/find-project-collaborators.js'
@@ -16,6 +17,7 @@ import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { getOverview } from './tools/get-overview.js'
 import { manageAssignments } from './tools/manage-assignments.js'
+import { search } from './tools/search.js'
 import { updateComments } from './tools/update-comments.js'
 import { updateProjects } from './tools/update-projects.js'
 import { updateSections } from './tools/update-sections.js'
@@ -137,6 +139,10 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     // Assignment and collaboration tools
     registerTool(findProjectCollaborators, server, todoist)
     registerTool(manageAssignments, server, todoist)
+
+    // OpenAI MCP tools
+    registerTool(search, server, todoist)
+    registerTool(fetch, server, todoist)
 
     return server
 }

@@ -116,6 +116,10 @@ For our design philosophy, guidelines, and development patterns, see [docs/tool-
 
 For a complete list of available tools, see the [src/tools](src/tools) directory.
 
+#### OpenAI MCP Compatibility
+
+This server includes `search` and `fetch` tools that follow the [OpenAI MCP specification](https://platform.openai.com/docs/mcp), enabling seamless integration with OpenAI's MCP protocol. These tools return JSON-encoded results optimized for OpenAI's requirements while maintaining compatibility with the broader MCP ecosystem.
+
 ## Dependencies
 
 -   MCP server using the official [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/typescript-sdk?tab=readme-ov-file#installation)

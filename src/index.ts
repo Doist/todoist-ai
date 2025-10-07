@@ -10,6 +10,7 @@ import { addTasks } from './tools/add-tasks.js'
 import { completeTasks } from './tools/complete-tasks.js'
 // General tools
 import { deleteObject } from './tools/delete-object.js'
+import { fetch } from './tools/fetch.js'
 import { findComments } from './tools/find-comments.js'
 import { findCompletedTasks } from './tools/find-completed-tasks.js'
 // Assignment and collaboration tools
@@ -20,6 +21,7 @@ import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { getOverview } from './tools/get-overview.js'
 import { manageAssignments } from './tools/manage-assignments.js'
+import { search } from './tools/search.js'
 import { updateComments } from './tools/update-comments.js'
 import { updateProjects } from './tools/update-projects.js'
 import { updateSections } from './tools/update-sections.js'
@@ -53,6 +55,9 @@ const tools = {
     // Assignment and collaboration tools
     findProjectCollaborators,
     manageAssignments,
+    // OpenAI MCP tools
+    search,
+    fetch,
 }
 
 export { tools, getMcpServer }
@@ -84,4 +89,7 @@ export {
     // Assignment and collaboration tools
     findProjectCollaborators,
     manageAssignments,
+    // OpenAI MCP tools
+    search,
+    fetch,
 }
