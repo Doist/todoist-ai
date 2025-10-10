@@ -13,8 +13,18 @@ const { FIND_TASKS_BY_DATE, GET_OVERVIEW } = ToolNames
 
 const TasksUpdateSchema = z.object({
     id: z.string().min(1).describe('The ID of the task to update.'),
-    content: z.string().optional().describe('The new content of the task.'),
-    description: z.string().optional().describe('The new description of the task.'),
+    content: z
+        .string()
+        .optional()
+        .describe(
+            'The new task name/title. Should be concise and actionable (e.g., "Review PR #123", "Call dentist"). For longer content, use the description field instead. Supports Markdown.',
+        ),
+    description: z
+        .string()
+        .optional()
+        .describe(
+            'New additional details, notes, or context for the task. Use this for longer content rather than putting it in the task name. Supports Markdown.',
+        ),
     projectId: z.string().optional().describe('The new project ID for the task.'),
     sectionId: z.string().optional().describe('The new section ID for the task.'),
     parentId: z.string().optional().describe('The new parent task ID (for subtasks).'),
