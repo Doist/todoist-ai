@@ -119,3 +119,19 @@ This will expose the service at the URL http://localhost:8080/mcp. You can now c
 
 > [!NOTE]
 > You may also need to change the command, passing the full path to your `npx` binary, depending one how you installed `node`.
+
+## Observability (optional)
+
+The MCP server can emit OpenTelemetry traces to any OTLP-compatible backend. Telemetry is disabled by default and will only start when both of the following environment variables are provided:
+
+- `OTEL_EXPORTER_OTLP_ENDPOINT` – the OTLP HTTP endpoint (e.g. `http://127.0.0.1:4318/v1/traces` when sending to a local Datadog Agent)
+- `OTEL_EXPORTER_OTLP_HEADERS` – comma‑separated headers (e.g. `DD-API-KEY=abc123` when sending directly to Datadog intake)
+
+You can optionally set:
+
+- `OTEL_SERVICE_ENV` – logical deployment environment (falls back to `NODE_ENV`)
+- `OTEL_SERVICE_VERSION` – build/version identifier (defaults to the package version)
+
+When telemetry is enabled, each tool invocation is wrapped in a span named `mcp.tool.execute`, tagged with the tool name and success state. Errors are recorded as span exceptions, so you can create Datadog dashboards or alerts around tool failures.
+
+If you leave the OTLP variables unset, nothing is exported and the server runs without OpenTelemetry overhead—ideal for local development.

@@ -1,5 +1,6 @@
 import { TodoistApi } from '@doist/todoist-api-typescript'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { SpanStatusCode, trace } from '@opentelemetry/api'
 import { registerTool } from './mcp-helpers.js'
 import { addComments } from './tools/add-comments.js'
 import { addProjects } from './tools/add-projects.js'
@@ -23,6 +24,65 @@ import { updateProjects } from './tools/update-projects.js'
 import { updateSections } from './tools/update-sections.js'
 import { updateTasks } from './tools/update-tasks.js'
 import { userInfo } from './tools/user-info.js'
+
+const tracer = trace.getTracer('todoist-mcp')
+
+type UnderlyingSetRequestHandler = McpServer['server']['setRequestHandler']
+type BoundUnderlyingSetRequestHandler = OmitThisParameter<UnderlyingSetRequestHandler>
+
+export type SetRequestHandlerWithTracing = (
+    ...args: Parameters<BoundUnderlyingSetRequestHandler>
+) => ReturnType<BoundUnderlyingSetRequestHandler>
+type ToolCallRequest = {
+    id?: number | string
+    params?: { name?: string }
+}
+type ToolCallExtra = {
+    requestInfo?: { headers?: Record<string, string | string[]> }
+}
+
+const SAFE_HEADER_ATTRIBUTE_MAP: Record<string, string> = {
+    'content-type': 'http.request.header.content_type',
+    'user-agent': 'http.request.header.user_agent',
+    'x-client-name': 'http.request.header.x_client_name',
+    'x-request-id': 'http.request.header.x_request_id',
+}
+
+function toHeaderAttributes(
+    headers: Record<string, string | string[] | undefined> | undefined,
+): Record<string, string> {
+    if (!headers) {
+        return {}
+    }
+
+    const normalized: Record<string, string | string[] | undefined> = {}
+    for (const [key, value] of Object.entries(headers)) {
+        normalized[key.toLowerCase()] = value
+    }
+
+    const headerNames = Object.keys(normalized).sort()
+
+    const attributes: Record<string, string> = {}
+    if (headerNames.length > 0) {
+        attributes['http.request.header_names'] = headerNames.join(',')
+    }
+
+    for (const [headerName, attributeName] of Object.entries(SAFE_HEADER_ATTRIBUTE_MAP)) {
+        const value = normalized[headerName]
+        if (!value) {
+            continue
+        }
+
+        const formatted = Array.isArray(value) ? value.join(',') : value
+        if (!formatted) {
+            continue
+        }
+
+        attributes[attributeName] = formatted
+    }
+
+    return attributes
+}
 
 const instructions = `
 ## Todoist Task and Project Management Tools
@@ -81,7 +141,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 ### Common Workflows:
 
 - **Daily Planning**: Use find-tasks-by-date with 'today' and get-overview for project status
-- **Team Assignment**: find-project-collaborators → add-tasks with responsibleUser → manage-assignments for bulk changes  
+- **Team Assignment**: find-project-collaborators → add-tasks with responsibleUser → manage-assignments for bulk changes
 - **Task Search**: find-tasks with multiple filters → update-tasks or complete-tasks based on results
 - **Project Organization**: add-projects → add-sections → add-tasks with projectId and sectionId
 - **Progress Reviews**: find-completed-tasks with date ranges → get-overview for project summaries
@@ -105,6 +165,8 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
             instructions,
         },
     )
+
+    instrumentToolRequests(server)
 
     const todoist = new TodoistApi(todoistApiKey, baseUrl)
 
@@ -145,6 +207,88 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     registerTool(fetch, server, todoist)
 
     return server
+}
+
+function instrumentToolRequests(server: McpServer) {
+    const underlyingServer = server.server
+    const originalSetRequestHandler = underlyingServer.setRequestHandler.bind(underlyingServer)
+
+    const setRequestHandlerWithTracing: SetRequestHandlerWithTracing = (schema, handler) => {
+        const method = schema?.shape?.method?.value
+
+        if (method === 'tools/call') {
+            const wrappedHandler: typeof handler = async (request, extra) => {
+                const typedRequest = request as ToolCallRequest
+                const typedExtra = extra as ToolCallExtra
+
+                if (!typedExtra?.requestInfo) {
+                    return handler(request, extra)
+                }
+
+                const baseAttributes: Record<string, string> = {
+                    'mcp.tool.name': typedRequest.params?.name ?? 'unknown',
+                }
+
+                if (typedRequest?.id !== undefined) {
+                    baseAttributes['mcp.request.id'] = String(typedRequest.id)
+                }
+
+                const clientInfo = underlyingServer.getClientVersion?.()
+                if (clientInfo?.name) {
+                    baseAttributes['mcp.client.name'] = clientInfo.name
+                }
+                if (clientInfo?.version) {
+                    baseAttributes['mcp.client.version'] = clientInfo.version
+                }
+
+                const headerAttributes = toHeaderAttributes(typedExtra.requestInfo.headers)
+                Object.assign(baseAttributes, headerAttributes)
+
+                return tracer.startActiveSpan(
+                    'mcp.http.request',
+                    { attributes: baseAttributes },
+                    async (span) => {
+                        if (!span) {
+                            return handler(request, extra)
+                        }
+
+                        try {
+                            const result = await handler(request, extra)
+
+                            if (result && typeof result === 'object' && 'isError' in result) {
+                                const isError = Boolean((result as { isError?: boolean }).isError)
+                                span.setAttribute('mcp.tool.success', !isError)
+                                span.setStatus({
+                                    code: isError ? SpanStatusCode.ERROR : SpanStatusCode.OK,
+                                })
+                            } else {
+                                span.setAttribute('mcp.tool.success', true)
+                                span.setStatus({ code: SpanStatusCode.OK })
+                            }
+
+                            return result
+                        } catch (error) {
+                            span.setAttribute('mcp.tool.success', false)
+                            const err = error instanceof Error ? error : new Error(String(error))
+                            span.recordException(err)
+                            span.setStatus({ code: SpanStatusCode.ERROR, message: err.message })
+                            throw error
+                        } finally {
+                            span.end()
+                        }
+                    },
+                )
+            }
+
+            const result = originalSetRequestHandler(schema, wrappedHandler)
+            underlyingServer.setRequestHandler = originalSetRequestHandler
+            return result
+        }
+
+        return originalSetRequestHandler(schema, handler)
+    }
+
+    underlyingServer.setRequestHandler = setRequestHandlerWithTracing
 }
 
 export { getMcpServer }
