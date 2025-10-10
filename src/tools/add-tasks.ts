@@ -14,8 +14,18 @@ import {
 import { ToolNames } from '../utils/tool-names.js'
 
 const TaskSchema = z.object({
-    content: z.string().min(1).describe('The content of the task to create.'),
-    description: z.string().optional().describe('The description of the task.'),
+    content: z
+        .string()
+        .min(1)
+        .describe(
+            'The task name/title. Should be concise and actionable (e.g., "Review PR #123", "Call dentist"). For longer content, use the description field instead. Supports Markdown.',
+        ),
+    description: z
+        .string()
+        .optional()
+        .describe(
+            'Additional details, notes, or context for the task. Use this for longer content rather than putting it in the task name. Supports Markdown.',
+        ),
     priority: PrioritySchema.optional().describe(
         'The priority of the task: p1 (highest), p2 (high), p3 (medium), p4 (lowest/default).',
     ),
