@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.10.0](https://github.com/Doist/todoist-ai/compare/v4.9.4...v4.10.0) (2025-10-10)
+
+
+### Features
+
+* add OpenAI-compliant `search` and `fetch` tools ([#134](https://github.com/Doist/todoist-ai/issues/134)) ([153289c](https://github.com/Doist/todoist-ai/commit/153289c5cf02b2da6b3f4cf6e8a7c681b3ee3aec))
+* Clarify content vs description usage and Markdown support ([#139](https://github.com/Doist/todoist-ai/issues/139)) ([cb410a2](https://github.com/Doist/todoist-ai/commit/cb410a2c16670ec07ee2d812ba961075c3f20dda))
+
 ## [4.9.4](https://github.com/Doist/todoist-ai/compare/v4.9.3...v4.9.4) (2025-10-06)
 
 
