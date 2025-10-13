@@ -52,16 +52,34 @@ const findCompletedTasks = {
     description: 'Get completed tasks.',
     parameters: ArgsSchema,
     async execute(args, client) {
-        const { getBy, labels, labelsOperator, ...rest } = args
+        const { getBy, labels, labelsOperator, since, until, ...rest } = args
         const labelsFilter = generateLabelsFilter(labels, labelsOperator)
+
+        // Get user timezone to convert local dates to UTC
+        const user = await client.getUser()
+        const userGmtOffset = user.tzInfo?.gmtString || '+00:00'
+
+        // Convert user's local date to UTC timestamps
+        // This ensures we capture the entire day from the user's perspective
+        const sinceWithOffset = `${since}T00:00:00${userGmtOffset}`
+        const untilWithOffset = `${until}T23:59:59${userGmtOffset}`
+
+        // Parse and convert to UTC
+        const sinceDateTime = new Date(sinceWithOffset).toISOString()
+        const untilDateTime = new Date(untilWithOffset).toISOString()
+
         const { items, nextCursor } =
             getBy === 'completion'
                 ? await client.getCompletedTasksByCompletionDate({
                       ...rest,
+                      since: sinceDateTime,
+                      until: untilDateTime,
                       ...(labelsFilter ? { filterQuery: labelsFilter, filterLang: 'en' } : {}),
                   })
                 : await client.getCompletedTasksByDueDate({
                       ...rest,
+                      since: sinceDateTime,
+                      until: untilDateTime,
                       ...(labelsFilter ? { filterQuery: labelsFilter, filterLang: 'en' } : {}),
                   })
         const mappedTasks = items.map(mapTask)

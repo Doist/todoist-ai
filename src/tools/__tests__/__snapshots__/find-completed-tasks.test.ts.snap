@@ -62,3 +62,12 @@ Preview:
 Next:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
+
+exports[`find-completed-tasks tool timezone handling should convert user timezone to UTC correctly (Europe/Madrid) 1`] = `
+"Completed tasks (by completed date): 1 (limit 50).
+Filter: completed date: 2025-10-11 to 2025-10-11.
+Preview:
+    Task completed in Madrid timezone • P4 • id=8485093750
+Next:
+- Use find-tasks-by-date for active tasks or get-overview for current productivity."
+`;

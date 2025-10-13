@@ -8,6 +8,7 @@ import { findCompletedTasks } from '../find-completed-tasks.js'
 const mockTodoistApi = {
     getCompletedTasksByCompletionDate: jest.fn(),
     getCompletedTasksByDueDate: jest.fn(),
+    getUser: jest.fn(),
 } as unknown as jest.Mocked<TodoistApi>
 
 const { FIND_COMPLETED_TASKS } = ToolNames
@@ -15,6 +16,20 @@ const { FIND_COMPLETED_TASKS } = ToolNames
 describe(`${FIND_COMPLETED_TASKS} tool`, () => {
     beforeEach(() => {
         jest.clearAllMocks()
+
+        // Mock default user with UTC timezone
+        mockTodoistApi.getUser.mockResolvedValue({
+            id: 'test-user-id',
+            fullName: 'Test User',
+            email: 'test@example.com',
+            tzInfo: {
+                timezone: 'UTC',
+                gmtString: '+00:00',
+                hours: 0,
+                minutes: 0,
+                isDst: 0,
+            },
+        } as any)
     })
 
     describe('getting completed tasks by completion date (default)', () => {
@@ -57,8 +72,8 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
             )
 
             expect(mockTodoistApi.getCompletedTasksByCompletionDate).toHaveBeenCalledWith({
-                since: '2025-08-10',
-                until: '2025-08-15',
+                since: '2025-08-10T00:00:00.000Z',
+                until: '2025-08-15T23:59:59.000Z',
                 limit: 50,
             })
 
@@ -86,8 +101,8 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
             )
 
             expect(mockTodoistApi.getCompletedTasksByCompletionDate).toHaveBeenCalledWith({
-                since: '2025-08-01',
-                until: '2025-08-31',
+                since: '2025-08-01T00:00:00.000Z',
+                until: '2025-08-31T23:59:59.000Z',
                 projectId: 'specific-project-id',
                 limit: 100,
                 cursor: 'current-cursor',
@@ -137,8 +152,8 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
             )
 
             expect(mockTodoistApi.getCompletedTasksByDueDate).toHaveBeenCalledWith({
-                since: '2025-08-10',
-                until: '2025-08-20',
+                since: '2025-08-10T00:00:00.000Z',
+                until: '2025-08-20T23:59:59.000Z',
                 limit: 50,
             })
             expect(mockTodoistApi.getCompletedTasksByCompletionDate).not.toHaveBeenCalled()
@@ -209,8 +224,8 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                 const result = await findCompletedTasks.execute(params, mockTodoistApi)
 
                 expect(mockMethod).toHaveBeenCalledWith({
-                    since: params.since,
-                    until: params.until,
+                    since: `${params.since}T00:00:00.000Z`,
+                    until: `${params.until}T23:59:59.000Z`,
                     limit: params.limit,
                     filterQuery: expectedFilter,
                     filterLang: 'en',
@@ -237,8 +252,8 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
             await findCompletedTasks.execute(params, mockTodoistApi)
 
             expect(mockTodoistApi.getCompletedTasksByCompletionDate).toHaveBeenCalledWith({
-                since: params.since,
-                until: params.until,
+                since: `${params.since}T00:00:00.000Z`,
+                until: `${params.until}T23:59:59.000Z`,
                 limit: params.limit,
             })
         })
@@ -268,8 +283,8 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
             const result = await findCompletedTasks.execute(params, mockTodoistApi)
 
             expect(mockTodoistApi.getCompletedTasksByDueDate).toHaveBeenCalledWith({
-                since: params.since,
-                until: params.until,
+                since: `${params.since}T00:00:00.000Z`,
+                until: `${params.until}T23:59:59.000Z`,
                 limit: params.limit,
                 projectId: params.projectId,
                 sectionId: params.sectionId,
@@ -279,6 +294,60 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
+        })
+    })
+
+    describe('timezone handling', () => {
+        it('should convert user timezone to UTC correctly (Europe/Madrid)', async () => {
+            // Mock user with Madrid timezone
+            mockTodoistApi.getUser.mockResolvedValue({
+                id: 'test-user-id',
+                fullName: 'Test User',
+                email: 'test@example.com',
+                tzInfo: {
+                    timezone: 'Europe/Madrid',
+                    gmtString: '+02:00',
+                    hours: 2,
+                    minutes: 0,
+                    isDst: 0,
+                },
+            } as any)
+
+            const mockCompletedTasks: Task[] = [
+                createMockTask({
+                    id: '8485093750',
+                    content: 'Task completed in Madrid timezone',
+                    completedAt: '2025-10-11T15:30:00Z',
+                }),
+            ]
+
+            mockTodoistApi.getCompletedTasksByCompletionDate.mockResolvedValue({
+                items: mockCompletedTasks,
+                nextCursor: null,
+            })
+
+            const result = await findCompletedTasks.execute(
+                {
+                    getBy: 'completion',
+                    limit: 50,
+                    since: '2025-10-11',
+                    until: '2025-10-11',
+                    labels: [],
+                    labelsOperator: 'or' as const,
+                },
+                mockTodoistApi,
+            )
+
+            // Should convert Madrid local time to UTC
+            // 2025-10-11 00:00:00 +02:00 = 2025-10-10 22:00:00 UTC
+            // 2025-10-11 23:59:59 +02:00 = 2025-10-11 21:59:59 UTC
+            expect(mockTodoistApi.getCompletedTasksByCompletionDate).toHaveBeenCalledWith({
+                since: '2025-10-10T22:00:00.000Z',
+                until: '2025-10-11T21:59:59.000Z',
+                limit: 50,
+            })
+
+            expect(extractTextContent(result)).toMatchSnapshot()
         })
     })
 
