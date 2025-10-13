@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.11.0](https://github.com/Doist/todoist-ai/compare/v4.10.0...v4.11.0) (2025-10-13)
+
+
+### Features
+
+* Improve findCompletedTasks to handle user timezones ([#143](https://github.com/Doist/todoist-ai/issues/143)) ([c27d897](https://github.com/Doist/todoist-ai/commit/c27d8973d0ea9342f8b1e56659fca900f920ddb3))
+
 ## [4.10.0](https://github.com/Doist/todoist-ai/compare/v4.9.4...v4.10.0) (2025-10-10)
 
 
