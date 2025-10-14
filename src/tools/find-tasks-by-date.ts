@@ -2,7 +2,7 @@ import { addDays, formatISO } from 'date-fns'
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { filterTasksByResponsibleUser, getTasksByFilter } from '../tool-helpers.js'
+import { getTasksByFilter, RESPONSIBLE_USER_FILTERING } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import {
@@ -47,6 +47,12 @@ const ArgsSchema = {
         .describe(
             'The cursor to get the next page of tasks (cursor is obtained from the previous call to this tool, with the same parameters).',
         ),
+    responsibleUserFiltering: z
+        .enum(RESPONSIBLE_USER_FILTERING)
+        .optional()
+        .describe(
+            'How to filter by responsible user. "assigned" = only tasks assigned to others; "unassignedOrMe" = only unassigned tasks or tasks assigned to me; "all" = all tasks regardless of assignment. Default is "unassignedOrMe".',
+        ),
     ...LabelsSchema,
 }
 
@@ -63,13 +69,13 @@ const findTasksByDate = {
         }
 
         let query = ''
-        const todoistUser = await client.getUser()
 
         if (args.overdueOption === 'overdue-only') {
             query = 'overdue'
         } else if (args.startDate === 'today') {
             // For 'today', include overdue unless explicitly excluded
-            query = args.overdueOption === 'exclude-overdue' ? 'today' : 'today | overdue'
+            // Use parentheses to ensure correct operator precedence when combining with other filters
+            query = args.overdueOption === 'exclude-overdue' ? 'today' : '(today | overdue)'
         } else if (args.startDate) {
             // For specific dates, never include overdue tasks
             const startDate = args.startDate
@@ -86,6 +92,19 @@ const findTasksByDate = {
             query += `(${labelsFilter})`
         }
 
+        // Add responsible user filtering to the query (backend filtering)
+        const filteringMode = args.responsibleUserFiltering || 'unassignedOrMe'
+        if (filteringMode === 'unassignedOrMe') {
+            // Exclude tasks assigned to others (keeps unassigned + assigned to me)
+            if (query.length > 0) query += ' & '
+            query += '!assigned to: others'
+        } else if (filteringMode === 'assigned') {
+            // Only tasks assigned to others
+            if (query.length > 0) query += ' & '
+            query += 'assigned to: others'
+        }
+        // For 'all', don't add any assignment filter
+
         const result = await getTasksByFilter({
             client,
             query,
@@ -93,12 +112,8 @@ const findTasksByDate = {
             limit: args.limit,
         })
 
-        // Apply responsible user filtering - only show unassigned tasks or tasks assigned to current user
-        const filteredTasks = filterTasksByResponsibleUser({
-            tasks: result.tasks,
-            resolvedAssigneeId: undefined,
-            currentUserId: todoistUser.id,
-        })
+        // No need for post-fetch filtering since it's handled in the query
+        const filteredTasks = result.tasks
 
         const textContent = generateTextContent({
             tasks: filteredTasks,

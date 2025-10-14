@@ -13,12 +13,12 @@ import {
 import { ToolNames } from '../../utils/tool-names.js'
 import { findTasksByDate } from '../find-tasks-by-date.js'
 
-// Mock the tool helpers
+// Mock only getTasksByFilter, use actual implementations for everything else
 jest.mock('../../tool-helpers', () => {
     const actual = jest.requireActual('../../tool-helpers') as typeof import('../../tool-helpers')
     return {
+        ...actual,
         getTasksByFilter: jest.fn(),
-        filterTasksByResponsibleUser: actual.filterTasksByResponsibleUser,
     }
 })
 
@@ -81,7 +81,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             // Verify the query uses daysCount=1 by checking the end date calculation
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: '(due after: 2025-08-20 | due: 2025-08-20) & due before: 2025-08-21',
+                query: '(due after: 2025-08-20 | due: 2025-08-20) & due before: 2025-08-21 & !assigned to: others',
                 cursor: undefined,
                 limit: 50,
             })
@@ -102,7 +102,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: 'today | overdue',
+                query: '(today | overdue) & !assigned to: others',
                 cursor: undefined,
                 limit: 50,
             })
@@ -304,7 +304,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     limit: 50,
                     labels: ['work'],
                 },
-                expectedQueryPattern: 'today | overdue & ((@work))', // Will be combined with date query
+                expectedQueryPattern: '(today | overdue) & ((@work)) & !assigned to: others', // Will be combined with date query
             },
             {
                 name: 'multiple labels with AND operator',
@@ -315,7 +315,8 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     labels: ['work', 'urgent'],
                     labelsOperator: 'and' as const,
                 },
-                expectedQueryPattern: 'today | overdue & ((@work  &  @urgent))',
+                expectedQueryPattern:
+                    '(today | overdue) & ((@work  &  @urgent)) & !assigned to: others',
             },
             {
                 name: 'multiple labels with OR operator',
@@ -424,6 +425,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
 
     describe('responsible user filtering', () => {
         it('should filter results to show only unassigned tasks or tasks assigned to current user', async () => {
+            // Backend filtering: API should only return unassigned + assigned to me
             const mockTasks = [
                 createMappedTask({
                     id: TEST_IDS.TASK_1,
@@ -437,21 +439,28 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     dueDate: '2025-08-15',
                     responsibleUid: null, // Unassigned
                 }),
-                createMappedTask({
-                    id: TEST_IDS.TASK_3,
-                    content: 'Someone else task',
-                    dueDate: '2025-08-15',
-                    responsibleUid: 'other-user-id', // Assigned to someone else
-                }),
             ]
 
             const mockResponse = { tasks: mockTasks, nextCursor: null }
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'today', daysCount: 1, limit: 50 },
+                {
+                    startDate: 'today',
+                    daysCount: 1,
+                    limit: 50,
+                    responsibleUserFiltering: 'unassignedOrMe',
+                },
                 mockTodoistApi,
             )
+
+            // Verify the query includes the assignment filter
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: '(today | overdue) & !assigned to: others',
+                cursor: undefined,
+                limit: 50,
+            })
 
             const structuredContent = extractStructuredContent(result)
             // Should only return tasks 1 and 2, not task 3
@@ -463,6 +472,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
         })
 
         it('should filter overdue results to show only unassigned tasks or tasks assigned to current user', async () => {
+            // Backend filtering: API should only return unassigned + assigned to me
             const mockTasks = [
                 createMappedTask({
                     id: TEST_IDS.TASK_1,
@@ -476,21 +486,28 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     dueDate: '2025-08-10',
                     responsibleUid: null, // Unassigned
                 }),
-                createMappedTask({
-                    id: TEST_IDS.TASK_3,
-                    content: 'Someone else overdue task',
-                    dueDate: '2025-08-10',
-                    responsibleUid: 'other-user-id', // Assigned to someone else
-                }),
             ]
 
             const mockResponse = { tasks: mockTasks, nextCursor: null }
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { overdueOption: 'overdue-only', daysCount: 1, limit: 50 },
+                {
+                    overdueOption: 'overdue-only',
+                    daysCount: 1,
+                    limit: 50,
+                    responsibleUserFiltering: 'unassignedOrMe',
+                },
                 mockTodoistApi,
             )
+
+            // Verify the query includes the assignment filter
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: 'overdue & !assigned to: others',
+                cursor: undefined,
+                limit: 50,
+            })
 
             const structuredContent = extractStructuredContent(result)
             // Should only return tasks 1 and 2, not task 3
