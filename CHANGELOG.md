@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.12.0](https://github.com/Doist/todoist-ai/compare/v4.11.0...v4.12.0) (2025-10-14)
+
+
+### Features
+
+* In find-tasks-by-date use backend filtering for responsible user ([#145](https://github.com/Doist/todoist-ai/issues/145)) ([5d1e140](https://github.com/Doist/todoist-ai/commit/5d1e1400f639e8c802019421eb0437ef39c67a64))
+
 ## [4.11.0](https://github.com/Doist/todoist-ai/compare/v4.10.0...v4.11.0) (2025-10-13)
 
 
