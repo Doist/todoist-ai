@@ -52,7 +52,7 @@
         "zod": "^3.25.7"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.2.5",
+        "@biomejs/biome": "2.2.6",
         "@types/express": "^5.0.2",
         "@types/jest": "30.0.0",
         "@types/morgan": "^1.9.9",
@@ -65,7 +65,7 @@
         "morgan": "^1.10.0",
         "nodemon": "^3.1.10",
         "rimraf": "^6.0.1",
-        "ts-jest": "29.4.4",
+        "ts-jest": "29.4.5",
         "typescript": "^5.8.3"
     },
     "lint-staged": {
