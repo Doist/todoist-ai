@@ -1,19 +1,19 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, vi } from 'vitest'
 import { extractTextContent } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { completeTasks } from '../complete-tasks.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    closeTask: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    closeTask: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { COMPLETE_TASKS, GET_OVERVIEW } = ToolNames
 
 describe(`${COMPLETE_TASKS} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('completing multiple tasks', () => {

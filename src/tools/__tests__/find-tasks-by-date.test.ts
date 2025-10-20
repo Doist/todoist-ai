@@ -1,5 +1,5 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, type MockedFunction, vi } from 'vitest'
 import { getTasksByFilter } from '../../tool-helpers.js'
 import {
     createMappedTask,
@@ -15,40 +15,42 @@ import { resolveUserNameToId } from '../../utils/user-resolver.js'
 import { findTasksByDate } from '../find-tasks-by-date.js'
 
 // Mock only getTasksByFilter, use actual implementations for everything else
-jest.mock('../../tool-helpers', () => {
-    const actual = jest.requireActual('../../tool-helpers') as typeof import('../../tool-helpers')
+vi.mock('../../tool-helpers', async () => {
+    const actual = (await vi.importActual(
+        '../../tool-helpers',
+    )) as typeof import('../../tool-helpers')
     return {
         ...actual,
-        getTasksByFilter: jest.fn(),
+        getTasksByFilter: vi.fn(),
     }
 })
 
 // Mock user resolver
-jest.mock('../../utils/user-resolver', () => ({
-    resolveUserNameToId: jest.fn(),
+vi.mock('../../utils/user-resolver', () => ({
+    resolveUserNameToId: vi.fn(),
 }))
 
-const mockGetTasksByFilter = getTasksByFilter as jest.MockedFunction<typeof getTasksByFilter>
-const mockResolveUserNameToId = resolveUserNameToId as jest.MockedFunction<
+const mockGetTasksByFilter = getTasksByFilter as MockedFunction<typeof getTasksByFilter>
+const mockResolveUserNameToId = resolveUserNameToId as MockedFunction<
     typeof resolveUserNameToId
 >
 
 // Mock the Todoist API (not directly used by find-tasks-by-date, but needed for type)
 const mockTodoistApi = {
-    getUser: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    getUser: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 // Mock the Todoist User
 const mockTodoistUser = createMockUser()
 
 // Mock date-fns functions to make tests deterministic
-jest.mock('date-fns', () => ({
-    addDays: jest.fn((date: string | Date, amount: number) => {
+vi.mock('date-fns', () => ({
+    addDays: vi.fn((date: string | Date, amount: number) => {
         const d = new Date(date)
         d.setDate(d.getDate() + amount)
         return d
     }),
-    formatISO: jest.fn((date: string | Date, options?: { representation?: string }) => {
+    formatISO: vi.fn((date: string | Date, options?: { representation?: string }) => {
         if (typeof date === 'string') {
             return date // Return string dates as-is
         }
@@ -63,15 +65,15 @@ const { FIND_TASKS_BY_DATE, UPDATE_TASKS } = ToolNames
 
 describe(`${FIND_TASKS_BY_DATE} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         mockTodoistApi.getUser.mockResolvedValue(mockTodoistUser)
 
         // Mock current date to make tests deterministic
-        jest.spyOn(Date, 'now').mockReturnValue(new Date('2025-08-15T10:00:00Z').getTime())
+        vi.spyOn(Date, 'now').mockReturnValue(new Date('2025-08-15T10:00:00Z').getTime())
     })
 
     afterEach(() => {
-        jest.restoreAllMocks()
+        vi.restoreAllMocks()
     })
 
     describe('listing tasks by date range', () => {

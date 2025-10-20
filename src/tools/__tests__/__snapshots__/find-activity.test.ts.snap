@@ -1,11 +1,11 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`find-activity tool basic functionality should handle empty results 1`] = `
+exports[`find-activity tool > basic functionality > should handle empty results 1`] = `
 "Activity events: 0 (limit 20).
 No results. No activity events match the specified filters; Note: Activity logs only show recent events."
 `;
 
-exports[`find-activity tool basic functionality should retrieve activity events with default parameters 1`] = `
+exports[`find-activity tool > basic functionality > should retrieve activity events with default parameters 1`] = `
 "Activity events: 2 (limit 20).
 Preview:
     [Oct 23, 10:00] added task • id=task-456 • by=user-001 • project=project-789
@@ -15,7 +15,7 @@ Next:
 - Review completed tasks to track productivity"
 `;
 
-exports[`find-activity tool filtering should support multiple filters simultaneously 1`] = `
+exports[`find-activity tool > filtering > should support multiple filters simultaneously 1`] = `
 "Activity: completed tasks: 1 (limit 50).
 Filter: project: project-work; initiator: user-bob.
 Preview:

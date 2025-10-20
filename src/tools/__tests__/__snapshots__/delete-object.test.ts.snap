@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`delete-object tool deleting projects should delete a project by ID 1`] = `
+exports[`delete-object tool > deleting projects > should delete a project by ID 1`] = `
 "Deleted project: id=6cfCcrrCFg2xP94Q
 Next:
 - Use find-projects to see remaining projects
@@ -8,7 +8,7 @@ Next:
 - Use get-overview to review your updated project structure"
 `;
 
-exports[`delete-object tool deleting sections should delete a section by ID 1`] = `
+exports[`delete-object tool > deleting sections > should delete a section by ID 1`] = `
 "Deleted section: id=section-123
 Next:
 - Use find-sections to see remaining sections in the project
@@ -16,7 +16,7 @@ Next:
 - Use find-tasks with projectId to see unorganized tasks"
 `;
 
-exports[`delete-object tool deleting tasks should delete a task by ID 1`] = `
+exports[`delete-object tool > deleting tasks > should delete a task by ID 1`] = `
 "Deleted task: id=8485093748
 Next:
 - Use find-tasks-by-date to see remaining tasks for today

@@ -1,13 +1,13 @@
 import type { Comment, TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, vi } from 'vitest'
 import { extractStructuredContent, extractTextContent } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { addComments } from '../add-comments.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    addComment: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    addComment: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { ADD_COMMENTS } = ToolNames
 
@@ -27,7 +27,7 @@ const createMockComment = (overrides: Partial<Comment> = {}): Comment => ({
 
 describe(`${ADD_COMMENTS} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('adding comments to tasks', () => {

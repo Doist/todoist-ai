@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`add-projects tool creating a single project should create a project and return mapped result 1`] = `
+exports[`add-projects tool > creating a single project > should create a project and return mapped result 1`] = `
 "Added 1 project:
 • test-abc123def456-project (id=6cfCcrrCFg2xP94Q)
 Next:
@@ -9,7 +9,7 @@ Next:
 - Use get-overview with projectId=6cfCcrrCFg2xP94Q to see project structure"
 `;
 
-exports[`add-projects tool creating a single project should create project with isFavorite and viewStyle options 1`] = `
+exports[`add-projects tool > creating a single project > should create project with isFavorite and viewStyle options 1`] = `
 "Added 1 project:
 • Board Project (id=project-789)
 Next:
@@ -18,7 +18,7 @@ Next:
 - Use get-overview with projectId=project-789 to see project structure"
 `;
 
-exports[`add-projects tool creating a single project should create project with parentId to create a sub-project 1`] = `
+exports[`add-projects tool > creating a single project > should create project with parentId to create a sub-project 1`] = `
 "Added 1 project:
 • Child Project (id=project-child)
 Next:
@@ -27,7 +27,7 @@ Next:
 - Use get-overview with projectId=project-child to see project structure"
 `;
 
-exports[`add-projects tool creating a single project should handle different project properties from API 1`] = `
+exports[`add-projects tool > creating a single project > should handle different project properties from API 1`] = `
 "Added 1 project:
 • My Blue Project (id=project-456)
 Next:
@@ -36,7 +36,7 @@ Next:
 - Use get-overview with projectId=project-456 to see project structure"
 `;
 
-exports[`add-projects tool creating multiple projects should create multiple projects and return mapped results 1`] = `
+exports[`add-projects tool > creating multiple projects > should create multiple projects and return mapped results 1`] = `
 "Added 3 projects:
 • First Project (id=project-1)
 • Second Project (id=project-2)

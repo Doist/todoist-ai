@@ -1,5 +1,5 @@
 import type { CurrentUser, TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, vi } from 'vitest'
 import {
     extractStructuredContent,
     extractTextContent,
@@ -10,8 +10,8 @@ import { userInfo } from '../user-info.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    getUser: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    getUser: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { USER_INFO } = ToolNames
 
@@ -55,7 +55,7 @@ function createMockUser(overrides: Partial<CurrentUser> = {}): CurrentUser {
 
 describe(`${USER_INFO} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     it('should generate user info with all required fields', async () => {

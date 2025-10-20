@@ -1,5 +1,5 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, vi } from 'vitest'
 import {
     createMockApiResponse,
     createMockProject,
@@ -13,14 +13,14 @@ import { findProjects } from '../find-projects.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    getProjects: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    getProjects: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { FIND_PROJECTS } = ToolNames
 
 describe(`${FIND_PROJECTS} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('listing all projects', () => {

@@ -1,21 +1,21 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, vi } from 'vitest'
 import { extractTextContent } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { deleteObject } from '../delete-object.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    deleteProject: jest.fn(),
-    deleteSection: jest.fn(),
-    deleteTask: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    deleteProject: vi.fn(),
+    deleteSection: vi.fn(),
+    deleteTask: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { FIND_PROJECTS, FIND_TASKS_BY_DATE, DELETE_OBJECT } = ToolNames
 
 describe(`${DELETE_OBJECT} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('deleting projects', () => {

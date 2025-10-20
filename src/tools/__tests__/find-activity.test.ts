@@ -1,13 +1,13 @@
 import type { ActivityEvent, TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, vi } from 'vitest'
 import { extractTextContent } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { findActivity } from '../find-activity.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    getActivityLogs: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    getActivityLogs: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { FIND_ACTIVITY } = ToolNames
 
@@ -31,7 +31,7 @@ function createMockActivityEvent(overrides: Partial<ActivityEvent> = {}): Activi
 
 describe(`${FIND_ACTIVITY} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('basic functionality', () => {
