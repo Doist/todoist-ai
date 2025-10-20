@@ -1,8 +1,14 @@
 import { addDays, formatISO } from 'date-fns'
 import { z } from 'zod'
+import {
+    appendToQuery,
+    buildResponsibleUserQueryFilter,
+    RESPONSIBLE_USER_FILTERING,
+    resolveResponsibleUser,
+} from '../filter-helpers.js'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { getTasksByFilter, RESPONSIBLE_USER_FILTERING } from '../tool-helpers.js'
+import { getTasksByFilter } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import {
@@ -12,7 +18,6 @@ import {
     summarizeList,
 } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
-import { resolveUserNameToId } from '../utils/user-resolver.js'
 
 const ArgsSchema = {
     startDate: z
@@ -74,19 +79,9 @@ const findTasksByDate = {
         }
 
         // Resolve assignee name to user ID if provided
-        let resolvedAssigneeId: string | undefined = args.responsibleUser
-        let assigneeEmail: string | undefined
-        if (args.responsibleUser) {
-            const resolved = await resolveUserNameToId(client, args.responsibleUser)
-            if (resolved) {
-                resolvedAssigneeId = resolved.userId
-                assigneeEmail = resolved.email
-            } else {
-                throw new Error(
-                    `Could not find user: "${args.responsibleUser}". Make sure the user is a collaborator on a shared project.`,
-                )
-            }
-        }
+        const resolved = await resolveResponsibleUser(client, args.responsibleUser)
+        const resolvedAssigneeId = resolved?.userId
+        const assigneeEmail = resolved?.email
 
         let query = ''
 
@@ -104,33 +99,19 @@ const findTasksByDate = {
             query = `(due after: ${startDate} | due: ${startDate}) & due before: ${endDateStr}`
         }
 
+        // Add labels filter
         const labelsFilter = generateLabelsFilter(args.labels, args.labelsOperator)
         if (labelsFilter.length > 0) {
-            // If there is already a query, we need to append the & operator first
-            if (query.length > 0) query += ' & '
-            // Add the labels to the filter
-            query += `(${labelsFilter})`
+            query = appendToQuery(query, `(${labelsFilter})`)
         }
 
         // Add responsible user filtering to the query (backend filtering)
-        if (resolvedAssigneeId && assigneeEmail) {
-            // If specific user is provided, filter by that user
-            if (query.length > 0) query += ' & '
-            query += `assigned to: ${assigneeEmail}`
-        } else {
-            // Otherwise use the filtering mode
-            const filteringMode = args.responsibleUserFiltering || 'unassignedOrMe'
-            if (filteringMode === 'unassignedOrMe') {
-                // Exclude tasks assigned to others (keeps unassigned + assigned to me)
-                if (query.length > 0) query += ' & '
-                query += '!assigned to: others'
-            } else if (filteringMode === 'assigned') {
-                // Only tasks assigned to others
-                if (query.length > 0) query += ' & '
-                query += 'assigned to: others'
-            }
-            // For 'all', don't add any assignment filter
-        }
+        const responsibleUserFilter = buildResponsibleUserQueryFilter({
+            resolvedAssigneeId,
+            assigneeEmail,
+            responsibleUserFiltering: args.responsibleUserFiltering,
+        })
+        query = appendToQuery(query, responsibleUserFilter)
 
         const result = await getTasksByFilter({
             client,

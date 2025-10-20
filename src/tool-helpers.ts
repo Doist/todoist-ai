@@ -8,8 +8,15 @@ import type {
 import z from 'zod'
 import { formatDuration } from './utils/duration-parser.js'
 
-export const RESPONSIBLE_USER_FILTERING = ['assigned', 'unassignedOrMe', 'all'] as const
-export type ResponsibleUserFiltering = (typeof RESPONSIBLE_USER_FILTERING)[number]
+// Re-export filter helpers for backward compatibility
+export {
+    appendToQuery,
+    buildResponsibleUserQueryFilter,
+    filterTasksByResponsibleUser,
+    RESPONSIBLE_USER_FILTERING,
+    type ResponsibleUserFiltering,
+    resolveResponsibleUser,
+} from './filter-helpers.js'
 
 export type Project = PersonalProject | WorkspaceProject
 
@@ -19,37 +26,6 @@ export function isPersonalProject(project: Project): project is PersonalProject 
 
 export function isWorkspaceProject(project: Project): project is WorkspaceProject {
     return 'accessLevel' in project
-}
-
-/**
- * Filters tasks based on responsible user logic:
- * - If resolvedAssigneeId is provided: returns only tasks assigned to that user
- * - If no resolvedAssigneeId: returns only unassigned tasks or tasks assigned to current user
- * @param tasks - Array of tasks to filter (must have responsibleUid property)
- * @param resolvedAssigneeId - The resolved assignee ID to filter by (optional)
- * @param currentUserId - The current authenticated user's ID
- * @returns Filtered array of tasks
- */
-export function filterTasksByResponsibleUser<T extends { responsibleUid: string | null }>({
-    tasks,
-    resolvedAssigneeId,
-    currentUserId,
-    responsibleUserFiltering = 'unassignedOrMe',
-}: {
-    tasks: T[]
-    resolvedAssigneeId: string | undefined
-    currentUserId: string
-    responsibleUserFiltering?: ResponsibleUserFiltering
-}): T[] {
-    if (resolvedAssigneeId) {
-        // If responsibleUser provided, only return tasks assigned to that user
-        return tasks.filter((task) => task.responsibleUid === resolvedAssigneeId)
-    } else {
-        // If no responsibleUser, only return unassigned tasks or tasks assigned to current user
-        return responsibleUserFiltering === 'unassignedOrMe'
-            ? tasks.filter((task) => !task.responsibleUid || task.responsibleUid === currentUserId)
-            : tasks
-    }
 }
 
 /**
@@ -180,4 +156,4 @@ function buildTodoistUrl(type: 'task' | 'project', id: string): string {
     return `https://app.todoist.com/app/${type}/${id}`
 }
 
-export { getTasksByFilter, mapTask, mapProject, buildTodoistUrl }
+export { buildTodoistUrl, getTasksByFilter, mapProject, mapTask }

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { appendToQuery, resolveResponsibleUser } from '../filter-helpers.js'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask } from '../tool-helpers.js'
@@ -6,7 +7,6 @@ import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
-import { resolveUserNameToId } from '../utils/user-resolver.js'
 
 const { FIND_TASKS_BY_DATE, GET_OVERVIEW } = ToolNames
 
@@ -60,32 +60,15 @@ const findCompletedTasks = {
         const { getBy, labels, labelsOperator, since, until, responsibleUser, ...rest } = args
 
         // Resolve assignee name to user ID if provided
-        let resolvedAssigneeId: string | undefined = responsibleUser
-        let assigneeEmail: string | undefined
-        if (responsibleUser) {
-            const resolved = await resolveUserNameToId(client, responsibleUser)
-            if (resolved) {
-                resolvedAssigneeId = resolved.userId
-                assigneeEmail = resolved.email
-            } else {
-                throw new Error(
-                    `Could not find user: "${responsibleUser}". Make sure the user is a collaborator on a shared project.`,
-                )
-            }
-        }
-
-        const labelsFilter = generateLabelsFilter(labels, labelsOperator)
+        const resolved = await resolveResponsibleUser(client, responsibleUser)
+        const assigneeEmail = resolved?.email
 
         // Build combined filter query (labels + assignment)
-        let filterQuery = ''
-        if (labelsFilter.length > 0) {
-            filterQuery = labelsFilter
-        }
-        if (resolvedAssigneeId && assigneeEmail) {
-            if (filterQuery.length > 0) {
-                filterQuery += ' & '
-            }
-            filterQuery += `assigned to: ${assigneeEmail}`
+        const labelsFilter = generateLabelsFilter(labels, labelsOperator)
+        let filterQuery = labelsFilter
+
+        if (resolved && assigneeEmail) {
+            filterQuery = appendToQuery(filterQuery, `assigned to: ${assigneeEmail}`)
         }
 
         // Get user timezone to convert local dates to UTC

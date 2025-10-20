@@ -1,13 +1,14 @@
 import { GetTasksArgs } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
+import {
+    appendToQuery,
+    filterTasksByResponsibleUser,
+    RESPONSIBLE_USER_FILTERING,
+    resolveResponsibleUser,
+} from '../filter-helpers.js'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import {
-    filterTasksByResponsibleUser,
-    getTasksByFilter,
-    mapTask,
-    RESPONSIBLE_USER_FILTERING,
-} from '../tool-helpers.js'
+import { getTasksByFilter, mapTask } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import {
@@ -18,7 +19,6 @@ import {
 } from '../utils/response-builders.js'
 import { MappedTask } from '../utils/test-helpers.js'
 import { ToolNames } from '../utils/tool-names.js'
-import { resolveUserNameToId } from '../utils/user-resolver.js'
 
 const { FIND_COMPLETED_TASKS, ADD_TASKS } = ToolNames
 
@@ -90,19 +90,9 @@ const findTasks = {
         }
 
         // Resolve assignee name to user ID if provided
-        let resolvedAssigneeId: string | undefined = responsibleUser
-        let assigneeEmail: string | undefined
-        if (responsibleUser) {
-            const resolved = await resolveUserNameToId(client, responsibleUser)
-            if (resolved) {
-                resolvedAssigneeId = resolved.userId
-                assigneeEmail = resolved.email
-            } else {
-                throw new Error(
-                    `Could not find user: "${responsibleUser}". Make sure the user is a collaborator on a shared project.`,
-                )
-            }
-        }
+        const resolved = await resolveResponsibleUser(client, responsibleUser)
+        const resolvedAssigneeId = resolved?.userId
+        const assigneeEmail = resolved?.email
 
         // If using container-based filtering, use direct API
         if (projectId || sectionId || parentId) {
@@ -208,13 +198,7 @@ const findTasks = {
 
         // Add labels component
         const labelsFilter = generateLabelsFilter(labels, labelsOperator)
-        if (labelsFilter.length > 0) {
-            if (query.length > 0) {
-                query += ` & ${labelsFilter}`
-            } else {
-                query = labelsFilter
-            }
-        }
+        query = appendToQuery(query, labelsFilter)
 
         // Execute filter query
         const result = await getTasksByFilter({
