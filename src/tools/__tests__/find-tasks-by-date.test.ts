@@ -11,6 +11,7 @@ import {
     TEST_IDS,
 } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
+import { resolveUserNameToId } from '../../utils/user-resolver.js'
 import { findTasksByDate } from '../find-tasks-by-date.js'
 
 // Mock only getTasksByFilter, use actual implementations for everything else
@@ -22,7 +23,15 @@ jest.mock('../../tool-helpers', () => {
     }
 })
 
+// Mock user resolver
+jest.mock('../../utils/user-resolver', () => ({
+    resolveUserNameToId: jest.fn(),
+}))
+
 const mockGetTasksByFilter = getTasksByFilter as jest.MockedFunction<typeof getTasksByFilter>
+const mockResolveUserNameToId = resolveUserNameToId as jest.MockedFunction<
+    typeof resolveUserNameToId
+>
 
 // Mock the Todoist API (not directly used by find-tasks-by-date, but needed for type)
 const mockTodoistApi = {
@@ -516,6 +525,110 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 TEST_IDS.TASK_1,
                 TEST_IDS.TASK_2,
             ])
+        })
+    })
+
+    describe('responsibleUser parameter', () => {
+        it('should filter tasks by specific user email', async () => {
+            mockResolveUserNameToId.mockResolvedValue({
+                userId: 'user-123',
+                displayName: 'John Doe',
+                email: 'john@example.com',
+            })
+
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Task assigned to John',
+                    dueDate: '2025-08-15',
+                    responsibleUid: 'user-123',
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasksByDate.execute(
+                {
+                    startDate: 'today',
+                    daysCount: 1,
+                    limit: 50,
+                    responsibleUser: 'john@example.com',
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockResolveUserNameToId).toHaveBeenCalledWith(mockTodoistApi, 'john@example.com')
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: '(today | overdue) & assigned to: john@example.com',
+                cursor: undefined,
+                limit: 50,
+            })
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('assigned to john@example.com')
+            expect(textContent).toMatchSnapshot()
+        })
+
+        it('should throw error when user cannot be resolved', async () => {
+            mockResolveUserNameToId.mockResolvedValue(null)
+
+            await expect(
+                findTasksByDate.execute(
+                    {
+                        startDate: 'today',
+                        daysCount: 1,
+                        limit: 50,
+                        responsibleUser: 'nonexistent@example.com',
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(
+                'Could not find user: "nonexistent@example.com". Make sure the user is a collaborator on a shared project.',
+            )
+        })
+
+        it('should combine responsibleUser with labels and date filters', async () => {
+            mockResolveUserNameToId.mockResolvedValue({
+                userId: 'user-789',
+                displayName: 'Bob Wilson',
+                email: 'bob@example.com',
+            })
+
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Important task for Bob',
+                    dueDate: '2025-08-20',
+                    responsibleUid: 'user-789',
+                    labels: ['urgent'],
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            await findTasksByDate.execute(
+                {
+                    startDate: '2025-08-20',
+                    daysCount: 1,
+                    limit: 50,
+                    responsibleUser: 'bob@example.com',
+                    labels: ['urgent'],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: expect.stringContaining('2025-08-20'),
+                cursor: undefined,
+                limit: 50,
+            })
+
+            const call = mockGetTasksByFilter.mock.calls[0]?.[0]
+            expect(call?.query).toContain('(@urgent)')
+            expect(call?.query).toContain('assigned to: bob@example.com')
         })
     })
 

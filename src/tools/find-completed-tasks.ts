@@ -6,6 +6,7 @@ import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
+import { resolveUserNameToId } from '../utils/user-resolver.js'
 
 const { FIND_TASKS_BY_DATE, GET_OVERVIEW } = ToolNames
 
@@ -30,6 +31,10 @@ const ArgsSchema = {
     projectId: z.string().optional().describe('The ID of the project to get the tasks for.'),
     sectionId: z.string().optional().describe('The ID of the section to get the tasks for.'),
     parentId: z.string().optional().describe('The ID of the parent task to get the tasks for.'),
+    responsibleUser: z
+        .string()
+        .optional()
+        .describe('Find tasks assigned to this user. Can be a user ID, name, or email address.'),
 
     limit: z
         .number()
@@ -52,8 +57,36 @@ const findCompletedTasks = {
     description: 'Get completed tasks.',
     parameters: ArgsSchema,
     async execute(args, client) {
-        const { getBy, labels, labelsOperator, since, until, ...rest } = args
+        const { getBy, labels, labelsOperator, since, until, responsibleUser, ...rest } = args
+
+        // Resolve assignee name to user ID if provided
+        let resolvedAssigneeId: string | undefined = responsibleUser
+        let assigneeEmail: string | undefined
+        if (responsibleUser) {
+            const resolved = await resolveUserNameToId(client, responsibleUser)
+            if (resolved) {
+                resolvedAssigneeId = resolved.userId
+                assigneeEmail = resolved.email
+            } else {
+                throw new Error(
+                    `Could not find user: "${responsibleUser}". Make sure the user is a collaborator on a shared project.`,
+                )
+            }
+        }
+
         const labelsFilter = generateLabelsFilter(labels, labelsOperator)
+
+        // Build combined filter query (labels + assignment)
+        let filterQuery = ''
+        if (labelsFilter.length > 0) {
+            filterQuery = labelsFilter
+        }
+        if (resolvedAssigneeId && assigneeEmail) {
+            if (filterQuery.length > 0) {
+                filterQuery += ' & '
+            }
+            filterQuery += `assigned to: ${assigneeEmail}`
+        }
 
         // Get user timezone to convert local dates to UTC
         const user = await client.getUser()
@@ -74,13 +107,13 @@ const findCompletedTasks = {
                       ...rest,
                       since: sinceDateTime,
                       until: untilDateTime,
-                      ...(labelsFilter ? { filterQuery: labelsFilter, filterLang: 'en' } : {}),
+                      ...(filterQuery ? { filterQuery, filterLang: 'en' } : {}),
                   })
                 : await client.getCompletedTasksByDueDate({
                       ...rest,
                       since: sinceDateTime,
                       until: untilDateTime,
-                      ...(labelsFilter ? { filterQuery: labelsFilter, filterLang: 'en' } : {}),
+                      ...(filterQuery ? { filterQuery, filterLang: 'en' } : {}),
                   })
         const mappedTasks = items.map(mapTask)
 
@@ -88,6 +121,7 @@ const findCompletedTasks = {
             tasks: mappedTasks,
             args,
             nextCursor,
+            assigneeEmail,
         })
 
         return getToolOutput({
@@ -107,10 +141,12 @@ function generateTextContent({
     tasks,
     args,
     nextCursor,
+    assigneeEmail,
 }: {
     tasks: ReturnType<typeof mapTask>[]
     args: z.infer<z.ZodObject<typeof ArgsSchema>>
     nextCursor: string | null
+    assigneeEmail?: string
 }) {
     // Generate subject description
     const getByText = args.getBy === 'completion' ? 'completed' : 'due'
@@ -130,6 +166,12 @@ function generateTextContent({
             .map((label) => `@${label}`)
             .join(args.labelsOperator === 'and' ? ' & ' : ' | ')
         filterHints.push(`labels: ${labelText}`)
+    }
+
+    // Add responsible user filter information
+    if (args.responsibleUser) {
+        const email = assigneeEmail || args.responsibleUser
+        filterHints.push(`assigned to: ${email}`)
     }
 
     // Generate helpful suggestions for empty results

@@ -96,3 +96,14 @@ Next:
 - Use complete-tasks to mark finished tasks
 - Focus on overdue items first to get back on track"
 `;
+
+exports[`find-tasks-by-date tool responsibleUser parameter should filter tasks by specific user email 1`] = `
+"Today's tasks + overdue assigned to john@example.com: 1 (limit 50).
+Filter: today + overdue tasks; assigned to: john@example.com.
+Preview:
+    Task assigned to John • due 2025-08-15 • P4 • id=8485093748
+Next:
+- Use update-tasks to modify priorities or due dates
+- Use complete-tasks to mark finished tasks
+- Focus on overdue items first to get back on track"
+`;

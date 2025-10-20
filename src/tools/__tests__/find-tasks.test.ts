@@ -886,6 +886,7 @@ End of test content.`
                 mockResolveUserNameToId.mockResolvedValue({
                     userId: 'specific-user-id',
                     displayName: 'John Doe',
+                    email: 'john@example.com',
                 })
 
                 const result = await findTasks.execute(
@@ -923,6 +924,7 @@ End of test content.`
                 mockResolveUserNameToId.mockResolvedValue({
                     userId: 'specific-user-id',
                     displayName: 'John Doe',
+                    email: 'john@example.com',
                 })
 
                 const result = await findTasks.execute(

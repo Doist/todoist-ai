@@ -3,6 +3,7 @@ import type { TodoistApi } from '@doist/todoist-api-typescript'
 export type ResolvedUser = {
     userId: string
     displayName: string
+    email: string
 }
 
 export type ProjectCollaborator = {
@@ -59,7 +60,7 @@ export class UserResolver {
                 !/^[a-z]+[\s-]/.test(trimmedInput) &&
                 /[0-9_]/.test(trimmedInput))
         ) {
-            const result = { userId: trimmedInput, displayName: trimmedInput }
+            const result = { userId: trimmedInput, displayName: trimmedInput, email: trimmedInput }
             userResolutionCache.set(trimmedInput, { result, timestamp: Date.now() })
             return result
         }
@@ -79,7 +80,7 @@ export class UserResolver {
             // Try exact name match first
             let match = allCollaborators.find((c) => c.name.toLowerCase() === searchTerm)
             if (match) {
-                const result = { userId: match.id, displayName: match.name }
+                const result = { userId: match.id, displayName: match.name, email: match.email }
                 userResolutionCache.set(trimmedInput, { result, timestamp: Date.now() })
                 return result
             }
@@ -87,7 +88,7 @@ export class UserResolver {
             // Try exact email match
             match = allCollaborators.find((c) => c.email.toLowerCase() === searchTerm)
             if (match) {
-                const result = { userId: match.id, displayName: match.name }
+                const result = { userId: match.id, displayName: match.name, email: match.email }
                 userResolutionCache.set(trimmedInput, { result, timestamp: Date.now() })
                 return result
             }
@@ -95,7 +96,7 @@ export class UserResolver {
             // Try partial name match (contains)
             match = allCollaborators.find((c) => c.name.toLowerCase().includes(searchTerm))
             if (match) {
-                const result = { userId: match.id, displayName: match.name }
+                const result = { userId: match.id, displayName: match.name, email: match.email }
                 userResolutionCache.set(trimmedInput, { result, timestamp: Date.now() })
                 return result
             }
@@ -103,7 +104,7 @@ export class UserResolver {
             // Try partial email match
             match = allCollaborators.find((c) => c.email.toLowerCase().includes(searchTerm))
             if (match) {
-                const result = { userId: match.id, displayName: match.name }
+                const result = { userId: match.id, displayName: match.name, email: match.email }
                 userResolutionCache.set(trimmedInput, { result, timestamp: Date.now() })
                 return result
             }
@@ -241,6 +242,6 @@ export const userResolver = new UserResolver()
 export async function resolveUserNameToId(
     client: TodoistApi,
     nameOrId: string,
-): Promise<{ userId: string; displayName: string } | null> {
+): Promise<ResolvedUser | null> {
     return userResolver.resolveUser(client, nameOrId)
 }

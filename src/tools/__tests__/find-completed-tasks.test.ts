@@ -1,4 +1,4 @@
-import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
+import type { CurrentUser, Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { createMockTask, extractTextContent } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
@@ -29,7 +29,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                 minutes: 0,
                 isDst: 0,
             },
-        } as any)
+        } as CurrentUser)
     })
 
     describe('getting completed tasks by completion date (default)', () => {
@@ -311,7 +311,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                     minutes: 0,
                     isDst: 0,
                 },
-            } as any)
+            } as CurrentUser)
 
             const mockCompletedTasks: Task[] = [
                 createMockTask({
