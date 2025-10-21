@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.13.0](https://github.com/Doist/todoist-ai/compare/v4.12.0...v4.13.0) (2025-10-21)
+
+
+### Features
+
+* Expose completion and modification metadata in task mapping ([#153](https://github.com/Doist/todoist-ai/issues/153)) ([1e2d3b3](https://github.com/Doist/todoist-ai/commit/1e2d3b3f461e75be8cc63ae3a4e070d113f5c4da))
+* extend responsibleUser filtering to more tools ([#149](https://github.com/Doist/todoist-ai/issues/149)) ([c146d74](https://github.com/Doist/todoist-ai/commit/c146d749eb097e1d383dda00e6a09e05389969dd))
+
 ## [4.12.0](https://github.com/Doist/todoist-ai/compare/v4.11.0...v4.12.0) (2025-10-14)
 
 
