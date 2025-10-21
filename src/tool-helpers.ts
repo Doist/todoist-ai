@@ -86,6 +86,9 @@ function mapTask(task: Task) {
         duration: task.duration ? formatDuration(task.duration.amount) : null,
         responsibleUid: task.responsibleUid,
         assignedByUid: task.assignedByUid,
+        checked: task.checked,
+        completedAt: task.completedAt,
+        updatedAt: task.updatedAt,
     }
 }
 
