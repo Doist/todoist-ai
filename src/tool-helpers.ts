@@ -88,7 +88,6 @@ function mapTask(task: Task) {
         assignedByUid: task.assignedByUid,
         checked: task.checked,
         completedAt: task.completedAt,
-        updatedAt: task.updatedAt,
     }
 }
 

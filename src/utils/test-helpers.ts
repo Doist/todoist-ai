@@ -21,7 +21,6 @@ export type MappedTask = {
     assignedByUid: string | null
     checked: boolean
     completedAt: string | null
-    updatedAt: string | null
 }
 
 /**
@@ -147,7 +146,6 @@ export function createMappedTask(overrides: Partial<MappedTask> = {}): MappedTas
         assignedByUid: null,
         checked: false,
         completedAt: null,
-        updatedAt: '2025-08-13T22:09:56.123456Z',
         ...overrides,
     }
 }
