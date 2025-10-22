@@ -83,6 +83,8 @@ const fetch = {
                         duration: mappedTask.duration,
                         responsibleUid: mappedTask.responsibleUid,
                         assignedByUid: mappedTask.assignedByUid,
+                        checked: mappedTask.checked,
+                        completedAt: mappedTask.completedAt,
                     },
                 }
             } else {
