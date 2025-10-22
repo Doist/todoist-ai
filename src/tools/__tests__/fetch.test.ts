@@ -64,6 +64,8 @@ describe(`${FETCH} tool`, () => {
                     duration: null,
                     responsibleUid: null,
                     assignedByUid: null,
+                    checked: false,
+                    completedAt: null,
                 },
             })
         })
@@ -93,6 +95,8 @@ describe(`${FETCH} tool`, () => {
                 duration: null,
                 responsibleUid: null,
                 assignedByUid: null,
+                checked: false,
+                completedAt: null,
             })
         })
 
