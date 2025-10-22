@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.13.1](https://github.com/Doist/todoist-ai/compare/v4.13.0...v4.13.1) (2025-10-22)
+
+
+### Bug Fixes
+
+* Remove `updatedAt` ([#155](https://github.com/Doist/todoist-ai/issues/155)) ([3f3f345](https://github.com/Doist/todoist-ai/commit/3f3f3458f9d54f4f347dfb7c34892fb3cda7ff3b))
+
 ## [4.13.0](https://github.com/Doist/todoist-ai/compare/v4.12.0...v4.13.0) (2025-10-21)
 
 
