@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.13.2](https://github.com/Doist/todoist-ai/compare/v4.13.1...v4.13.2) (2025-10-22)
+
+
+### Bug Fixes
+
+* Output `checked` for the `fetch` tool ([#158](https://github.com/Doist/todoist-ai/issues/158)) ([f0a6eaf](https://github.com/Doist/todoist-ai/commit/f0a6eaf62a915cfab289f1b5181770ccd11d0bdb))
+
 ## [4.13.1](https://github.com/Doist/todoist-ai/compare/v4.13.0...v4.13.1) (2025-10-22)
 
 
