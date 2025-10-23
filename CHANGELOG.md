@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.13.5](https://github.com/Doist/todoist-ai/compare/v4.13.4...v4.13.5) (2025-10-23)
+
+
+### Bug Fixes
+
+* clarify find-completed-tasks scope ([#167](https://github.com/Doist/todoist-ai/issues/167)) ([f110669](https://github.com/Doist/todoist-ai/commit/f11066934d4f6b790599d0f89db416a32437edd3))
+
 ## [4.13.4](https://github.com/Doist/todoist-ai/compare/v4.13.3...v4.13.4) (2025-10-23)
 
 
