@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.14.0](https://github.com/Doist/todoist-ai/compare/v4.13.5...v4.14.0) (2025-10-23)
+
+
+### Features
+
+* Add find-activity tool ([#169](https://github.com/Doist/todoist-ai/issues/169)) ([1abf67f](https://github.com/Doist/todoist-ai/commit/1abf67f3a99191582cf0b5ea2516420f1278dc9a))
+
 ## [4.13.5](https://github.com/Doist/todoist-ai/compare/v4.13.4...v4.13.5) (2025-10-23)
 
 
