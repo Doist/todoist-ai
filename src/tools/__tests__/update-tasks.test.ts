@@ -12,7 +12,7 @@ import { updateTasks } from '../update-tasks.js'
 // Mock the Todoist API
 const mockTodoistApi = {
     updateTask: jest.fn(),
-    moveTasks: jest.fn(),
+    moveTask: jest.fn(),
 } as unknown as jest.Mocked<TodoistApi>
 
 const { UPDATE_TASKS } = ToolNames
@@ -171,7 +171,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 addedAt: '2025-08-13T22:09:56.123456Z',
             })
 
-            mockTodoistApi.moveTasks.mockResolvedValue([mockApiResponse])
+            mockTodoistApi.moveTask.mockResolvedValue(mockApiResponse)
 
             const result = await updateTasks.execute(
                 {
@@ -185,7 +185,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            expect(mockTodoistApi.moveTasks).toHaveBeenCalledWith(['8485093750'], {
+            expect(mockTodoistApi.moveTask).toHaveBeenCalledWith('8485093750', {
                 projectId: 'new-project-id',
             })
             expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
@@ -206,7 +206,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 addedAt: '2025-08-13T22:09:56.123456Z',
             })
 
-            mockTodoistApi.moveTasks.mockResolvedValue([mockApiResponse])
+            mockTodoistApi.moveTask.mockResolvedValue(mockApiResponse)
 
             const result = await updateTasks.execute(
                 {
@@ -220,7 +220,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            expect(mockTodoistApi.moveTasks).toHaveBeenCalledWith(['8485093751'], {
+            expect(mockTodoistApi.moveTask).toHaveBeenCalledWith('8485093751', {
                 parentId: 'parent-task-123',
             })
             expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
@@ -256,7 +256,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 },
             })
 
-            mockTodoistApi.moveTasks.mockResolvedValue([movedTask])
+            mockTodoistApi.moveTask.mockResolvedValue(movedTask)
             mockTodoistApi.updateTask.mockResolvedValue(updatedTask)
 
             const result = await updateTasks.execute(
@@ -275,8 +275,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            // Should call moveTasks first for the projectId
-            expect(mockTodoistApi.moveTasks).toHaveBeenCalledWith(['8485093752'], {
+            // Should call moveTask first for the projectId
+            expect(mockTodoistApi.moveTask).toHaveBeenCalledWith('8485093752', {
                 projectId: 'different-project-id',
             })
 
@@ -397,7 +397,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 projectId: 'new-project-id',
             })
 
-            mockTodoistApi.moveTasks.mockResolvedValue([movedTask])
+            mockTodoistApi.moveTask.mockResolvedValue(movedTask)
             mockTodoistApi.updateTask.mockResolvedValue(updatedTask)
 
             const result = await updateTasks.execute(
@@ -414,8 +414,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            // Should call moveTasks first
-            expect(mockTodoistApi.moveTasks).toHaveBeenCalledWith(['8485093755'], {
+            // Should call moveTask first
+            expect(mockTodoistApi.moveTask).toHaveBeenCalledWith('8485093755', {
                 projectId: 'new-project-id',
             })
 
@@ -645,9 +645,9 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 ]
 
                 // Each task should be moved individually to avoid bulk operation issues
-                mockTodoistApi.moveTasks
-                    .mockResolvedValueOnce([mockResponses[0] as Task])
-                    .mockResolvedValueOnce([mockResponses[1] as Task])
+                mockTodoistApi.moveTask
+                    .mockResolvedValueOnce(mockResponses[0] as Task)
+                    .mockResolvedValueOnce(mockResponses[1] as Task)
 
                 const result = await updateTasks.execute(
                     {
@@ -659,12 +659,12 @@ describe(`${UPDATE_TASKS} tool`, () => {
                     mockTodoistApi,
                 )
 
-                // Should call moveTasks twice, once for each task individually
-                expect(mockTodoistApi.moveTasks).toHaveBeenCalledTimes(2)
-                expect(mockTodoistApi.moveTasks).toHaveBeenNthCalledWith(1, ['6cPHJm59x4WhMwR4'], {
+                // Should call moveTask twice, once for each task individually
+                expect(mockTodoistApi.moveTask).toHaveBeenCalledTimes(2)
+                expect(mockTodoistApi.moveTask).toHaveBeenNthCalledWith(1, '6cPHJm59x4WhMwR4', {
                     sectionId,
                 })
-                expect(mockTodoistApi.moveTasks).toHaveBeenNthCalledWith(2, ['6cPHJj2MV4HMj92W'], {
+                expect(mockTodoistApi.moveTask).toHaveBeenNthCalledWith(2, '6cPHJj2MV4HMj92W', {
                     sectionId,
                 })
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
@@ -686,10 +686,10 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 ]
 
                 // Each task should be moved individually
-                mockTodoistApi.moveTasks
-                    .mockResolvedValueOnce([mockResponses[0] as Task])
-                    .mockResolvedValueOnce([mockResponses[1] as Task])
-                    .mockResolvedValueOnce([mockResponses[2] as Task])
+                mockTodoistApi.moveTask
+                    .mockResolvedValueOnce(mockResponses[0] as Task)
+                    .mockResolvedValueOnce(mockResponses[1] as Task)
+                    .mockResolvedValueOnce(mockResponses[2] as Task)
 
                 const result = await updateTasks.execute(
                     {
@@ -703,14 +703,14 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 )
 
                 // Verify API was called correctly - 3 individual move calls
-                expect(mockTodoistApi.moveTasks).toHaveBeenCalledTimes(3)
-                expect(mockTodoistApi.moveTasks).toHaveBeenNthCalledWith(1, ['8485093748'], {
+                expect(mockTodoistApi.moveTask).toHaveBeenCalledTimes(3)
+                expect(mockTodoistApi.moveTask).toHaveBeenNthCalledWith(1, '8485093748', {
                     projectId: 'new-project-id',
                 })
-                expect(mockTodoistApi.moveTasks).toHaveBeenNthCalledWith(2, ['8485093749'], {
+                expect(mockTodoistApi.moveTask).toHaveBeenNthCalledWith(2, '8485093749', {
                     sectionId: 'new-section-id',
                 })
-                expect(mockTodoistApi.moveTasks).toHaveBeenNthCalledWith(3, ['8485093750'], {
+                expect(mockTodoistApi.moveTask).toHaveBeenNthCalledWith(3, '8485093750', {
                     parentId: 'parent-task-123',
                 })
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
@@ -732,15 +732,15 @@ describe(`${UPDATE_TASKS} tool`, () => {
                     addedAt: '2025-08-13T22:09:59.123456Z',
                 })
 
-                mockTodoistApi.moveTasks.mockResolvedValue([mockTaskResponse])
+                mockTodoistApi.moveTask.mockResolvedValue(mockTaskResponse)
 
                 const result = await updateTasks.execute(
                     { tasks: [{ id: '8485093751', sectionId: 'target-section' }] },
                     mockTodoistApi,
                 )
 
-                expect(mockTodoistApi.moveTasks).toHaveBeenCalledTimes(1)
-                expect(mockTodoistApi.moveTasks).toHaveBeenCalledWith(['8485093751'], {
+                expect(mockTodoistApi.moveTask).toHaveBeenCalledTimes(1)
+                expect(mockTodoistApi.moveTask).toHaveBeenCalledWith('8485093751', {
                     sectionId: 'target-section',
                 })
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
@@ -786,10 +786,10 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 ]
 
                 // Each task should be moved individually
-                mockTodoistApi.moveTasks
-                    .mockResolvedValueOnce([mockResponses[0] as Task])
-                    .mockResolvedValueOnce([mockResponses[1] as Task])
-                    .mockResolvedValueOnce([mockResponses[2] as Task])
+                mockTodoistApi.moveTask
+                    .mockResolvedValueOnce(mockResponses[0] as Task)
+                    .mockResolvedValueOnce(mockResponses[1] as Task)
+                    .mockResolvedValueOnce(mockResponses[2] as Task)
 
                 const result = await updateTasks.execute(
                     {
@@ -803,14 +803,14 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 )
 
                 // Verify API was called correctly - 3 individual move calls
-                expect(mockTodoistApi.moveTasks).toHaveBeenCalledTimes(3)
-                expect(mockTodoistApi.moveTasks).toHaveBeenNthCalledWith(1, ['task-1'], {
+                expect(mockTodoistApi.moveTask).toHaveBeenCalledTimes(3)
+                expect(mockTodoistApi.moveTask).toHaveBeenNthCalledWith(1, 'task-1', {
                     projectId: 'project-new',
                 })
-                expect(mockTodoistApi.moveTasks).toHaveBeenNthCalledWith(2, ['task-2'], {
+                expect(mockTodoistApi.moveTask).toHaveBeenNthCalledWith(2, 'task-2', {
                     parentId: 'task-1',
                 })
-                expect(mockTodoistApi.moveTasks).toHaveBeenNthCalledWith(3, ['task-3'], {
+                expect(mockTodoistApi.moveTask).toHaveBeenNthCalledWith(3, 'task-3', {
                     sectionId: 'section-new',
                 })
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
@@ -834,7 +834,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                     addedAt: '2025-08-13T22:10:07.123456Z',
                 })
 
-                mockTodoistApi.moveTasks.mockResolvedValue([mockResponse])
+                mockTodoistApi.moveTask.mockResolvedValue(mockResponse)
 
                 const result = await updateTasks.execute(
                     {
@@ -849,7 +849,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                     mockTodoistApi,
                 )
 
-                expect(mockTodoistApi.moveTasks).toHaveBeenCalledWith(['8485093752'], {
+                expect(mockTodoistApi.moveTask).toHaveBeenCalledWith('8485093752', {
                     projectId: 'new-project-only',
                 })
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
@@ -874,7 +874,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 )
 
                 // No API calls should be made since no move parameters are provided
-                expect(mockTodoistApi.moveTasks).not.toHaveBeenCalled()
+                expect(mockTodoistApi.moveTask).not.toHaveBeenCalled()
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
                 // Returns empty results since no moves were processed
@@ -908,7 +908,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
 
             it('should propagate API errors for individual task moves', async () => {
                 const apiError = new Error('API Error: Task not found')
-                mockTodoistApi.moveTasks.mockRejectedValue(apiError)
+                mockTodoistApi.moveTask.mockRejectedValue(apiError)
 
                 await expect(
                     updateTasks.execute(
@@ -920,7 +920,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
 
             it('should handle validation errors', async () => {
                 const validationError = new Error('API Error: Invalid section ID')
-                mockTodoistApi.moveTasks.mockRejectedValue(validationError)
+                mockTodoistApi.moveTask.mockRejectedValue(validationError)
 
                 await expect(
                     updateTasks.execute(
@@ -934,7 +934,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 const permissionError = new Error(
                     'API Error: Insufficient permissions to move task',
                 )
-                mockTodoistApi.moveTasks.mockRejectedValue(permissionError)
+                mockTodoistApi.moveTask.mockRejectedValue(permissionError)
 
                 await expect(
                     updateTasks.execute(
@@ -946,7 +946,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
 
             it('should handle circular parent dependency errors', async () => {
                 const circularError = new Error('API Error: Circular dependency detected')
-                mockTodoistApi.moveTasks.mockRejectedValue(circularError)
+                mockTodoistApi.moveTask.mockRejectedValue(circularError)
 
                 await expect(
                     updateTasks.execute(

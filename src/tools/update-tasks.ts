@@ -137,19 +137,19 @@ const updateTasks = {
                 }
             }
 
-            // If no move parameters are provided, use updateTask without moveTasks
+            // If no move parameters are provided, use updateTask without moveTask
             if (!projectId && !sectionId && !parentId) {
                 return await client.updateTask(id, updateArgs)
             }
 
             const moveArgs = createMoveTaskArgs(id, projectId, sectionId, parentId)
-            const movedTasks = await client.moveTasks([id], moveArgs)
+            const movedTask = await client.moveTask(id, moveArgs)
 
             if (Object.keys(updateArgs).length > 0) {
                 return await client.updateTask(id, updateArgs)
             }
 
-            return movedTasks[0]
+            return movedTask
         })
         const updatedTasks = (await Promise.all(updateTasksPromises)).filter(
             (task): task is Task => task !== undefined,
