@@ -11,6 +11,8 @@ import { completeTasks } from './tools/complete-tasks.js'
 // General tools
 import { deleteObject } from './tools/delete-object.js'
 import { fetch } from './tools/fetch.js'
+// Activity and audit tools
+import { findActivity } from './tools/find-activity.js'
 import { findComments } from './tools/find-comments.js'
 import { findCompletedTasks } from './tools/find-completed-tasks.js'
 // Assignment and collaboration tools
@@ -48,6 +50,8 @@ const tools = {
     addComments,
     updateComments,
     findComments,
+    // Activity and audit tools
+    findActivity,
     // General tools
     getOverview,
     deleteObject,
@@ -82,6 +86,8 @@ export {
     addComments,
     updateComments,
     findComments,
+    // Activity and audit tools
+    findActivity,
     // General tools
     getOverview,
     deleteObject,

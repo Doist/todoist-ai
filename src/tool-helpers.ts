@@ -1,4 +1,5 @@
 import type {
+    ActivityEvent,
     MoveTaskArgs,
     PersonalProject,
     Task,
@@ -109,6 +110,25 @@ function mapProject(project: Project) {
     }
 }
 
+/**
+ * Map a single Todoist activity event to a more structured format, for LLM consumption.
+ * @param event - The activity event to map.
+ * @returns The mapped activity event.
+ */
+function mapActivityEvent(event: ActivityEvent) {
+    return {
+        id: event.id,
+        objectType: event.objectType,
+        objectId: event.objectId,
+        eventType: event.eventType,
+        eventDate: event.eventDate,
+        parentProjectId: event.parentProjectId,
+        parentItemId: event.parentItemId,
+        initiatorId: event.initiatorId,
+        extraData: event.extraData,
+    }
+}
+
 const ErrorSchema = z.object({
     httpStatusCode: z.number(),
     responseData: z.object({
@@ -158,4 +178,4 @@ function buildTodoistUrl(type: 'task' | 'project', id: string): string {
     return `https://app.todoist.com/app/${type}/${id}`
 }
 
-export { buildTodoistUrl, getTasksByFilter, mapProject, mapTask }
+export { buildTodoistUrl, getTasksByFilter, mapActivityEvent, mapProject, mapTask }

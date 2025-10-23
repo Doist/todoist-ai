@@ -25,6 +25,10 @@ export const ApiLimits = {
     COMMENTS_DEFAULT: 10,
     /** Maximum limit for comment search and list operations */
     COMMENTS_MAX: 10,
+    /** Default limit for activity log listings */
+    ACTIVITY_DEFAULT: 20,
+    /** Maximum limit for activity log search and list operations */
+    ACTIVITY_MAX: 100,
 } as const
 
 // UI Display Limits

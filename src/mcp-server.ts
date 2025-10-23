@@ -8,6 +8,7 @@ import { addTasks } from './tools/add-tasks.js'
 import { completeTasks } from './tools/complete-tasks.js'
 import { deleteObject } from './tools/delete-object.js'
 import { fetch } from './tools/fetch.js'
+import { findActivity } from './tools/find-activity.js'
 import { findComments } from './tools/find-comments.js'
 import { findCompletedTasks } from './tools/find-completed-tasks.js'
 import { findProjectCollaborators } from './tools/find-project-collaborators.js'
@@ -56,6 +57,9 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **find-project-collaborators**: Find team members by name or email for assignments
 - **manage-assignments**: Bulk assign/unassign/reassign up to 50 tasks with atomic operations and dry-run validation
 
+**Activity & Audit:**
+- **find-activity**: Retrieve recent activity logs to monitor and audit changes. Shows events from all users by default; use initiatorId to filter by specific user. Filter by object type (task/project/comment), event type (added/updated/deleted/completed/uncompleted/archived/unarchived/shared/left), and specific objects (objectId, projectId, taskId). Useful for tracking who did what and when. Note: Date-based filtering is not supported.
+
 **General Operations:**
 - **delete-object**: Remove projects, sections, tasks, or comments by type and ID
 - **user-info**: Get user details including timezone, goals, and plan information
@@ -85,6 +89,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **Task Search**: find-tasks with multiple filters → update-tasks or complete-tasks based on results
 - **Project Organization**: add-projects → add-sections → add-tasks with projectId and sectionId
 - **Progress Reviews**: find-completed-tasks with date ranges → get-overview for project summaries
+- **Activity Auditing**: find-activity with event/object filters to track changes, monitor team activity, or investigate specific actions
 
 Always provide clear, actionable task titles and descriptions. Use the overview tools to give users context about their workload and project status.
 `
@@ -130,6 +135,9 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     registerTool(addComments, server, todoist)
     registerTool(findComments, server, todoist)
     registerTool(updateComments, server, todoist)
+
+    // Activity and audit tools
+    registerTool(findActivity, server, todoist)
 
     // General tools
     registerTool(getOverview, server, todoist)

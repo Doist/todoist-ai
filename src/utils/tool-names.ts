@@ -33,6 +33,9 @@ export const ToolNames = {
     FIND_PROJECT_COLLABORATORS: 'find-project-collaborators',
     MANAGE_ASSIGNMENTS: 'manage-assignments',
 
+    // Activity and audit tools
+    FIND_ACTIVITY: 'find-activity',
+
     // General tools
     GET_OVERVIEW: 'get-overview',
     DELETE_OBJECT: 'delete-object',
