@@ -34,7 +34,9 @@ const ArgsSchema = {
     responsibleUser: z
         .string()
         .optional()
-        .describe('Find tasks assigned to this user. Can be a user ID, name, or email address.'),
+        .describe(
+            'Find tasks assigned to this user. Can be a user ID, name, or email address. Defaults to all collaborators when omitted.',
+        ),
 
     limit: z
         .number()
@@ -54,7 +56,8 @@ const ArgsSchema = {
 
 const findCompletedTasks = {
     name: ToolNames.FIND_COMPLETED_TASKS,
-    description: 'Get completed tasks.',
+    description:
+        'Get completed tasks (includes all collaborators by default—use responsibleUser to narrow).',
     parameters: ArgsSchema,
     async execute(args, client) {
         const { getBy, labels, labelsOperator, since, until, responsibleUser, ...rest } = args

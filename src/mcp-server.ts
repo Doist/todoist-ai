@@ -44,7 +44,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **complete-tasks**: Mark tasks as done using task IDs
 - **find-tasks**: Search by text, project/section/parent container, responsible user, or labels. Requires at least one search parameter
 - **find-tasks-by-date**: Get tasks by date range (startDate: YYYY-MM-DD or 'today' which includes overdue tasks) or specific day counts
-- **find-completed-tasks**: View completed tasks by completion date or original due date
+- **find-completed-tasks**: View completed tasks by completion date or original due date (returns all collaborators unless filtered)
 
 **Project & Organization:**
 - **add-projects/update-projects/find-projects**: Manage project lifecycle with names, favorites, and view styles (list/board/calendar)
