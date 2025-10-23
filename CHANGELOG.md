@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.13.3](https://github.com/Doist/todoist-ai/compare/v4.13.2...v4.13.3) (2025-10-23)
+
+
+### Bug Fixes
+
+* Switch to using `moveTask` instead of `moveTasks` ([#160](https://github.com/Doist/todoist-ai/issues/160)) ([34e3fc6](https://github.com/Doist/todoist-ai/commit/34e3fc67922379bf0aef39a9e7f1939ded5f0e08))
+
 ## [4.13.2](https://github.com/Doist/todoist-ai/compare/v4.13.1...v4.13.2) (2025-10-22)
 
 
