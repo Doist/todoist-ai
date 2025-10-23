@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.13.4](https://github.com/Doist/todoist-ai/compare/v4.13.3...v4.13.4) (2025-10-23)
+
+
+### Bug Fixes
+
+* Test publish workflow (no functional changes) ([#164](https://github.com/Doist/todoist-ai/issues/164)) ([68afb4c](https://github.com/Doist/todoist-ai/commit/68afb4ce06366cc022a1718e6cd0c3525c5aab48))
+
 ## [4.13.3](https://github.com/Doist/todoist-ai/compare/v4.13.2...v4.13.3) (2025-10-23)
 
 
