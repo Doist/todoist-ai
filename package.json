@@ -48,7 +48,7 @@
         "@doist/todoist-api-typescript": "5.7.0",
         "@modelcontextprotocol/sdk": "^1.11.1",
         "date-fns": "^4.1.0",
-        "dotenv": "^16.5.0",
+        "dotenv": "^17.0.0",
         "zod": "^3.25.7"
     },
     "devDependencies": {
