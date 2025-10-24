@@ -1,7 +1,8 @@
+import { getProjectUrl, getTaskUrl } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { getErrorOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { buildTodoistUrl, mapProject, mapTask } from '../tool-helpers.js'
+import { mapProject, mapTask } from '../tool-helpers.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const ArgsSchema = {
@@ -73,7 +74,7 @@ const fetch = {
                     id: `task:${mappedTask.id}`,
                     title: mappedTask.content,
                     text: textParts.join(''),
-                    url: buildTodoistUrl('task', mappedTask.id),
+                    url: getTaskUrl(mappedTask.id),
                     metadata: {
                         priority: mappedTask.priority,
                         projectId: mappedTask.projectId,
@@ -105,7 +106,7 @@ const fetch = {
                     id: `project:${mappedProject.id}`,
                     title: mappedProject.name,
                     text: textParts.join(''),
-                    url: buildTodoistUrl('project', mappedProject.id),
+                    url: getProjectUrl(mappedProject.id),
                     metadata: {
                         color: mappedProject.color,
                         isFavorite: mappedProject.isFavorite,

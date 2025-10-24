@@ -11,10 +11,8 @@ import { ToolNames } from '../../utils/tool-names.js'
 import { search } from '../search.js'
 
 jest.mock('../../tool-helpers', () => {
-    const actual = jest.requireActual('../../tool-helpers') as typeof import('../../tool-helpers')
     return {
         getTasksByFilter: jest.fn(),
-        buildTodoistUrl: actual.buildTodoistUrl,
     }
 })
 

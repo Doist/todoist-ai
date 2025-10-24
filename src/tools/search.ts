@@ -1,7 +1,8 @@
+import { getProjectUrl, getTaskUrl } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { getErrorOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { buildTodoistUrl, getTasksByFilter } from '../tool-helpers.js'
+import { getTasksByFilter } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -61,7 +62,7 @@ const search = {
                 results.push({
                     id: `task:${task.id}`,
                     title: task.content,
-                    url: buildTodoistUrl('task', task.id),
+                    url: getTaskUrl(task.id),
                 })
             }
 
@@ -70,7 +71,7 @@ const search = {
                 results.push({
                     id: `project:${project.id}`,
                     title: project.name,
-                    url: buildTodoistUrl('project', project.id),
+                    url: getProjectUrl(project.id),
                 })
             }
 
