@@ -61,17 +61,17 @@ docker build -t todoist-mcp-sse .
 
 **Run the container:**
 ```bash
-docker run -p 3000:3000 todoist-mcp-sse
+docker run --name todoist-mcp -p 3000:3000 todoist-mcp-sse
 ```
 
 **Run with custom port:**
 ```bash
-docker run -p 8080:3000 -e PORT=3000 todoist-mcp-sse
+docker run --name todoist-mcp -p 8080:3000 -e PORT=3000 todoist-mcp-sse
 ```
 
 **Run in detached mode (background):**
 ```bash
-docker run -d -p 3000:3000 --name todoist-mcp todoist-mcp-sse
+docker run -d --name todoist-mcp -p 3000:3000 todoist-mcp-sse
 ```
 
 **View logs:**
