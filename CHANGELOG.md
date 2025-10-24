@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.14.3](https://github.com/Doist/todoist-ai/compare/v4.14.2...v4.14.3) (2025-10-24)
+
+
+### Bug Fixes
+
+* Add --repo flag to gh workflow run command ([f61caa8](https://github.com/Doist/todoist-ai/commit/f61caa8c7aabce166484b95b70886aa4049c904c))
+
 ## [4.14.2](https://github.com/Doist/todoist-ai/compare/v4.14.1...v4.14.2) (2025-10-24)
 
 
