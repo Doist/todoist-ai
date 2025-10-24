@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.14.4](https://github.com/Doist/todoist-ai/compare/v4.14.3...v4.14.4) (2025-10-24)
+
+
+### Bug Fixes
+
+* Add actions: write permission to trigger workflows ([6863953](https://github.com/Doist/todoist-ai/commit/6863953b6e92fd8b35f4692b5c609ad42631722a))
+
 ## [4.14.3](https://github.com/Doist/todoist-ai/compare/v4.14.2...v4.14.3) (2025-10-24)
 
 
