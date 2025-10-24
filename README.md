@@ -50,6 +50,43 @@ npm run start:sse
 
 See [docs/mcp-server.md](docs/mcp-server.md) for detailed SSE setup and LibreChat configuration.
 
+### Running with Docker
+
+The SSE server can be run in a Docker container for easier deployment and isolation:
+
+**Build the image:**
+```bash
+docker build -t todoist-mcp-sse .
+```
+
+**Run the container:**
+```bash
+docker run -p 3000:3000 todoist-mcp-sse
+```
+
+**Run with custom port:**
+```bash
+docker run -p 8080:3000 -e PORT=3000 todoist-mcp-sse
+```
+
+**Run in detached mode (background):**
+```bash
+docker run -d -p 3000:3000 --name todoist-mcp todoist-mcp-sse
+```
+
+**View logs:**
+```bash
+docker logs -f todoist-mcp
+```
+
+**Stop the container:**
+```bash
+docker stop todoist-mcp
+docker rm todoist-mcp
+```
+
+For production deployment to platforms like Railway, see [RAILWAY.md](RAILWAY.md).
+
 ### Setup Guide
 
 The Todoist AI MCP server is available as a streamable HTTP service for easy integration with various AI clients:

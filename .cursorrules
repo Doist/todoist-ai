@@ -1,0 +1,27 @@
+# Git Commit Messages
+Use the Conventional Commit Messages specification for all commit messages.
+
+Format:
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+
+Types:
+- feat: A new feature
+- fix: A bug fix
+- docs: Documentation only changes
+- style: Changes that don't affect code meaning (formatting, etc.)
+- refactor: Code change that neither fixes a bug nor adds a feature
+- perf: Performance improvements
+- test: Adding or correcting tests
+- chore: Changes to build process or auxiliary tools
+- ci: Changes to CI configuration files and scripts
+
+Rules:
+- Subject line must be lowercase
+- Subject line must not end with a period
+- Subject line must be 50 characters or less
+- Body should wrap at 72 characters
+- Use body to explain what and why, not how
