@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.14.2](https://github.com/Doist/todoist-ai/compare/v4.14.1...v4.14.2) (2025-10-24)
+
+
+### Bug Fixes
+
+* Trigger publish workflow automatically from release-please ([#174](https://github.com/Doist/todoist-ai/issues/174)) ([081bc2b](https://github.com/Doist/todoist-ai/commit/081bc2ba5abfdc3bf4bfe3c282f29570877b977c))
+
 ## [4.14.1](https://github.com/Doist/todoist-ai/compare/v4.14.0...v4.14.1) (2025-10-24)
 
 
