@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.14.1](https://github.com/Doist/todoist-ai/compare/v4.14.0...v4.14.1) (2025-10-24)
+
+
+### Bug Fixes
+
+* Update todoist-typescript-sdk to 5.7.1 (follow-up) ([#172](https://github.com/Doist/todoist-ai/issues/172)) ([b4f8dc3](https://github.com/Doist/todoist-ai/commit/b4f8dc3ffa4c3dd7489ece03be5a0f391130a2ce))
+
 ## [4.14.0](https://github.com/Doist/todoist-ai/compare/v4.13.5...v4.14.0) (2025-10-23)
 
 
