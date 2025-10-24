@@ -42,6 +42,14 @@ You can run the MCP server directly with npx:
 npx @doist/todoist-ai
 ```
 
+For multi-user environments (like LibreChat) that require per-user authentication via API tokens, use the SSE server:
+
+```bash
+npm run start:sse
+```
+
+See [docs/mcp-server.md](docs/mcp-server.md) for detailed SSE setup and LibreChat configuration.
+
 ### Setup Guide
 
 The Todoist AI MCP server is available as a streamable HTTP service for easy integration with various AI clients:
