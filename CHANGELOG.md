@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.14.5](https://github.com/Doist/todoist-ai/compare/v4.14.4...v4.14.5) (2025-10-25)
+
+
+### Bug Fixes
+
+* Remove nullable type from update_tasks to fix Gemini API compatibility ([#181](https://github.com/Doist/todoist-ai/issues/181)) ([c97be7f](https://github.com/Doist/todoist-ai/commit/c97be7f39ae48d837562fd303b67ed81e8935c18))
+
 ## [4.14.4](https://github.com/Doist/todoist-ai/compare/v4.14.3...v4.14.4) (2025-10-24)
 
 
