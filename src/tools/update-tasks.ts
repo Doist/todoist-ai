@@ -44,10 +44,9 @@ const TasksUpdateSchema = z.object({
         ),
     responsibleUser: z
         .string()
-        .nullable()
         .optional()
         .describe(
-            'Change task assignment. Use null to unassign. Can be user ID, name, or email. User must be a project collaborator.',
+            'Change task assignment. Use "unassign" to remove assignment. Can be user ID, name, or email. User must be a project collaborator.',
         ),
     labels: z
         .array(z.string())
@@ -113,7 +112,7 @@ const updateTasks = {
 
             // Handle assignment changes if provided
             if (responsibleUser !== undefined) {
-                if (responsibleUser === null) {
+                if (responsibleUser === null || responsibleUser === 'unassign') {
                     // Unassign task - no validation needed
                     updateArgs = { ...updateArgs, assigneeId: null }
                 } else {

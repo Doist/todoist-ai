@@ -230,13 +230,34 @@ describe('Assignment Integration Tests', () => {
             expect(extractTextContent(result)).toContain('Updated 1 task')
         })
 
-        it('should unassign task when responsibleUser is null', async () => {
+        it('should unassign task when responsibleUser is "unassign"', async () => {
             await updateTasks.execute(
                 {
                     tasks: [
                         {
                             id: 'task-123',
-                            responsibleUser: null,
+                            responsibleUser: 'unassign',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith(
+                'task-123',
+                expect.objectContaining({
+                    assigneeId: null,
+                }),
+            )
+        })
+
+        it('should unassign task when responsibleUser is null (backward compatibility)', async () => {
+            await updateTasks.execute(
+                {
+                    tasks: [
+                        {
+                            id: 'task-123',
+                            responsibleUser: null as unknown as string,
                         },
                     ],
                 },
@@ -577,7 +598,7 @@ describe('Assignment Integration Tests', () => {
                     tasks: [
                         {
                             id: 'task-123',
-                            responsibleUser: null,
+                            responsibleUser: null as unknown as string,
                         },
                     ],
                 },
