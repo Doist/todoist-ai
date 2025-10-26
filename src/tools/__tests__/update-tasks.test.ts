@@ -488,7 +488,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
             expect(structuredContent.tasks).toHaveLength(1)
         })
 
-        it('should remove task deadline with null', async () => {
+        it('should remove task deadline with "remove" string', async () => {
             const mockApiResponse: Task = createMockTask({
                 id: '8485093761',
                 content: 'Task without deadline',
@@ -504,14 +504,14 @@ describe(`${UPDATE_TASKS} tool`, () => {
                     tasks: [
                         {
                             id: '8485093761',
-                            deadlineDate: null,
+                            deadlineDate: 'remove',
                         },
                     ],
                 },
                 mockTodoistApi,
             )
 
-            // Verify API was called to remove deadline
+            // Verify API was called to remove deadline (converts "remove" to null)
             expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093761', {
                 deadlineDate: null,
             })

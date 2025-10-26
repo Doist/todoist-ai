@@ -41,7 +41,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 **Task Management:**
 - **add-tasks**: Create tasks with content, description, priority (p1=highest, p2=high, p3=medium, p4=lowest/default), dueString (natural language like "tomorrow", "next Friday", "2024-12-25"), deadlineDate (ISO 8601 format like "2025-12-31" for immovable constraints), duration (formats like "2h", "90m", "2h30m"), and assignments to project collaborators
-- **update-tasks**: Modify existing tasks - get task IDs from search results first, only include fields that need changes. Supports deadlineDate (ISO 8601 format like "2025-12-31") updates and removals
+- **update-tasks**: Modify existing tasks - get task IDs from search results first, only include fields that need changes. Supports deadlineDate (ISO 8601 format like "2025-12-31") updates and removals (use "remove" to clear)
 - **complete-tasks**: Mark tasks as done using task IDs
 - **find-tasks**: Search by text, project/section/parent container, responsible user, or labels. Requires at least one search parameter
 - **find-tasks-by-date**: Get tasks by date range (startDate: YYYY-MM-DD or 'today' which includes overdue tasks) or specific day counts

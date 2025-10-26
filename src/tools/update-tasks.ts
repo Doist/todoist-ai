@@ -38,10 +38,9 @@ const TasksUpdateSchema = z.object({
         .describe("The new due date for the task, in natural language (e.g., 'tomorrow at 5pm')."),
     deadlineDate: z
         .string()
-        .nullable()
         .optional()
         .describe(
-            'The new deadline date for the task in ISO 8601 format (YYYY-MM-DD, e.g., "2025-12-31"). Deadlines are immovable constraints shown with a different indicator than due dates. Use null to remove the deadline.',
+            'The new deadline date for the task in ISO 8601 format (YYYY-MM-DD, e.g., "2025-12-31"). Deadlines are immovable constraints shown with a different indicator than due dates. Use "remove" to clear the deadline.',
         ),
     duration: z
         .string()
@@ -94,12 +93,22 @@ const updateTasks = {
             let updateArgs: UpdateTaskArgs = {
                 ...otherUpdateArgs,
                 ...(labels !== undefined && { labels }),
-                ...(deadlineDate !== undefined && { deadlineDate }),
             }
 
             // Handle priority conversion if provided
             if (priority) {
                 updateArgs.priority = convertPriorityToNumber(priority)
+            }
+
+            // Handle deadline changes if provided
+            if (deadlineDate !== undefined) {
+                if (deadlineDate === null || deadlineDate === 'remove') {
+                    // Remove deadline - support both legacy null and new "remove" string
+                    updateArgs = { ...updateArgs, deadlineDate: null }
+                } else {
+                    // Set new deadline
+                    updateArgs = { ...updateArgs, deadlineDate }
+                }
             }
 
             // Parse duration if provided
