@@ -9,6 +9,14 @@ Next:
 - Use get-overview to see your updated project organization"
 `;
 
+exports[`add-tasks tool adding multiple tasks should add task with deadline 1`] = `
+"Added 1 task to projects.
+Tasks:
+    Task with deadline • P4 • id=8485093756.
+Next:
+- Use get-overview to see your updated project organization"
+`;
+
 exports[`add-tasks tool adding multiple tasks should add tasks with duration 1`] = `
 "Added 2 tasks to projects.
 Tasks:

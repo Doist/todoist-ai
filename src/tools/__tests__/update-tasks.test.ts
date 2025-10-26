@@ -439,6 +439,91 @@ describe(`${UPDATE_TASKS} tool`, () => {
         })
     })
 
+    describe('updating deadlines', () => {
+        it('should update task deadline', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093760',
+                content: 'Task with deadline',
+                deadline: {
+                    date: '2025-12-31',
+                    lang: 'en',
+                },
+                url: 'https://todoist.com/showTask?id=8485093760',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+
+            const result = await updateTasks.execute(
+                {
+                    tasks: [
+                        {
+                            id: '8485093760',
+                            deadlineDate: '2025-12-31',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Verify API was called with deadline
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093760', {
+                deadlineDate: '2025-12-31',
+            })
+
+            // Verify result structure
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('Updated 1 task')
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    tasks: expect.arrayContaining([
+                        expect.objectContaining({
+                            id: '8485093760',
+                            deadlineDate: '2025-12-31',
+                        }),
+                    ]),
+                }),
+            )
+            expect(structuredContent.tasks).toHaveLength(1)
+        })
+
+        it('should remove task deadline with null', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093761',
+                content: 'Task without deadline',
+                deadline: null,
+                url: 'https://todoist.com/showTask?id=8485093761',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+
+            const result = await updateTasks.execute(
+                {
+                    tasks: [
+                        {
+                            id: '8485093761',
+                            deadlineDate: null,
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Verify API was called to remove deadline
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093761', {
+                deadlineDate: null,
+            })
+
+            // Verify result structure
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('Updated 1 task')
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.tasks).toHaveLength(1)
+        })
+    })
+
     describe('updating labels', () => {
         it('should update task labels', async () => {
             const mockApiResponse: Task = createMockTask({

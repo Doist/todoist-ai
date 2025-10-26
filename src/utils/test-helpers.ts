@@ -11,6 +11,7 @@ export type MappedTask = {
     description: string
     dueDate: string | undefined
     recurring: string | boolean
+    deadlineDate: string | undefined
     priority: number
     projectId: string
     sectionId: string | null
@@ -136,6 +137,7 @@ export function createMappedTask(overrides: Partial<MappedTask> = {}): MappedTas
         description: '',
         dueDate: undefined,
         recurring: false,
+        deadlineDate: undefined,
         priority: 1,
         projectId: TEST_IDS.PROJECT_TEST,
         sectionId: null,

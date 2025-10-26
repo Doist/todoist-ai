@@ -30,6 +30,12 @@ const TaskSchema = z.object({
         'The priority of the task: p1 (highest), p2 (high), p3 (medium), p4 (lowest/default).',
     ),
     dueString: z.string().optional().describe('The due date for the task, in natural language.'),
+    deadlineDate: z
+        .string()
+        .optional()
+        .describe(
+            'The deadline date for the task in ISO 8601 format (YYYY-MM-DD, e.g., "2025-12-31"). Deadlines are immovable constraints shown with a different indicator than due dates.',
+        ),
     duration: z
         .string()
         .optional()
@@ -86,10 +92,18 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
         responsibleUser,
         priority,
         labels,
+        deadlineDate,
         ...otherTaskArgs
     } = task
 
-    let taskArgs: AddTaskArgs = { ...otherTaskArgs, projectId, sectionId, parentId, labels }
+    let taskArgs: AddTaskArgs = {
+        ...otherTaskArgs,
+        projectId,
+        sectionId,
+        parentId,
+        labels,
+        deadlineDate,
+    }
 
     // Handle priority conversion if provided
     if (priority) {

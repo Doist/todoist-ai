@@ -277,6 +277,61 @@ describe(`${ADD_TASKS} tool`, () => {
             }
         })
 
+        it('should add task with deadline', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093756',
+                content: 'Task with deadline',
+                deadline: {
+                    date: '2025-12-31',
+                    lang: 'en',
+                },
+                url: 'https://todoist.com/showTask?id=8485093756',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
+
+            const result = await addTasks.execute(
+                {
+                    tasks: [
+                        {
+                            content: 'Task with deadline',
+                            projectId: '6cfCcrrCFg2xP94Q',
+                            deadlineDate: '2025-12-31',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Verify API was called with deadline
+            expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
+                content: 'Task with deadline',
+                projectId: '6cfCcrrCFg2xP94Q',
+                sectionId: undefined,
+                parentId: undefined,
+                deadlineDate: '2025-12-31',
+            })
+
+            // Verify result is a concise summary
+            expect(extractTextContent(result)).toMatchSnapshot()
+
+            // Verify structured content includes deadline
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.tasks).toHaveLength(1)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    totalCount: 1,
+                    tasks: expect.arrayContaining([
+                        expect.objectContaining({
+                            id: '8485093756',
+                            deadlineDate: '2025-12-31',
+                        }),
+                    ]),
+                }),
+            )
+        })
+
         it('should add task with labels', async () => {
             const mockApiResponse: Task = createMockTask({
                 id: '8485093755',

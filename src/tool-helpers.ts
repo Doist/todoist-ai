@@ -79,6 +79,7 @@ function mapTask(task: Task) {
         description: task.description,
         dueDate: task.due?.date,
         recurring: task.due?.isRecurring && task.due.string ? task.due.string : false,
+        deadlineDate: task.deadline?.date,
         priority: task.priority,
         projectId: task.projectId,
         sectionId: task.sectionId,
