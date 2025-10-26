@@ -131,6 +131,32 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
             expect(textContent).toContain('Updated 1 project:')
             expect(textContent).toContain('Updated Favorite Project (id=project-123)')
         })
+
+        it('should update project with parentId to move it to a sub-project', async () => {
+            const mockApiResponse = createMockProject({
+                id: 'project-child',
+                name: 'Child Project',
+                parentId: 'project-parent',
+            })
+
+            mockTodoistApi.updateProject.mockResolvedValue(mockApiResponse)
+
+            const result = await updateProjects.execute(
+                {
+                    projects: [{ id: 'project-child', parentId: 'project-parent' }],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateProject).toHaveBeenCalledWith('project-child', {
+                parentId: 'project-parent',
+            })
+
+            const textContent = extractTextContent(result)
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Updated 1 project:')
+            expect(textContent).toContain('Child Project (id=project-child)')
+        })
     })
 
     describe('updating multiple projects', () => {

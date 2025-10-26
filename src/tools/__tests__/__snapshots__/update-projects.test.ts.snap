@@ -16,6 +16,14 @@ Next:
 - Use find-tasks with projectId=project-123 to review existing tasks"
 `;
 
+exports[`update-projects tool updating a single project should update project with parentId to move it to a sub-project 1`] = `
+"Updated 1 project:
+• Child Project (id=project-child)
+Next:
+- Use get-overview with projectId=project-child to see project structure
+- Use find-tasks with projectId=project-child to review existing tasks"
+`;
+
 exports[`update-projects tool updating multiple projects should skip projects with no updates and report correctly 1`] = `
 "Updated 1 project (1 skipped - no changes):
 • Updated Project (id=project-1)
