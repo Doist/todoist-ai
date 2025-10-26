@@ -20,14 +20,28 @@ Here's an example using [Vercel's AI SDK](https://ai-sdk.dev/docs/ai-sdk-core/ge
 
 ```js
 import { findTasksByDate, addTasks } from "@doist/todoist-ai";
+import { TodoistApi } from "@doist/todoist-api-typescript";
 import { streamText } from "ai";
+
+// Create Todoist API client
+const client = new TodoistApi(process.env.TODOIST_API_KEY);
+
+// Helper to wrap tools with the client
+function wrapTool(tool, todoistClient) {
+    return {
+        ...tool,
+        execute(args) {
+            return tool.execute(args, todoistClient);
+        },
+    };
+}
 
 const result = streamText({
     model: yourModel,
     system: "You are a helpful Todoist assistant",
     tools: {
-        findTasksByDate,
-        addTasks,
+        findTasksByDate: wrapTool(findTasksByDate, client),
+        addTasks: wrapTool(addTasks, client),
     },
 });
 ```
