@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.15.0](https://github.com/Doist/todoist-ai/compare/v4.14.5...v4.15.0) (2025-10-26)
+
+
+### Features
+
+* Add deadline support to add-tasks and update-tasks ([#186](https://github.com/Doist/todoist-ai/issues/186)) ([8f795c8](https://github.com/Doist/todoist-ai/commit/8f795c8949f40d10bf629933793d8cb4607dcb58))
+* Add parentId support to update-projects tool ([#184](https://github.com/Doist/todoist-ai/issues/184)) ([0185b83](https://github.com/Doist/todoist-ai/commit/0185b836fff1359c8303de20bcc37c8f86138180))
+
 ## [4.14.5](https://github.com/Doist/todoist-ai/compare/v4.14.4...v4.14.5) (2025-10-25)
 
 
