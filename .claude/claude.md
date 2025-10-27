@@ -2,29 +2,11 @@
 
 ## Tool Schema Design Rules
 
-### ⚠️ CRITICAL: Gemini API Compatibility
-
-**Never use `.nullable()` on optional string fields in Zod schemas for MCP tools.**
-
-Google's Gemini API does not support OpenAPI 3.1 style nullable types that use `["string", "null"]` format. This causes HTTP 400 errors or complete tool call failures.
-
-### Pattern to Follow
-
-#### ❌ WRONG - Causes Gemini API failures:
-```typescript
-fieldName: z.string().nullable().optional()
-```
-
-#### ✅ CORRECT - Gemini API compatible:
-```typescript
-fieldName: z.string().optional()
-```
-
 ### Removing/Clearing Optional Fields
 
 When you need to support clearing an optional field:
 
-1. **Use a special string value** (not `null`)
+1. **Use a special string value** (not `null` - avoids LLM provider compatibility issues, with Gemini in particular)
    - For assignments: use `"unassign"`
    - For other fields: use `"remove"` or similar descriptive string
 

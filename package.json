@@ -40,7 +40,8 @@
         "lint:write": "biome lint --write",
         "format:check": "biome format",
         "format:write": "biome format --write",
-        "check": "biome check",
+        "lint:schemas": "npm run build && npx tsc scripts/validate-schemas.ts --outDir dist/scripts --moduleResolution node --module ESNext --target es2021 --esModuleInterop --skipLibCheck --declaration false && node dist/scripts/validate-schemas.js",
+        "check": "biome check && npm run lint:schemas",
         "check:fix": "biome check --fix --unsafe",
         "prepare": "husky"
     },
@@ -71,6 +72,15 @@
     "lint-staged": {
         "*": [
             "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
+        ],
+        "src/tools/*.ts": [
+            "npm run lint:schemas"
+        ],
+        "src/index.ts": [
+            "npm run lint:schemas"
+        ],
+        "scripts/validate-schemas.ts": [
+            "npm run lint:schemas"
         ]
     }
 }

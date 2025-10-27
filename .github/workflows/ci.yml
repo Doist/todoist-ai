@@ -54,6 +54,9 @@ jobs:
       - name: Run linting checks
         run: npm run lint:check && npm run format:check
 
+      - name: Validate tool schemas
+        run: npm run lint:schemas
+
       - name: Test MCP server executable
         run: npm run test:executable
         env:
