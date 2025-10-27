@@ -10,12 +10,6 @@ const { FIND_PROJECTS, FIND_TASKS, GET_OVERVIEW } = ToolNames
 const ProjectUpdateSchema = z.object({
     id: z.string().min(1).describe('The ID of the project to update.'),
     name: z.string().min(1).optional().describe('The new name of the project.'),
-    parentId: z
-        .string()
-        .optional()
-        .describe(
-            'The ID of the parent project. If provided, moves this project to be a sub-project.',
-        ),
     isFavorite: z.boolean().optional().describe('Whether the project is a favorite.'),
     viewStyle: z.enum(['list', 'board', 'calendar']).optional().describe('The project view style.'),
 })
