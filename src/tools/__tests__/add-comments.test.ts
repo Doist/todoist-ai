@@ -1,4 +1,4 @@
-import type { Comment, TodoistApi } from '@doist/todoist-api-typescript'
+import type { Attachment, Comment, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import { extractStructuredContent, extractTextContent } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
@@ -7,6 +7,7 @@ import { addComments } from '../add-comments.js'
 // Mock the Todoist API
 const mockTodoistApi = {
     addComment: jest.fn(),
+    uploadFile: jest.fn(),
 } as unknown as jest.Mocked<TodoistApi>
 
 const { ADD_COMMENTS } = ToolNames
@@ -22,6 +23,22 @@ const createMockComment = (overrides: Partial<Comment> = {}): Comment => ({
     uidsToNotify: null,
     reactions: null,
     isDeleted: false,
+    ...overrides,
+})
+
+const createMockAttachment = (overrides: Partial<Attachment> = {}): Attachment => ({
+    resourceType: 'file',
+    fileName: 'test-document.pdf',
+    fileSize: 1024,
+    fileType: 'application/pdf',
+    fileUrl: 'https://example.com/uploads/test-document.pdf',
+    fileDuration: null,
+    uploadState: 'completed',
+    image: null,
+    imageWidth: null,
+    imageHeight: null,
+    url: null,
+    title: null,
     ...overrides,
 })
 
@@ -305,6 +322,273 @@ describe(`${ADD_COMMENTS} tool`, () => {
             await expect(
                 addComments.execute({ comments: [comment] }, mockTodoistApi),
             ).rejects.toThrow('Comment 1: Cannot provide both taskId and projectId. Choose one.')
+        })
+
+        // Note: Schema validation (like fileData without fileName) is handled by the MCP framework
+        // during parameter parsing, not at the tool execution level
+    })
+
+    describe('file attachments', () => {
+        it('should upload file and add comment with attachment', async () => {
+            const mockAttachment = createMockAttachment({
+                fileUrl: 'https://example.com/uploaded-file.pdf',
+                fileName: 'document.pdf',
+                fileType: 'application/pdf',
+                resourceType: 'file',
+            })
+
+            const mockComment = createMockComment({
+                id: '77777',
+                content: 'Comment with attachment',
+                taskId: 'task789',
+                fileAttachment: mockAttachment,
+            })
+
+            mockTodoistApi.uploadFile.mockResolvedValue(mockAttachment)
+            mockTodoistApi.addComment.mockResolvedValue(mockComment)
+
+            const base64Data = Buffer.from('PDF file content').toString('base64')
+
+            const result = await addComments.execute(
+                {
+                    comments: [
+                        {
+                            taskId: 'task789',
+                            content: 'Comment with attachment',
+                            fileData: base64Data,
+                            fileName: 'document.pdf',
+                            fileType: 'application/pdf',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Verify uploadFile was called with correct parameters
+            expect(mockTodoistApi.uploadFile).toHaveBeenCalledWith({
+                file: Buffer.from(base64Data, 'base64'),
+                fileName: 'document.pdf',
+                projectId: undefined,
+            })
+
+            // Verify addComment was called with attachment
+            expect(mockTodoistApi.addComment).toHaveBeenCalledWith({
+                content: 'Comment with attachment',
+                taskId: 'task789',
+                attachment: {
+                    fileUrl: 'https://example.com/uploaded-file.pdf',
+                    fileName: 'document.pdf',
+                    fileType: 'application/pdf',
+                    resourceType: 'file',
+                },
+            })
+
+            // Verify text output mentions attachment
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('1 with an attachment')
+
+            // Verify structured content includes attachment info
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    attachmentCount: 1,
+                    commentsWithAttachments: [
+                        {
+                            commentId: '77777',
+                            fileName: 'document.pdf',
+                            fileType: 'application/pdf',
+                        },
+                    ],
+                }),
+            )
+        })
+
+        it('should handle mixed comments with and without attachments', async () => {
+            const mockAttachment = createMockAttachment({
+                fileUrl: 'https://example.com/report.pdf',
+                fileName: 'report.pdf',
+                fileType: 'application/pdf',
+            })
+
+            const mockCommentWithAttachment = createMockComment({
+                id: '88888',
+                content: 'Comment with file',
+                taskId: 'task111',
+                fileAttachment: mockAttachment,
+            })
+
+            const mockCommentWithoutAttachment = createMockComment({
+                id: '99999',
+                content: 'Comment without file',
+                taskId: 'task222',
+                fileAttachment: null,
+            })
+
+            mockTodoistApi.uploadFile.mockResolvedValue(mockAttachment)
+            mockTodoistApi.addComment
+                .mockResolvedValueOnce(mockCommentWithAttachment)
+                .mockResolvedValueOnce(mockCommentWithoutAttachment)
+
+            const base64Data = Buffer.from('Report content').toString('base64')
+
+            const result = await addComments.execute(
+                {
+                    comments: [
+                        {
+                            taskId: 'task111',
+                            content: 'Comment with file',
+                            fileData: base64Data,
+                            fileName: 'report.pdf',
+                        },
+                        {
+                            taskId: 'task222',
+                            content: 'Comment without file',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Verify uploadFile called only once
+            expect(mockTodoistApi.uploadFile).toHaveBeenCalledTimes(1)
+
+            // Verify addComment called twice
+            expect(mockTodoistApi.addComment).toHaveBeenCalledTimes(2)
+
+            // Verify calls were made with correct parameters (order may vary due to parallel processing)
+            expect(mockTodoistApi.addComment).toHaveBeenCalledWith({
+                content: 'Comment with file',
+                taskId: 'task111',
+                attachment: expect.objectContaining({
+                    fileUrl: 'https://example.com/report.pdf',
+                }),
+            })
+
+            expect(mockTodoistApi.addComment).toHaveBeenCalledWith({
+                content: 'Comment without file',
+                taskId: 'task222',
+            })
+
+            // Verify text output shows attachment count
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('2 task comments (1 with an attachment)')
+
+            // Verify structured content
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    attachmentCount: 1,
+                    commentsWithAttachments: [
+                        {
+                            commentId: '88888',
+                            fileName: 'report.pdf',
+                            fileType: 'application/pdf',
+                        },
+                    ],
+                }),
+            )
+        })
+
+        it('should use project ID for file upload when provided', async () => {
+            const mockAttachment = createMockAttachment()
+            const mockComment = createMockComment({
+                taskId: undefined,
+                projectId: 'project456',
+                fileAttachment: mockAttachment,
+            })
+
+            mockTodoistApi.uploadFile.mockResolvedValue(mockAttachment)
+            mockTodoistApi.addComment.mockResolvedValue(mockComment)
+
+            const base64Data = Buffer.from('File content').toString('base64')
+
+            await addComments.execute(
+                {
+                    comments: [
+                        {
+                            projectId: 'project456',
+                            content: 'Project comment with file',
+                            fileData: base64Data,
+                            fileName: 'project-file.pdf',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Verify uploadFile called with projectId
+            expect(mockTodoistApi.uploadFile).toHaveBeenCalledWith({
+                file: Buffer.from(base64Data, 'base64'),
+                fileName: 'project-file.pdf',
+                projectId: 'project456',
+            })
+        })
+
+        it('should handle upload errors gracefully', async () => {
+            mockTodoistApi.uploadFile.mockRejectedValue(new Error('Upload failed'))
+
+            const base64Data = Buffer.from('File content').toString('base64')
+
+            await expect(
+                addComments.execute(
+                    {
+                        comments: [
+                            {
+                                taskId: 'task123',
+                                content: 'Comment with failed upload',
+                                fileData: base64Data,
+                                fileName: 'test.pdf',
+                            },
+                        ],
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow('Failed to upload file "test.pdf": Upload failed')
+
+            // Verify uploadFile was called
+            expect(mockTodoistApi.uploadFile).toHaveBeenCalledTimes(1)
+            // Verify addComment was NOT called due to upload failure
+            expect(mockTodoistApi.addComment).not.toHaveBeenCalled()
+        })
+
+        it('should handle file without fileType specified', async () => {
+            const mockAttachment = createMockAttachment({
+                fileType: null,
+            })
+
+            const mockComment = createMockComment({
+                fileAttachment: mockAttachment,
+            })
+
+            mockTodoistApi.uploadFile.mockResolvedValue(mockAttachment)
+            mockTodoistApi.addComment.mockResolvedValue(mockComment)
+
+            const base64Data = Buffer.from('File content').toString('base64')
+
+            const result = await addComments.execute(
+                {
+                    comments: [
+                        {
+                            taskId: 'task123',
+                            content: 'Comment with file',
+                            fileData: base64Data,
+                            fileName: 'document.txt',
+                            // No fileType specified
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addComment).toHaveBeenCalledWith({
+                content: 'Comment with file',
+                taskId: 'task123',
+                attachment: expect.objectContaining({
+                    fileType: undefined,
+                }),
+            })
+
+            expect(result).toBeDefined()
         })
     })
 })
