@@ -46,9 +46,9 @@
         "prepare": "husky"
     },
     "dependencies": {
+        "@doist/todoist-api-typescript": "6.0.0",
         "@modelcontextprotocol/sdk": "^1.11.1",
         "date-fns": "^4.1.0",
-        "@doist/todoist-api-typescript": "5.9.0",
         "dotenv": "^17.0.0",
         "zod": "^3.25.7"
     },
