@@ -24,7 +24,12 @@ const { FIND_COMPLETED_TASKS, ADD_TASKS } = ToolNames
 
 const ArgsSchema = {
     searchText: z.string().optional().describe('The text to search for in tasks.'),
-    projectId: z.string().optional().describe('Find tasks in this project.'),
+    projectId: z
+        .string()
+        .optional()
+        .describe(
+            'Find tasks in this project. Project ID should be an ID string, or the text "inbox", for inbox tasks.',
+        ),
     sectionId: z.string().optional().describe('Find tasks in this section.'),
     parentId: z.string().optional().describe('Find subtasks of this parent task.'),
     responsibleUser: z
@@ -101,7 +106,10 @@ const findTasks = {
                 cursor: cursor ?? null,
             }
 
-            if (projectId) taskParams.projectId = projectId
+            if (projectId) {
+                taskParams.projectId =
+                    projectId === 'inbox' ? todoistUser.inboxProjectId : projectId
+            }
             if (sectionId) taskParams.sectionId = sectionId
             if (parentId) taskParams.parentId = parentId
 
