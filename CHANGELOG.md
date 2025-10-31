@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.15.1](https://github.com/Doist/todoist-ai/compare/v4.15.0...v4.15.1) (2025-10-31)
+
+
+### Bug Fixes
+
+* Allow `inbox` as a project id ([#193](https://github.com/Doist/todoist-ai/issues/193)) ([fe4a91f](https://github.com/Doist/todoist-ai/commit/fe4a91fe2daa7f97473b97de54385e03358a8122))
+
 ## [4.15.0](https://github.com/Doist/todoist-ai/compare/v4.14.5...v4.15.0) (2025-10-26)
 
 
