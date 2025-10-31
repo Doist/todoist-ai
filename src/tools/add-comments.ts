@@ -7,11 +7,33 @@ import { ToolNames } from '../utils/tool-names.js'
 
 const { FIND_COMMENTS, UPDATE_COMMENTS, DELETE_OBJECT } = ToolNames
 
-const CommentSchema = z.object({
-    taskId: z.string().optional().describe('The ID of the task to comment on.'),
-    projectId: z.string().optional().describe('The ID of the project to comment on.'),
-    content: z.string().min(1).describe('The content of the comment.'),
-})
+const CommentSchema = z
+    .object({
+        taskId: z.string().optional().describe('The ID of the task to comment on.'),
+        projectId: z.string().optional().describe('The ID of the project to comment on.'),
+        content: z.string().min(1).describe('The content of the comment.'),
+        fileData: z
+            .string()
+            .optional()
+            .describe('Base64-encoded file content to attach to the comment.'),
+        fileName: z
+            .string()
+            .optional()
+            .describe('Name of the file (required when fileData is provided).'),
+        fileType: z
+            .string()
+            .optional()
+            .describe('MIME type of the file (e.g., "application/pdf", "image/png").'),
+    })
+    .refine(
+        (data) => {
+            // If fileData is provided, fileName is required
+            return !data.fileData || data.fileName
+        },
+        {
+            message: 'fileName is required when fileData is provided',
+        },
+    )
 
 const ArgsSchema = {
     comments: z.array(CommentSchema).min(1).describe('The array of comments to add.'),
@@ -20,7 +42,7 @@ const ArgsSchema = {
 const addComments = {
     name: ToolNames.ADD_COMMENTS,
     description:
-        'Add multiple comments to tasks or projects. Each comment must specify either taskId or projectId.',
+        'Add multiple comments to tasks or projects. Each comment must specify either taskId or projectId. Optionally attach files by providing base64-encoded fileData and fileName.',
     parameters: ArgsSchema,
     async execute(args, client) {
         const { comments } = args
@@ -40,11 +62,38 @@ const addComments = {
         }
 
         const addCommentPromises = comments.map(
-            async ({ content, taskId, projectId }) =>
-                await client.addComment({
+            async ({ content, taskId, projectId, fileData, fileName, fileType }) => {
+                let attachment = null
+
+                // Handle file upload if file data is provided
+                if (fileData && fileName) {
+                    try {
+                        const buffer = Buffer.from(fileData, 'base64')
+                        const uploadResult = await client.uploadFile({
+                            file: buffer,
+                            fileName: fileName,
+                            projectId: projectId || undefined,
+                        })
+
+                        attachment = {
+                            fileUrl: uploadResult.fileUrl || '',
+                            fileName: uploadResult.fileName || fileName,
+                            fileType: fileType || uploadResult.fileType || undefined,
+                            resourceType: uploadResult.resourceType || 'file',
+                        }
+                    } catch (error) {
+                        throw new Error(
+                            `Failed to upload file "${fileName}": ${error instanceof Error ? error.message : String(error)}`,
+                        )
+                    }
+                }
+
+                return await client.addComment({
                     content,
                     ...(taskId ? { taskId } : { projectId }),
-                } as AddCommentArgs),
+                    ...(attachment ? { attachment } : {}),
+                } as AddCommentArgs)
+            },
         )
 
         const newComments = await Promise.all(addCommentPromises)
@@ -56,6 +105,14 @@ const addComments = {
                 comments: newComments,
                 totalCount: newComments.length,
                 addedCommentIds: newComments.map((comment) => comment.id),
+                attachmentCount: newComments.filter((c) => c.fileAttachment !== null).length,
+                commentsWithAttachments: newComments
+                    .filter((c) => c.fileAttachment !== null)
+                    .map((c) => ({
+                        commentId: c.id,
+                        fileName: c.fileAttachment?.fileName || 'Unknown',
+                        fileType: c.fileAttachment?.fileType || undefined,
+                    })),
             },
         })
     },
@@ -65,6 +122,7 @@ function generateTextContent({ comments }: { comments: Comment[] }): string {
     // Group comments by entity type and count
     const taskComments = comments.filter((c) => c.taskId).length
     const projectComments = comments.filter((c) => c.projectId).length
+    const attachmentCount = comments.filter((c) => c.fileAttachment !== null).length
 
     // Generate summary text
     const parts: string[] = []
@@ -76,7 +134,13 @@ function generateTextContent({ comments }: { comments: Comment[] }): string {
         const commentsLabel = projectComments > 1 ? 'comments' : 'comment'
         parts.push(`${projectComments} project ${commentsLabel}`)
     }
-    const summary = parts.length > 0 ? `Added ${parts.join(' and ')}` : 'No comments added'
+
+    let summary = parts.length > 0 ? `Added ${parts.join(' and ')}` : 'No comments added'
+
+    // Add attachment information
+    if (attachmentCount > 0) {
+        summary += ` (${attachmentCount} with an attachment)`
+    }
 
     // Context-aware next steps
     const nextSteps: string[] = []
