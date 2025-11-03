@@ -2,6 +2,7 @@ import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import {
     createMockSection,
+    createMockUser,
     extractStructuredContent,
     extractTextContent,
     TEST_ERRORS,
@@ -13,6 +14,7 @@ import { findSections } from '../find-sections.js'
 // Mock the Todoist API
 const mockTodoistApi = {
     getSections: jest.fn(),
+    getUser: jest.fn(),
 } as unknown as jest.Mocked<TodoistApi>
 
 const { FIND_SECTIONS, ADD_SECTIONS } = ToolNames
@@ -293,6 +295,86 @@ describe(`${FIND_SECTIONS} tool`, () => {
             expect(textContent).toContain('matching "done"')
             expect(textContent).toContain('Done • id=')
             expect(textContent).toContain('Done Soon • id=')
+        })
+    })
+
+    describe('inbox project ID resolution', () => {
+        it('should resolve "inbox" to actual inbox project ID', async () => {
+            const mockUser = createMockUser({
+                inboxProjectId: TEST_IDS.PROJECT_INBOX,
+            })
+            const mockSections: Section[] = [
+                createMockSection({
+                    id: TEST_IDS.SECTION_1,
+                    projectId: TEST_IDS.PROJECT_INBOX,
+                    name: 'Inbox Section 1',
+                }),
+                createMockSection({
+                    id: TEST_IDS.SECTION_2,
+                    projectId: TEST_IDS.PROJECT_INBOX,
+                    name: 'Inbox Section 2',
+                    sectionOrder: 2,
+                }),
+            ]
+
+            // Mock getUser to return our mock user with inbox ID
+            mockTodoistApi.getUser.mockResolvedValue(mockUser)
+
+            // Mock the API response
+            mockTodoistApi.getSections.mockResolvedValue({
+                results: mockSections,
+                nextCursor: null,
+            })
+
+            const result = await findSections.execute({ projectId: 'inbox' }, mockTodoistApi)
+
+            // Verify getUser was called to resolve inbox
+            expect(mockTodoistApi.getUser).toHaveBeenCalledTimes(1)
+
+            // Verify getSections was called with resolved inbox project ID
+            expect(mockTodoistApi.getSections).toHaveBeenCalledWith({
+                projectId: TEST_IDS.PROJECT_INBOX,
+            })
+
+            // Verify result contains the sections
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('Sections in project')
+            expect(textContent).toContain('Inbox Section 1')
+            expect(textContent).toContain('Inbox Section 2')
+
+            // Verify structured content
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.totalCount).toBe(2)
+            expect(structuredContent.sections).toEqual([
+                { id: TEST_IDS.SECTION_1, name: 'Inbox Section 1' },
+                { id: TEST_IDS.SECTION_2, name: 'Inbox Section 2' },
+            ])
+        })
+
+        it('should not call getUser when projectId is not "inbox"', async () => {
+            const mockSections: Section[] = [
+                createMockSection({
+                    id: TEST_IDS.SECTION_1,
+                    projectId: TEST_IDS.PROJECT_TEST,
+                    name: 'Regular Section',
+                }),
+            ]
+
+            // Mock the API response
+            mockTodoistApi.getSections.mockResolvedValue({
+                results: mockSections,
+                nextCursor: null,
+            })
+
+            await findSections.execute({ projectId: TEST_IDS.PROJECT_TEST }, mockTodoistApi)
+
+            // Verify getUser was NOT called for regular project ID
+            expect(mockTodoistApi.getUser).not.toHaveBeenCalled()
+
+            // Verify getSections was called with original project ID
+            expect(mockTodoistApi.getSections).toHaveBeenCalledWith({
+                projectId: TEST_IDS.PROJECT_TEST,
+            })
         })
     })
 

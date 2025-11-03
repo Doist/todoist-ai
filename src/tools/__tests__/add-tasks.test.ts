@@ -2,8 +2,10 @@ import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
 import {
     createMockTask,
+    createMockUser,
     extractStructuredContent,
     extractTextContent,
+    TEST_IDS,
     TODAY,
 } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
@@ -12,6 +14,7 @@ import { addTasks } from '../add-tasks.js'
 // Mock the Todoist API
 const mockTodoistApi = {
     addTask: jest.fn(),
+    getUser: jest.fn(),
 } as unknown as jest.Mocked<TodoistApi>
 
 const { ADD_TASKS, GET_OVERVIEW } = ToolNames
@@ -702,6 +705,97 @@ describe(`${ADD_TASKS} tool`, () => {
             ).rejects.toThrow(
                 'Task "Task with assignment but no project": Cannot assign tasks without specifying project context. Please specify a projectId, sectionId, or parentId.',
             )
+        })
+    })
+
+    describe('inbox project ID resolution', () => {
+        it('should resolve "inbox" to actual inbox project ID', async () => {
+            const mockUser = createMockUser({
+                inboxProjectId: TEST_IDS.PROJECT_INBOX,
+            })
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093760',
+                content: 'Task for inbox',
+                projectId: TEST_IDS.PROJECT_INBOX,
+                url: 'https://todoist.com/showTask?id=8485093760',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            // Mock the API calls
+            mockTodoistApi.getUser.mockResolvedValue(mockUser)
+            mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
+
+            const result = await addTasks.execute(
+                {
+                    tasks: [
+                        {
+                            content: 'Task for inbox',
+                            projectId: 'inbox',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Verify getUser was called to resolve inbox
+            expect(mockTodoistApi.getUser).toHaveBeenCalledTimes(1)
+
+            // Verify addTask was called with resolved inbox project ID
+            expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
+                content: 'Task for inbox',
+                projectId: TEST_IDS.PROJECT_INBOX,
+                sectionId: undefined,
+                parentId: undefined,
+                labels: undefined,
+            })
+
+            // Verify result contains the task
+            const structuredContent = extractStructuredContent(result)
+            expect(structuredContent.totalCount).toBe(1)
+            expect(structuredContent.tasks).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        id: '8485093760',
+                        projectId: TEST_IDS.PROJECT_INBOX,
+                    }),
+                ]),
+            )
+        })
+
+        it('should not call getUser when projectId is not "inbox"', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093761',
+                content: 'Regular task',
+                projectId: '6cfCcrrCFg2xP94Q',
+                url: 'https://todoist.com/showTask?id=8485093761',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
+
+            await addTasks.execute(
+                {
+                    tasks: [
+                        {
+                            content: 'Regular task',
+                            projectId: '6cfCcrrCFg2xP94Q',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Verify getUser was NOT called for regular project ID
+            expect(mockTodoistApi.getUser).not.toHaveBeenCalled()
+
+            // Verify addTask was called with original project ID
+            expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
+                content: 'Regular task',
+                projectId: '6cfCcrrCFg2xP94Q',
+                sectionId: undefined,
+                parentId: undefined,
+                labels: undefined,
+            })
         })
     })
 })
