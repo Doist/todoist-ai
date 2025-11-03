@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.16.0](https://github.com/Doist/todoist-ai/compare/v4.15.1...v4.16.0) (2025-11-03)
+
+
+### Features
+
+* Extend "inbox" project ID support to 7 additional tools ([#198](https://github.com/Doist/todoist-ai/issues/198)) ([5bab0f9](https://github.com/Doist/todoist-ai/commit/5bab0f94ab2d997d71870202294af3c5d3ac7784))
+
 ## [4.15.1](https://github.com/Doist/todoist-ai/compare/v4.15.0...v4.15.1) (2025-10-31)
 
 
