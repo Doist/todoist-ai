@@ -43,7 +43,12 @@ const TaskSchema = z.object({
             'The duration of the task. Use format: "2h" (hours), "90m" (minutes), "2h30m" (combined), or "1.5h" (decimal hours). Max 24h.',
         ),
     labels: z.array(z.string()).optional().describe('The labels to attach to the task.'),
-    projectId: z.string().optional().describe('The project ID to add this task to.'),
+    projectId: z
+        .string()
+        .optional()
+        .describe(
+            'The project ID to add this task to. Project ID should be an ID string, or the text "inbox", for inbox tasks.',
+        ),
     sectionId: z.string().optional().describe('The section ID to add this task to.'),
     parentId: z.string().optional().describe('The parent task ID (for subtasks).'),
     responsibleUser: z
@@ -96,9 +101,16 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
         ...otherTaskArgs
     } = task
 
+    // Resolve "inbox" to actual inbox project ID if needed
+    let resolvedProjectId = projectId
+    if (projectId === 'inbox') {
+        const todoistUser = await client.getUser()
+        resolvedProjectId = todoistUser.inboxProjectId
+    }
+
     let taskArgs: AddTaskArgs = {
         ...otherTaskArgs,
-        projectId,
+        projectId: resolvedProjectId,
         sectionId,
         parentId,
         labels,
@@ -111,7 +123,7 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
     }
 
     // Only prevent assignment (not task creation) without sufficient project context
-    if (responsibleUser && !projectId && !sectionId && !parentId) {
+    if (responsibleUser && !resolvedProjectId && !sectionId && !parentId) {
         throw new Error(
             `Task "${task.content}": Cannot assign tasks without specifying project context. Please specify a projectId, sectionId, or parentId.`,
         )
@@ -137,7 +149,7 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
     // Handle assignment if provided
     if (responsibleUser) {
         // Resolve target project for validation
-        let targetProjectId = projectId
+        let targetProjectId = resolvedProjectId
         if (!targetProjectId && parentId) {
             // For subtasks, get project from parent task
             try {

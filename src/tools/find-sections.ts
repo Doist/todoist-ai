@@ -8,7 +8,12 @@ import { ToolNames } from '../utils/tool-names.js'
 const { ADD_SECTIONS, UPDATE_SECTIONS, FIND_TASKS, UPDATE_TASKS, DELETE_OBJECT } = ToolNames
 
 const ArgsSchema = {
-    projectId: z.string().min(1).describe('The ID of the project to search sections in.'),
+    projectId: z
+        .string()
+        .min(1)
+        .describe(
+            'The ID of the project to search sections in. Project ID should be an ID string, or the text "inbox", for inbox tasks.',
+        ),
     search: z
         .string()
         .optional()
@@ -27,8 +32,12 @@ const findSections = {
     description: 'Search for sections by name or other criteria in a project.',
     parameters: ArgsSchema,
     async execute(args, client) {
+        // Resolve "inbox" to actual inbox project ID if needed
+        const resolvedProjectId =
+            args.projectId === 'inbox' ? (await client.getUser()).inboxProjectId : args.projectId
+
         const { results } = await client.getSections({
-            projectId: args.projectId,
+            projectId: resolvedProjectId,
         })
         const searchLower = args.search ? args.search.toLowerCase() : undefined
         const filtered = searchLower

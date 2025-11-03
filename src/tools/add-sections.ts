@@ -9,7 +9,12 @@ const { ADD_TASKS, FIND_TASKS, GET_OVERVIEW, FIND_SECTIONS } = ToolNames
 
 const SectionSchema = z.object({
     name: z.string().min(1).describe('The name of the section.'),
-    projectId: z.string().min(1).describe('The ID of the project to add the section to.'),
+    projectId: z
+        .string()
+        .min(1)
+        .describe(
+            'The ID of the project to add the section to. Project ID should be an ID string, or the text "inbox", for inbox tasks.',
+        ),
 })
 
 const ArgsSchema = {
@@ -21,7 +26,22 @@ const addSections = {
     description: 'Add one or more new sections to projects.',
     parameters: ArgsSchema,
     async execute({ sections }, client) {
-        const newSections = await Promise.all(sections.map((section) => client.addSection(section)))
+        // Check if any section needs inbox resolution
+        const needsInboxResolution = sections.some((section) => section.projectId === 'inbox')
+        const todoistUser = needsInboxResolution ? await client.getUser() : null
+
+        // Resolve inbox project IDs
+        const sectionsWithResolvedProjectIds = sections.map((section) => ({
+            ...section,
+            projectId:
+                section.projectId === 'inbox' && todoistUser
+                    ? todoistUser.inboxProjectId
+                    : section.projectId,
+        }))
+
+        const newSections = await Promise.all(
+            sectionsWithResolvedProjectIds.map((section) => client.addSection(section)),
+        )
         const textContent = generateTextContent({ sections: newSections })
 
         return getToolOutput({

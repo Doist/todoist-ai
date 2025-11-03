@@ -25,7 +25,12 @@ const TasksUpdateSchema = z.object({
         .describe(
             'New additional details, notes, or context for the task. Use this for longer content rather than putting it in the task name. Supports Markdown.',
         ),
-    projectId: z.string().optional().describe('The new project ID for the task.'),
+    projectId: z
+        .string()
+        .optional()
+        .describe(
+            'The new project ID for the task. Project ID should be an ID string, or the text "inbox", for inbox tasks.',
+        ),
     sectionId: z.string().optional().describe('The new section ID for the task.'),
     parentId: z.string().optional().describe('The new parent task ID (for subtasks).'),
     order: z.number().optional().describe('The new order of the task within its parent/section.'),
@@ -89,6 +94,13 @@ const updateTasks = {
                 deadlineDate,
                 ...otherUpdateArgs
             } = task
+
+            // Resolve "inbox" to actual inbox project ID if needed
+            let resolvedProjectId = projectId
+            if (projectId === 'inbox') {
+                const todoistUser = await client.getUser()
+                resolvedProjectId = todoistUser.inboxProjectId
+            }
 
             let updateArgs: UpdateTaskArgs = {
                 ...otherUpdateArgs,
@@ -155,11 +167,11 @@ const updateTasks = {
             }
 
             // If no move parameters are provided, use updateTask without moveTask
-            if (!projectId && !sectionId && !parentId) {
+            if (!resolvedProjectId && !sectionId && !parentId) {
                 return await client.updateTask(id, updateArgs)
             }
 
-            const moveArgs = createMoveTaskArgs(id, projectId, sectionId, parentId)
+            const moveArgs = createMoveTaskArgs(id, resolvedProjectId, sectionId, parentId)
             const movedTask = await client.moveTask(id, moveArgs)
 
             if (Object.keys(updateArgs).length > 0) {

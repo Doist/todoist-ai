@@ -28,7 +28,12 @@ const ArgsSchema = {
         .regex(/^\d{4}-\d{2}-\d{2}$/)
         .describe('The start date to get the tasks for. Format: YYYY-MM-DD.'),
     workspaceId: z.string().optional().describe('The ID of the workspace to get the tasks for.'),
-    projectId: z.string().optional().describe('The ID of the project to get the tasks for.'),
+    projectId: z
+        .string()
+        .optional()
+        .describe(
+            'The ID of the project to get the tasks for. Project ID should be an ID string, or the text "inbox", for inbox tasks.',
+        ),
     sectionId: z.string().optional().describe('The ID of the section to get the tasks for.'),
     parentId: z.string().optional().describe('The ID of the parent task to get the tasks for.'),
     responsibleUser: z
@@ -60,7 +65,8 @@ const findCompletedTasks = {
         'Get completed tasks (includes all collaborators by default—use responsibleUser to narrow).',
     parameters: ArgsSchema,
     async execute(args, client) {
-        const { getBy, labels, labelsOperator, since, until, responsibleUser, ...rest } = args
+        const { getBy, labels, labelsOperator, since, until, responsibleUser, projectId, ...rest } =
+            args
 
         // Resolve assignee name to user ID if provided
         const resolved = await resolveResponsibleUser(client, responsibleUser)
@@ -78,6 +84,9 @@ const findCompletedTasks = {
         const user = await client.getUser()
         const userGmtOffset = user.tzInfo?.gmtString || '+00:00'
 
+        // Resolve "inbox" to actual inbox project ID if needed
+        const resolvedProjectId = projectId === 'inbox' ? user.inboxProjectId : projectId
+
         // Convert user's local date to UTC timestamps
         // This ensures we capture the entire day from the user's perspective
         const sinceWithOffset = `${since}T00:00:00${userGmtOffset}`
@@ -91,12 +100,14 @@ const findCompletedTasks = {
             getBy === 'completion'
                 ? await client.getCompletedTasksByCompletionDate({
                       ...rest,
+                      projectId: resolvedProjectId,
                       since: sinceDateTime,
                       until: untilDateTime,
                       ...(filterQuery ? { filterQuery, filterLang: 'en' } : {}),
                   })
                 : await client.getCompletedTasksByDueDate({
                       ...rest,
+                      projectId: resolvedProjectId,
                       since: sinceDateTime,
                       until: untilDateTime,
                       ...(filterQuery ? { filterQuery, filterLang: 'en' } : {}),

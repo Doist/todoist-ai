@@ -9,7 +9,12 @@ const { FIND_COMMENTS, UPDATE_COMMENTS, DELETE_OBJECT } = ToolNames
 
 const CommentSchema = z.object({
     taskId: z.string().optional().describe('The ID of the task to comment on.'),
-    projectId: z.string().optional().describe('The ID of the project to comment on.'),
+    projectId: z
+        .string()
+        .optional()
+        .describe(
+            'The ID of the project to comment on. Project ID should be an ID string, or the text "inbox", for inbox tasks.',
+        ),
     content: z.string().min(1).describe('The content of the comment.'),
 })
 
@@ -39,13 +44,20 @@ const addComments = {
             }
         }
 
-        const addCommentPromises = comments.map(
-            async ({ content, taskId, projectId }) =>
-                await client.addComment({
-                    content,
-                    ...(taskId ? { taskId } : { projectId }),
-                } as AddCommentArgs),
-        )
+        // Check if any comment needs inbox resolution
+        const needsInboxResolution = comments.some((comment) => comment.projectId === 'inbox')
+        const todoistUser = needsInboxResolution ? await client.getUser() : null
+
+        const addCommentPromises = comments.map(async ({ content, taskId, projectId }) => {
+            // Resolve "inbox" to actual inbox project ID if needed
+            const resolvedProjectId =
+                projectId === 'inbox' && todoistUser ? todoistUser.inboxProjectId : projectId
+
+            return await client.addComment({
+                content,
+                ...(taskId ? { taskId } : { projectId: resolvedProjectId }),
+            } as AddCommentArgs)
+        })
 
         const newComments = await Promise.all(addCommentPromises)
         const textContent = generateTextContent({ comments: newComments })
