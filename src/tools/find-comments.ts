@@ -10,7 +10,12 @@ const { ADD_COMMENTS, UPDATE_COMMENTS, DELETE_OBJECT } = ToolNames
 
 const ArgsSchema = {
     taskId: z.string().optional().describe('Find comments for a specific task.'),
-    projectId: z.string().optional().describe('Find comments for a specific project.'),
+    projectId: z
+        .string()
+        .optional()
+        .describe(
+            'Find comments for a specific project. Project ID should be an ID string, or the text "inbox", for inbox tasks.',
+        ),
     commentId: z.string().optional().describe('Get a specific comment by ID.'),
     cursor: z.string().optional().describe('Pagination cursor for retrieving more results.'),
     limit: z
@@ -39,6 +44,10 @@ const findComments = {
             )
         }
 
+        // Resolve "inbox" to actual inbox project ID if needed
+        const resolvedProjectId =
+            args.projectId === 'inbox' ? (await client.getUser()).inboxProjectId : args.projectId
+
         let comments: Comment[]
         let hasMore = false
         let nextCursor: string | null = null
@@ -57,10 +66,10 @@ const findComments = {
             comments = response.results
             hasMore = response.nextCursor !== null
             nextCursor = response.nextCursor
-        } else if (args.projectId) {
+        } else if (resolvedProjectId) {
             // Get comments by project
             const response = await client.getComments({
-                projectId: args.projectId,
+                projectId: resolvedProjectId,
                 cursor: args.cursor || null,
                 limit: args.limit || ApiLimits.COMMENTS_DEFAULT,
             })

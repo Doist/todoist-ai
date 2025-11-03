@@ -1,6 +1,11 @@
 import type { CurrentUser, Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { jest } from '@jest/globals'
-import { createMockTask, extractTextContent } from '../../utils/test-helpers.js'
+import {
+    createMockTask,
+    createMockUser,
+    extractTextContent,
+    TEST_IDS,
+} from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { findCompletedTasks } from '../find-completed-tasks.js'
 
@@ -390,6 +395,128 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                     mockTodoistApi,
                 ),
             ).rejects.toThrow('API Error: Project not found')
+        })
+    })
+
+    describe('inbox project ID resolution', () => {
+        it('should resolve "inbox" to actual inbox project ID', async () => {
+            const mockUser = createMockUser({
+                inboxProjectId: TEST_IDS.PROJECT_INBOX,
+                tzInfo: {
+                    timezone: 'UTC',
+                    gmtString: '+00:00',
+                    hours: 0,
+                    minutes: 0,
+                    isDst: 0,
+                },
+            })
+            const mockCompletedTasks: Task[] = [
+                createMockTask({
+                    id: '8485093760',
+                    content: 'Completed inbox task',
+                    projectId: TEST_IDS.PROJECT_INBOX,
+                    completedAt: '2025-08-15T12:00:00Z',
+                    url: 'https://todoist.com/showTask?id=8485093760',
+                    addedAt: '2025-08-13T22:09:56.123456Z',
+                }),
+            ]
+
+            // Mock getUser to return our mock user with inbox ID
+            mockTodoistApi.getUser.mockResolvedValue(mockUser)
+
+            // Mock the API response
+            mockTodoistApi.getCompletedTasksByCompletionDate.mockResolvedValue({
+                items: mockCompletedTasks,
+                nextCursor: null,
+            })
+
+            const result = await findCompletedTasks.execute(
+                {
+                    getBy: 'completion',
+                    since: '2025-08-15',
+                    until: '2025-08-15',
+                    projectId: 'inbox',
+                    labels: [],
+                    labelsOperator: 'or' as const,
+                    limit: 50,
+                },
+                mockTodoistApi,
+            )
+
+            // Verify getUser was called
+            expect(mockTodoistApi.getUser).toHaveBeenCalledTimes(1)
+
+            // Verify getCompletedTasksByCompletionDate was called with resolved inbox project ID
+            expect(mockTodoistApi.getCompletedTasksByCompletionDate).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    projectId: TEST_IDS.PROJECT_INBOX,
+                    since: '2025-08-15T00:00:00.000Z',
+                    until: '2025-08-15T23:59:59.000Z',
+                    limit: 50,
+                }),
+            )
+
+            // Verify result contains the completed tasks
+            const textContent = extractTextContent(result)
+            expect(textContent).toContain('Completed tasks')
+            expect(textContent).toContain('Completed inbox task')
+        })
+
+        it('should use regular project ID when not "inbox"', async () => {
+            const mockUser = createMockUser({
+                tzInfo: {
+                    timezone: 'UTC',
+                    gmtString: '+00:00',
+                    hours: 0,
+                    minutes: 0,
+                    isDst: 0,
+                },
+            })
+            const mockCompletedTasks: Task[] = [
+                createMockTask({
+                    id: '8485093761',
+                    content: 'Completed regular task',
+                    projectId: '6cfCcrrCFg2xP94Q',
+                    completedAt: '2025-08-15T12:00:00Z',
+                    url: 'https://todoist.com/showTask?id=8485093761',
+                    addedAt: '2025-08-13T22:09:56.123456Z',
+                }),
+            ]
+
+            // Mock getUser (will be called for timezone, but inbox resolution won't happen)
+            mockTodoistApi.getUser.mockResolvedValue(mockUser)
+
+            // Mock the API response
+            mockTodoistApi.getCompletedTasksByCompletionDate.mockResolvedValue({
+                items: mockCompletedTasks,
+                nextCursor: null,
+            })
+
+            await findCompletedTasks.execute(
+                {
+                    getBy: 'completion',
+                    since: '2025-08-15',
+                    until: '2025-08-15',
+                    projectId: '6cfCcrrCFg2xP94Q',
+                    labels: [],
+                    labelsOperator: 'or' as const,
+                    limit: 50,
+                },
+                mockTodoistApi,
+            )
+
+            // Verify getUser was called (for timezone info)
+            expect(mockTodoistApi.getUser).toHaveBeenCalledTimes(1)
+
+            // Verify getCompletedTasksByCompletionDate was called with original project ID
+            expect(mockTodoistApi.getCompletedTasksByCompletionDate).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    projectId: '6cfCcrrCFg2xP94Q',
+                    since: '2025-08-15T00:00:00.000Z',
+                    until: '2025-08-15T23:59:59.000Z',
+                    limit: 50,
+                }),
+            )
         })
     })
 })
