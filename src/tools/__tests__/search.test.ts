@@ -15,8 +15,8 @@ vi.mock('../../tool-helpers', async () => {
         '../../tool-helpers',
     )) as typeof import('../../tool-helpers')
     return {
+        ...actual,
         getTasksByFilter: vi.fn(),
-        buildTodoistUrl: actual.buildTodoistUrl,
     }
 })
 

@@ -1,6 +1,6 @@
 import { resolve } from 'node:path'
-import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
     plugins: [
@@ -51,7 +51,7 @@ export default defineConfig({
         emptyOutDir: true,
         sourcemap: false,
         ssr: true, // Server-side rendering mode for Node.js
-        minify: false, // Keep readable for debugging
+        minify: true,
     },
 
     // Enable ?raw imports for future HTML/CSS template loading
@@ -63,6 +63,12 @@ export default defineConfig({
         environment: 'node',
         include: ['src/**/*.{test,spec}.{js,ts}'],
         exclude: ['node_modules', 'dist'],
+        // Optimize for CI - avoid unnecessary bundling
+        server: {
+            deps: {
+                external: ['rollup'],
+            },
+        },
         coverage: {
             provider: 'v8',
             include: ['src/**/*.ts'],

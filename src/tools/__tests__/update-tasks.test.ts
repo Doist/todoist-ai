@@ -555,10 +555,12 @@ describe(`${UPDATE_TASKS} tool`, () => {
             // Verify structured content includes updated labels
             const structuredContent = extractStructuredContent(result)
             expect(structuredContent.tasks).toHaveLength(1)
-            expect((structuredContent.tasks as any[])[0]).toEqual(
-                expect.objectContaining({
-                    labels: ['work', 'important'],
-                }),
+            expect(structuredContent.tasks).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        labels: ['work', 'important'],
+                    }),
+                ]),
             )
         })
 

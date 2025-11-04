@@ -31,9 +31,7 @@ vi.mock('../../utils/user-resolver', () => ({
 }))
 
 const mockGetTasksByFilter = getTasksByFilter as MockedFunction<typeof getTasksByFilter>
-const mockResolveUserNameToId = resolveUserNameToId as MockedFunction<
-    typeof resolveUserNameToId
->
+const mockResolveUserNameToId = resolveUserNameToId as MockedFunction<typeof resolveUserNameToId>
 
 // Mock the Todoist API (not directly used by find-tasks-by-date, but needed for type)
 const mockTodoistApi = {
