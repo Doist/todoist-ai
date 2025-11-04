@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`update-sections tool updating a single section should update a section when id and name are provided 1`] = `
+exports[`update-sections tool > updating a single section > should update a section when id and name are provided 1`] = `
 "Updated 1 section:
 • Updated Section Name (id=existing-section-123, projectId=6cfCcrrCFg2xP94Q)
 Next:
@@ -9,7 +9,7 @@ Next:
 - Consider updating task descriptions if section purpose changed"
 `;
 
-exports[`update-sections tool updating multiple sections should handle sections from the same project 1`] = `
+exports[`update-sections tool > updating multiple sections > should handle sections from the same project 1`] = `
 "Updated 2 sections:
 • Backlog (id=section-1, projectId=same-project)
 • Done (id=section-2, projectId=same-project)
@@ -19,7 +19,7 @@ Next:
 - Consider updating task descriptions if section purposes changed"
 `;
 
-exports[`update-sections tool updating multiple sections should update multiple sections and return mapped results 1`] = `
+exports[`update-sections tool > updating multiple sections > should update multiple sections and return mapped results 1`] = `
 "Updated 3 sections:
 • Updated First Section (id=section-1, projectId=project-1)
 • Updated Second Section (id=section-2, projectId=project-1)

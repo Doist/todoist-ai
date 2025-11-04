@@ -1,5 +1,5 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, vi } from 'vitest'
 import {
     createMockSection,
     createMockUser,
@@ -13,15 +13,15 @@ import { findSections } from '../find-sections.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    getSections: jest.fn(),
-    getUser: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    getSections: vi.fn(),
+    getUser: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { FIND_SECTIONS, ADD_SECTIONS } = ToolNames
 
 describe(`${FIND_SECTIONS} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('listing all sections in a project', () => {

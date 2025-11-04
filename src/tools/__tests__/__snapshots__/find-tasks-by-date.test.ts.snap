@@ -1,12 +1,12 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`find-tasks-by-date tool edge cases should handle empty results 1`] = `
+exports[`find-tasks-by-date tool > edge cases > should handle 'empty results' 1`] = `
 "Today's tasks + overdue: 0 (limit 50).
 Filter: today + overdue tasks + 6 more days.
 No results. Great job! No tasks for today or overdue."
 `;
 
-exports[`find-tasks-by-date tool label filtering should combine date filters with label filters 1`] = `
+exports[`find-tasks-by-date tool > label filtering > should combine date filters with label filters 1`] = `
 "Tasks for 2025-08-15: 1 (limit 25).
 Filter: 2025-08-15; labels: @important.
 Preview:
@@ -17,7 +17,7 @@ Next:
 - Focus on overdue items first to get back on track"
 `;
 
-exports[`find-tasks-by-date tool listing tasks by date range only returns tasks for the startDate when daysCount is 1 1`] = `
+exports[`find-tasks-by-date tool > listing tasks by date range > only returns tasks for the startDate when daysCount is 1 1`] = `
 "Tasks for 2025-08-20: 1 (limit 50).
 Filter: 2025-08-20.
 Preview:
@@ -28,7 +28,7 @@ Next:
 - Focus on overdue items first to get back on track"
 `;
 
-exports[`find-tasks-by-date tool listing tasks by date range should get tasks for today when startDate is "today" (includes overdue) 1`] = `
+exports[`find-tasks-by-date tool > listing tasks by date range > should get tasks for today when startDate is "today" (includes overdue) 1`] = `
 "Today's tasks + overdue: 1 (limit 50).
 Filter: today + overdue tasks + 6 more days.
 Preview:
@@ -39,7 +39,7 @@ Next:
 - Focus on overdue items first to get back on track"
 `;
 
-exports[`find-tasks-by-date tool listing tasks by date range should handle multiple days with pagination 1`] = `
+exports[`find-tasks-by-date tool > listing tasks by date range > should handle 'multiple days with pagination' 1`] = `
 "Tasks for 2025-08-20: 2 (limit 20), more available.
 Filter: 2025-08-20 to 2025-08-23.
 Preview:
@@ -52,7 +52,7 @@ Next:
 - Pass cursor 'next-page-cursor' to fetch more results."
 `;
 
-exports[`find-tasks-by-date tool listing tasks by date range should handle specific date 1`] = `
+exports[`find-tasks-by-date tool > listing tasks by date range > should handle 'specific date' 1`] = `
 "Tasks for 2025-08-20: 1 (limit 50).
 Filter: 2025-08-20 to 2025-08-27.
 Preview:
@@ -63,19 +63,19 @@ Next:
 - Focus on overdue items first to get back on track"
 `;
 
-exports[`find-tasks-by-date tool next steps logic should provide helpful suggestions for empty date range results 1`] = `
+exports[`find-tasks-by-date tool > next steps logic > should provide helpful suggestions for empty date range results 1`] = `
 "Tasks for 2025-08-20: 0 (limit 10).
 Filter: 2025-08-20.
 No results. Expand date range with larger 'daysCount'; Check today's tasks with startDate='today'."
 `;
 
-exports[`find-tasks-by-date tool next steps logic should provide helpful suggestions for empty today results 1`] = `
+exports[`find-tasks-by-date tool > next steps logic > should provide helpful suggestions for empty today results 1`] = `
 "Today's tasks + overdue: 0 (limit 10).
 Filter: today + overdue tasks.
 No results. Great job! No tasks for today or overdue."
 `;
 
-exports[`find-tasks-by-date tool next steps logic should suggest appropriate actions when hasOverdue is true 1`] = `
+exports[`find-tasks-by-date tool > next steps logic > should suggest appropriate actions when hasOverdue is true 1`] = `
 "Tasks for 2025-08-15: 1 (limit 10).
 Filter: 2025-08-15.
 Preview:
@@ -86,7 +86,7 @@ Next:
 - Focus on overdue items first to get back on track"
 `;
 
-exports[`find-tasks-by-date tool next steps logic should suggest today-focused actions when startDate is today 1`] = `
+exports[`find-tasks-by-date tool > next steps logic > should suggest today-focused actions when startDate is today 1`] = `
 "Today's tasks + overdue: 1 (limit 10).
 Filter: today + overdue tasks.
 Preview:
@@ -97,7 +97,7 @@ Next:
 - Focus on overdue items first to get back on track"
 `;
 
-exports[`find-tasks-by-date tool responsibleUser parameter should filter tasks by specific user email 1`] = `
+exports[`find-tasks-by-date tool > responsibleUser parameter > should filter tasks by specific user email 1`] = `
 "Today's tasks + overdue assigned to john@example.com: 1 (limit 50).
 Filter: today + overdue tasks; assigned to: john@example.com.
 Preview:

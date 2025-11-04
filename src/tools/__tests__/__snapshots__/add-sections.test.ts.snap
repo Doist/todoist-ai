@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`add-sections tool creating a single section should create a section and return mapped result 1`] = `
+exports[`add-sections tool > creating a single section > should create a section and return mapped result 1`] = `
 "Added 1 section:
 • test-abc123def456-section (id=section-123, projectId=6cfCcrrCFg2xP94Q)
 Next:
@@ -9,7 +9,7 @@ Next:
 - Use get-overview with projectId=6cfCcrrCFg2xP94Q to see project organization"
 `;
 
-exports[`add-sections tool creating a single section should handle different section properties from API 1`] = `
+exports[`add-sections tool > creating a single section > should handle different section properties from API 1`] = `
 "Added 1 section:
 • My Section Name (id=section-456, projectId=project-789)
 Next:
@@ -18,7 +18,7 @@ Next:
 - Use get-overview with projectId=project-789 to see project organization"
 `;
 
-exports[`add-sections tool creating multiple sections should create multiple sections and return mapped results 1`] = `
+exports[`add-sections tool > creating multiple sections > should create multiple sections and return mapped results 1`] = `
 "Added 3 sections:
 • First Section (id=section-1, projectId=6cfCcrrCFg2xP94Q)
 • Second Section (id=section-2, projectId=6cfCcrrCFg2xP94Q)
@@ -29,7 +29,7 @@ Next:
 - Use find-sections to see sections in specific projects"
 `;
 
-exports[`add-sections tool creating multiple sections should handle sections for the same project 1`] = `
+exports[`add-sections tool > creating multiple sections > should handle sections for the same project 1`] = `
 "Added 2 sections:
 • To Do (id=section-1, projectId=6cfCcrrCFg2xP94Q)
 • In Progress (id=section-2, projectId=6cfCcrrCFg2xP94Q)

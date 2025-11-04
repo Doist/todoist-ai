@@ -1,5 +1,5 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, vi } from 'vitest'
 import {
     createMockSection,
     extractStructuredContent,
@@ -10,14 +10,14 @@ import { updateSections } from '../update-sections.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    updateSection: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    updateSection: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { FIND_TASKS, UPDATE_SECTIONS, GET_OVERVIEW } = ToolNames
 
 describe(`${UPDATE_SECTIONS} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('updating a single section', () => {

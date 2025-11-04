@@ -1,5 +1,5 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, vi } from 'vitest'
 import {
     createMockTask,
     createMockUser,
@@ -13,15 +13,15 @@ import { addTasks } from '../add-tasks.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    addTask: jest.fn(),
-    getUser: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    addTask: vi.fn(),
+    getUser: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { ADD_TASKS, GET_OVERVIEW } = ToolNames
 
 describe(`${ADD_TASKS} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('adding multiple tasks', () => {

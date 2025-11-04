@@ -1,5 +1,5 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, type MockedFunction, vi } from 'vitest'
 import { getTasksByFilter } from '../../tool-helpers.js'
 import {
     createMappedTask,
@@ -10,24 +10,28 @@ import {
 import { ToolNames } from '../../utils/tool-names.js'
 import { search } from '../search.js'
 
-jest.mock('../../tool-helpers', () => {
+vi.mock('../../tool-helpers', async () => {
+    const actual = (await vi.importActual(
+        '../../tool-helpers',
+    )) as typeof import('../../tool-helpers')
     return {
-        getTasksByFilter: jest.fn(),
+        ...actual,
+        getTasksByFilter: vi.fn(),
     }
 })
 
 const { SEARCH } = ToolNames
 
-const mockGetTasksByFilter = getTasksByFilter as jest.MockedFunction<typeof getTasksByFilter>
+const mockGetTasksByFilter = getTasksByFilter as MockedFunction<typeof getTasksByFilter>
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    getProjects: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    getProjects: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 describe(`${SEARCH} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('searching tasks and projects', () => {

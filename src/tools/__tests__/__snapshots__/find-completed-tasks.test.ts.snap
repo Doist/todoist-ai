@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`find-completed-tasks tool getting completed tasks by completion date (default) should get completed tasks by completion date 1`] = `
+exports[`find-completed-tasks tool > getting completed tasks by completion date (default) > should get completed tasks by completion date 1`] = `
 "Completed tasks (by completed date): 1 (limit 50).
 Filter: completed date: 2025-08-10 to 2025-08-15.
 Preview:
@@ -9,7 +9,7 @@ Next:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
 
-exports[`find-completed-tasks tool getting completed tasks by completion date (default) should handle explicit completion date query 1`] = `
+exports[`find-completed-tasks tool > getting completed tasks by completion date (default) > should handle explicit completion date query 1`] = `
 "Completed tasks (by completed date): 0 (limit 100), more available.
 Filter: completed date: 2025-08-01 to 2025-08-31; project: specific-project-id.
 No results. No tasks completed in this date range; Try expanding the date range; Try removing project/section/parent filters.
@@ -17,7 +17,7 @@ Next:
 - Pass cursor 'next-cursor' to fetch more results."
 `;
 
-exports[`find-completed-tasks tool getting completed tasks by due date should get completed tasks by due date 1`] = `
+exports[`find-completed-tasks tool > getting completed tasks by due date > should get completed tasks by due date 1`] = `
 "Completed tasks (by due date): 1 (limit 50).
 Filter: due date: 2025-08-10 to 2025-08-20.
 Preview:
@@ -27,7 +27,7 @@ Next:
 - Recurring tasks will automatically create new instances."
 `;
 
-exports[`find-completed-tasks tool label filtering should combine other filters with label filters 1`] = `
+exports[`find-completed-tasks tool > label filtering > should combine other filters with label filters 1`] = `
 "Completed tasks (by due date): 1 (limit 25).
 Filter: due date: 2025-08-01 to 2025-08-31; project: test-project-id; section: test-section-id; labels: @important.
 Preview:
@@ -36,7 +36,7 @@ Next:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
 
-exports[`find-completed-tasks tool label filtering should filter completed tasks by labels: multiple labels with AND operator 1`] = `
+exports[`find-completed-tasks tool > label filtering > should filter completed tasks by labels: 'multiple labels with AND operator' 1`] = `
 "Completed tasks (by due date): 1 (limit 50).
 Filter: due date: 2025-08-01 to 2025-08-31; labels: @work & @urgent.
 Preview:
@@ -45,7 +45,7 @@ Next:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
 
-exports[`find-completed-tasks tool label filtering should filter completed tasks by labels: multiple labels with OR operator 1`] = `
+exports[`find-completed-tasks tool > label filtering > should filter completed tasks by labels: 'multiple labels with OR operator' 1`] = `
 "Completed tasks (by completed date): 1 (limit 25).
 Filter: completed date: 2025-08-10 to 2025-08-20; labels: @personal | @shopping.
 Preview:
@@ -54,7 +54,7 @@ Next:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
 
-exports[`find-completed-tasks tool label filtering should filter completed tasks by labels: single label with OR operator 1`] = `
+exports[`find-completed-tasks tool > label filtering > should filter completed tasks by labels: 'single label with OR operator' 1`] = `
 "Completed tasks (by completed date): 1 (limit 50).
 Filter: completed date: 2025-08-01 to 2025-08-31; labels: @work.
 Preview:
@@ -63,7 +63,7 @@ Next:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
 
-exports[`find-completed-tasks tool timezone handling should convert user timezone to UTC correctly (Europe/Madrid) 1`] = `
+exports[`find-completed-tasks tool > timezone handling > should convert user timezone to UTC correctly (Europe/Madrid) 1`] = `
 "Completed tasks (by completed date): 1 (limit 50).
 Filter: completed date: 2025-10-11 to 2025-10-11.
 Preview:

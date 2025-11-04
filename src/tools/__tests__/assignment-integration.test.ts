@@ -1,38 +1,46 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
+import { type Mocked, vi } from 'vitest'
+import { AssignmentErrorType, assignmentValidator } from '../../utils/assignment-validator.js'
 import {
     createMockProject,
     extractStructuredContent,
     extractTextContent,
 } from '../../utils/test-helpers.js'
+import { userResolver } from '../../utils/user-resolver.js'
 import { addTasks } from '../add-tasks.js'
 import { findProjectCollaborators } from '../find-project-collaborators.js'
 import { manageAssignments } from '../manage-assignments.js'
 import { updateTasks } from '../update-tasks.js'
 
 // Mock the assignment validator
-jest.mock('../../utils/assignment-validator.js', () => ({
-    assignmentValidator: {
-        validateTaskCreationAssignment: jest.fn(),
-        validateTaskUpdateAssignment: jest.fn(),
-        validateBulkAssignment: jest.fn(),
-    },
-}))
+vi.mock('../../utils/assignment-validator.js', async (importOriginal) => {
+    const actual = (await importOriginal()) as typeof import('../../utils/assignment-validator.js')
+    return {
+        ...actual,
+        assignmentValidator: {
+            validateTaskCreationAssignment: vi.fn(),
+            validateTaskUpdateAssignment: vi.fn(),
+            validateBulkAssignment: vi.fn(),
+        },
+    }
+})
 
 // Mock the user resolver
-jest.mock('../../utils/user-resolver.js', () => ({
+vi.mock('../../utils/user-resolver.js', () => ({
     userResolver: {
-        resolveUser: jest.fn(),
-        getProjectCollaborators: jest.fn(),
+        resolveUser: vi.fn(),
+        getProjectCollaborators: vi.fn(),
     },
 }))
 
 describe('Assignment Integration Tests', () => {
-    let mockTodoistApi: jest.Mocked<TodoistApi>
+    let mockTodoistApi: Mocked<TodoistApi>
 
     const mockValidUser = {
         userId: 'user-123',
         name: 'John Doe',
         email: 'john@example.com',
+        displayName: 'John Doe',
     }
 
     const mockTask: Task = {
@@ -73,19 +81,18 @@ describe('Assignment Integration Tests', () => {
     })
 
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
 
         mockTodoistApi = {
-            addTask: jest.fn(),
-            updateTask: jest.fn(),
-            getTask: jest.fn(),
-            getProjects: jest.fn(),
-            getProject: jest.fn(),
-        } as unknown as jest.Mocked<TodoistApi>
+            addTask: vi.fn(),
+            updateTask: vi.fn(),
+            getTask: vi.fn(),
+            getProjects: vi.fn(),
+            getProject: vi.fn(),
+        } as unknown as Mocked<TodoistApi>
 
         // Mock assignment validator responses
-        const mockAssignmentValidator =
-            require('../../utils/assignment-validator.js').assignmentValidator
+        const mockAssignmentValidator = vi.mocked(assignmentValidator)
         mockAssignmentValidator.validateTaskCreationAssignment.mockResolvedValue({
             isValid: true,
             resolvedUser: mockValidUser,
@@ -101,7 +108,7 @@ describe('Assignment Integration Tests', () => {
         ])
 
         // Mock user resolver
-        const mockUserResolver = require('../../utils/user-resolver.js').userResolver
+        const mockUserResolver = vi.mocked(userResolver)
         mockUserResolver.resolveUser.mockResolvedValue(mockValidUser)
         mockUserResolver.getProjectCollaborators.mockResolvedValue([
             { id: 'user-123', name: 'John Doe', email: 'john@example.com' },
@@ -146,11 +153,11 @@ describe('Assignment Integration Tests', () => {
         })
 
         it('should validate assignment before creating task', async () => {
-            const mockAssignmentValidator =
-                require('../../utils/assignment-validator.js').assignmentValidator
+            const mockAssignmentValidator = vi.mocked(assignmentValidator)
             mockAssignmentValidator.validateTaskCreationAssignment.mockResolvedValueOnce({
                 isValid: false,
                 error: {
+                    type: AssignmentErrorType.USER_NOT_COLLABORATOR,
                     message: 'User not found in project collaborators',
                     suggestions: ['Use find-project-collaborators to see valid assignees'],
                 },
@@ -209,22 +216,13 @@ describe('Assignment Integration Tests', () => {
     describe('Task Update with Assignment', () => {
         it('should update task assignment', async () => {
             const result = await updateTasks.execute(
-                {
-                    tasks: [
-                        {
-                            id: 'task-123',
-                            responsibleUser: 'jane@example.com',
-                        },
-                    ],
-                },
+                { tasks: [{ id: 'task-123', responsibleUser: 'jane@example.com' }] },
                 mockTodoistApi,
             )
 
             expect(mockTodoistApi.updateTask).toHaveBeenCalledWith(
                 'task-123',
-                expect.objectContaining({
-                    assigneeId: 'user-123',
-                }),
+                expect.objectContaining({ assigneeId: 'user-123' }),
             )
 
             expect(extractTextContent(result)).toContain('Updated 1 task')
@@ -266,32 +264,23 @@ describe('Assignment Integration Tests', () => {
 
             expect(mockTodoistApi.updateTask).toHaveBeenCalledWith(
                 'task-123',
-                expect.objectContaining({
-                    assigneeId: null,
-                }),
+                expect.objectContaining({ assigneeId: null }),
             )
         })
 
         it('should validate assignment changes', async () => {
-            const mockAssignmentValidator =
-                require('../../utils/assignment-validator.js').assignmentValidator
+            const mockAssignmentValidator = vi.mocked(assignmentValidator)
             mockAssignmentValidator.validateTaskUpdateAssignment.mockResolvedValueOnce({
                 isValid: false,
                 error: {
+                    type: AssignmentErrorType.USER_NOT_COLLABORATOR,
                     message: 'User cannot be assigned to this project',
                 },
             })
 
             await expect(
                 updateTasks.execute(
-                    {
-                        tasks: [
-                            {
-                                id: 'task-123',
-                                responsibleUser: 'invalid@example.com',
-                            },
-                        ],
-                    },
+                    { tasks: [{ id: 'task-123', responsibleUser: 'invalid@example.com' }] },
                     mockTodoistApi,
                 ),
             ).rejects.toThrow('Task task-123: User cannot be assigned to this project')
@@ -356,8 +345,7 @@ describe('Assignment Integration Tests', () => {
 
         it('should handle dry-run mode', async () => {
             // Mock validation for 2 tasks
-            const mockAssignmentValidator =
-                require('../../utils/assignment-validator.js').assignmentValidator
+            const mockAssignmentValidator = vi.mocked(assignmentValidator)
             mockAssignmentValidator.validateBulkAssignment.mockResolvedValueOnce([
                 { isValid: true, resolvedUser: mockValidUser },
                 { isValid: true, resolvedUser: mockValidUser },
@@ -380,11 +368,13 @@ describe('Assignment Integration Tests', () => {
 
         it('should handle mixed success and failure results', async () => {
             // Mock validation for 3 tasks - 2 valid, 1 invalid
-            const mockAssignmentValidator =
-                require('../../utils/assignment-validator.js').assignmentValidator
+            const mockAssignmentValidator = vi.mocked(assignmentValidator)
             mockAssignmentValidator.validateBulkAssignment.mockResolvedValueOnce([
                 { isValid: true, resolvedUser: mockValidUser },
-                { isValid: false, error: { message: 'API Error' } },
+                {
+                    isValid: false,
+                    error: { type: AssignmentErrorType.PERMISSION_DENIED, message: 'API Error' },
+                },
                 { isValid: true, resolvedUser: mockValidUser },
             ])
 
@@ -439,9 +429,7 @@ describe('Assignment Integration Tests', () => {
             mockTodoistApi.getProject.mockResolvedValueOnce({ ...mockProject, isShared: false })
 
             const result = await findProjectCollaborators.execute(
-                {
-                    projectId: 'project-123',
-                },
+                { projectId: 'project-123' },
                 mockTodoistApi,
             )
 
@@ -454,9 +442,7 @@ describe('Assignment Integration Tests', () => {
 
             await expect(
                 findProjectCollaborators.execute(
-                    {
-                        projectId: 'nonexistent-project',
-                    },
+                    { projectId: 'nonexistent-project' },
                     mockTodoistApi,
                 ),
             ).rejects.toThrow('Failed to access project "nonexistent-project"')
@@ -465,11 +451,11 @@ describe('Assignment Integration Tests', () => {
 
     describe('Error Handling and Edge Cases', () => {
         it('should handle assignment validation errors gracefully', async () => {
-            const mockAssignmentValidator =
-                require('../../utils/assignment-validator.js').assignmentValidator
+            const mockAssignmentValidator = vi.mocked(assignmentValidator)
             mockAssignmentValidator.validateTaskCreationAssignment.mockResolvedValueOnce({
                 isValid: false,
                 error: {
+                    type: AssignmentErrorType.PROJECT_NOT_SHARED,
                     message: 'Project not shared',
                     suggestions: ['Share the project to enable assignments'],
                 },
@@ -579,14 +565,7 @@ describe('Assignment Integration Tests', () => {
 
             // 2. Update assignment
             const updateResult = await updateTasks.execute(
-                {
-                    tasks: [
-                        {
-                            id: 'task-123',
-                            responsibleUser: 'jane@example.com',
-                        },
-                    ],
-                },
+                { tasks: [{ id: 'task-123', responsibleUser: 'jane@example.com' }] },
                 mockTodoistApi,
             )
 

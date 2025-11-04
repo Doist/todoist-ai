@@ -1,5 +1,5 @@
 import type { PersonalProject, TodoistApi, WorkspaceProject } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, vi } from 'vitest'
 import {
     createMockProject,
     extractStructuredContent,
@@ -10,14 +10,14 @@ import { updateProjects } from '../update-projects.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    updateProject: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    updateProject: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { FIND_PROJECTS, UPDATE_PROJECTS, GET_OVERVIEW } = ToolNames
 
 describe(`${UPDATE_PROJECTS} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('updating a single project', () => {

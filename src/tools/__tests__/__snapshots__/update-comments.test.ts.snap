@@ -1,41 +1,41 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`update-comments tool bulk operations should update multiple comments from different entities (task + project) 1`] = `
+exports[`update-comments tool > bulk operations > should update multiple comments from different entities (task + project) 1`] = `
 "Updated 1 task comment and 1 project comment
 Next:
 - Use find-comments to view comments by task or project
 - Use delete-object with type=comment to remove comments"
 `;
 
-exports[`update-comments tool bulk operations should update multiple comments from different tasks 1`] = `
+exports[`update-comments tool > bulk operations > should update multiple comments from different tasks 1`] = `
 "Updated 2 task comments
 Next:
 - Use find-comments to view comments by task or project
 - Use delete-object with type=comment to remove comments"
 `;
 
-exports[`update-comments tool bulk operations should update multiple comments from the same project 1`] = `
+exports[`update-comments tool > bulk operations > should update multiple comments from the same project 1`] = `
 "Updated 2 project comments
 Next:
 - Use find-comments to view comments by task or project
 - Use delete-object with type=comment to remove comments"
 `;
 
-exports[`update-comments tool bulk operations should update multiple comments from the same task 1`] = `
+exports[`update-comments tool > bulk operations > should update multiple comments from the same task 1`] = `
 "Updated 2 task comments
 Next:
 - Use find-comments to view comments by task or project
 - Use delete-object with type=comment to remove comments"
 `;
 
-exports[`update-comments tool should handle project comment 1`] = `
+exports[`update-comments tool > should handle project comment 1`] = `
 "Updated 1 project comment
 Next:
 - Use find-comments with projectId=project789 to see all project comments
 - Use delete-object with type=comment id=98767 to remove comment"
 `;
 
-exports[`update-comments tool should update comment content 1`] = `
+exports[`update-comments tool > should update comment content 1`] = `
 "Updated 1 task comment
 Next:
 - Use find-comments with taskId=task456 to see all task comments

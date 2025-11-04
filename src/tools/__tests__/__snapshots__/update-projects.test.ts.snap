@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`update-projects tool updating a single project should update a project when id and name are provided 1`] = `
+exports[`update-projects tool > updating a single project > should update a project when id and name are provided 1`] = `
 "Updated 1 project:
 • Updated Project Name (id=existing-project-123)
 Next:
@@ -8,7 +8,7 @@ Next:
 - Use find-tasks with projectId=existing-project-123 to review existing tasks"
 `;
 
-exports[`update-projects tool updating a single project should update project with isFavorite and viewStyle options 1`] = `
+exports[`update-projects tool > updating a single project > should update project with isFavorite and viewStyle options 1`] = `
 "Updated 1 project:
 • Updated Favorite Project (id=project-123)
 Next:
@@ -16,7 +16,7 @@ Next:
 - Use find-tasks with projectId=project-123 to review existing tasks"
 `;
 
-exports[`update-projects tool updating multiple projects should skip projects with no updates and report correctly 1`] = `
+exports[`update-projects tool > updating multiple projects > should skip projects with no updates and report correctly 1`] = `
 "Updated 1 project (1 skipped - no changes):
 • Updated Project (id=project-1)
 Next:
@@ -24,7 +24,7 @@ Next:
 - Use find-tasks with projectId=project-1 to review existing tasks"
 `;
 
-exports[`update-projects tool updating multiple projects should update multiple projects and return mapped results 1`] = `
+exports[`update-projects tool > updating multiple projects > should update multiple projects and return mapped results 1`] = `
 "Updated 3 projects:
 • Updated First Project (id=project-1)
 • Updated Second Project (id=project-2)

@@ -1,5 +1,5 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, vi } from 'vitest'
 import {
     createMockTask,
     extractStructuredContent,
@@ -11,15 +11,15 @@ import { updateTasks } from '../update-tasks.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    updateTask: jest.fn(),
-    moveTask: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    updateTask: vi.fn(),
+    moveTask: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { UPDATE_TASKS } = ToolNames
 
 describe(`${UPDATE_TASKS} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('updating task properties', () => {
@@ -555,10 +555,12 @@ describe(`${UPDATE_TASKS} tool`, () => {
             // Verify structured content includes updated labels
             const structuredContent = extractStructuredContent(result)
             expect(structuredContent.tasks).toHaveLength(1)
-            expect((structuredContent.tasks as any[])[0]).toEqual(
-                expect.objectContaining({
-                    labels: ['work', 'important'],
-                }),
+            expect(structuredContent.tasks).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        labels: ['work', 'important'],
+                    }),
+                ]),
             )
         })
 

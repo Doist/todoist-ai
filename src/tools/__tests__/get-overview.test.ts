@@ -1,5 +1,5 @@
 import type { PersonalProject, Section, Task, TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, vi } from 'vitest'
 import {
     createMockProject,
     createMockSection,
@@ -14,17 +14,17 @@ import { getOverview } from '../get-overview.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    getProjects: jest.fn(),
-    getProject: jest.fn(),
-    getSections: jest.fn(),
-    getTasks: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    getProjects: vi.fn(),
+    getProject: vi.fn(),
+    getSections: vi.fn(),
+    getTasks: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { GET_OVERVIEW } = ToolNames
 
 describe(`${GET_OVERVIEW} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('account overview (no projectId)', () => {

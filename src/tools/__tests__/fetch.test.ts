@@ -1,20 +1,20 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, vi } from 'vitest'
 import { createMockProject, createMockTask, TEST_IDS } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { fetch } from '../fetch.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    getTask: jest.fn(),
-    getProject: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    getTask: vi.fn(),
+    getProject: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { FETCH } = ToolNames
 
 describe(`${FETCH} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('fetching tasks', () => {

@@ -30,7 +30,10 @@
         /* Other */
         "skipLibCheck": true,
         "declaration": true,
-        "declarationMap": true
+        "declarationMap": true,
+
+        /* Vitest types */
+        "types": ["vitest/globals"]
     },
     "include": ["src"]
 }

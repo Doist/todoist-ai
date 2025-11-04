@@ -27,11 +27,13 @@
         "tools"
     ],
     "scripts": {
-        "test": "jest",
-        "build": "rimraf dist && npx tsc --project tsconfig.json",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:coverage": "vitest run --coverage",
+        "build": "vite build",
         "postbuild": "chmod +x dist/main.js",
         "start": "npm run build && npx @modelcontextprotocol/inspector node dist/main.js",
-        "dev": "concurrently \"npx tsc --watch\" \"npx @modelcontextprotocol/inspector npx nodemon --quiet --watch dist --ext js --exec node dist/main.js\"",
+        "dev": "concurrently \"vite build --watch\" \"npx @modelcontextprotocol/inspector npx nodemon --quiet --watch dist --ext js --exec node dist/main.js\"",
         "setup": "cp .env.example .env && npm install && npm run build",
         "test:executable": "npm run build && node scripts/test-executable.cjs",
         "type-check": "npx tsc --noEmit",
@@ -55,19 +57,19 @@
     "devDependencies": {
         "@biomejs/biome": "2.3.2",
         "@types/express": "^5.0.2",
-        "@types/jest": "30.0.0",
         "@types/morgan": "^1.9.9",
         "@types/node": "^22.15.17",
         "concurrently": "^9.0.0",
         "express": "^5.0.0",
         "husky": "^9.1.7",
-        "jest": "30.2.0",
         "lint-staged": "^16.0.0",
         "morgan": "^1.10.0",
         "nodemon": "^3.1.10",
         "rimraf": "^6.0.1",
-        "ts-jest": "29.4.5",
-        "typescript": "^5.8.3"
+        "typescript": "^5.8.3",
+        "vite": "7.1.10",
+        "vite-plugin-dts": "4.5.4",
+        "vitest": "3.2.4"
     },
     "lint-staged": {
         "*": [

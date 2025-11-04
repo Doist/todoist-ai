@@ -1,5 +1,5 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, type MockedFunction, vi } from 'vitest'
 import { getTasksByFilter } from '../../tool-helpers.js'
 import {
     createMappedTask,
@@ -17,31 +17,32 @@ import { ToolNames } from '../../utils/tool-names.js'
 import { resolveUserNameToId } from '../../utils/user-resolver.js'
 import { findTasks } from '../find-tasks.js'
 
-jest.mock('../../tool-helpers', () => {
-    const actual = jest.requireActual('../../tool-helpers') as typeof import('../../tool-helpers')
+vi.mock('../../tool-helpers', async () => {
+    const actual = (await vi.importActual(
+        '../../tool-helpers',
+    )) as typeof import('../../tool-helpers')
     return {
-        getTasksByFilter: jest.fn(),
+        getTasksByFilter: vi.fn(),
         mapTask: actual.mapTask,
         filterTasksByResponsibleUser: actual.filterTasksByResponsibleUser,
+        RESPONSIBLE_USER_FILTERING: actual.RESPONSIBLE_USER_FILTERING,
     }
 })
 
-jest.mock('../../utils/user-resolver', () => ({
-    resolveUserNameToId: jest.fn(),
+vi.mock('../../utils/user-resolver', () => ({
+    resolveUserNameToId: vi.fn(),
 }))
 
 const { FIND_TASKS, UPDATE_TASKS, FIND_COMPLETED_TASKS } = ToolNames
 
-const mockGetTasksByFilter = getTasksByFilter as jest.MockedFunction<typeof getTasksByFilter>
-const mockResolveUserNameToId = resolveUserNameToId as jest.MockedFunction<
-    typeof resolveUserNameToId
->
+const mockGetTasksByFilter = getTasksByFilter as MockedFunction<typeof getTasksByFilter>
+const mockResolveUserNameToId = resolveUserNameToId as MockedFunction<typeof resolveUserNameToId>
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    getTasks: jest.fn(),
-    getUser: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    getTasks: vi.fn(),
+    getUser: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 // Mock the Todoist User
 const mockTodoistUser = createMockUser()
@@ -49,7 +50,7 @@ const mockTodoistUser = createMockUser()
 describe(`${FIND_TASKS} tool`, () => {
     beforeEach(() => {
         mockTodoistApi.getUser.mockResolvedValue(mockTodoistUser)
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('searching tasks', () => {

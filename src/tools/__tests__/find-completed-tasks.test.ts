@@ -1,5 +1,5 @@
 import type { CurrentUser, Task, TodoistApi } from '@doist/todoist-api-typescript'
-import { jest } from '@jest/globals'
+import { type Mocked, type MockedFunction, vi } from 'vitest'
 import {
     createMockTask,
     createMockUser,
@@ -11,16 +11,16 @@ import { findCompletedTasks } from '../find-completed-tasks.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    getCompletedTasksByCompletionDate: jest.fn(),
-    getCompletedTasksByDueDate: jest.fn(),
-    getUser: jest.fn(),
-} as unknown as jest.Mocked<TodoistApi>
+    getCompletedTasksByCompletionDate: vi.fn(),
+    getCompletedTasksByDueDate: vi.fn(),
+    getUser: vi.fn(),
+} as unknown as Mocked<TodoistApi>
 
 const { FIND_COMPLETED_TASKS } = ToolNames
 
 describe(`${FIND_COMPLETED_TASKS} tool`, () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
 
         // Mock default user with UTC timezone
         mockTodoistApi.getUser.mockResolvedValue({
@@ -221,7 +221,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                 const mockResponse = { items: mockCompletedTasks, nextCursor: null }
                 const mockMethod = mockTodoistApi[
                     expectedMethod as keyof typeof mockTodoistApi
-                ] as jest.MockedFunction<
+                ] as MockedFunction<
                     (...args: never[]) => Promise<{ items: unknown[]; nextCursor: string | null }>
                 >
                 mockMethod.mockResolvedValue(mockResponse)

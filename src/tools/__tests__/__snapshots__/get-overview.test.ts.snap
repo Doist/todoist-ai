@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`get-overview tool account overview (no projectId) should generate account overview with projects and sections 1`] = `
+exports[`get-overview tool > account overview (no projectId) > should generate account overview with projects and sections 1`] = `
 "# Personal Projects
 
 - Inbox Project: Inbox (id=inbox-project-id)
@@ -9,14 +9,14 @@ exports[`get-overview tool account overview (no projectId) should generate accou
 "
 `;
 
-exports[`get-overview tool account overview (no projectId) should handle empty projects list 1`] = `
+exports[`get-overview tool > account overview (no projectId) > should handle empty projects list 1`] = `
 "# Personal Projects
 
 _No projects found._
 "
 `;
 
-exports[`get-overview tool project overview (with projectId) should generate detailed project overview with tasks 1`] = `
+exports[`get-overview tool > project overview (with projectId) > should generate detailed project overview with tasks 1`] = `
 "# test-abc123def456-project
 
 - id=8485093748; content=Task without section
@@ -28,4 +28,4 @@ exports[`get-overview tool project overview (with projectId) should generate det
 ## In Progress"
 `;
 
-exports[`get-overview tool project overview (with projectId) should handle project with no tasks 1`] = `"# Empty Project"`;
+exports[`get-overview tool > project overview (with projectId) > should handle project with no tasks 1`] = `"# Empty Project"`;
