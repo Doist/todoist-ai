@@ -33,7 +33,6 @@ type ProjectLike = {
 }
 
 type TaskOperationOptions = {
-    nextSteps?: string[]
     context?: string
     showDetails?: boolean
 }
@@ -48,7 +47,6 @@ type BatchOperationParams = {
         error: string
         code?: string
     }>
-    nextSteps?: string[]
 }
 
 /**
@@ -59,7 +57,7 @@ export function summarizeTaskOperation(
     tasks: TaskLike[],
     options: TaskOperationOptions = {},
 ): string {
-    const { nextSteps, context, showDetails = false } = options
+    const { context, showDetails = false } = options
     const count = tasks.length
     const bits: string[] = []
 
@@ -78,11 +76,6 @@ export function summarizeTaskOperation(
         }
     }
 
-    // Next steps guidance
-    if (nextSteps?.length) {
-        bits.push(formatNextSteps(nextSteps))
-    }
-
     return bits.join('\n')
 }
 
@@ -90,7 +83,7 @@ export function summarizeTaskOperation(
  * Creates batch operation summaries with success/failure breakdown
  */
 export function summarizeBatch(params: BatchOperationParams): string {
-    const { action, success, total, successItems, failures, nextSteps } = params
+    const { action, success, total, successItems, failures } = params
     const bits: string[] = []
 
     // Main result summary
@@ -112,11 +105,6 @@ export function summarizeBatch(params: BatchOperationParams): string {
                 '\n',
             )}${failureCount > DisplayLimits.MAX_FAILURES_SHOWN ? `, +${failureCount - DisplayLimits.MAX_FAILURES_SHOWN} more` : ''}.`
         bits.push(failureBit)
-    }
-
-    // Next steps
-    if (nextSteps?.length) {
-        bits.push(formatNextSteps(nextSteps))
     }
 
     return bits.join('\n')
@@ -219,7 +207,7 @@ export function summarizeList({
 }
 
 /**
- * Formats next steps array into a consistent "Next:" section
+ * Formats next steps array into a consistent "Possible suggested next step(s):" section
  * If nextCursor is provided, adds cursor instruction to the steps
  */
 export function formatNextSteps(nextSteps: string[], nextCursor?: string): string {
@@ -227,7 +215,9 @@ export function formatNextSteps(nextSteps: string[], nextCursor?: string): strin
     if (nextCursor) {
         allSteps.push(`Pass cursor '${nextCursor}' to fetch more results.`)
     }
-    return `Next:\n${allSteps.map((step) => `- ${step}`).join('\n')}`
+    const header =
+        allSteps.length === 1 ? 'Possible suggested next step:' : 'Possible suggested next steps:'
+    return `${header}\n${allSteps.map((step) => `- ${step}`).join('\n')}`
 }
 
 /**

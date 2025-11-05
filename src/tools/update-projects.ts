@@ -2,10 +2,7 @@ import type { PersonalProject, WorkspaceProject } from '@doist/todoist-api-types
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { formatNextSteps } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
-
-const { FIND_PROJECTS, FIND_TASKS, GET_OVERVIEW } = ToolNames
 
 const ProjectUpdateSchema = z.object({
     id: z.string().min(1).describe('The ID of the project to update.'),
@@ -82,30 +79,7 @@ function generateTextContent({
         summary += `:\n${projectList}`
     }
 
-    // Context-aware next steps for updated projects
-    const nextSteps: string[] = []
-
-    if (projects.length > 0) {
-        if (count === 1) {
-            const project = projects[0]
-            if (project) {
-                nextSteps.push(
-                    `Use ${GET_OVERVIEW} with projectId=${project.id} to see project structure`,
-                )
-                nextSteps.push(
-                    `Use ${FIND_TASKS} with projectId=${project.id} to review existing tasks`,
-                )
-            }
-        } else {
-            nextSteps.push(`Use ${FIND_PROJECTS} to see all projects with updated names`)
-            nextSteps.push(`Use ${GET_OVERVIEW} to see updated project hierarchy`)
-        }
-    } else {
-        nextSteps.push(`Use ${FIND_PROJECTS} to see current projects`)
-    }
-
-    const next = formatNextSteps(nextSteps)
-    return `${summary}\n${next}`
+    return summary
 }
 
 function hasUpdatesToMake({ id, ...otherUpdateArgs }: ProjectUpdate) {

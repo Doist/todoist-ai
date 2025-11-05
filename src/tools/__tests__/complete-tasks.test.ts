@@ -9,7 +9,7 @@ const mockTodoistApi = {
     closeTask: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
-const { COMPLETE_TASKS, GET_OVERVIEW } = ToolNames
+const { COMPLETE_TASKS } = ToolNames
 
 describe(`${COMPLETE_TASKS} tool`, () => {
     beforeEach(() => {
@@ -200,7 +200,6 @@ describe(`${COMPLETE_TASKS} tool`, () => {
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
-            expect(textContent).toContain("Use find-tasks-by-date('today')")
         })
 
         it('should suggest reviewing failures when mixed results', async () => {
@@ -215,7 +214,6 @@ describe(`${COMPLETE_TASKS} tool`, () => {
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
-            expect(textContent).toContain('Review failed completions and retry if needed')
         })
 
         it('should suggest checking IDs when all tasks fail', async () => {
@@ -228,8 +226,6 @@ describe(`${COMPLETE_TASKS} tool`, () => {
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
-            expect(textContent).toContain('Check task IDs and permissions, then retry')
-            expect(textContent).not.toContain(`Use ${GET_OVERVIEW} tool`) // Should only show retry message
         })
     })
 

@@ -12,7 +12,7 @@ Preview:
     In Progress • id=section-456
     Done • id=section-789
     Backlog Items • id=section-999
-Next:
+Possible suggested next steps:
 - Use find-tasks with sectionId to see tasks in specific sections
 - Use update-sections to modify section names"
 `;
@@ -22,7 +22,7 @@ exports[`find-sections tool > searching sections by name > should filter section
 Preview:
     In Progress • id=section-456
     Progress Review • id=section-999
-Next:
+Possible suggested next steps:
 - Use find-tasks with sectionId to see tasks in specific sections
 - Use update-sections to modify section names
 - Remove search parameter to see all sections in this project"
@@ -32,7 +32,7 @@ exports[`find-sections tool > searching sections by name > should handle case se
 "Sections in project 6cfCcrrCFg2xP94Q matching "IMPORTANT": 1.
 Preview:
     Important Tasks • id=section-123
-Next:
+Possible suggested next steps:
 - Use find-tasks with sectionId=section-123 to see tasks
 - Use add-sections to create additional sections for organization
 - Remove search parameter to see all sections in this project"
@@ -43,7 +43,7 @@ exports[`find-sections tool > searching sections by name > should handle exact m
 Preview:
     Done • id=section-123
     Done Soon • id=section-456
-Next:
+Possible suggested next steps:
 - Use find-tasks with sectionId to see tasks in specific sections
 - Use update-sections to modify section names
 - Remove search parameter to see all sections in this project"
@@ -54,7 +54,7 @@ exports[`find-sections tool > searching sections by name > should handle partial
 Preview:
     Development Tasks • id=section-123
     Testing Tasks • id=section-456
-Next:
+Possible suggested next steps:
 - Use find-tasks with sectionId to see tasks in specific sections
 - Use update-sections to modify section names
 - Remove search parameter to see all sections in this project"

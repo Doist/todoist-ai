@@ -5,7 +5,7 @@ exports[`find-completed-tasks tool > getting completed tasks by completion date 
 Filter: completed date: 2025-08-10 to 2025-08-15.
 Preview:
     Completed task 1 • due 2025-08-14 • P3 • id=8485093748
-Next:
+Possible suggested next step:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
 
@@ -13,7 +13,7 @@ exports[`find-completed-tasks tool > getting completed tasks by completion date 
 "Completed tasks (by completed date): 0 (limit 100), more available.
 Filter: completed date: 2025-08-01 to 2025-08-31; project: specific-project-id.
 No results. No tasks completed in this date range; Try expanding the date range; Try removing project/section/parent filters.
-Next:
+Possible suggested next step:
 - Pass cursor 'next-cursor' to fetch more results."
 `;
 
@@ -22,7 +22,7 @@ exports[`find-completed-tasks tool > getting completed tasks by due date > shoul
 Filter: due date: 2025-08-10 to 2025-08-20.
 Preview:
     Task completed by due date • due 2025-08-15 • P2 • id=8485093750
-Next:
+Possible suggested next steps:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity.
 - Recurring tasks will automatically create new instances."
 `;
@@ -32,7 +32,7 @@ exports[`find-completed-tasks tool > label filtering > should combine other filt
 Filter: due date: 2025-08-01 to 2025-08-31; project: test-project-id; section: test-section-id; labels: @important.
 Preview:
     Important completed task • P4 • id=8485093748
-Next:
+Possible suggested next step:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
 
@@ -41,7 +41,7 @@ exports[`find-completed-tasks tool > label filtering > should filter completed t
 Filter: due date: 2025-08-01 to 2025-08-31; labels: @work & @urgent.
 Preview:
     Completed task with label • P4 • id=8485093748
-Next:
+Possible suggested next step:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
 
@@ -50,7 +50,7 @@ exports[`find-completed-tasks tool > label filtering > should filter completed t
 Filter: completed date: 2025-08-10 to 2025-08-20; labels: @personal | @shopping.
 Preview:
     Completed task with label • P4 • id=8485093748
-Next:
+Possible suggested next step:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
 
@@ -59,7 +59,7 @@ exports[`find-completed-tasks tool > label filtering > should filter completed t
 Filter: completed date: 2025-08-01 to 2025-08-31; labels: @work.
 Preview:
     Completed task with label • P4 • id=8485093748
-Next:
+Possible suggested next step:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;
 
@@ -68,6 +68,6 @@ exports[`find-completed-tasks tool > timezone handling > should convert user tim
 Filter: completed date: 2025-10-11 to 2025-10-11.
 Preview:
     Task completed in Madrid timezone • P4 • id=8485093750
-Next:
+Possible suggested next step:
 - Use find-tasks-by-date for active tasks or get-overview for current productivity."
 `;

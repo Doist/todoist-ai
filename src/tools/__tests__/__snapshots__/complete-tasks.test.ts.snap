@@ -5,17 +5,13 @@ exports[`complete-tasks tool > completing multiple tasks > should complete all t
 Completed:
     task-1
     task-2
-    task-3.
-Next:
-- Use find-tasks-by-date('today') to tackle remaining overdue items."
+    task-3."
 `;
 
 exports[`complete-tasks tool > completing multiple tasks > should complete single task 1`] = `
 "Completed tasks: 1/1 successful.
 Completed:
-    8485093748.
-Next:
-- Use find-tasks-by-date('today') to tackle remaining overdue items."
+    8485093748."
 `;
 
 exports[`complete-tasks tool > completing multiple tasks > should continue processing remaining tasks after failures 1`] = `
@@ -26,18 +22,14 @@ Completed:
 Failed (3):
     task-1 (Error: Task already completed)
     task-2 (Error: Task not found)
-    task-4 (Error: Permission denied).
-Next:
-- Review failed completions and retry if needed."
+    task-4 (Error: Permission denied)."
 `;
 
 exports[`complete-tasks tool > completing multiple tasks > should handle all tasks failing 1`] = `
 "Completed tasks: 0/2 successful.
 Failed (2):
     task-1 (Error: API Error: Network timeout)
-    task-2 (Error: API Error: Network timeout).
-Next:
-- Check task IDs and permissions, then retry."
+    task-2 (Error: API Error: Network timeout)."
 `;
 
 exports[`complete-tasks tool > completing multiple tasks > should handle different types of API errors 1`] = `
@@ -45,9 +37,7 @@ exports[`complete-tasks tool > completing multiple tasks > should handle differe
 Failed (4):
     not-found (Error: Task not found)
     already-done (Error: Task already completed)
-    no-permission (Error: Permission denied), +1 more.
-Next:
-- Check task IDs and permissions, then retry."
+    no-permission (Error: Permission denied), +1 more."
 `;
 
 exports[`complete-tasks tool > completing multiple tasks > should handle partial failures gracefully 1`] = `
@@ -56,17 +46,13 @@ Completed:
     task-1
     task-3.
 Failed (1):
-    task-2 (Error: Task not found).
-Next:
-- Review failed completions and retry if needed."
+    task-2 (Error: Task not found)."
 `;
 
 exports[`complete-tasks tool > edge cases > should handle empty task completion (minimum one task required by schema) 1`] = `
 "Completed tasks: 1/1 successful.
 Completed:
-    single-task.
-Next:
-- Use find-tasks-by-date('today') to tackle remaining overdue items."
+    single-task."
 `;
 
 exports[`complete-tasks tool > edge cases > should handle tasks with special ID formats 1`] = `
@@ -74,9 +60,7 @@ exports[`complete-tasks tool > edge cases > should handle tasks with special ID 
 Completed:
     proj_123_task_456
     task-with-dashes
-    1234567890.
-Next:
-- Use find-tasks-by-date('today') to tackle remaining overdue items."
+    1234567890."
 `;
 
 exports[`complete-tasks tool > error message truncation > should not show truncation message for exactly 3 errors 1`] = `
@@ -84,9 +68,7 @@ exports[`complete-tasks tool > error message truncation > should not show trunca
 Failed (3):
     task-1 (Error: Error 1)
     task-2 (Error: Error 2)
-    task-3 (Error: Error 3).
-Next:
-- Check task IDs and permissions, then retry."
+    task-3 (Error: Error 3)."
 `;
 
 exports[`complete-tasks tool > error message truncation > should truncate failure messages after 3 errors 1`] = `
@@ -94,9 +76,7 @@ exports[`complete-tasks tool > error message truncation > should truncate failur
 Failed (5):
     task-1 (Error: Error 1)
     task-2 (Error: Error 2)
-    task-3 (Error: Error 3), +2 more.
-Next:
-- Check task IDs and permissions, then retry."
+    task-3 (Error: Error 3), +2 more."
 `;
 
 exports[`complete-tasks tool > mixed success and failure scenarios > should handle realistic mixed scenario 1`] = `
@@ -107,27 +87,21 @@ Completed:
     8485093751.
 Failed (2):
     8485093750 (Error: Task already completed)
-    8485093752 (Error: Task not found).
-Next:
-- Review failed completions and retry if needed."
+    8485093752 (Error: Task not found)."
 `;
 
 exports[`complete-tasks tool > next steps logic validation > should suggest checking IDs when all tasks fail 1`] = `
 "Completed tasks: 0/2 successful.
 Failed (2):
     bad-id-1 (Error: Task not found)
-    bad-id-2 (Error: Task not found).
-Next:
-- Check task IDs and permissions, then retry."
+    bad-id-2 (Error: Task not found)."
 `;
 
 exports[`complete-tasks tool > next steps logic validation > should suggest overdue tasks when all tasks complete successfully 1`] = `
 "Completed tasks: 2/2 successful.
 Completed:
     task-1
-    task-2.
-Next:
-- Use find-tasks-by-date('today') to tackle remaining overdue items."
+    task-2."
 `;
 
 exports[`complete-tasks tool > next steps logic validation > should suggest reviewing failures when mixed results 1`] = `
@@ -135,7 +109,5 @@ exports[`complete-tasks tool > next steps logic validation > should suggest revi
 Completed:
     task-1.
 Failed (1):
-    task-2 (Error: Task not found).
-Next:
-- Review failed completions and retry if needed."
+    task-2 (Error: Task not found)."
 `;

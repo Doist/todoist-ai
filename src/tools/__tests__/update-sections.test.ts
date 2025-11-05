@@ -13,7 +13,7 @@ const mockTodoistApi = {
     updateSection: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
-const { FIND_TASKS, UPDATE_SECTIONS, GET_OVERVIEW } = ToolNames
+const { UPDATE_SECTIONS } = ToolNames
 
 describe(`${UPDATE_SECTIONS} tool`, () => {
     beforeEach(() => {
@@ -54,7 +54,6 @@ describe(`${UPDATE_SECTIONS} tool`, () => {
             expect(textContent).toContain(
                 'Updated Section Name (id=existing-section-123, projectId=6cfCcrrCFg2xP94Q)',
             )
-            expect(textContent).toContain(`Use ${FIND_TASKS} with sectionId=existing-section-123`)
 
             // Verify structured content
             const structuredContent = extractStructuredContent(result)
@@ -185,7 +184,6 @@ describe(`${UPDATE_SECTIONS} tool`, () => {
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Updated 2 sections:')
-            expect(textContent).toContain(`Use ${GET_OVERVIEW} with projectId=same-project`)
         })
     })
 

@@ -4,7 +4,7 @@ exports[`find-projects tool > listing all projects > should handle pagination wi
 "Projects: 1 (limit 10), more available.
 Preview:
     First Project • id=project-1
-Next:
+Possible suggested next steps:
 - Use find-tasks with projectId to see tasks in specific projects.
 - Pass cursor 'next-page-cursor' to fetch more results."
 `;
@@ -15,7 +15,7 @@ Preview:
     Inbox • Inbox • id=inbox-project-id
     test-abc123def456-project • id=6cfCcrrCFg2xP94Q
     Work Project • ⭐ • Shared • board • id=work-project-id
-Next:
+Possible suggested next steps:
 - Use find-tasks with projectId to see tasks in specific projects.
 - Favorite projects appear first in most Todoist views."
 `;
@@ -26,7 +26,7 @@ Filter: search: "work".
 Preview:
     Work Project • id=work-project-id
     Hobby Work • id=hobby-project-id
-Next:
+Possible suggested next step:
 - Use find-tasks with projectId to see tasks in specific projects."
 `;
 
@@ -35,7 +35,7 @@ exports[`find-projects tool > searching projects > should handle search with 'ca
 Filter: search: "IMPORTANT".
 Preview:
     Important Project • id=6cfCcrrCFg2xP94Q
-Next:
+Possible suggested next step:
 - Use find-tasks with projectId to see tasks in specific projects."
 `;
 

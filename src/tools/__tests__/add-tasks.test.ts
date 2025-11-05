@@ -17,7 +17,7 @@ const mockTodoistApi = {
     getUser: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
-const { ADD_TASKS, GET_OVERVIEW } = ToolNames
+const { ADD_TASKS } = ToolNames
 
 describe(`${ADD_TASKS} tool`, () => {
     beforeEach(() => {
@@ -621,9 +621,6 @@ describe(`${ADD_TASKS} tool`, () => {
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
-            expect(textContent).toContain(
-                `Use ${GET_OVERVIEW} to see your updated project organization`,
-            )
         })
 
         it('should suggest overview tool when no hasToday context', async () => {
@@ -648,9 +645,6 @@ describe(`${ADD_TASKS} tool`, () => {
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
-            expect(textContent).toContain(
-                `Use ${GET_OVERVIEW} to see your updated project organization`,
-            )
         })
     })
 

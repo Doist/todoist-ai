@@ -9,8 +9,6 @@ import { convertPriorityToNumber, PrioritySchema } from '../utils/priorities.js'
 import { summarizeTaskOperation } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
-const { FIND_TASKS_BY_DATE, GET_OVERVIEW } = ToolNames
-
 const TasksUpdateSchema = z.object({
     id: z.string().min(1).describe('The ID of the task to update.'),
     content: z
@@ -222,17 +220,8 @@ function generateTextContent({
         context = ` (${skipped} skipped - no changes)`
     }
 
-    const nextSteps: string[] = []
-    if (tasks.length > 0) {
-        nextSteps.push(`Use ${FIND_TASKS_BY_DATE} to see your updated schedule`)
-        nextSteps.push(`Use ${GET_OVERVIEW} to see updated project organization`)
-    } else {
-        nextSteps.push(`Use ${FIND_TASKS_BY_DATE} to see current tasks`)
-    }
-
     return summarizeTaskOperation('Updated', tasks, {
         context,
-        nextSteps,
         showDetails: tasks.length <= 5,
     })
 }

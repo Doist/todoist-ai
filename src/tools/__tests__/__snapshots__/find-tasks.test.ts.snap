@@ -5,7 +5,7 @@ exports[`find-tasks tool > container filtering > should find tasks in 'parent ta
 Filter: subtasks of 8485093748.
 Preview:
     Subtask • P4 • id=8485093748
-Next:
+Possible suggested next steps:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks"
 `;
@@ -15,7 +15,7 @@ exports[`find-tasks tool > container filtering > should find tasks in 'project' 
 Filter: in project 6cfCcrrCFg2xP94Q.
 Preview:
     Project task • P4 • id=8485093748
-Next:
+Possible suggested next steps:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks"
 `;
@@ -25,7 +25,7 @@ exports[`find-tasks tool > container filtering > should find tasks in 'section' 
 Filter: in section section-123.
 Preview:
     Section task • P4 • id=8485093748
-Next:
+Possible suggested next steps:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks"
 `;
@@ -35,7 +35,7 @@ exports[`find-tasks tool > next steps logic > should provide different next step
 Filter: matching "future tasks".
 Preview:
     Regular future task • due 2025-08-25 • P4 • id=8485093748
-Next:
+Possible suggested next steps:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks
 - Focus on overdue items first to get back on track"
@@ -52,7 +52,7 @@ exports[`find-tasks tool > next steps logic > should suggest different actions w
 Filter: matching "overdue tasks".
 Preview:
     Overdue search result • due 2025-08-10 • P4 • id=8485093748
-Next:
+Possible suggested next steps:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks
 - Focus on overdue items first to get back on track"
@@ -63,7 +63,7 @@ exports[`find-tasks tool > next steps logic > should suggest today tasks when ha
 Filter: matching "today tasks".
 Preview:
     Task due today • due 2025-08-17 • P4 • id=8485093748
-Next:
+Possible suggested next steps:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks
 - Focus on overdue items first to get back on track"
@@ -74,7 +74,7 @@ exports[`find-tasks tool > searching tasks > should handle 'custom limit' 1`] = 
 Filter: matching "project update".
 Preview:
     Test result • P4 • id=8485093748
-Next:
+Possible suggested next steps:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks"
 `;
@@ -84,7 +84,7 @@ exports[`find-tasks tool > searching tasks > should handle 'pagination cursor' 1
 Filter: matching "follow up".
 Preview:
     Test result • P4 • id=8485093748
-Next:
+Possible suggested next steps:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks"
 `;
@@ -107,7 +107,7 @@ Filter: matching "important meeting".
 Preview:
     Task containing search term • P4 • id=8485093748
     Another matching task • P3 • id=8485093749
-Next:
+Possible suggested next steps:
 - Use update-tasks to modify priorities or due dates
 - Use complete-tasks to mark finished tasks
 - Pass cursor 'cursor-for-next-page' to fetch more results."

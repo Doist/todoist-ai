@@ -1,25 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`delete-object tool > deleting projects > should delete a project by ID 1`] = `
-"Deleted project: id=6cfCcrrCFg2xP94Q
-Next:
-- Use find-projects to see remaining projects
-- Note: All tasks and sections in this project were also deleted
-- Use get-overview to review your updated project structure"
-`;
+exports[`delete-object tool > deleting projects > should delete a project by ID 1`] = `"Deleted project: id=6cfCcrrCFg2xP94Q"`;
 
-exports[`delete-object tool > deleting sections > should delete a section by ID 1`] = `
-"Deleted section: id=section-123
-Next:
-- Use find-sections to see remaining sections in the project
-- Note: Tasks in this section were also deleted
-- Use find-tasks with projectId to see unorganized tasks"
-`;
+exports[`delete-object tool > deleting sections > should delete a section by ID 1`] = `"Deleted section: id=section-123"`;
 
-exports[`delete-object tool > deleting tasks > should delete a task by ID 1`] = `
-"Deleted task: id=8485093748
-Next:
-- Use find-tasks-by-date to see remaining tasks for today
-- Use get-overview to check if this affects any dependent tasks
-- Note: Any subtasks of this task were also deleted"
-`;
+exports[`delete-object tool > deleting tasks > should delete a task by ID 1`] = `"Deleted task: id=8485093748"`;

@@ -11,7 +11,7 @@ const mockTodoistApi = {
     deleteTask: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
-const { FIND_PROJECTS, FIND_TASKS_BY_DATE, DELETE_OBJECT } = ToolNames
+const { DELETE_OBJECT } = ToolNames
 
 describe(`${DELETE_OBJECT} tool`, () => {
     beforeEach(() => {
@@ -34,7 +34,6 @@ describe(`${DELETE_OBJECT} tool`, () => {
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Deleted project: id=6cfCcrrCFg2xP94Q')
-            expect(textContent).toContain(`Use ${FIND_PROJECTS} to see remaining projects`)
             expect(result.structuredContent).toEqual({
                 deletedEntity: {
                     type: 'project',
@@ -70,9 +69,6 @@ describe(`${DELETE_OBJECT} tool`, () => {
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Deleted section: id=section-123')
-            expect(textContent).toContain(
-                `Use ${ToolNames.FIND_SECTIONS} to see remaining sections`,
-            )
             expect(result.structuredContent).toEqual({
                 deletedEntity: { type: 'section', id: 'section-123' },
                 success: true,
@@ -108,7 +104,6 @@ describe(`${DELETE_OBJECT} tool`, () => {
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Deleted task: id=8485093748')
-            expect(textContent).toContain(`Use ${FIND_TASKS_BY_DATE} to see remaining tasks`)
             expect(result.structuredContent).toEqual({
                 deletedEntity: { type: 'task', id: '8485093748' },
                 success: true,
