@@ -4,41 +4,28 @@ exports[`find-tasks tool > container filtering > should find tasks in 'parent ta
 "Subtasks: 1 (limit 10).
 Filter: subtasks of 8485093748.
 Preview:
-    Subtask • P4 • id=8485093748
-Possible suggested next steps:
-- Use update-tasks to modify priorities or due dates
-- Use complete-tasks to mark finished tasks"
+    Subtask • P4 • id=8485093748"
 `;
 
 exports[`find-tasks tool > container filtering > should find tasks in 'project' 1`] = `
 "Tasks in project: 1 (limit 10).
 Filter: in project 6cfCcrrCFg2xP94Q.
 Preview:
-    Project task • P4 • id=8485093748
-Possible suggested next steps:
-- Use update-tasks to modify priorities or due dates
-- Use complete-tasks to mark finished tasks"
+    Project task • P4 • id=8485093748"
 `;
 
 exports[`find-tasks tool > container filtering > should find tasks in 'section' 1`] = `
 "Tasks in section: 1 (limit 10).
 Filter: in section section-123.
 Preview:
-    Section task • P4 • id=8485093748
-Possible suggested next steps:
-- Use update-tasks to modify priorities or due dates
-- Use complete-tasks to mark finished tasks"
+    Section task • P4 • id=8485093748"
 `;
 
 exports[`find-tasks tool > next steps logic > should provide different next steps for regular tasks 1`] = `
 "Search results for "future tasks": 1 (limit 10).
 Filter: matching "future tasks".
 Preview:
-    Regular future task • due 2025-08-25 • P4 • id=8485093748
-Possible suggested next steps:
-- Use update-tasks to modify priorities or due dates
-- Use complete-tasks to mark finished tasks
-- Focus on overdue items first to get back on track"
+    Regular future task • due 2025-08-25 • P4 • id=8485093748"
 `;
 
 exports[`find-tasks tool > next steps logic > should provide helpful suggestions for empty search results 1`] = `
@@ -51,42 +38,28 @@ exports[`find-tasks tool > next steps logic > should suggest different actions w
 "Search results for "overdue tasks": 1 (limit 10).
 Filter: matching "overdue tasks".
 Preview:
-    Overdue search result • due 2025-08-10 • P4 • id=8485093748
-Possible suggested next steps:
-- Use update-tasks to modify priorities or due dates
-- Use complete-tasks to mark finished tasks
-- Focus on overdue items first to get back on track"
+    Overdue search result • due 2025-08-10 • P4 • id=8485093748"
 `;
 
 exports[`find-tasks tool > next steps logic > should suggest today tasks when hasToday is true 1`] = `
 "Search results for "today tasks": 1 (limit 10).
 Filter: matching "today tasks".
 Preview:
-    Task due today • due 2025-08-17 • P4 • id=8485093748
-Possible suggested next steps:
-- Use update-tasks to modify priorities or due dates
-- Use complete-tasks to mark finished tasks
-- Focus on overdue items first to get back on track"
+    Task due today • due 2025-08-17 • P4 • id=8485093748"
 `;
 
 exports[`find-tasks tool > searching tasks > should handle 'custom limit' 1`] = `
 "Search results for "project update": 1 (limit 5).
 Filter: matching "project update".
 Preview:
-    Test result • P4 • id=8485093748
-Possible suggested next steps:
-- Use update-tasks to modify priorities or due dates
-- Use complete-tasks to mark finished tasks"
+    Test result • P4 • id=8485093748"
 `;
 
 exports[`find-tasks tool > searching tasks > should handle 'pagination cursor' 1`] = `
 "Search results for "follow up": 1 (limit 20).
 Filter: matching "follow up".
 Preview:
-    Test result • P4 • id=8485093748
-Possible suggested next steps:
-- Use update-tasks to modify priorities or due dates
-- Use complete-tasks to mark finished tasks"
+    Test result • P4 • id=8485093748"
 `;
 
 exports[`find-tasks tool > searching tasks > should handle search with 'empty results' 1`] = `
@@ -107,8 +80,6 @@ Filter: matching "important meeting".
 Preview:
     Task containing search term • P4 • id=8485093748
     Another matching task • P3 • id=8485093749
-Possible suggested next steps:
-- Use update-tasks to modify priorities or due dates
-- Use complete-tasks to mark finished tasks
+Possible suggested next step:
 - Pass cursor 'cursor-for-next-page' to fetch more results."
 `;

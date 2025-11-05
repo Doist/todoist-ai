@@ -9,19 +9,12 @@ exports[`find-activity tool > basic functionality > should retrieve activity eve
 "Activity events: 2 (limit 20).
 Preview:
     [Oct 23, 10:00] added task • id=task-456 • by=user-001 • project=project-789
-    [Oct 23, 11:00] completed task • id=task-456 • by=user-001 • project=project-789
-Possible suggested next steps:
-- Use find-tasks to view current task details
-- Review completed tasks to track productivity"
+    [Oct 23, 11:00] completed task • id=task-456 • by=user-001 • project=project-789"
 `;
 
 exports[`find-activity tool > filtering > should support multiple filters simultaneously 1`] = `
 "Activity: completed tasks: 1 (limit 50).
 Filter: project: project-work; initiator: user-bob.
 Preview:
-    [Oct 23, 10:30] completed task • id=task-456 • by=user-bob • project=project-work
-Possible suggested next steps:
-- Use find-tasks to view current task details
-- Review completed tasks to track productivity
-- Use user-info to get details about the user"
+    [Oct 23, 10:30] completed task • id=task-456 • by=user-bob • project=project-work"
 `;

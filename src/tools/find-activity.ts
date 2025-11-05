@@ -6,8 +6,6 @@ import { ApiLimits } from '../utils/constants.js'
 import { summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
-const { FIND_TASKS, USER_INFO } = ToolNames
-
 const ArgsSchema = {
     objectType: z
         .enum(['task', 'project', 'comment'])
@@ -160,29 +158,6 @@ function generateTextContent({
         }
     }
 
-    // Generate contextual next steps
-    const nextSteps: string[] = []
-    if (events.length > 0) {
-        // Suggest related tools based on what was found
-        const hasTaskEvents = events.some((e) => e.objectType === 'task' || e.objectType === 'item')
-        const hasCompletions = events.some((e) => e.eventType === 'completed')
-
-        if (hasTaskEvents) {
-            nextSteps.push(`Use ${FIND_TASKS} to view current task details`)
-        }
-        if (hasCompletions) {
-            nextSteps.push('Review completed tasks to track productivity')
-        }
-        if (args.initiatorId) {
-            nextSteps.push(`Use ${USER_INFO} to get details about the user`)
-        }
-
-        // Suggest narrowing down if too many results
-        if (events.length >= args.limit && !nextCursor) {
-            nextSteps.push('Add more specific filters to narrow down results')
-        }
-    }
-
     return summarizeList({
         subject,
         count: events.length,
@@ -191,7 +166,6 @@ function generateTextContent({
         filterHints,
         previewLines: previewActivityEvents(events, Math.min(events.length, args.limit)),
         zeroReasonHints,
-        nextSteps,
     })
 }
 

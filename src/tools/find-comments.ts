@@ -6,8 +6,6 @@ import { ApiLimits } from '../utils/constants.js'
 import { formatNextSteps } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
-const { ADD_COMMENTS, UPDATE_COMMENTS, DELETE_OBJECT } = ToolNames
-
 const ArgsSchema = {
     taskId: z.string().optional().describe('Find comments for a specific task.'),
     projectId: z
@@ -143,46 +141,13 @@ function generateTextContent({
         }
     }
 
-    // Context-aware next steps
-    const nextSteps: string[] = []
-
-    if (searchType === 'single') {
-        const comment = comments[0]
-        if (comment) {
-            nextSteps.push(`Use ${UPDATE_COMMENTS} with id=${comment.id} to edit content`)
-            nextSteps.push(`Use ${DELETE_OBJECT} with type=comment id=${comment.id} to remove`)
-
-            // Suggest viewing related comments
-            if (comment.taskId) {
-                nextSteps.push(
-                    `Use ${ToolNames.FIND_COMMENTS} with taskId=${comment.taskId} to see all task comments`,
-                )
-            } else if (comment.projectId) {
-                nextSteps.push(
-                    `Use ${ToolNames.FIND_COMMENTS} with projectId=${comment.projectId} to see all project comments`,
-                )
-            }
-        }
-    } else {
-        // Multiple comments
-        nextSteps.push(`Use ${ADD_COMMENTS} with ${searchType}Id=${searchId} to add new comment`)
-
-        if (comments.length > 0) {
-            nextSteps.push(
-                `Use ${ToolNames.FIND_COMMENTS} with commentId to view specific comment details`,
-            )
-        }
-
-        // Pagination
-        if (hasMore && nextCursor) {
-            nextSteps.push(
-                `Use ${ToolNames.FIND_COMMENTS} with cursor="${nextCursor}" to get more results`,
-            )
-        }
+    // Only show pagination next step if there's a cursor
+    if (nextCursor) {
+        const next = formatNextSteps([], nextCursor)
+        return `${summary}\n${next}`
     }
 
-    const next = formatNextSteps(nextSteps)
-    return `${summary}\n${next}`
+    return summary
 }
 
 export { findComments }

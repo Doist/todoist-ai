@@ -6,7 +6,7 @@ import { ApiLimits } from '../utils/constants.js'
 import { formatProjectPreview, summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
-const { ADD_PROJECTS, FIND_TASKS } = ToolNames
+const { ADD_PROJECTS } = ToolNames
 
 const ArgsSchema = {
     search: z
@@ -102,15 +102,6 @@ function generateTextContent({
         }
     }
 
-    // Generate contextual next steps
-    const nextSteps: string[] = []
-    if (projects.length > 0) {
-        nextSteps.push(`Use ${FIND_TASKS} with projectId to see tasks in specific projects.`)
-        if (projects.some((p) => p.isFavorite)) {
-            nextSteps.push('Favorite projects appear first in most Todoist views.')
-        }
-    }
-
     return summarizeList({
         subject,
         count: projects.length,
@@ -119,7 +110,6 @@ function generateTextContent({
         filterHints,
         previewLines: previewWithMore,
         zeroReasonHints,
-        nextSteps,
     })
 }
 

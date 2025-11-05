@@ -2,40 +2,16 @@
 
 exports[`find-comments tool > empty results > should handle no comments found 1`] = `"No comments found for task task123"`;
 
-exports[`find-comments tool > finding comments by project > should find comments for a project 1`] = `
-"Found 1 comment for project project456
-Possible suggested next steps:
-- Use add-comments with projectId=project456 to add new comment
-- Use find-comments with commentId to view specific comment details"
-`;
+exports[`find-comments tool > finding comments by project > should find comments for a project 1`] = `"Found 1 comment for project project456"`;
 
-exports[`find-comments tool > finding comments by task > should find comments for a task 1`] = `
-"Found 2 comments for task task123
-Possible suggested next steps:
-- Use add-comments with taskId=task123 to add new comment
-- Use find-comments with commentId to view specific comment details"
-`;
+exports[`find-comments tool > finding comments by task > should find comments for a task 1`] = `"Found 2 comments for task task123"`;
 
 exports[`find-comments tool > finding comments by task > should handle pagination 1`] = `
 "Found 1 comment for task task123 • More available
-Possible suggested next steps:
-- Use add-comments with taskId=task123 to add new comment
-- Use find-comments with commentId to view specific comment details
-- Use find-comments with cursor="next_page_token" to get more results"
+Possible suggested next step:
+- Pass cursor 'next_page_token' to fetch more results."
 `;
 
-exports[`find-comments tool > finding single comment > should find comment by ID 1`] = `
-"Found comment • id=comment789
-Possible suggested next steps:
-- Use update-comments with id=comment789 to edit content
-- Use delete-object with type=comment id=comment789 to remove
-- Use find-comments with taskId=task123 to see all task comments"
-`;
+exports[`find-comments tool > finding single comment > should find comment by ID 1`] = `"Found comment • id=comment789"`;
 
-exports[`find-comments tool > finding single comment > should handle comment with attachment 1`] = `
-"Found comment • Has attachment: document.pdf • id=comment789
-Possible suggested next steps:
-- Use update-comments with id=comment789 to edit content
-- Use delete-object with type=comment id=comment789 to remove
-- Use find-comments with taskId=task123 to see all task comments"
-`;
+exports[`find-comments tool > finding single comment > should handle comment with attachment 1`] = `"Found comment • Has attachment: document.pdf • id=comment789"`;
