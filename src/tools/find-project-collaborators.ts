@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { type Project } from '../tool-helpers.js'
+import { CollaboratorSchema } from '../utils/output-schemas.js'
 import { summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 import { type ProjectCollaborator, userResolver } from '../utils/user-resolver.js'
@@ -18,10 +19,29 @@ const ArgsSchema = {
         ),
 }
 
+const OutputSchema = {
+    collaborators: z.array(CollaboratorSchema).describe('The found collaborators.'),
+    projectInfo: z
+        .object({
+            id: z.string().describe('The project ID.'),
+            name: z.string().describe('The project name.'),
+            isShared: z.boolean().describe('Whether the project is shared.'),
+        })
+        .optional()
+        .describe('Information about the project.'),
+    totalCount: z.number().describe('The total number of collaborators found.'),
+    totalAvailable: z
+        .number()
+        .optional()
+        .describe('The total number of available collaborators in the project.'),
+    appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
+}
+
 const findProjectCollaborators = {
     name: ToolNames.FIND_PROJECT_COLLABORATORS,
     description: 'Search for collaborators by name or other criteria in a project.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         const { projectId, searchTerm } = args
 

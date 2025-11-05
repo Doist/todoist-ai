@@ -11,6 +11,7 @@ import type { TodoistTool } from '../todoist-tool.js'
 import { getTasksByFilter, mapTask } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
+import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
 import { MappedTask } from '../utils/test-helpers.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -53,11 +54,20 @@ const ArgsSchema = {
     ...LabelsSchema,
 }
 
+const OutputSchema = {
+    tasks: z.array(TaskOutputSchema).describe('The found tasks.'),
+    nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
+    totalCount: z.number().describe('The total number of tasks in this page.'),
+    hasMore: z.boolean().describe('Whether there are more results available.'),
+    appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
+}
+
 const findTasks = {
     name: ToolNames.FIND_TASKS,
     description:
         'Find tasks by text search, or by project/section/parent container/responsible user. At least one filter must be provided.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         const {
             searchText,

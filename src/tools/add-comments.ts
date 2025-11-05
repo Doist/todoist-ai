@@ -2,6 +2,7 @@ import type { AddCommentArgs, Comment } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
+import { CommentSchema as CommentOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const CommentSchema = z.object({
@@ -19,11 +20,18 @@ const ArgsSchema = {
     comments: z.array(CommentSchema).min(1).describe('The array of comments to add.'),
 }
 
+const OutputSchema = {
+    comments: z.array(CommentOutputSchema).describe('The created comments.'),
+    totalCount: z.number().describe('The total number of comments created.'),
+    addedCommentIds: z.array(z.string()).describe('The IDs of the added comments.'),
+}
+
 const addComments = {
     name: ToolNames.ADD_COMMENTS,
     description:
         'Add multiple comments to tasks or projects. Each comment must specify either taskId or projectId.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         const { comments } = args
 

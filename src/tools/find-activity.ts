@@ -3,6 +3,7 @@ import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapActivityEvent } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
+import { ActivityEventSchema } from '../utils/output-schemas.js'
 import { summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -52,11 +53,20 @@ const ArgsSchema = {
         .describe('Pagination cursor for retrieving the next page of results.'),
 }
 
+const OutputSchema = {
+    events: z.array(ActivityEventSchema).describe('The activity events.'),
+    nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
+    totalCount: z.number().describe('The total number of events in this page.'),
+    hasMore: z.boolean().describe('Whether there are more results available.'),
+    appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
+}
+
 const findActivity = {
     name: ToolNames.FIND_ACTIVITY,
     description:
         'Retrieve recent activity logs to monitor and audit changes in Todoist. Shows events from all users by default (use initiatorId to filter by specific user). Track task completions, updates, deletions, project changes, and more with flexible filtering. Note: Date-based filtering is not supported by the Todoist API.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         const { objectType, objectId, eventType, projectId, taskId, initiatorId, limit, cursor } =
             args

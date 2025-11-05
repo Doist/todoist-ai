@@ -2,6 +2,7 @@ import type { Section } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
+import { SectionSchema as SectionOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const SectionSchema = z.object({
@@ -18,10 +19,16 @@ const ArgsSchema = {
     sections: z.array(SectionSchema).min(1).describe('The array of sections to add.'),
 }
 
+const OutputSchema = {
+    sections: z.array(SectionOutputSchema).describe('The created sections.'),
+    totalCount: z.number().describe('The total number of sections created.'),
+}
+
 const addSections = {
     name: ToolNames.ADD_SECTIONS,
     description: 'Add one or more new sections to projects.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute({ sections }, client) {
         // Check if any section needs inbox resolution
         const needsInboxResolution = sections.some((section) => section.projectId === 'inbox')

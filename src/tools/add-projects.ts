@@ -2,6 +2,7 @@ import type { PersonalProject, WorkspaceProject } from '@doist/todoist-api-types
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
+import { ProjectSchema as ProjectOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const ProjectSchema = z.object({
@@ -24,10 +25,16 @@ const ArgsSchema = {
     projects: z.array(ProjectSchema).min(1).describe('The array of projects to add.'),
 }
 
+const OutputSchema = {
+    projects: z.array(ProjectOutputSchema).describe('The created projects.'),
+    totalCount: z.number().describe('The total number of projects created.'),
+}
+
 const addProjects = {
     name: ToolNames.ADD_PROJECTS,
     description: 'Add one or more new projects.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute({ projects }, client) {
         const newProjects = await Promise.all(projects.map((project) => client.addProject(project)))
         const textContent = generateTextContent({ projects: newProjects })

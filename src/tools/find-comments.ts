@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ApiLimits } from '../utils/constants.js'
+import { CommentSchema as CommentOutputSchema } from '../utils/output-schemas.js'
 import { formatNextSteps } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -25,11 +26,18 @@ const ArgsSchema = {
         .describe('Maximum number of comments to return'),
 }
 
+const OutputSchema = {
+    comments: z.array(CommentOutputSchema).describe('The found comments.'),
+    nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
+    totalCount: z.number().describe('The total number of comments in this page.'),
+}
+
 const findComments = {
     name: ToolNames.FIND_COMMENTS,
     description:
         'Find comments by task, project, or get a specific comment by ID. Exactly one of taskId, projectId, or commentId must be provided.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         // Validate that exactly one search parameter is provided
         const searchParams = [args.taskId, args.projectId, args.commentId].filter(Boolean)
