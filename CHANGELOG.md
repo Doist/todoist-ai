@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.17.0](https://github.com/Doist/todoist-ai/compare/v4.16.1...v4.17.0) (2025-11-05)
+
+
+### Features
+
+* Add output schema to all tools ([#203](https://github.com/Doist/todoist-ai/issues/203)) ([7663388](https://github.com/Doist/todoist-ai/commit/76633886dde65880cd049733431aa9d4a5038b84))
+
 ## [4.16.1](https://github.com/Doist/todoist-ai/compare/v4.16.0...v4.16.1) (2025-11-05)
 
 
