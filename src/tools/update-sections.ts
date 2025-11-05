@@ -1,6 +1,5 @@
 import type { Section } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { SectionSchema as SectionOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -34,16 +33,16 @@ const updateSections = {
             sections: updatedSections,
         })
 
-        return getToolOutput({
+        return {
             textContent,
             structuredContent: {
                 sections: updatedSections,
                 totalCount: updatedSections.length,
                 updatedSectionIds: updatedSections.map((section) => section.id),
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent({ sections }: { sections: Section[] }) {
     const count = sections.length

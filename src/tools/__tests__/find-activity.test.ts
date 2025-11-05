@@ -1,6 +1,5 @@
 import type { ActivityEvent, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import { extractTextContent } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { findActivity } from '../find-activity.js'
 
@@ -61,7 +60,7 @@ describe(`${FIND_ACTIVITY} tool`, () => {
                 cursor: null,
             })
 
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
 
         it('should handle empty results', async () => {
@@ -72,7 +71,7 @@ describe(`${FIND_ACTIVITY} tool`, () => {
 
             const result = await findActivity.execute({ limit: 20 }, mockTodoistApi)
 
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
 
         it('should handle pagination with cursor', async () => {
@@ -98,8 +97,8 @@ describe(`${FIND_ACTIVITY} tool`, () => {
                 cursor: 'current-cursor',
             })
 
-            expect(extractTextContent(result)).toContain('Pass cursor')
-            expect(extractTextContent(result)).toContain('next-page-cursor')
+            expect(result.textContent).toContain('Pass cursor')
+            expect(result.textContent).toContain('next-page-cursor')
         })
     })
 
@@ -132,7 +131,7 @@ describe(`${FIND_ACTIVITY} tool`, () => {
                 cursor: null,
             })
 
-            expect(extractTextContent(result)).toContain(objectType)
+            expect(result.textContent).toContain(objectType)
         })
 
         it.each([
@@ -176,7 +175,7 @@ describe(`${FIND_ACTIVITY} tool`, () => {
                 cursor: null,
             })
 
-            expect(extractTextContent(result)).toContain(eventType)
+            expect(result.textContent).toContain(eventType)
         })
 
         it.each([
@@ -242,7 +241,7 @@ describe(`${FIND_ACTIVITY} tool`, () => {
                 cursor: null,
             })
 
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
     })
 
@@ -262,7 +261,7 @@ describe(`${FIND_ACTIVITY} tool`, () => {
 
             const result = await findActivity.execute({ limit: 20 }, mockTodoistApi)
 
-            expect(extractTextContent(result)).toContain('Buy groceries')
+            expect(result.textContent).toContain('Buy groceries')
         })
 
         it('should handle system-generated events with no initiator', async () => {
@@ -280,7 +279,7 @@ describe(`${FIND_ACTIVITY} tool`, () => {
 
             const result = await findActivity.execute({ limit: 20 }, mockTodoistApi)
 
-            expect(extractTextContent(result)).toContain('system')
+            expect(result.textContent).toContain('system')
         })
 
         it('should truncate long content', async () => {
@@ -298,8 +297,8 @@ describe(`${FIND_ACTIVITY} tool`, () => {
 
             const result = await findActivity.execute({ limit: 20 }, mockTodoistApi)
 
-            expect(extractTextContent(result)).toContain('...')
-            expect(extractTextContent(result)).not.toContain(longContent)
+            expect(result.textContent).toContain('...')
+            expect(result.textContent).not.toContain(longContent)
         })
     })
 })

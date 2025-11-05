@@ -1,6 +1,5 @@
 import type { AddTaskArgs, Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask } from '../tool-helpers.js'
 import { assignmentValidator } from '../utils/assignment-validator.js'
@@ -81,15 +80,15 @@ const addTasks = {
             args: { tasks },
         })
 
-        return getToolOutput({
+        return {
             textContent,
             structuredContent: {
                 tasks: mappedTasks,
                 totalCount: mappedTasks.length,
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi): Promise<Task> {
     const {

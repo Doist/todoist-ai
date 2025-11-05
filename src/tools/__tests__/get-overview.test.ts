@@ -4,8 +4,6 @@ import {
     createMockProject,
     createMockSection,
     createMockTask,
-    extractStructuredContent,
-    extractTextContent,
     TEST_ERRORS,
     TEST_IDS,
 } from '../../utils/test-helpers.js'
@@ -69,10 +67,10 @@ describe(`${GET_OVERVIEW} tool`, () => {
             expect(mockTodoistApi.getSections).toHaveBeenCalledTimes(2) // Once for each project
 
             // Test text content with snapshot
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Test structured content sanity checks
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     type: 'account_overview',
@@ -96,16 +94,17 @@ describe(`${GET_OVERVIEW} tool`, () => {
             const result = await getOverview.execute({}, mockTodoistApi)
 
             // Test text content with snapshot
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Test structured content sanity checks
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual({
                 type: 'account_overview',
-                // projects array is removed when empty
+                projects: [], // projects array is now kept as empty array
                 totalProjects: 0,
                 totalSections: 0,
                 hasNestedProjects: false,
+                inbox: null,
             })
         })
     })
@@ -188,10 +187,10 @@ describe(`${GET_OVERVIEW} tool`, () => {
             })
 
             // Test text content with snapshot
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Test structured content sanity checks
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     type: 'project_overview',
@@ -229,17 +228,18 @@ describe(`${GET_OVERVIEW} tool`, () => {
             )
 
             // Test text content with snapshot
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Test structured content sanity checks
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual({
                 type: 'project_overview',
                 project: expect.objectContaining({
                     id: 'empty-project-id',
                     name: 'Empty Project',
                 }),
-                // sections and tasks arrays are removed when empty
+                sections: [], // sections array is now kept as empty array
+                tasks: [], // tasks array is now kept as empty array
                 stats: expect.objectContaining({
                     totalTasks: 0,
                     totalSections: 0,

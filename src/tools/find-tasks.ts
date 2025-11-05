@@ -6,7 +6,6 @@ import {
     RESPONSIBLE_USER_FILTERING,
     resolveResponsibleUser,
 } from '../filter-helpers.js'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { getTasksByFilter, mapTask } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
@@ -56,7 +55,7 @@ const ArgsSchema = {
 
 const OutputSchema = {
     tasks: z.array(TaskOutputSchema).describe('The found tasks.'),
-    nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
+    nextCursor: z.string().nullable().describe('Cursor for the next page of results.'),
     totalCount: z.number().describe('The total number of tasks in this page.'),
     hasMore: z.boolean().describe('Whether there are more results available.'),
     appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
@@ -158,7 +157,7 @@ const findTasks = {
                 assigneeEmail,
             })
 
-            return getToolOutput({
+            return {
                 textContent,
                 structuredContent: {
                     tasks: filteredTasks,
@@ -167,7 +166,7 @@ const findTasks = {
                     hasMore: Boolean(nextCursor),
                     appliedFilters: args,
                 },
-            })
+            }
         }
 
         // If only responsibleUid is provided (without containers), use assignee filter
@@ -189,7 +188,7 @@ const findTasks = {
                 assigneeEmail,
             })
 
-            return getToolOutput({
+            return {
                 textContent,
                 structuredContent: {
                     tasks: mappedTasks,
@@ -198,7 +197,7 @@ const findTasks = {
                     hasMore: Boolean(tasks.nextCursor),
                     appliedFilters: args,
                 },
-            })
+            }
         }
 
         // Handle search text and/or labels using filter query (responsibleUid filtering done client-side)
@@ -236,7 +235,7 @@ const findTasks = {
             assigneeEmail,
         })
 
-        return getToolOutput({
+        return {
             textContent,
             structuredContent: {
                 tasks,
@@ -245,9 +244,9 @@ const findTasks = {
                 hasMore: Boolean(result.nextCursor),
                 appliedFilters: args,
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function getContainerZeroReasonHints(args: z.infer<z.ZodObject<typeof ArgsSchema>>): string[] {
     if (args.projectId) {

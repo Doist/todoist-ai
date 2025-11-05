@@ -1,10 +1,6 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import {
-    createMockSection,
-    extractStructuredContent,
-    extractTextContent,
-} from '../../utils/test-helpers.js'
+import { createMockSection } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { updateSections } from '../update-sections.js'
 
@@ -48,7 +44,7 @@ describe(`${UPDATE_SECTIONS} tool`, () => {
                 name: 'Updated Section Name',
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Updated 1 section:')
             expect(textContent).toContain(
@@ -56,7 +52,7 @@ describe(`${UPDATE_SECTIONS} tool`, () => {
             )
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     sections: expect.arrayContaining([
@@ -121,7 +117,7 @@ describe(`${UPDATE_SECTIONS} tool`, () => {
                 name: 'Updated Third Section',
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Updated 3 sections:')
             expect(textContent).toContain(
@@ -135,7 +131,7 @@ describe(`${UPDATE_SECTIONS} tool`, () => {
             )
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     sections: expect.arrayContaining([
@@ -181,7 +177,7 @@ describe(`${UPDATE_SECTIONS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Updated 2 sections:')
         })

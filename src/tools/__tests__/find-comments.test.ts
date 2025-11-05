@@ -1,6 +1,5 @@
 import type { Comment, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import { extractStructuredContent, extractTextContent } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { findComments } from '../find-comments.js'
 
@@ -12,19 +11,21 @@ const mockTodoistApi = {
 
 const { FIND_COMMENTS } = ToolNames
 
-const createMockComment = (overrides: Partial<Comment> = {}): Comment => ({
-    id: '12345',
-    content: 'Test comment content',
-    postedAt: '2024-01-01T12:00:00Z',
-    postedUid: 'user123',
-    taskId: 'task123',
-    projectId: undefined,
-    fileAttachment: null,
-    uidsToNotify: null,
-    reactions: null,
-    isDeleted: false,
-    ...overrides,
-})
+function createMockComment(overrides: Partial<Comment> = {}): Comment {
+    return {
+        id: '12345',
+        content: 'Test comment content',
+        postedAt: '2024-01-01T12:00:00Z',
+        postedUid: 'user123',
+        taskId: 'task123',
+        projectId: undefined,
+        fileAttachment: null,
+        uidsToNotify: null,
+        reactions: null,
+        isDeleted: false,
+        ...overrides,
+    }
+}
 
 describe(`${FIND_COMMENTS} tool`, () => {
     beforeEach(() => {
@@ -43,12 +44,7 @@ describe(`${FIND_COMMENTS} tool`, () => {
                 nextCursor: null,
             })
 
-            const result = await findComments.execute(
-                {
-                    taskId: 'task123',
-                },
-                mockTodoistApi,
-            )
+            const result = await findComments.execute({ taskId: 'task123' }, mockTodoistApi)
 
             expect(mockTodoistApi.getComments).toHaveBeenCalledWith({
                 taskId: 'task123',
@@ -56,11 +52,9 @@ describe(`${FIND_COMMENTS} tool`, () => {
                 limit: 10,
             })
 
-            // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
-            // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     comments: expect.arrayContaining([
@@ -99,10 +93,10 @@ describe(`${FIND_COMMENTS} tool`, () => {
             })
 
             // Verify result includes pagination info
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content includes pagination
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     comments: expect.arrayContaining([
@@ -134,12 +128,7 @@ describe(`${FIND_COMMENTS} tool`, () => {
                 nextCursor: null,
             })
 
-            const result = await findComments.execute(
-                {
-                    projectId: 'project456',
-                },
-                mockTodoistApi,
-            )
+            const result = await findComments.execute({ projectId: 'project456' }, mockTodoistApi)
 
             expect(mockTodoistApi.getComments).toHaveBeenCalledWith({
                 projectId: 'project456',
@@ -147,11 +136,9 @@ describe(`${FIND_COMMENTS} tool`, () => {
                 limit: 10,
             })
 
-            // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
-            // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     comments: expect.arrayContaining([
@@ -180,20 +167,13 @@ describe(`${FIND_COMMENTS} tool`, () => {
 
             mockTodoistApi.getComment.mockResolvedValue(mockComment)
 
-            const result = await findComments.execute(
-                {
-                    commentId: 'comment789',
-                },
-                mockTodoistApi,
-            )
+            const result = await findComments.execute({ commentId: 'comment789' }, mockTodoistApi)
 
             expect(mockTodoistApi.getComment).toHaveBeenCalledWith('comment789')
 
-            // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
-            // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     comments: expect.arrayContaining([
@@ -233,10 +213,10 @@ describe(`${FIND_COMMENTS} tool`, () => {
             )
 
             // Verify result includes attachment info
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content includes attachment
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     comments: expect.arrayContaining([
@@ -295,16 +275,17 @@ describe(`${FIND_COMMENTS} tool`, () => {
             )
 
             // Verify result handles empty case
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual({
                 searchType: 'task',
                 searchId: 'task123',
                 hasMore: false,
                 totalCount: 0,
-                // comments array is removed when empty
+                comments: [], // comments array is now kept as empty array
+                nextCursor: null,
             })
         })
     })

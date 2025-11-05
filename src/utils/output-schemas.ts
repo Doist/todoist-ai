@@ -17,17 +17,17 @@ const TaskSchema = z.object({
         .describe('The deadline date of the task (ISO 8601 format).'),
     priority: z.number().describe('The priority level (1-4, where 1 is highest priority).'),
     projectId: z.string().describe('The ID of the project this task belongs to.'),
-    sectionId: z.string().optional().describe('The ID of the section this task belongs to.'),
-    parentId: z.string().optional().describe('The ID of the parent task (for subtasks).'),
+    sectionId: z.string().nullable().describe('The ID of the section this task belongs to.'),
+    parentId: z.string().nullable().describe('The ID of the parent task (for subtasks).'),
     labels: z.array(z.string()).describe('The labels attached to this task.'),
-    duration: z.string().optional().describe('The duration of the task (e.g., "2h30m").'),
+    duration: z.string().nullable().describe('The duration of the task (e.g., "2h30m").'),
     responsibleUid: z
         .string()
-        .optional()
+        .nullable()
         .describe('The UID of the user responsible for this task.'),
-    assignedByUid: z.string().optional().describe('The UID of the user who assigned this task.'),
+    assignedByUid: z.string().nullable().describe('The UID of the user who assigned this task.'),
     checked: z.boolean().describe('Whether the task is checked/completed.'),
-    completedAt: z.string().optional().describe('When the task was completed (ISO 8601 format).'),
+    completedAt: z.string().nullable().describe('When the task was completed (ISO 8601 format).'),
 })
 
 /**
@@ -39,7 +39,7 @@ const ProjectSchema = z.object({
     color: z.string().describe('The color of the project.'),
     isFavorite: z.boolean().describe('Whether the project is marked as favorite.'),
     isShared: z.boolean().describe('Whether the project is shared.'),
-    parentId: z.string().optional().describe('The ID of the parent project (for sub-projects).'),
+    parentId: z.string().nullable().describe('The ID of the parent project (for sub-projects).'),
     inboxProject: z.boolean().describe('Whether this is the inbox project.'),
     viewStyle: z.string().describe('The view style of the project (list, board, calendar).'),
 })
@@ -87,17 +87,17 @@ const CommentSchema = z.object({
  * Schema for an activity event object returned by tools
  */
 const ActivityEventSchema = z.object({
-    id: z.string().describe('The unique ID of the activity event.'),
+    id: z.string().nullable().describe('The unique ID of the activity event.'),
     objectType: z
         .string()
         .describe('The type of object this event relates to (task, project, etc).'),
     objectId: z.string().describe('The ID of the object this event relates to.'),
     eventType: z.string().describe('The type of event (added, updated, deleted, completed, etc).'),
     eventDate: z.string().describe('When the event occurred (ISO 8601 format).'),
-    parentProjectId: z.string().optional().describe('The ID of the parent project.'),
-    parentItemId: z.string().optional().describe('The ID of the parent item.'),
-    initiatorId: z.string().optional().describe('The ID of the user who initiated this event.'),
-    extraData: z.record(z.unknown()).describe('Additional event data.'),
+    parentProjectId: z.string().nullable().describe('The ID of the parent project.'),
+    parentItemId: z.string().nullable().describe('The ID of the parent item.'),
+    initiatorId: z.string().nullable().describe('The ID of the user who initiated this event.'),
+    extraData: z.record(z.unknown()).nullable().describe('Additional event data.'),
 })
 
 /**

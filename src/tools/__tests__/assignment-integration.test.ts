@@ -1,11 +1,7 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
 import { AssignmentErrorType, assignmentValidator } from '../../utils/assignment-validator.js'
-import {
-    createMockProject,
-    extractStructuredContent,
-    extractTextContent,
-} from '../../utils/test-helpers.js'
+import { createMockProject } from '../../utils/test-helpers.js'
 import { userResolver } from '../../utils/user-resolver.js'
 import { addTasks } from '../add-tasks.js'
 import { findProjectCollaborators } from '../find-project-collaborators.js'
@@ -149,7 +145,7 @@ describe('Assignment Integration Tests', () => {
                 }),
             )
 
-            expect(extractTextContent(result)).toContain('Added 1 task')
+            expect(result.textContent).toContain('Added 1 task')
         })
 
         it('should validate assignment before creating task', async () => {
@@ -225,7 +221,7 @@ describe('Assignment Integration Tests', () => {
                 expect.objectContaining({ assigneeId: 'user-123' }),
             )
 
-            expect(extractTextContent(result)).toContain('Updated 1 task')
+            expect(result.textContent).toContain('Updated 1 task')
         })
 
         it('should unassign task when responsibleUser is "unassign"', async () => {
@@ -319,7 +315,7 @@ describe('Assignment Integration Tests', () => {
                 assigneeId: 'user-123',
             })
 
-            expect(extractTextContent(result)).toContain('3 tasks were successfully assigned')
+            expect(result.textContent).toContain('3 tasks were successfully assigned')
         })
 
         it('should perform bulk unassignment', async () => {
@@ -340,7 +336,7 @@ describe('Assignment Integration Tests', () => {
                 assigneeId: null,
             })
 
-            expect(extractTextContent(result)).toContain('2 tasks were successfully unassigned')
+            expect(result.textContent).toContain('2 tasks were successfully unassigned')
         })
 
         it('should handle dry-run mode', async () => {
@@ -362,8 +358,8 @@ describe('Assignment Integration Tests', () => {
             )
 
             expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
-            expect(extractTextContent(result)).toContain('Dry Run: Bulk assign operation')
-            expect(extractTextContent(result)).toContain('2 tasks would be successfully assigned')
+            expect(result.textContent).toContain('Dry Run: Bulk assign operation')
+            expect(result.textContent).toContain('2 tasks would be successfully assigned')
         })
 
         it('should handle mixed success and failure results', async () => {
@@ -392,9 +388,9 @@ describe('Assignment Integration Tests', () => {
                 mockTodoistApi,
             )
 
-            expect(extractTextContent(result)).toContain('2 tasks were successfully assigned')
-            expect(extractTextContent(result)).toContain('1 task failed')
-            expect(extractTextContent(result)).toContain('API Error')
+            expect(result.textContent).toContain('2 tasks were successfully assigned')
+            expect(result.textContent).toContain('1 task failed')
+            expect(result.textContent).toContain('API Error')
         })
     })
 
@@ -407,10 +403,10 @@ describe('Assignment Integration Tests', () => {
                 mockTodoistApi,
             )
 
-            expect(extractTextContent(result)).toContain('Project collaborators')
-            expect(extractTextContent(result)).toContain('John Doe (john@example.com)')
-            expect(extractTextContent(result)).toContain('Jane Smith (jane@example.com)')
-            expect(extractStructuredContent(result).collaborators).toHaveLength(2)
+            expect(result.textContent).toContain('Project collaborators')
+            expect(result.textContent).toContain('John Doe (john@example.com)')
+            expect(result.textContent).toContain('Jane Smith (jane@example.com)')
+            expect(result.structuredContent.collaborators).toHaveLength(2)
         })
 
         it('should filter collaborators by search term', async () => {
@@ -422,7 +418,7 @@ describe('Assignment Integration Tests', () => {
                 mockTodoistApi,
             )
 
-            expect(extractTextContent(result)).toContain('matching "John"')
+            expect(result.textContent).toContain('matching "John"')
         })
 
         it('should handle non-shared projects', async () => {
@@ -433,8 +429,8 @@ describe('Assignment Integration Tests', () => {
                 mockTodoistApi,
             )
 
-            expect(extractTextContent(result)).toContain('is not shared and has no collaborators')
-            expect(extractStructuredContent(result).collaborators).toBeUndefined() // Empty arrays are removed
+            expect(result.textContent).toContain('is not shared and has no collaborators')
+            expect(result.structuredContent.collaborators).toEqual([]) // Empty arrays are removed
         })
 
         it('should handle project not found', async () => {
@@ -561,7 +557,7 @@ describe('Assignment Integration Tests', () => {
                 mockTodoistApi,
             )
 
-            expect(extractTextContent(createResult)).toContain('Added 1 task')
+            expect(createResult.textContent).toContain('Added 1 task')
 
             // 2. Update assignment
             const updateResult = await updateTasks.execute(
@@ -569,7 +565,7 @@ describe('Assignment Integration Tests', () => {
                 mockTodoistApi,
             )
 
-            expect(extractTextContent(updateResult)).toContain('Updated 1 task')
+            expect(updateResult.textContent).toContain('Updated 1 task')
 
             // 3. Unassign task
             const unassignResult = await updateTasks.execute(
@@ -584,7 +580,7 @@ describe('Assignment Integration Tests', () => {
                 mockTodoistApi,
             )
 
-            expect(extractTextContent(unassignResult)).toContain('Updated 1 task')
+            expect(unassignResult.textContent).toContain('Updated 1 task')
         })
     })
 })

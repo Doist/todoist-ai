@@ -1,11 +1,6 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import {
-    createMockSection,
-    extractStructuredContent,
-    extractTextContent,
-    TEST_IDS,
-} from '../../utils/test-helpers.js'
+import { createMockSection, TEST_IDS } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { addSections } from '../add-sections.js'
 
@@ -46,14 +41,14 @@ describe(`${ADD_SECTIONS} tool`, () => {
                 projectId: TEST_IDS.PROJECT_TEST,
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Added 1 section:')
             expect(textContent).toContain('test-abc123def456-section')
             expect(textContent).toContain(`id=${TEST_IDS.SECTION_1}`)
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     sections: [
@@ -87,7 +82,7 @@ describe(`${ADD_SECTIONS} tool`, () => {
                 projectId: 'project-789',
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Added 1 section:')
             expect(textContent).toContain('My Section Name')
@@ -147,7 +142,7 @@ describe(`${ADD_SECTIONS} tool`, () => {
                 projectId: 'different-project',
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Added 3 sections:')
             expect(textContent).toContain('First Section (id=section-1, projectId=')
@@ -157,7 +152,7 @@ describe(`${ADD_SECTIONS} tool`, () => {
             )
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     sections: expect.arrayContaining([
@@ -199,7 +194,7 @@ describe(`${ADD_SECTIONS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Added 2 sections:')
         })

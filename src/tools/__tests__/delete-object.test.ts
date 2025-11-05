@@ -1,6 +1,5 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import { extractTextContent } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { deleteObject } from '../delete-object.js'
 
@@ -31,7 +30,7 @@ describe(`${DELETE_OBJECT} tool`, () => {
             expect(mockTodoistApi.deleteSection).not.toHaveBeenCalled()
             expect(mockTodoistApi.deleteTask).not.toHaveBeenCalled()
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Deleted project: id=6cfCcrrCFg2xP94Q')
             expect(result.structuredContent).toEqual({
@@ -66,7 +65,7 @@ describe(`${DELETE_OBJECT} tool`, () => {
             expect(mockTodoistApi.deleteProject).not.toHaveBeenCalled()
             expect(mockTodoistApi.deleteTask).not.toHaveBeenCalled()
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Deleted section: id=section-123')
             expect(result.structuredContent).toEqual({
@@ -101,7 +100,7 @@ describe(`${DELETE_OBJECT} tool`, () => {
             expect(mockTodoistApi.deleteProject).not.toHaveBeenCalled()
             expect(mockTodoistApi.deleteSection).not.toHaveBeenCalled()
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Deleted task: id=8485093748')
             expect(result.structuredContent).toEqual({

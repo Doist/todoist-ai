@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { FailureSchema } from '../utils/output-schemas.js'
 import { summarizeBatch } from '../utils/response-builders.js'
@@ -45,7 +44,7 @@ const completeTasks = {
             args,
         })
 
-        return getToolOutput({
+        return {
             textContent,
             structuredContent: {
                 completed,
@@ -54,9 +53,9 @@ const completeTasks = {
                 successCount: completed.length,
                 failureCount: failures.length,
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent({
     completed,

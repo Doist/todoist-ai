@@ -1,13 +1,6 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import {
-    createMockTask,
-    createMockUser,
-    extractStructuredContent,
-    extractTextContent,
-    TEST_IDS,
-    TODAY,
-} from '../../utils/test-helpers.js'
+import { createMockTask, createMockUser, TEST_IDS, TODAY } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { addTasks } from '../add-tasks.js'
 
@@ -94,10 +87,10 @@ describe(`${ADD_TASKS} tool`, () => {
             })
 
             // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent.tasks).toHaveLength(2)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
@@ -150,10 +143,10 @@ describe(`${ADD_TASKS} tool`, () => {
             })
 
             // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     totalCount: 1,
@@ -220,10 +213,10 @@ describe(`${ADD_TASKS} tool`, () => {
             })
 
             // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent.tasks).toHaveLength(2)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
@@ -317,10 +310,10 @@ describe(`${ADD_TASKS} tool`, () => {
             })
 
             // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content includes deadline
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent.tasks).toHaveLength(1)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
@@ -368,7 +361,7 @@ describe(`${ADD_TASKS} tool`, () => {
             })
 
             // Verify structured content includes labels
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent.tasks).toHaveLength(1)
             expect(structuredContent.tasks).toEqual(
                 expect.arrayContaining([expect.objectContaining({ labels: ['urgent', 'work'] })]),
@@ -619,7 +612,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
         })
 
@@ -643,7 +636,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
         })
     })
@@ -678,7 +671,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 parentId: undefined,
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toContain('Added 1 task')
             expect(textContent).toContain('Simple inbox task')
         })
@@ -744,7 +737,7 @@ describe(`${ADD_TASKS} tool`, () => {
             })
 
             // Verify result contains the task
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent.totalCount).toBe(1)
             expect(structuredContent.tasks).toEqual(
                 expect.arrayContaining([

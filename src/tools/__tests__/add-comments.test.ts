@@ -1,6 +1,5 @@
 import type { Comment, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import { extractStructuredContent, extractTextContent } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { addComments } from '../add-comments.js'
 
@@ -11,19 +10,21 @@ const mockTodoistApi = {
 
 const { ADD_COMMENTS } = ToolNames
 
-const createMockComment = (overrides: Partial<Comment> = {}): Comment => ({
-    id: '12345',
-    content: 'Test comment content',
-    postedAt: '2024-01-01T12:00:00Z',
-    postedUid: 'user123',
-    taskId: 'task123',
-    projectId: undefined,
-    fileAttachment: null,
-    uidsToNotify: null,
-    reactions: null,
-    isDeleted: false,
-    ...overrides,
-})
+function createMockComment(overrides: Partial<Comment> = {}): Comment {
+    return {
+        id: '12345',
+        content: 'Test comment content',
+        postedAt: '2024-01-01T12:00:00Z',
+        postedUid: 'user123',
+        taskId: 'task123',
+        projectId: undefined,
+        fileAttachment: null,
+        uidsToNotify: null,
+        reactions: null,
+        isDeleted: false,
+        ...overrides,
+    }
+}
 
 describe(`${ADD_COMMENTS} tool`, () => {
     beforeEach(() => {
@@ -50,11 +51,9 @@ describe(`${ADD_COMMENTS} tool`, () => {
                 taskId: 'task456',
             })
 
-            // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
-            // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     comments: [
@@ -93,10 +92,10 @@ describe(`${ADD_COMMENTS} tool`, () => {
             })
 
             // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     comments: [
@@ -155,9 +154,9 @@ describe(`${ADD_COMMENTS} tool`, () => {
             })
 
             // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     comments: [
@@ -208,9 +207,9 @@ describe(`${ADD_COMMENTS} tool`, () => {
             expect(mockTodoistApi.addComment).toHaveBeenCalledTimes(2)
 
             // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     comments: expect.arrayContaining([
@@ -269,9 +268,9 @@ describe(`${ADD_COMMENTS} tool`, () => {
             })
 
             // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     comments: expect.arrayContaining([

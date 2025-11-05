@@ -1,11 +1,6 @@
 import type { CurrentUser, Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, type MockedFunction, vi } from 'vitest'
-import {
-    createMockTask,
-    createMockUser,
-    extractTextContent,
-    TEST_IDS,
-} from '../../utils/test-helpers.js'
+import { createMockTask, createMockUser, TEST_IDS } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { findCompletedTasks } from '../find-completed-tasks.js'
 
@@ -82,7 +77,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                 limit: 50,
             })
 
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
 
         it('should handle explicit completion date query', async () => {
@@ -113,7 +108,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                 cursor: 'current-cursor',
             })
 
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
     })
 
@@ -163,7 +158,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
             })
             expect(mockTodoistApi.getCompletedTasksByCompletionDate).not.toHaveBeenCalled()
 
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
     })
 
@@ -236,7 +231,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                     filterLang: 'en',
                 })
 
-                const textContent = extractTextContent(result)
+                const textContent = result.textContent
                 expect(textContent).toMatchSnapshot()
             },
         )
@@ -297,7 +292,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                 filterLang: 'en',
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
         })
     })
@@ -352,7 +347,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                 limit: 50,
             })
 
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
     })
 
@@ -457,7 +452,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
             )
 
             // Verify result contains the completed tasks
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toContain('Completed tasks')
             expect(textContent).toContain('Completed inbox task')
         })

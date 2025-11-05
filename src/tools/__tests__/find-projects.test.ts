@@ -3,8 +3,6 @@ import { type Mocked, vi } from 'vitest'
 import {
     createMockApiResponse,
     createMockProject,
-    extractStructuredContent,
-    extractTextContent,
     TEST_ERRORS,
     TEST_IDS,
 } from '../../utils/test-helpers.js'
@@ -62,10 +60,10 @@ describe(`${FIND_PROJECTS} tool`, () => {
                 cursor: null,
             })
 
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     projects: expect.any(Array),
@@ -100,10 +98,10 @@ describe(`${FIND_PROJECTS} tool`, () => {
                 limit: 10,
                 cursor: 'current-page-cursor',
             })
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent.projects).toHaveLength(1)
             expect(structuredContent.totalCount).toBe(1)
             expect(structuredContent.hasMore).toBe(true)
@@ -136,10 +134,10 @@ describe(`${FIND_PROJECTS} tool`, () => {
             const result = await findProjects.execute({ search: 'work', limit: 50 }, mockTodoistApi)
 
             expect(mockTodoistApi.getProjects).toHaveBeenCalledWith({ limit: 50, cursor: null })
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content with search filter
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent.projects).toHaveLength(2) // Should match filtered results
             expect(structuredContent.totalCount).toBe(2)
             expect(structuredContent.hasMore).toBe(false)
@@ -168,10 +166,10 @@ describe(`${FIND_PROJECTS} tool`, () => {
             mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse(mockProjects))
 
             const result = await findProjects.execute({ search, limit: 50 }, mockTodoistApi)
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     appliedFilters: expect.objectContaining({ search }),

@@ -1,6 +1,5 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import { extractTextContent } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { completeTasks } from '../complete-tasks.js'
 
@@ -32,13 +31,13 @@ describe(`${COMPLETE_TASKS} tool`, () => {
             expect(mockTodoistApi.closeTask).toHaveBeenNthCalledWith(3, 'task-3')
 
             // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content
             const { structuredContent } = result
             expect(structuredContent).toEqual({
                 completed: ['task-1', 'task-2', 'task-3'],
-                // failures array is removed when empty
+                failures: [], // failures array is now kept as empty array
                 totalRequested: 3,
                 successCount: 3,
                 failureCount: 0,
@@ -53,13 +52,13 @@ describe(`${COMPLETE_TASKS} tool`, () => {
             expect(mockTodoistApi.closeTask).toHaveBeenCalledTimes(1)
             expect(mockTodoistApi.closeTask).toHaveBeenCalledWith('8485093748')
 
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content
             const { structuredContent } = result
             expect(structuredContent).toEqual({
                 completed: ['8485093748'],
-                // failures array is removed when empty
+                failures: [], // failures array is now kept as empty array
                 totalRequested: 1,
                 successCount: 1,
                 failureCount: 0,
@@ -85,7 +84,7 @@ describe(`${COMPLETE_TASKS} tool`, () => {
             expect(mockTodoistApi.closeTask).toHaveBeenNthCalledWith(3, 'task-3')
 
             // Verify only successful completions are reported
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content with partial failures
             const { structuredContent } = result
@@ -114,11 +113,8 @@ describe(`${COMPLETE_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            // Verify API was attempted for all tasks
             expect(mockTodoistApi.closeTask).toHaveBeenCalledTimes(2)
-
-            // Verify no tasks were completed but still returns success
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
 
         it('should continue processing remaining tasks after failures', async () => {
@@ -138,7 +134,7 @@ describe(`${COMPLETE_TASKS} tool`, () => {
             expect(mockTodoistApi.closeTask).toHaveBeenCalledTimes(5)
 
             // Only tasks 3 and 5 should be in completed list
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
 
         it('should handle different types of API errors', async () => {
@@ -156,7 +152,7 @@ describe(`${COMPLETE_TASKS} tool`, () => {
             expect(mockTodoistApi.closeTask).toHaveBeenCalledTimes(4)
 
             // All should fail, but the tool should handle it gracefully
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
     })
 
@@ -185,7 +181,7 @@ describe(`${COMPLETE_TASKS} tool`, () => {
 
             expect(mockTodoistApi.closeTask).toHaveBeenCalledTimes(5)
 
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
     })
 
@@ -198,7 +194,7 @@ describe(`${COMPLETE_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const { textContent } = result
             expect(textContent).toMatchSnapshot()
         })
 
@@ -212,7 +208,7 @@ describe(`${COMPLETE_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const { textContent } = result
             expect(textContent).toMatchSnapshot()
         })
 
@@ -224,7 +220,7 @@ describe(`${COMPLETE_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const { textContent } = result
             expect(textContent).toMatchSnapshot()
         })
     })
@@ -243,7 +239,7 @@ describe(`${COMPLETE_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const { textContent } = result
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('+2 more') // 5 total failures, showing first 3, so +2 more
             expect(textContent).not.toContain('Error 4') // Should not show 4th error
@@ -261,7 +257,7 @@ describe(`${COMPLETE_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const { textContent } = result
             expect(textContent).toMatchSnapshot()
             expect(textContent).not.toContain('more') // Should not show truncation
         })
@@ -275,7 +271,7 @@ describe(`${COMPLETE_TASKS} tool`, () => {
 
             const result = await completeTasks.execute({ ids: ['single-task'] }, mockTodoistApi)
 
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
 
         it('should handle tasks with special ID formats', async () => {
@@ -291,7 +287,7 @@ describe(`${COMPLETE_TASKS} tool`, () => {
             expect(mockTodoistApi.closeTask).toHaveBeenCalledWith('task-with-dashes')
             expect(mockTodoistApi.closeTask).toHaveBeenCalledWith('1234567890')
 
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
     })
 })

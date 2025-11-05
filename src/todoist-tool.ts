@@ -1,10 +1,15 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import type { z } from 'zod'
 
+type ExecuteResult<Output extends z.ZodRawShape> = Promise<{
+    textContent?: string
+    structuredContent?: z.infer<z.ZodObject<Output>>
+}>
+
 /**
  * A Todoist tool that can be used in an MCP server or other conversational AI interfaces.
  */
-type TodoistTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape = z.ZodRawShape> = {
+type TodoistTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape> = {
     /**
      * The name of the tool.
      */
@@ -40,7 +45,7 @@ type TodoistTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape = z.
      * @param client - The Todoist API client used to make requests to the Todoist API.
      * @returns The result of the tool.
      */
-    execute: (args: z.infer<z.ZodObject<Params>>, client: TodoistApi) => Promise<unknown>
+    execute: (args: z.infer<z.ZodObject<Params>>, client: TodoistApi) => ExecuteResult<Output>
 }
 
 export type { TodoistTool }

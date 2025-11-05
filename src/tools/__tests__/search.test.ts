@@ -73,12 +73,8 @@ describe(`${SEARCH} tool`, () => {
                 limit: 100, // PROJECTS_MAX
             })
 
-            // Verify result structure
-            expect(result.content).toHaveLength(1)
-            expect(result.content[0]?.type).toBe('text')
-
             // Parse the JSON response
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse).toHaveProperty('results')
             expect(jsonResponse.results).toHaveLength(3) // 2 tasks + 1 project matching "important"
 
@@ -121,7 +117,7 @@ describe(`${SEARCH} tool`, () => {
 
             const result = await search.execute({ query: 'unique' }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse.results).toHaveLength(1)
             expect(jsonResponse.results[0].id).toBe(`task:${TEST_IDS.TASK_1}`)
         })
@@ -143,7 +139,7 @@ describe(`${SEARCH} tool`, () => {
 
             const result = await search.execute({ query: 'special' }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse.results).toHaveLength(1)
             expect(jsonResponse.results[0]).toEqual({
                 id: `project:${TEST_IDS.PROJECT_WORK}`,
@@ -158,7 +154,7 @@ describe(`${SEARCH} tool`, () => {
 
             const result = await search.execute({ query: 'nonexistent' }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse.results).toHaveLength(0)
         })
 
@@ -175,7 +171,7 @@ describe(`${SEARCH} tool`, () => {
 
             const result = await search.execute({ query: 'IMPORTANT' }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse.results).toHaveLength(1)
             expect(jsonResponse.results[0].title).toBe('Important Work')
         })
@@ -192,7 +188,7 @@ describe(`${SEARCH} tool`, () => {
 
             const result = await search.execute({ query: 'develop' }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse.results).toHaveLength(2)
             expect(jsonResponse.results[0].title).toBe('Development Tasks')
             expect(jsonResponse.results[1].title).toBe('Developer Resources')
@@ -200,45 +196,32 @@ describe(`${SEARCH} tool`, () => {
     })
 
     describe('error handling', () => {
-        it('should return error response for task search failure', async () => {
+        it('should throw error for task search failure', async () => {
             mockGetTasksByFilter.mockRejectedValue(new Error('Task search failed'))
             mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse([]))
 
-            const result = await search.execute({ query: 'test' }, mockTodoistApi)
-
-            expect(result.isError).toBe(true)
-            expect(result.content[0]?.text).toBe('Task search failed')
+            await expect(search.execute({ query: 'test' }, mockTodoistApi)).rejects.toThrow(
+                'Task search failed',
+            )
         })
 
-        it('should return error response for project search failure', async () => {
+        it('should throw error for project search failure', async () => {
             mockGetTasksByFilter.mockResolvedValue({ tasks: [], nextCursor: null })
             mockTodoistApi.getProjects.mockRejectedValue(new Error('Project search failed'))
 
-            const result = await search.execute({ query: 'test' }, mockTodoistApi)
-
-            expect(result.isError).toBe(true)
-            expect(result.content[0]?.text).toBe('Project search failed')
+            await expect(search.execute({ query: 'test' }, mockTodoistApi)).rejects.toThrow(
+                'Project search failed',
+            )
         })
     })
 
     describe('OpenAI MCP spec compliance', () => {
-        it('should return exactly one content item with type "text"', async () => {
-            mockGetTasksByFilter.mockResolvedValue({ tasks: [], nextCursor: null })
-            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse([]))
-
-            const result = await search.execute({ query: 'test' }, mockTodoistApi)
-
-            expect(result.content).toHaveLength(1)
-            expect(result.content[0]?.type).toBe('text')
-        })
-
         it('should return valid JSON string in text field', async () => {
             mockGetTasksByFilter.mockResolvedValue({ tasks: [], nextCursor: null })
             mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse([]))
 
             const result = await search.execute({ query: 'test' }, mockTodoistApi)
-
-            expect(() => JSON.parse(result.content[0]?.text ?? '{}')).not.toThrow()
+            expect(() => JSON.parse(result.textContent ?? '{}')).not.toThrow()
         })
 
         it('should include required fields (id, title, url) in each result', async () => {
@@ -250,7 +233,7 @@ describe(`${SEARCH} tool`, () => {
 
             const result = await search.execute({ query: 'test' }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             for (const item of jsonResponse.results) {
                 expect(item).toHaveProperty('id')
                 expect(item).toHaveProperty('title')

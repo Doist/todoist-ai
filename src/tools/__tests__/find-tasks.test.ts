@@ -6,8 +6,6 @@ import {
     createMockApiResponse,
     createMockTask,
     createMockUser,
-    extractStructuredContent,
-    extractTextContent,
     type MappedTask,
     TEST_ERRORS,
     TEST_IDS,
@@ -87,10 +85,10 @@ describe(`${FIND_TASKS} tool`, () => {
                 limit: 10,
             })
             // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     tasks: expect.any(Array),
@@ -148,10 +146,10 @@ describe(`${FIND_TASKS} tool`, () => {
                     limit: expectedLimit,
                 })
                 // Verify result is a concise summary
-                expect(extractTextContent(result)).toMatchSnapshot()
+                expect(result.textContent).toMatchSnapshot()
 
                 // Verify structured content
-                const structuredContent = extractStructuredContent(result)
+                const structuredContent = result.structuredContent
                 expect(structuredContent).toEqual(
                     expect.objectContaining({
                         tasks: expect.any(Array),
@@ -187,14 +185,15 @@ describe(`${FIND_TASKS} tool`, () => {
                 limit: 10,
             })
             // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content for empty results
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual({
-                // tasks array is removed when empty
+                tasks: [], // tasks array is now kept as empty array
                 totalCount: 0,
                 hasMore: false,
+                nextCursor: null,
                 appliedFilters: expect.objectContaining({
                     searchText: searchText,
                 }),
@@ -250,9 +249,9 @@ describe(`${FIND_TASKS} tool`, () => {
                 ...expectedApiParam,
             })
 
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
 
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     tasks: expect.any(Array),
@@ -293,7 +292,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 projectId: TEST_IDS.PROJECT_TEST,
             })
 
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent.tasks).toHaveLength(1)
             expect(structuredContent.tasks).toEqual([
                 expect.objectContaining({ content: 'relevant task' }),
@@ -311,7 +310,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toContain('Section is empty')
             expect(textContent).toContain('Tasks may be in other sections of the project')
         })
@@ -337,7 +336,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 projectId: TEST_IDS.PROJECT_TEST,
             })
 
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent.hasMore).toBe(true)
             expect(structuredContent.nextCursor).toBe('next-cursor')
         })
@@ -371,7 +370,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
         })
 
@@ -391,7 +390,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
         })
 
@@ -411,7 +410,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
         })
 
@@ -424,7 +423,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Try broader search terms')
             expect(textContent).toContain(`Check completed tasks with ${FIND_COMPLETED_TASKS}`)
@@ -484,7 +483,7 @@ describe(`${FIND_TASKS} tool`, () => {
                     limit: params.limit,
                 })
 
-                const structuredContent = extractStructuredContent(result)
+                const structuredContent = result.structuredContent
                 expect(structuredContent.appliedFilters).toEqual(
                     expect.objectContaining({
                         searchText: params.searchText,
@@ -550,7 +549,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 })
 
                 // Should filter results client-side based on labels
-                const structuredContent = extractStructuredContent(result)
+                const structuredContent = result.structuredContent
                 if (params.labelsOperator === 'and') {
                     // AND operation: task must have all specified labels
                     expect(structuredContent.tasks).toEqual(
@@ -622,7 +621,7 @@ describe(`${FIND_TASKS} tool`, () => {
             })
 
             // Should filter results by search text AND labels
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent.tasks).toEqual([
                 expect.objectContaining({
                     content: 'important task',
@@ -656,7 +655,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 limit: 10,
             })
 
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent.appliedFilters).toEqual(
                 expect.objectContaining({
                     labels: ['work'],
@@ -690,7 +689,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 limit: 10,
             })
 
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent.appliedFilters).toEqual(
                 expect.objectContaining({
                     labels: ['@work', 'personal'],
@@ -740,7 +739,7 @@ End of test content.`
                 mockTodoistApi,
             )
 
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
 
             // Verify that markdown links and formatting are preserved exactly as provided
             expect(structuredContent.tasks).toHaveLength(1)
@@ -768,7 +767,7 @@ End of test content.`
                 mockTodoistApi,
             )
 
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
 
             // Verify URLs are preserved in container-based searches too
             expect(structuredContent.tasks).toHaveLength(1)
@@ -813,7 +812,7 @@ End of test content.`
                     mockTodoistApi,
                 )
 
-                const structuredContent = extractStructuredContent(result)
+                const structuredContent = result.structuredContent
                 // Should only return tasks 1 and 2, not task 3
                 expect(structuredContent.tasks).toHaveLength(2)
                 expect(
@@ -847,7 +846,7 @@ End of test content.`
                     mockTodoistApi,
                 )
 
-                const structuredContent = extractStructuredContent(result)
+                const structuredContent = result.structuredContent
                 // Should only return tasks 1 and 2, not task 3
                 expect(structuredContent.tasks).toHaveLength(2)
                 expect(
@@ -890,7 +889,7 @@ End of test content.`
                     mockTodoistApi,
                 )
 
-                const structuredContent = extractStructuredContent(result)
+                const structuredContent = result.structuredContent
                 // Should only return task 1 (assigned to John)
                 expect(structuredContent.tasks).toHaveLength(1)
                 expect((structuredContent.tasks as MappedTask[])[0]?.id).toBe(TEST_IDS.TASK_1)
@@ -928,7 +927,7 @@ End of test content.`
                     mockTodoistApi,
                 )
 
-                const structuredContent = extractStructuredContent(result)
+                const structuredContent = result.structuredContent
                 // Should only return task 1 (assigned to John)
                 expect(structuredContent.tasks).toHaveLength(1)
                 expect((structuredContent.tasks as MappedTask[])[0]?.id).toBe(TEST_IDS.TASK_1)

@@ -1,6 +1,5 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -199,11 +198,11 @@ const userInfo = {
     async execute(_args, client) {
         const result = await generateUserInfo(client)
 
-        return getToolOutput({
+        return {
             textContent: result.textContent,
             structuredContent: result.structuredContent,
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 export { userInfo, type UserInfoStructured }

@@ -1,6 +1,5 @@
 import type { Task } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import {
     type Assignment,
@@ -61,10 +60,12 @@ const OutputSchema = {
                 originalAssigneeId: z
                     .string()
                     .optional()
+                    .nullable()
                     .describe('The original assignee ID before the operation.'),
                 newAssigneeId: z
                     .string()
                     .optional()
+                    .nullable()
                     .describe('The new assignee ID after the operation.'),
             }),
         )
@@ -76,6 +77,7 @@ const OutputSchema = {
             failed: z.number().describe('Number of failed operations.'),
             dryRun: z.boolean().describe('Whether this was a dry run.'),
         })
+        .optional()
         .describe('Summary of the operation.'),
 }
 
@@ -133,7 +135,7 @@ const manageAssignments = {
                 dryRun,
             })
 
-            return getToolOutput({
+            return {
                 textContent,
                 structuredContent: {
                     operation,
@@ -143,7 +145,7 @@ const manageAssignments = {
                     failed: taskErrors.length,
                     dryRun,
                 },
-            })
+            }
         }
 
         // Pre-resolve fromAssigneeUser once for reassign operations
@@ -187,7 +189,7 @@ const manageAssignments = {
                     dryRun: true,
                 })
 
-                return getToolOutput({
+                return {
                     textContent,
                     structuredContent: {
                         operation,
@@ -197,7 +199,7 @@ const manageAssignments = {
                         failed: taskErrors.length,
                         dryRun: true,
                     },
-                })
+                }
             }
 
             // Execute unassign operations
@@ -229,7 +231,7 @@ const manageAssignments = {
                 dryRun: false,
             })
 
-            return getToolOutput({
+            return {
                 textContent,
                 structuredContent: {
                     operation,
@@ -239,7 +241,7 @@ const manageAssignments = {
                     failed: allResults.filter((r) => !r.success).length,
                     dryRun: false,
                 },
-            })
+            }
         }
 
         // Validate all assignments
@@ -344,7 +346,7 @@ const manageAssignments = {
             dryRun,
         })
 
-        return getToolOutput({
+        return {
             textContent,
             structuredContent: {
                 operation,
@@ -354,9 +356,9 @@ const manageAssignments = {
                 failed: allResults.filter((r) => !r.success).length,
                 dryRun,
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent({
     operation,
