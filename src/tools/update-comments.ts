@@ -2,6 +2,7 @@ import type { Comment } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
+import { CommentSchema as CommentOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const CommentUpdateSchema = z.object({
@@ -13,10 +14,22 @@ const ArgsSchema = {
     comments: z.array(CommentUpdateSchema).min(1).describe('The comments to update.'),
 }
 
+const OutputSchema = {
+    comments: z.array(CommentOutputSchema).describe('The updated comments.'),
+    totalCount: z.number().describe('The total number of comments updated.'),
+    updatedCommentIds: z.array(z.string()).describe('The IDs of the updated comments.'),
+    appliedOperations: z
+        .object({
+            updateCount: z.number().describe('The number of comments updated.'),
+        })
+        .describe('Summary of operations performed.'),
+}
+
 const updateComments = {
     name: ToolNames.UPDATE_COMMENTS,
     description: 'Update multiple existing comments with new content.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         const { comments } = args
 

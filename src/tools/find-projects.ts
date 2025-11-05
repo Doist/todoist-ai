@@ -3,6 +3,7 @@ import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapProject } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
+import { ProjectSchema as ProjectOutputSchema } from '../utils/output-schemas.js'
 import { formatProjectPreview, summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -30,11 +31,20 @@ const ArgsSchema = {
         ),
 }
 
+const OutputSchema = {
+    projects: z.array(ProjectOutputSchema).describe('The found projects.'),
+    nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
+    totalCount: z.number().describe('The total number of projects in this page.'),
+    hasMore: z.boolean().describe('Whether there are more results available.'),
+    appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
+}
+
 const findProjects = {
     name: ToolNames.FIND_PROJECTS,
     description:
         'List all projects or search for projects by name. If search parameter is omitted, all projects are returned.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         const { results, nextCursor } = await client.getProjects({
             limit: args.limit,

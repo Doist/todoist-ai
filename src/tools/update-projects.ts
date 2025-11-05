@@ -2,6 +2,7 @@ import type { PersonalProject, WorkspaceProject } from '@doist/todoist-api-types
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
+import { ProjectSchema as ProjectOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const ProjectUpdateSchema = z.object({
@@ -17,10 +18,23 @@ const ArgsSchema = {
     projects: z.array(ProjectUpdateSchema).min(1).describe('The projects to update.'),
 }
 
+const OutputSchema = {
+    projects: z.array(ProjectOutputSchema).describe('The updated projects.'),
+    totalCount: z.number().describe('The total number of projects updated.'),
+    updatedProjectIds: z.array(z.string()).describe('The IDs of the updated projects.'),
+    appliedOperations: z
+        .object({
+            updateCount: z.number().describe('The number of projects actually updated.'),
+            skippedCount: z.number().describe('The number of projects skipped (no changes).'),
+        })
+        .describe('Summary of operations performed.'),
+}
+
 const updateProjects = {
     name: ToolNames.UPDATE_PROJECTS,
     description: 'Update multiple existing projects with new values.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         const { projects } = args
         const updateProjectsPromises = projects.map(async (project) => {

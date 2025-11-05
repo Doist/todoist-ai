@@ -11,6 +11,7 @@ import type { TodoistTool } from '../todoist-tool.js'
 import { getTasksByFilter } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
+import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
 import { getDateString, previewTasks, summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -61,11 +62,20 @@ const ArgsSchema = {
     ...LabelsSchema,
 }
 
+const OutputSchema = {
+    tasks: z.array(TaskOutputSchema).describe('The found tasks.'),
+    nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
+    totalCount: z.number().describe('The total number of tasks in this page.'),
+    hasMore: z.boolean().describe('Whether there are more results available.'),
+    appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
+}
+
 const findTasksByDate = {
     name: ToolNames.FIND_TASKS_BY_DATE,
     description:
         "Get tasks by date range. Use startDate 'today' to get today's tasks including overdue items, or provide a specific date/date range.",
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         if (!args.startDate && args.overdueOption !== 'overdue-only') {
             throw new Error(

@@ -5,6 +5,7 @@ import type { TodoistTool } from '../todoist-tool.js'
 import { createMoveTaskArgs, mapTask } from '../tool-helpers.js'
 import { assignmentValidator } from '../utils/assignment-validator.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
+import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
 import { convertPriorityToNumber, PrioritySchema } from '../utils/priorities.js'
 import { summarizeTaskOperation } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -69,10 +70,23 @@ const ArgsSchema = {
     tasks: z.array(TasksUpdateSchema).min(1).describe('The tasks to update.'),
 }
 
+const OutputSchema = {
+    tasks: z.array(TaskOutputSchema).describe('The updated tasks.'),
+    totalCount: z.number().describe('The total number of tasks updated.'),
+    updatedTaskIds: z.array(z.string()).describe('The IDs of the updated tasks.'),
+    appliedOperations: z
+        .object({
+            updateCount: z.number().describe('The number of tasks actually updated.'),
+            skippedCount: z.number().describe('The number of tasks skipped (no changes).'),
+        })
+        .describe('Summary of operations performed.'),
+}
+
 const updateTasks = {
     name: ToolNames.UPDATE_TASKS,
     description: 'Update existing tasks including content, dates, priorities, and assignments.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         const { tasks } = args
         const updateTasksPromises = tasks.map(async (task) => {

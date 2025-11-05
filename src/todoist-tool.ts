@@ -4,7 +4,7 @@ import type { z } from 'zod'
 /**
  * A Todoist tool that can be used in an MCP server or other conversational AI interfaces.
  */
-type TodoistTool<Params extends z.ZodRawShape> = {
+type TodoistTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape = z.ZodRawShape> = {
     /**
      * The name of the tool.
      */
@@ -23,6 +23,13 @@ type TodoistTool<Params extends z.ZodRawShape> = {
      * parameters are.
      */
     parameters: Params
+
+    /**
+     * The schema of the output of the tool.
+     *
+     * This is used to describe the structured output format that the tool will return.
+     */
+    outputSchema: Output
 
     /**
      * The function that executes the tool.

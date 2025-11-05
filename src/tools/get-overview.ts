@@ -16,6 +16,34 @@ const ArgsSchema = {
         ),
 }
 
+const OutputSchema = {
+    type: z
+        .enum(['account_overview', 'project_overview'])
+        .describe('The type of overview returned.'),
+    totalProjects: z
+        .number()
+        .optional()
+        .describe('Total number of projects (account overview only).'),
+    totalTasks: z.number().describe('Total number of tasks.'),
+    totalSections: z
+        .number()
+        .optional()
+        .describe('Total number of sections (project overview only).'),
+    tasksWithoutSection: z
+        .number()
+        .optional()
+        .describe('Number of tasks not in any section (project overview only).'),
+    projectInfo: z
+        .object({
+            id: z.string(),
+            name: z.string(),
+            isShared: z.boolean(),
+            isFavorite: z.boolean(),
+        })
+        .optional()
+        .describe('Project information (project overview only).'),
+}
+
 // Types and helpers from account-overview
 type ProjectWithChildren = Project & {
     children: ProjectWithChildren[]
@@ -326,6 +354,7 @@ const getOverview = {
     description:
         'Get a Markdown overview. If no projectId is provided, shows all projects with hierarchy and sections (useful for navigation). If projectId is provided, shows detailed overview of that specific project including all tasks grouped by sections.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         const result = args.projectId
             ? await generateProjectOverview(client, args.projectId)

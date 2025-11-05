@@ -10,10 +10,23 @@ const ArgsSchema = {
     id: z.string().min(1).describe('The ID of the entity to delete.'),
 }
 
+const OutputSchema = {
+    deletedEntity: z
+        .object({
+            type: z
+                .enum(['project', 'section', 'task', 'comment'])
+                .describe('The type of deleted entity.'),
+            id: z.string().describe('The ID of the deleted entity.'),
+        })
+        .describe('Information about the deleted entity.'),
+    success: z.boolean().describe('Whether the deletion was successful.'),
+}
+
 const deleteObject = {
     name: ToolNames.DELETE_OBJECT,
     description: 'Delete a project, section, task, or comment by its ID.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         switch (args.type) {
             case 'project':

@@ -5,6 +5,7 @@ import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask } from '../tool-helpers.js'
 import { assignmentValidator } from '../utils/assignment-validator.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
+import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
 import { convertPriorityToNumber, PrioritySchema } from '../utils/priorities.js'
 import { summarizeTaskOperation } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -59,11 +60,17 @@ const ArgsSchema = {
     tasks: z.array(TaskSchema).min(1).describe('The array of tasks to add.'),
 }
 
+const OutputSchema = {
+    tasks: z.array(TaskOutputSchema).describe('The created tasks.'),
+    totalCount: z.number().describe('The total number of tasks created.'),
+}
+
 const addTasks = {
     name: ToolNames.ADD_TASKS,
     description:
         'Add one or more tasks to a project, section, or parent. Supports assignment to project collaborators.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute({ tasks }, client) {
         const addTaskPromises = tasks.map((task) => processTask(task, client))
         const newTasks = await Promise.all(addTaskPromises)

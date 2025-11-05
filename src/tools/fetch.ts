@@ -27,6 +27,14 @@ type FetchToolOutput = {
     isError?: boolean
 }
 
+const OutputSchema = {
+    id: z.string().describe('The ID of the fetched document.'),
+    title: z.string().describe('The title of the document.'),
+    text: z.string().describe('The text content of the document.'),
+    url: z.string().describe('The URL of the document.'),
+    metadata: z.record(z.unknown()).optional().describe('Additional metadata about the document.'),
+}
+
 /**
  * OpenAI MCP fetch tool - retrieves the full contents of a task or project by ID.
  *
@@ -38,6 +46,7 @@ const fetch = {
     description:
         'Fetch the full contents of a task or project by its ID. The ID should be in the format "task:{id}" or "project:{id}".',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client): Promise<FetchToolOutput> {
         try {
             const { id } = args

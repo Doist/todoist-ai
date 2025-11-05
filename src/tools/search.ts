@@ -21,6 +21,19 @@ type SearchToolOutput = {
     isError?: boolean
 }
 
+const OutputSchema = {
+    results: z
+        .array(
+            z.object({
+                id: z.string().describe('The ID of the result.'),
+                title: z.string().describe('The title of the result.'),
+                url: z.string().describe('The URL of the result.'),
+            }),
+        )
+        .describe('The search results.'),
+    totalCount: z.number().describe('Total number of results found.'),
+}
+
 /**
  * OpenAI MCP search tool - returns a list of relevant search results from Todoist.
  *
@@ -32,6 +45,7 @@ const search = {
     description:
         'Search across tasks and projects in Todoist. Returns a list of relevant results with IDs, titles, and URLs.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client): Promise<SearchToolOutput> {
         try {
             const { query } = args

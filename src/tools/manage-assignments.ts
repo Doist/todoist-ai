@@ -51,11 +51,40 @@ export type OperationResult = {
     newAssigneeId?: string | null
 }
 
+const OutputSchema = {
+    results: z
+        .array(
+            z.object({
+                taskId: z.string().describe('The ID of the task.'),
+                success: z.boolean().describe('Whether the operation was successful.'),
+                error: z.string().optional().describe('Error message if the operation failed.'),
+                originalAssigneeId: z
+                    .string()
+                    .optional()
+                    .describe('The original assignee ID before the operation.'),
+                newAssigneeId: z
+                    .string()
+                    .optional()
+                    .describe('The new assignee ID after the operation.'),
+            }),
+        )
+        .describe('Results of the assignment operations.'),
+    summary: z
+        .object({
+            total: z.number().describe('Total number of tasks processed.'),
+            succeeded: z.number().describe('Number of successful operations.'),
+            failed: z.number().describe('Number of failed operations.'),
+            dryRun: z.boolean().describe('Whether this was a dry run.'),
+        })
+        .describe('Summary of the operation.'),
+}
+
 const manageAssignments = {
     name: ToolNames.MANAGE_ASSIGNMENTS,
     description:
         'Bulk assignment operations for multiple tasks. Supports assign, unassign, and reassign operations with atomic rollback on failures.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         const { operation, taskIds, responsibleUser, fromAssigneeUser, dryRun } = args
 

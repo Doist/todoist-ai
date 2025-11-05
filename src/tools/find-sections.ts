@@ -2,6 +2,7 @@ import type { Section } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
+import { SectionSchema as SectionOutputSchema } from '../utils/output-schemas.js'
 import { summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -27,10 +28,17 @@ type SectionSummary = {
     name: string
 }
 
+const OutputSchema = {
+    sections: z.array(SectionOutputSchema).describe('The found sections.'),
+    totalCount: z.number().describe('The total number of sections found.'),
+    appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
+}
+
 const findSections = {
     name: ToolNames.FIND_SECTIONS,
     description: 'Search for sections by name or other criteria in a project.',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         // Resolve "inbox" to actual inbox project ID if needed
         const resolvedProjectId =

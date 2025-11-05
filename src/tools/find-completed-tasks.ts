@@ -5,6 +5,7 @@ import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
+import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -59,11 +60,20 @@ const ArgsSchema = {
     ...LabelsSchema,
 }
 
+const OutputSchema = {
+    tasks: z.array(TaskOutputSchema).describe('The found completed tasks.'),
+    nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
+    totalCount: z.number().describe('The total number of tasks in this page.'),
+    hasMore: z.boolean().describe('Whether there are more results available.'),
+    appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
+}
+
 const findCompletedTasks = {
     name: ToolNames.FIND_COMPLETED_TASKS,
     description:
         'Get completed tasks (includes all collaborators by default—use responsibleUser to narrow).',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(args, client) {
         const { getBy, labels, labelsOperator, since, until, responsibleUser, projectId, ...rest } =
             args

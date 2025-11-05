@@ -1,9 +1,28 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
+import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const ArgsSchema = {}
+
+const OutputSchema = {
+    type: z.literal('user_info').describe('The type of the response.'),
+    userId: z.string().describe('The user ID.'),
+    fullName: z.string().describe('The full name of the user.'),
+    timezone: z.string().describe('The timezone of the user.'),
+    currentLocalTime: z.string().describe('The current local time of the user.'),
+    startDay: z.number().describe('The start day of the week (1 = Monday, 7 = Sunday).'),
+    startDayName: z.string().describe('The name of the start day.'),
+    weekStartDate: z.string().describe('The start date of the current week (YYYY-MM-DD).'),
+    weekEndDate: z.string().describe('The end date of the current week (YYYY-MM-DD).'),
+    currentWeekNumber: z.number().describe('The current week number of the year.'),
+    completedToday: z.number().describe('The number of tasks completed today.'),
+    dailyGoal: z.number().describe('The daily goal for task completions.'),
+    weeklyGoal: z.number().describe('The weekly goal for task completions.'),
+    email: z.string().describe('The email address of the user.'),
+    plan: z.enum(['Todoist Free', 'Todoist Pro', 'Todoist Business']).describe('The user plan.'),
+}
 
 type UserPlan = 'Todoist Free' | 'Todoist Pro' | 'Todoist Business'
 
@@ -176,6 +195,7 @@ const userInfo = {
     description:
         'Get comprehensive user information including user ID, full name, email, timezone with current local time, week start day preferences, current week dates, daily/weekly goal progress, and user plan (Free/Pro/Business).',
     parameters: ArgsSchema,
+    outputSchema: OutputSchema,
     async execute(_args, client) {
         const result = await generateUserInfo(client)
 

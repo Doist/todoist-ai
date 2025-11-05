@@ -67,8 +67,8 @@ function getErrorOutput(error: string) {
  * @param server - The server to register the tool on.
  * @param client - The Todoist API client to use to execute the tool.
  */
-function registerTool<Params extends z.ZodRawShape>(
-    tool: TodoistTool<Params>,
+function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape = z.ZodRawShape>(
+    tool: TodoistTool<Params, Output>,
     server: McpServer,
     client: TodoistApi,
 ) {
@@ -90,7 +90,16 @@ function registerTool<Params extends z.ZodRawShape>(
         }
     }
 
-    server.tool(tool.name, tool.description, tool.parameters, cb)
+    // Use registerTool to support outputSchema
+    server.registerTool(
+        tool.name,
+        {
+            description: tool.description,
+            inputSchema: tool.parameters,
+            outputSchema: tool.outputSchema as Output,
+        },
+        cb,
+    )
 }
 
 export { registerTool, getErrorOutput, getToolOutput }
