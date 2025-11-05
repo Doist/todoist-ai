@@ -2,34 +2,22 @@
 
 exports[`update-projects tool > updating a single project > should update a project when id and name are provided 1`] = `
 "Updated 1 project:
-• Updated Project Name (id=existing-project-123)
-Next:
-- Use get-overview with projectId=existing-project-123 to see project structure
-- Use find-tasks with projectId=existing-project-123 to review existing tasks"
+• Updated Project Name (id=existing-project-123)"
 `;
 
 exports[`update-projects tool > updating a single project > should update project with isFavorite and viewStyle options 1`] = `
 "Updated 1 project:
-• Updated Favorite Project (id=project-123)
-Next:
-- Use get-overview with projectId=project-123 to see project structure
-- Use find-tasks with projectId=project-123 to review existing tasks"
+• Updated Favorite Project (id=project-123)"
 `;
 
 exports[`update-projects tool > updating multiple projects > should skip projects with no updates and report correctly 1`] = `
 "Updated 1 project (1 skipped - no changes):
-• Updated Project (id=project-1)
-Next:
-- Use get-overview with projectId=project-1 to see project structure
-- Use find-tasks with projectId=project-1 to review existing tasks"
+• Updated Project (id=project-1)"
 `;
 
 exports[`update-projects tool > updating multiple projects > should update multiple projects and return mapped results 1`] = `
 "Updated 3 projects:
 • Updated First Project (id=project-1)
 • Updated Second Project (id=project-2)
-• Updated Third Project (id=project-3)
-Next:
-- Use find-projects to see all projects with updated names
-- Use get-overview to see updated project hierarchy"
+• Updated Third Project (id=project-3)"
 `;

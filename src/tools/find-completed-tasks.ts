@@ -8,7 +8,7 @@ import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
-const { FIND_TASKS_BY_DATE, GET_OVERVIEW } = ToolNames
+// No ToolNames constants needed - we only use cursor-based pagination
 
 const ArgsSchema = {
     getBy: z
@@ -184,17 +184,6 @@ function generateTextContent({
         }
     }
 
-    // Generate contextual next steps
-    const nextSteps: string[] = []
-    if (tasks.length > 0) {
-        nextSteps.push(
-            `Use ${FIND_TASKS_BY_DATE} for active tasks or ${GET_OVERVIEW} for current productivity.`,
-        )
-        if (tasks.some((task) => task.recurring)) {
-            nextSteps.push('Recurring tasks will automatically create new instances.')
-        }
-    }
-
     return summarizeList({
         subject,
         count: tasks.length,
@@ -203,7 +192,6 @@ function generateTextContent({
         filterHints,
         previewLines: previewTasks(tasks, Math.min(tasks.length, args.limit)),
         zeroReasonHints,
-        nextSteps,
     })
 }
 

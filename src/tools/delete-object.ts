@@ -1,17 +1,7 @@
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { formatNextSteps } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
-
-const {
-    FIND_PROJECTS,
-    GET_OVERVIEW,
-    FIND_SECTIONS,
-    FIND_TASKS,
-    FIND_TASKS_BY_DATE,
-    FIND_COMMENTS,
-} = ToolNames
 
 const ArgsSchema = {
     type: z
@@ -67,40 +57,7 @@ function generateTextContent({
 }): string {
     const summary = `Deleted ${type}: id=${id}`
 
-    // Recovery-focused next steps based on what was deleted
-    const nextSteps: string[] = []
-
-    switch (type) {
-        case 'project':
-            // Help user understand impact and navigate remaining work
-            nextSteps.push(`Use ${FIND_PROJECTS} to see remaining projects`)
-            nextSteps.push('Note: All tasks and sections in this project were also deleted')
-            nextSteps.push(`Use ${GET_OVERVIEW} to review your updated project structure`)
-            break
-
-        case 'section':
-            // Guide user to reorganize remaining sections and tasks
-            nextSteps.push(`Use ${FIND_SECTIONS} to see remaining sections in the project`)
-            nextSteps.push('Note: Tasks in this section were also deleted')
-            nextSteps.push(`Use ${FIND_TASKS} with projectId to see unorganized tasks`)
-            break
-
-        case 'task':
-            // Help user stay focused on remaining work
-            nextSteps.push(`Use ${FIND_TASKS_BY_DATE} to see remaining tasks for today`)
-            nextSteps.push(`Use ${GET_OVERVIEW} to check if this affects any dependent tasks`)
-            nextSteps.push('Note: Any subtasks of this task were also deleted')
-            break
-
-        case 'comment':
-            // Help user understand comment deletion impact
-            nextSteps.push(`Use ${FIND_COMMENTS} to see remaining comments on the task/project`)
-            nextSteps.push('Note: Comment attachments were also deleted')
-            break
-    }
-
-    const next = formatNextSteps(nextSteps)
-    return `${summary}\n${next}`
+    return summary
 }
 
 export { deleteObject }

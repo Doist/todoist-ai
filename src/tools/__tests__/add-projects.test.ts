@@ -14,7 +14,7 @@ const mockTodoistApi = {
     addProject: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
-const { ADD_TASKS, ADD_PROJECTS, ADD_SECTIONS } = ToolNames
+const { ADD_PROJECTS } = ToolNames
 
 describe(`${ADD_PROJECTS} tool`, () => {
     beforeEach(() => {
@@ -47,7 +47,6 @@ describe(`${ADD_PROJECTS} tool`, () => {
             expect(textContent).toContain('Added 1 project:')
             expect(textContent).toContain('test-abc123def456-project')
             expect(textContent).toContain(`id=${TEST_IDS.PROJECT_TEST}`)
-            expect(textContent).toContain(`Use ${ADD_TASKS} to add your first tasks`)
 
             // Verify structured content
             const structuredContent = extractStructuredContent(result)
@@ -96,7 +95,6 @@ describe(`${ADD_PROJECTS} tool`, () => {
             expect(textContent).toContain('Added 1 project:')
             expect(textContent).toContain('My Blue Project')
             expect(textContent).toContain('id=project-456')
-            expect(textContent).toContain(`Use ${ADD_SECTIONS} to organize new project`)
         })
 
         it('should create project with isFavorite and viewStyle options', async () => {
@@ -192,7 +190,6 @@ describe(`${ADD_PROJECTS} tool`, () => {
             expect(textContent).toContain('First Project (id=project-1)')
             expect(textContent).toContain('Second Project (id=project-2)')
             expect(textContent).toContain('Third Project (id=project-3)')
-            expect(textContent).toContain(`Use ${ADD_SECTIONS} to organize these projects`)
 
             // Verify structured content
             const structuredContent = extractStructuredContent(result)

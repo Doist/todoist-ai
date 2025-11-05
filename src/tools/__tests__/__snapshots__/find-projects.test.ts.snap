@@ -4,8 +4,7 @@ exports[`find-projects tool > listing all projects > should handle pagination wi
 "Projects: 1 (limit 10), more available.
 Preview:
     First Project • id=project-1
-Next:
-- Use find-tasks with projectId to see tasks in specific projects.
+Possible suggested next step:
 - Pass cursor 'next-page-cursor' to fetch more results."
 `;
 
@@ -14,10 +13,7 @@ exports[`find-projects tool > listing all projects > should list all projects wh
 Preview:
     Inbox • Inbox • id=inbox-project-id
     test-abc123def456-project • id=6cfCcrrCFg2xP94Q
-    Work Project • ⭐ • Shared • board • id=work-project-id
-Next:
-- Use find-tasks with projectId to see tasks in specific projects.
-- Favorite projects appear first in most Todoist views."
+    Work Project • ⭐ • Shared • board • id=work-project-id"
 `;
 
 exports[`find-projects tool > searching projects > should filter projects by search term (case insensitive) 1`] = `
@@ -25,18 +21,14 @@ exports[`find-projects tool > searching projects > should filter projects by sea
 Filter: search: "work".
 Preview:
     Work Project • id=work-project-id
-    Hobby Work • id=hobby-project-id
-Next:
-- Use find-tasks with projectId to see tasks in specific projects."
+    Hobby Work • id=hobby-project-id"
 `;
 
 exports[`find-projects tool > searching projects > should handle search with 'case insensitive matching' 1`] = `
 "Projects matching "IMPORTANT": 1 (limit 50).
 Filter: search: "IMPORTANT".
 Preview:
-    Important Project • id=6cfCcrrCFg2xP94Q
-Next:
-- Use find-tasks with projectId to see tasks in specific projects."
+    Important Project • id=6cfCcrrCFg2xP94Q"
 `;
 
 exports[`find-projects tool > searching projects > should handle search with 'no matches' 1`] = `

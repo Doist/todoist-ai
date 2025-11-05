@@ -2,48 +2,27 @@
 
 exports[`add-projects tool > creating a single project > should create a project and return mapped result 1`] = `
 "Added 1 project:
-• test-abc123def456-project (id=6cfCcrrCFg2xP94Q)
-Next:
-- Use add-sections to organize new project with sections
-- Use add-tasks to add your first tasks to this project
-- Use get-overview with projectId=6cfCcrrCFg2xP94Q to see project structure"
+• test-abc123def456-project (id=6cfCcrrCFg2xP94Q)"
 `;
 
 exports[`add-projects tool > creating a single project > should create project with isFavorite and viewStyle options 1`] = `
 "Added 1 project:
-• Board Project (id=project-789)
-Next:
-- Use add-sections to organize new project with sections
-- Use add-tasks to add your first tasks to this project
-- Use get-overview with projectId=project-789 to see project structure"
+• Board Project (id=project-789)"
 `;
 
 exports[`add-projects tool > creating a single project > should create project with parentId to create a sub-project 1`] = `
 "Added 1 project:
-• Child Project (id=project-child)
-Next:
-- Use add-sections to organize new project with sections
-- Use add-tasks to add your first tasks to this project
-- Use get-overview with projectId=project-child to see project structure"
+• Child Project (id=project-child)"
 `;
 
 exports[`add-projects tool > creating a single project > should handle different project properties from API 1`] = `
 "Added 1 project:
-• My Blue Project (id=project-456)
-Next:
-- Use add-sections to organize new project with sections
-- Use add-tasks to add your first tasks to this project
-- Use get-overview with projectId=project-456 to see project structure"
+• My Blue Project (id=project-456)"
 `;
 
 exports[`add-projects tool > creating multiple projects > should create multiple projects and return mapped results 1`] = `
 "Added 3 projects:
 • First Project (id=project-1)
 • Second Project (id=project-2)
-• Third Project (id=project-3)
-Next:
-- Use add-sections to organize these projects with sections
-- Use add-tasks to add tasks to these projects
-- Use find-projects to see all projects including the new ones
-- Use get-overview to see updated project hierarchy"
+• Third Project (id=project-3)"
 `;

@@ -6,11 +6,7 @@ import { mapTask } from '../tool-helpers.js'
 import { assignmentValidator } from '../utils/assignment-validator.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
 import { convertPriorityToNumber, PrioritySchema } from '../utils/priorities.js'
-import {
-    generateTaskNextSteps,
-    getDateString,
-    summarizeTaskOperation,
-} from '../utils/response-builders.js'
+import { summarizeTaskOperation } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const TaskSchema = z.object({
@@ -201,10 +197,6 @@ function generateTextContent({
     tasks: ReturnType<typeof mapTask>[]
     args: z.infer<z.ZodObject<typeof ArgsSchema>>
 }) {
-    // Get context for smart next steps
-    const todayStr = getDateString()
-    const hasToday = tasks.some((task) => task.dueDate === todayStr)
-
     // Generate context description for mixed contexts
     const contextTypes = new Set<string>()
     for (const task of args.tasks) {
@@ -224,7 +216,6 @@ function generateTextContent({
 
     return summarizeTaskOperation('Added', tasks, {
         context: projectContext,
-        nextSteps: generateTaskNextSteps('added', tasks, { hasToday }),
         showDetails: true,
     })
 }

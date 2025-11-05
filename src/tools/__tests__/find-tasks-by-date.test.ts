@@ -59,7 +59,7 @@ vi.mock('date-fns', () => ({
     }),
 }))
 
-const { FIND_TASKS_BY_DATE, UPDATE_TASKS } = ToolNames
+const { FIND_TASKS_BY_DATE } = ToolNames
 
 describe(`${FIND_TASKS_BY_DATE} tool`, () => {
     beforeEach(() => {
@@ -245,7 +245,6 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
-            expect(textContent).toContain(`Use ${UPDATE_TASKS} to modify priorities or due dates`)
         })
 
         it('should suggest today-focused actions when startDate is today', async () => {
@@ -266,7 +265,6 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
-            expect(textContent).toContain(`Use ${UPDATE_TASKS} to modify priorities or due dates`)
         })
 
         it('should provide helpful suggestions for empty today results', async () => {

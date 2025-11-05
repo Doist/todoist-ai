@@ -11,12 +11,7 @@ import type { TodoistTool } from '../todoist-tool.js'
 import { getTasksByFilter, mapTask } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
-import {
-    generateTaskNextSteps,
-    getDateString,
-    previewTasks,
-    summarizeList,
-} from '../utils/response-builders.js'
+import { previewTasks, summarizeList } from '../utils/response-builders.js'
 import { MappedTask } from '../utils/test-helpers.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -393,14 +388,6 @@ function generateTextContent({
         }
     }
 
-    // Generate contextual next steps
-    const now = new Date()
-    const todayDateString = getDateString(now)
-    const nextSteps = generateTaskNextSteps('listed', tasks, {
-        hasToday: tasks.some((task) => task.dueDate === todayDateString),
-        hasOverdue: tasks.some((task) => task.dueDate && new Date(task.dueDate) < now),
-    })
-
     return summarizeList({
         subject,
         count: tasks.length,
@@ -409,7 +396,6 @@ function generateTextContent({
         filterHints,
         previewLines: previewTasks(tasks, Math.min(tasks.length, args.limit)),
         zeroReasonHints,
-        nextSteps,
     })
 }
 

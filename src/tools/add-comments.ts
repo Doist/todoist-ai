@@ -2,10 +2,7 @@ import type { AddCommentArgs, Comment } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { formatNextSteps } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
-
-const { FIND_COMMENTS, UPDATE_COMMENTS, DELETE_OBJECT } = ToolNames
 
 const CommentSchema = z.object({
     taskId: z.string().optional().describe('The ID of the task to comment on.'),
@@ -90,26 +87,7 @@ function generateTextContent({ comments }: { comments: Comment[] }): string {
     }
     const summary = parts.length > 0 ? `Added ${parts.join(' and ')}` : 'No comments added'
 
-    // Context-aware next steps
-    const nextSteps: string[] = []
-    if (comments.length > 0) {
-        if (comments.length === 1 && comments[0]) {
-            const comment = comments[0]
-            const targetId = comment.taskId || comment.projectId || ''
-            const targetType = comment.taskId ? 'task' : 'project'
-            nextSteps.push(
-                `Use ${FIND_COMMENTS} with ${targetType}Id=${targetId} to see all comments`,
-            )
-            nextSteps.push(`Use ${UPDATE_COMMENTS} with id=${comment.id} to edit content`)
-        } else {
-            nextSteps.push(`Use ${FIND_COMMENTS} to view comments by task or project`)
-            nextSteps.push(`Use ${UPDATE_COMMENTS} to edit any comment content`)
-        }
-        nextSteps.push(`Use ${DELETE_OBJECT} with type=comment to remove comments`)
-    }
-
-    const next = formatNextSteps(nextSteps)
-    return `${summary}\n${next}`
+    return summary
 }
 
 export { addComments }

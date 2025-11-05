@@ -14,7 +14,7 @@ const mockTodoistApi = {
     addSection: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
-const { ADD_TASKS, ADD_SECTIONS, FIND_TASKS } = ToolNames
+const { ADD_SECTIONS } = ToolNames
 
 describe(`${ADD_SECTIONS} tool`, () => {
     beforeEach(() => {
@@ -51,7 +51,6 @@ describe(`${ADD_SECTIONS} tool`, () => {
             expect(textContent).toContain('Added 1 section:')
             expect(textContent).toContain('test-abc123def456-section')
             expect(textContent).toContain(`id=${TEST_IDS.SECTION_1}`)
-            expect(textContent).toContain(`Use ${ADD_TASKS} with sectionId`)
 
             // Verify structured content
             const structuredContent = extractStructuredContent(result)
@@ -93,7 +92,6 @@ describe(`${ADD_SECTIONS} tool`, () => {
             expect(textContent).toContain('Added 1 section:')
             expect(textContent).toContain('My Section Name')
             expect(textContent).toContain(`id=${TEST_IDS.SECTION_2}`)
-            expect(textContent).toContain(`Use ${FIND_TASKS} with sectionId`)
         })
     })
 
@@ -204,7 +202,6 @@ describe(`${ADD_SECTIONS} tool`, () => {
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Added 2 sections:')
-            expect(textContent).toContain(`Use ${ADD_TASKS} to add tasks to these new sections`)
         })
     })
 

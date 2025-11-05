@@ -11,53 +11,34 @@ Preview:
     To Do • id=section-123
     In Progress • id=section-456
     Done • id=section-789
-    Backlog Items • id=section-999
-Next:
-- Use find-tasks with sectionId to see tasks in specific sections
-- Use update-sections to modify section names"
+    Backlog Items • id=section-999"
 `;
 
 exports[`find-sections tool > searching sections by name > should filter sections by search term (case insensitive) 1`] = `
 "Sections in project 6cfCcrrCFg2xP94Q matching "progress": 2.
 Preview:
     In Progress • id=section-456
-    Progress Review • id=section-999
-Next:
-- Use find-tasks with sectionId to see tasks in specific sections
-- Use update-sections to modify section names
-- Remove search parameter to see all sections in this project"
+    Progress Review • id=section-999"
 `;
 
 exports[`find-sections tool > searching sections by name > should handle case sensitive search correctly 1`] = `
 "Sections in project 6cfCcrrCFg2xP94Q matching "IMPORTANT": 1.
 Preview:
-    Important Tasks • id=section-123
-Next:
-- Use find-tasks with sectionId=section-123 to see tasks
-- Use add-sections to create additional sections for organization
-- Remove search parameter to see all sections in this project"
+    Important Tasks • id=section-123"
 `;
 
 exports[`find-sections tool > searching sections by name > should handle exact matches 1`] = `
 "Sections in project 6cfCcrrCFg2xP94Q matching "done": 2.
 Preview:
     Done • id=section-123
-    Done Soon • id=section-456
-Next:
-- Use find-tasks with sectionId to see tasks in specific sections
-- Use update-sections to modify section names
-- Remove search parameter to see all sections in this project"
+    Done Soon • id=section-456"
 `;
 
 exports[`find-sections tool > searching sections by name > should handle partial matches correctly 1`] = `
 "Sections in project 6cfCcrrCFg2xP94Q matching "task": 2.
 Preview:
     Development Tasks • id=section-123
-    Testing Tasks • id=section-456
-Next:
-- Use find-tasks with sectionId to see tasks in specific sections
-- Use update-sections to modify section names
-- Remove search parameter to see all sections in this project"
+    Testing Tasks • id=section-456"
 `;
 
 exports[`find-sections tool > searching sections by name > should handle search with no matches 1`] = `

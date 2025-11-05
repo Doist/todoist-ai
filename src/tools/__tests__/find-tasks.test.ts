@@ -33,7 +33,7 @@ vi.mock('../../utils/user-resolver', () => ({
     resolveUserNameToId: vi.fn(),
 }))
 
-const { FIND_TASKS, UPDATE_TASKS, FIND_COMPLETED_TASKS } = ToolNames
+const { FIND_TASKS, FIND_COMPLETED_TASKS } = ToolNames
 
 const mockGetTasksByFilter = getTasksByFilter as MockedFunction<typeof getTasksByFilter>
 const mockResolveUserNameToId = resolveUserNameToId as MockedFunction<typeof resolveUserNameToId>
@@ -373,8 +373,6 @@ describe(`${FIND_TASKS} tool`, () => {
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
-            // Should prioritize overdue tasks in next steps
-            expect(textContent).toContain(`Use ${UPDATE_TASKS} to modify priorities or due dates`)
         })
 
         it('should suggest today tasks when hasToday is true', async () => {
@@ -395,8 +393,6 @@ describe(`${FIND_TASKS} tool`, () => {
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
-            // Should suggest today-focused actions
-            expect(textContent).toContain(`Use ${UPDATE_TASKS} to modify priorities or due dates`)
         })
 
         it('should provide different next steps for regular tasks', async () => {
@@ -417,7 +413,6 @@ describe(`${FIND_TASKS} tool`, () => {
 
             const textContent = extractTextContent(result)
             expect(textContent).toMatchSnapshot()
-            expect(textContent).toContain(`Use ${UPDATE_TASKS} to modify priorities or due dates`)
         })
 
         it('should provide helpful suggestions for empty search results', async () => {

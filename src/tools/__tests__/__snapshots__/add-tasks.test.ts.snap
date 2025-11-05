@@ -4,48 +4,36 @@ exports[`add-tasks tool > adding multiple tasks > should add multiple tasks and 
 "Added 2 tasks to projects.
 Tasks:
     First task content • P4 • id=8485093748
-    Second task content • due 2025-08-15 • P3 • id=8485093749.
-Next:
-- Use get-overview to see your updated project organization"
+    Second task content • due 2025-08-15 • P3 • id=8485093749."
 `;
 
 exports[`add-tasks tool > adding multiple tasks > should add task with deadline 1`] = `
 "Added 1 task to projects.
 Tasks:
-    Task with deadline • P4 • id=8485093756.
-Next:
-- Use get-overview to see your updated project organization"
+    Task with deadline • P4 • id=8485093756."
 `;
 
 exports[`add-tasks tool > adding multiple tasks > should add tasks with duration 1`] = `
 "Added 2 tasks to projects.
 Tasks:
     Task with 2 hour duration • P4 • id=8485093752
-    Task with 45 minute duration • P4 • id=8485093753.
-Next:
-- Use get-overview to see your updated project organization"
+    Task with 45 minute duration • P4 • id=8485093753."
 `;
 
 exports[`add-tasks tool > adding multiple tasks > should handle tasks with section and parent IDs 1`] = `
 "Added 1 task to projects.
 Tasks:
-    Subtask content • P2 • id=8485093750.
-Next:
-- Use get-overview to see your updated project organization"
+    Subtask content • P2 • id=8485093750."
 `;
 
 exports[`add-tasks tool > next steps logic > should suggest find-tasks-by-date for today when hasToday is true 1`] = `
 "Added 1 task to projects.
 Tasks:
-    Task due today • due 2025-08-17 • P4 • id=8485093755.
-Next:
-- Use get-overview to see your updated project organization"
+    Task due today • due 2025-08-17 • P4 • id=8485093755."
 `;
 
 exports[`add-tasks tool > next steps logic > should suggest overview tool when no hasToday context 1`] = `
 "Added 1 task to projects.
 Tasks:
-    Regular task • P4 • id=8485093756.
-Next:
-- Use get-overview to see your updated project organization"
+    Regular task • P4 • id=8485093756."
 `;
