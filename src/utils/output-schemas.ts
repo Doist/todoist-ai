@@ -53,6 +53,25 @@ const SectionSchema = z.object({
 })
 
 /**
+ * Schema for a file attachment in a comment
+ */
+const AttachmentSchema = z.object({
+    resourceType: z.string().describe('The type of resource.'),
+    fileName: z.string().optional().describe('The name of the file.'),
+    fileSize: z.number().optional().describe('The size of the file in bytes.'),
+    fileType: z.string().optional().describe('The MIME type of the file.'),
+    fileUrl: z.string().optional().describe('The URL to access the file.'),
+    fileDuration: z
+        .number()
+        .optional()
+        .describe('The duration in milliseconds (for audio/video files).'),
+    uploadState: z
+        .enum(['pending', 'completed'])
+        .optional()
+        .describe('The upload state of the file.'),
+})
+
+/**
  * Schema for a comment object returned by tools
  */
 const CommentSchema = z.object({
@@ -61,7 +80,7 @@ const CommentSchema = z.object({
     projectId: z.string().optional().describe('The ID of the project this comment belongs to.'),
     content: z.string().describe('The content of the comment.'),
     postedAt: z.string().describe('When the comment was posted (ISO 8601 format).'),
-    attachment: z.record(z.unknown()).optional().describe('Attachment information, if any.'),
+    attachment: AttachmentSchema.optional().describe('File attachment information, if any.'),
 })
 
 /**
