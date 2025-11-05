@@ -38,23 +38,24 @@ function getToolOutput<StructuredContent extends Record<string, unknown>>({
     // Remove null fields from structured content before returning
     const sanitizedContent = removeNullFields(structuredContent)
 
-    if (USE_STRUCTURED_CONTENT) {
-        const result: Record<string, unknown> = {}
-        if (textContent) result.content = [{ type: 'text' as const, text: textContent }]
-        if (structuredContent) result.structuredContent = sanitizedContent
-        return result
+    // Always include structuredContent when available since all tools have outputSchema
+    const result: Record<string, unknown> = {}
+    if (textContent) result.content = [{ type: 'text' as const, text: textContent }]
+    if (structuredContent) result.structuredContent = sanitizedContent
+
+    // Legacy support: also include JSON in content when USE_STRUCTURED_CONTENT is false
+    if (!USE_STRUCTURED_CONTENT && structuredContent) {
+        const json = JSON.stringify(sanitizedContent)
+        if (!result.content) {
+            result.content = []
+        }
+        ;(result.content as Array<{ type: 'text'; text: string; mimeType?: string }>).push({
+            type: 'text',
+            mimeType: 'application/json',
+            text: json,
+        })
     }
 
-    const json = JSON.stringify(sanitizedContent)
-    const result: { content: Array<{ type: 'text'; text: string; mimeType?: string }> } = {
-        content: [],
-    }
-    if (textContent) {
-        result.content.push({ type: 'text', text: textContent })
-    }
-    if (structuredContent) {
-        result.content.push({ type: 'text', mimeType: 'application/json', text: json })
-    }
     return result
 }
 
