@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.16.1](https://github.com/Doist/todoist-ai/compare/v4.16.0...v4.16.1) (2025-11-05)
+
+
+### Bug Fixes
+
+* Show next steps only for paginated tools and clarify as suggestions ([#201](https://github.com/Doist/todoist-ai/issues/201)) ([f969615](https://github.com/Doist/todoist-ai/commit/f9696155fe931b6c40859c1a2f7e82a859253288))
+
 ## [4.16.0](https://github.com/Doist/todoist-ai/compare/v4.15.1...v4.16.0) (2025-11-03)
 
 
