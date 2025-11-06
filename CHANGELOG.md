@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.17.1](https://github.com/Doist/todoist-ai/compare/v4.17.0...v4.17.1) (2025-11-06)
+
+
+### Bug Fixes
+
+* enforce output schemas for tools ([#205](https://github.com/Doist/todoist-ai/issues/205)) ([9b1d593](https://github.com/Doist/todoist-ai/commit/9b1d59317dbe5277b6f4126388a2402cf3c35e8e))
+
 ## [4.17.0](https://github.com/Doist/todoist-ai/compare/v4.16.1...v4.17.0) (2025-11-05)
 
 
