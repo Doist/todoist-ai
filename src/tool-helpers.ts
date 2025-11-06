@@ -126,6 +126,7 @@ function mapComment(comment: Comment) {
         projectId: comment.projectId ?? undefined,
         content: comment.content,
         postedAt: comment.postedAt,
+        postedUid: comment.postedUid ?? undefined,
         fileAttachment: comment.fileAttachment
             ? {
                   resourceType: comment.fileAttachment.resourceType,
@@ -135,6 +136,11 @@ function mapComment(comment: Comment) {
                   fileUrl: comment.fileAttachment.fileUrl ?? undefined,
                   fileDuration: comment.fileAttachment.fileDuration ?? undefined,
                   uploadState: comment.fileAttachment.uploadState ?? undefined,
+                  url: comment.fileAttachment.url ?? undefined,
+                  title: comment.fileAttachment.title ?? undefined,
+                  image: comment.fileAttachment.image ?? undefined,
+                  imageWidth: comment.fileAttachment.imageWidth ?? undefined,
+                  imageHeight: comment.fileAttachment.imageHeight ?? undefined,
               }
             : undefined,
     }
