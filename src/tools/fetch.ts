@@ -1,6 +1,5 @@
 import { getProjectUrl, getTaskUrl } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import { getErrorOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapProject, mapTask } from '../tool-helpers.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -20,11 +19,6 @@ type FetchResult = {
     text: string
     url: string
     metadata?: Record<string, unknown>
-}
-
-type FetchToolOutput = {
-    content: { type: 'text'; text: string }[]
-    isError?: boolean
 }
 
 const OutputSchema = {
@@ -47,94 +41,87 @@ const fetch = {
         'Fetch the full contents of a task or project by its ID. The ID should be in the format "task:{id}" or "project:{id}".',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    async execute(args, client): Promise<FetchToolOutput> {
-        try {
-            const { id } = args
+    async execute(args, client) {
+        const { id } = args
 
-            // Parse the composite ID
-            const [type, objectId] = id.split(':', 2)
+        // Parse the composite ID
+        const [type, objectId] = id.split(':', 2)
 
-            if (!objectId || (type !== 'task' && type !== 'project')) {
-                throw new Error(
-                    'Invalid ID format. Expected "task:{id}" or "project:{id}". Example: "task:8485093748" or "project:6cfCcrrCFg2xP94Q"',
-                )
-            }
-
-            let result: FetchResult
-
-            if (type === 'task') {
-                // Fetch task
-                const task = await client.getTask(objectId)
-                const mappedTask = mapTask(task)
-
-                // Build text content
-                const textParts = [mappedTask.content]
-                if (mappedTask.description) {
-                    textParts.push(`\n\nDescription: ${mappedTask.description}`)
-                }
-                if (mappedTask.dueDate) {
-                    textParts.push(`\nDue: ${mappedTask.dueDate}`)
-                }
-                if (mappedTask.labels.length > 0) {
-                    textParts.push(`\nLabels: ${mappedTask.labels.join(', ')}`)
-                }
-
-                result = {
-                    id: `task:${mappedTask.id}`,
-                    title: mappedTask.content,
-                    text: textParts.join(''),
-                    url: getTaskUrl(mappedTask.id),
-                    metadata: {
-                        priority: mappedTask.priority,
-                        projectId: mappedTask.projectId,
-                        sectionId: mappedTask.sectionId,
-                        parentId: mappedTask.parentId,
-                        recurring: mappedTask.recurring,
-                        duration: mappedTask.duration,
-                        responsibleUid: mappedTask.responsibleUid,
-                        assignedByUid: mappedTask.assignedByUid,
-                        checked: mappedTask.checked,
-                        completedAt: mappedTask.completedAt,
-                    },
-                }
-            } else {
-                // Fetch project
-                const project = await client.getProject(objectId)
-                const mappedProject = mapProject(project)
-
-                // Build text content
-                const textParts = [mappedProject.name]
-                if (mappedProject.isShared) {
-                    textParts.push('\n\nShared project')
-                }
-                if (mappedProject.isFavorite) {
-                    textParts.push('\nFavorite: Yes')
-                }
-
-                result = {
-                    id: `project:${mappedProject.id}`,
-                    title: mappedProject.name,
-                    text: textParts.join(''),
-                    url: getProjectUrl(mappedProject.id),
-                    metadata: {
-                        color: mappedProject.color,
-                        isFavorite: mappedProject.isFavorite,
-                        isShared: mappedProject.isShared,
-                        parentId: mappedProject.parentId,
-                        inboxProject: mappedProject.inboxProject,
-                        viewStyle: mappedProject.viewStyle,
-                    },
-                }
-            }
-
-            // Return as JSON-encoded string in a text content item (OpenAI MCP spec)
-            const jsonText = JSON.stringify(result)
-            return { content: [{ type: 'text' as const, text: jsonText }] }
-        } catch (error) {
-            const message = error instanceof Error ? error.message : 'An unknown error occurred'
-            return getErrorOutput(message)
+        if (!objectId || (type !== 'task' && type !== 'project')) {
+            throw new Error(
+                'Invalid ID format. Expected "task:{id}" or "project:{id}". Example: "task:8485093748" or "project:6cfCcrrCFg2xP94Q"',
+            )
         }
+
+        let result: FetchResult
+
+        if (type === 'task') {
+            // Fetch task
+            const task = await client.getTask(objectId)
+            const mappedTask = mapTask(task)
+
+            // Build text content
+            const textParts = [mappedTask.content]
+            if (mappedTask.description) {
+                textParts.push(`\n\nDescription: ${mappedTask.description}`)
+            }
+            if (mappedTask.dueDate) {
+                textParts.push(`\nDue: ${mappedTask.dueDate}`)
+            }
+            if (mappedTask.labels.length > 0) {
+                textParts.push(`\nLabels: ${mappedTask.labels.join(', ')}`)
+            }
+
+            result = {
+                id: `task:${mappedTask.id}`,
+                title: mappedTask.content,
+                text: textParts.join(''),
+                url: getTaskUrl(mappedTask.id),
+                metadata: {
+                    priority: mappedTask.priority,
+                    projectId: mappedTask.projectId,
+                    sectionId: mappedTask.sectionId,
+                    parentId: mappedTask.parentId,
+                    recurring: mappedTask.recurring,
+                    duration: mappedTask.duration,
+                    responsibleUid: mappedTask.responsibleUid,
+                    assignedByUid: mappedTask.assignedByUid,
+                    checked: mappedTask.checked,
+                    completedAt: mappedTask.completedAt,
+                },
+            }
+        } else {
+            // Fetch project
+            const project = await client.getProject(objectId)
+            const mappedProject = mapProject(project)
+
+            // Build text content
+            const textParts = [mappedProject.name]
+            if (mappedProject.isShared) {
+                textParts.push('\n\nShared project')
+            }
+            if (mappedProject.isFavorite) {
+                textParts.push('\nFavorite: Yes')
+            }
+
+            result = {
+                id: `project:${mappedProject.id}`,
+                title: mappedProject.name,
+                text: textParts.join(''),
+                url: getProjectUrl(mappedProject.id),
+                metadata: {
+                    color: mappedProject.color,
+                    isFavorite: mappedProject.isFavorite,
+                    isShared: mappedProject.isShared,
+                    parentId: mappedProject.parentId,
+                    inboxProject: mappedProject.inboxProject,
+                    viewStyle: mappedProject.viewStyle,
+                },
+            }
+        }
+
+        return { textContent: JSON.stringify(result) }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 export { fetch }

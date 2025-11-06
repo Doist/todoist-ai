@@ -6,14 +6,12 @@ import {
     RESPONSIBLE_USER_FILTERING,
     resolveResponsibleUser,
 } from '../filter-helpers.js'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { getTasksByFilter, mapTask } from '../tool-helpers.js'
+import { getTasksByFilter, type MappedTask, mapTask } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
-import { MappedTask } from '../utils/test-helpers.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const { FIND_COMPLETED_TASKS, ADD_TASKS } = ToolNames
@@ -158,47 +156,47 @@ const findTasks = {
                 assigneeEmail,
             })
 
-            return getToolOutput({
+            return {
                 textContent,
                 structuredContent: {
                     tasks: filteredTasks,
-                    nextCursor,
+                    nextCursor: nextCursor ?? undefined,
                     totalCount: filteredTasks.length,
                     hasMore: Boolean(nextCursor),
                     appliedFilters: args,
                 },
-            })
+            }
         }
 
         // If only responsibleUid is provided (without containers), use assignee filter
         if (resolvedAssigneeId && !searchText && !hasLabels) {
-            const tasks = await client.getTasksByFilter({
+            const { results: tasks, nextCursor } = await client.getTasksByFilter({
                 query: `assigned to: ${assigneeEmail}`,
                 lang: 'en',
                 limit,
                 cursor: cursor ?? null,
             })
 
-            const mappedTasks = tasks.results.map(mapTask)
+            const mappedTasks = tasks.map(mapTask)
 
             const textContent = generateTextContent({
                 tasks: mappedTasks,
                 args,
-                nextCursor: tasks.nextCursor,
+                nextCursor,
                 isContainerSearch: false,
                 assigneeEmail,
             })
 
-            return getToolOutput({
+            return {
                 textContent,
                 structuredContent: {
                     tasks: mappedTasks,
-                    nextCursor: tasks.nextCursor,
+                    nextCursor: nextCursor ?? undefined,
                     totalCount: mappedTasks.length,
-                    hasMore: Boolean(tasks.nextCursor),
+                    hasMore: Boolean(nextCursor),
                     appliedFilters: args,
                 },
-            })
+            }
         }
 
         // Handle search text and/or labels using filter query (responsibleUid filtering done client-side)
@@ -214,40 +212,40 @@ const findTasks = {
         query = appendToQuery(query, labelsFilter)
 
         // Execute filter query
-        const result = await getTasksByFilter({
+        const { tasks, nextCursor } = await getTasksByFilter({
             client,
             query,
             cursor: args.cursor,
             limit: args.limit,
         })
 
-        const tasks = filterTasksByResponsibleUser({
-            tasks: result.tasks,
+        const filteredTasks = filterTasksByResponsibleUser({
+            tasks,
             resolvedAssigneeId,
             currentUserId: todoistUser.id,
             responsibleUserFiltering,
         })
 
         const textContent = generateTextContent({
-            tasks,
+            tasks: filteredTasks,
             args,
-            nextCursor: result.nextCursor,
+            nextCursor,
             isContainerSearch: false,
             assigneeEmail,
         })
 
-        return getToolOutput({
+        return {
             textContent,
             structuredContent: {
-                tasks,
-                nextCursor: result.nextCursor,
+                tasks: filteredTasks,
+                nextCursor: nextCursor ?? undefined,
                 totalCount: tasks.length,
-                hasMore: Boolean(result.nextCursor),
+                hasMore: Boolean(nextCursor),
                 appliedFilters: args,
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function getContainerZeroReasonHints(args: z.infer<z.ZodObject<typeof ArgsSchema>>): string[] {
     if (args.projectId) {

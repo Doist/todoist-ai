@@ -1,6 +1,5 @@
 import type { Comment } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { CommentSchema as CommentOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -43,7 +42,7 @@ const updateComments = {
             comments: updatedComments,
         })
 
-        return getToolOutput({
+        return {
             textContent,
             structuredContent: {
                 comments: updatedComments,
@@ -53,9 +52,9 @@ const updateComments = {
                     updateCount: updatedComments.length,
                 },
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent({ comments }: { comments: Comment[] }): string {
     // Group comments by entity type and count

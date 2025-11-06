@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapActivityEvent } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
@@ -89,25 +88,19 @@ const findActivity = {
         const { results, nextCursor } = await client.getActivityLogs(apiArgs)
         const events = results.map(mapActivityEvent)
 
-        // Generate text content
-        const textContent = generateTextContent({
-            events,
-            args,
-            nextCursor,
-        })
-
-        return getToolOutput({
+        const textContent = generateTextContent({ events, args, nextCursor })
+        return {
             textContent,
             structuredContent: {
                 events,
-                nextCursor,
+                nextCursor: nextCursor ?? undefined,
                 totalCount: events.length,
                 hasMore: Boolean(nextCursor),
                 appliedFilters: args,
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent({
     events,

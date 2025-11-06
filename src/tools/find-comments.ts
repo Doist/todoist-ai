@@ -1,6 +1,5 @@
 import type { Comment } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ApiLimits } from '../utils/constants.js'
 import { CommentSchema as CommentOutputSchema } from '../utils/output-schemas.js'
@@ -95,19 +94,19 @@ const findComments = {
             nextCursor,
         })
 
-        return getToolOutput({
+        return {
             textContent,
             structuredContent: {
                 comments,
                 searchType: args.commentId ? 'single' : args.taskId ? 'task' : 'project',
                 searchId: args.commentId || args.taskId || args.projectId || '',
                 hasMore,
-                nextCursor,
+                nextCursor: nextCursor ?? undefined,
                 totalCount: comments.length,
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent({
     comments,

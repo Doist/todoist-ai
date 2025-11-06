@@ -3,8 +3,6 @@ import { type Mocked, vi } from 'vitest'
 import {
     createMockSection,
     createMockUser,
-    extractStructuredContent,
-    extractTextContent,
     TEST_ERRORS,
     TEST_IDS,
 } from '../../utils/test-helpers.js'
@@ -66,7 +64,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
                 projectId: TEST_IDS.PROJECT_TEST,
             })
 
-            const textContent = extractTextContent(result)
+            const { textContent } = result
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Sections in project')
             expect(textContent).toContain('To Do • id=')
@@ -75,7 +73,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             expect(textContent).toContain('Backlog Items • id=')
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const { structuredContent } = result
             expect(structuredContent.sections).toHaveLength(4)
             expect(structuredContent.totalCount).toBe(4)
             expect(structuredContent.appliedFilters).toEqual({
@@ -99,14 +97,14 @@ describe(`${FIND_SECTIONS} tool`, () => {
                 projectId: 'empty-project-id',
             })
 
-            const textContent = extractTextContent(result)
+            const { textContent } = result
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Project has no sections yet')
             expect(textContent).toContain(`Use ${ADD_SECTIONS} to create sections`)
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
-            expect(structuredContent.sections).toBeUndefined() // Empty arrays are removed
+            const { structuredContent } = result
+            expect(structuredContent.sections).toEqual([]) // Empty arrays are now kept as empty arrays
             expect(structuredContent.totalCount).toBe(0)
         })
     })
@@ -154,7 +152,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             })
 
             // Should return both "In Progress" and "Progress Review" (case insensitive partial match)
-            const textContent = extractTextContent(result)
+            const { textContent } = result
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('matching "progress"')
             expect(textContent).toContain('In Progress • id=')
@@ -186,7 +184,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const { textContent } = result
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Try broader search terms')
             expect(textContent).toContain('Check spelling')
@@ -219,7 +217,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             )
 
             // Should match despite different case
-            const textContent = extractTextContent(result)
+            const { textContent } = result
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('matching "IMPORTANT"')
             expect(textContent).toContain('Important Tasks • id=')
@@ -257,7 +255,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             )
 
             // Should match both sections with "task" in the name
-            const textContent = extractTextContent(result)
+            const { textContent } = result
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('matching "task"')
             expect(textContent).toContain('Development Tasks • id=')
@@ -290,7 +288,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             )
 
             // Should match both sections containing "done"
-            const textContent = extractTextContent(result)
+            const { textContent } = result
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('matching "done"')
             expect(textContent).toContain('Done • id=')
@@ -337,13 +335,13 @@ describe(`${FIND_SECTIONS} tool`, () => {
             })
 
             // Verify result contains the sections
-            const textContent = extractTextContent(result)
+            const { textContent } = result
             expect(textContent).toContain('Sections in project')
             expect(textContent).toContain('Inbox Section 1')
             expect(textContent).toContain('Inbox Section 2')
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const { structuredContent } = result
             expect(structuredContent.totalCount).toBe(2)
             expect(structuredContent.sections).toEqual([
                 { id: TEST_IDS.SECTION_1, name: 'Inbox Section 1' },

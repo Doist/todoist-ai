@@ -1,11 +1,6 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import {
-    createMockTask,
-    extractStructuredContent,
-    extractTextContent,
-    TEST_IDS,
-} from '../../utils/test-helpers.js'
+import { createMockTask, TEST_IDS } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { updateTasks } from '../update-tasks.js'
 
@@ -55,9 +50,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
             })
 
             // Verify result matches expected structure with text and structured content
-            const textContent = extractTextContent(result)
-            expect(textContent).toContain('Updated 1 task')
-            const structuredContent = extractStructuredContent(result)
+            expect(result.textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     tasks: expect.arrayContaining([expect.objectContaining({ id: '8485093748' })]),
@@ -106,9 +100,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
             })
 
             // Verify result matches expected structure with text and structured content
-            const textContent = extractTextContent(result)
-            expect(textContent).toContain('Updated 2 tasks')
-            const structuredContent = extractStructuredContent(result)
+            expect(result.textContent).toContain('Updated 2 tasks')
+            const { structuredContent } = result
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     totalCount: 2,
@@ -156,9 +149,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
             })
 
             // Verify result structure
-            const textContent = extractTextContent(result)
-            expect(textContent).toContain('Updated 1 task')
-            const structuredContent = extractStructuredContent(result)
+            expect(result.textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
             expect(structuredContent.tasks).toHaveLength(1)
         })
 
@@ -191,9 +183,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
             expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
             // Verify result structure
-            const textContent = extractTextContent(result)
-            expect(textContent).toContain('Updated 1 task')
-            const structuredContent = extractStructuredContent(result)
+            expect(result.textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
             expect(structuredContent.tasks).toHaveLength(1)
         })
 
@@ -226,9 +217,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
             expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
             // Verify result structure
-            const textContent = extractTextContent(result)
-            expect(textContent).toContain('Updated 1 task')
-            const structuredContent = extractStructuredContent(result)
+            expect(result.textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
             expect(structuredContent.tasks).toHaveLength(1)
         })
 
@@ -289,9 +279,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
             })
 
             // Verify result structure
-            const textContent = extractTextContent(result)
-            expect(textContent).toContain('Updated 1 task')
-            const structuredContent = extractStructuredContent(result)
+            expect(result.textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     tasks: expect.arrayContaining([expect.objectContaining({ id: '8485093752' })]),
@@ -329,9 +318,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
             })
 
             // Verify result structure
-            const textContent = extractTextContent(result)
-            expect(textContent).toContain('Updated 1 task')
-            const structuredContent = extractStructuredContent(result)
+            expect(result.textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     tasks: expect.arrayContaining([expect.objectContaining({ id: '8485093753' })]),
@@ -427,9 +415,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
             })
 
             // Verify result structure
-            const textContent = extractTextContent(result)
-            expect(textContent).toContain('Updated 1 task')
-            const structuredContent = extractStructuredContent(result)
+            expect(result.textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     tasks: expect.arrayContaining([expect.objectContaining({ id: '8485093755' })]),
@@ -472,9 +459,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
             })
 
             // Verify result structure
-            const textContent = extractTextContent(result)
-            expect(textContent).toContain('Updated 1 task')
-            const structuredContent = extractStructuredContent(result)
+            expect(result.textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     tasks: expect.arrayContaining([
@@ -517,9 +503,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
             })
 
             // Verify result structure
-            const textContent = extractTextContent(result)
-            expect(textContent).toContain('Updated 1 task')
-            const structuredContent = extractStructuredContent(result)
+            expect(result.textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
             expect(structuredContent.tasks).toHaveLength(1)
         })
     })
@@ -553,7 +538,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
             })
 
             // Verify structured content includes updated labels
-            const structuredContent = extractStructuredContent(result)
+            const { structuredContent } = result
             expect(structuredContent.tasks).toHaveLength(1)
             expect(structuredContent.tasks).toEqual(
                 expect.arrayContaining([
@@ -757,9 +742,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
                 // Verify result structure
-                const textContent = extractTextContent(result)
-                expect(textContent).toContain('Updated 2 tasks')
-                const structuredContent = extractStructuredContent(result)
+                expect(result.textContent).toContain('Updated 2 tasks')
+                const { structuredContent } = result
                 expect(structuredContent.tasks).toHaveLength(2)
                 expect(structuredContent.totalCount).toBe(2)
             })
@@ -803,9 +787,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
                 // Verify results are returned in the correct order
-                const textContent = extractTextContent(result)
-                expect(textContent).toContain('Updated 3 tasks')
-                const structuredContent = extractStructuredContent(result)
+                expect(result.textContent).toContain('Updated 3 tasks')
+                const { structuredContent } = result
                 expect(structuredContent.tasks).toHaveLength(3)
                 expect(structuredContent.totalCount).toBe(3)
             })
@@ -833,9 +816,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
                 // Verify result structure
-                const textContent = extractTextContent(result)
-                expect(textContent).toContain('Updated 1 task')
-                const structuredContent = extractStructuredContent(result)
+                expect(result.textContent).toContain('Updated 1 task')
+                const { structuredContent } = result
                 expect(structuredContent).toEqual(
                     expect.objectContaining({
                         tasks: expect.arrayContaining([
@@ -903,9 +885,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
                 // Verify result structure
-                const textContent = extractTextContent(result)
-                expect(textContent).toContain('Updated 3 tasks')
-                const structuredContent = extractStructuredContent(result)
+                expect(result.textContent).toContain('Updated 3 tasks')
+                const { structuredContent } = result
                 expect(structuredContent.tasks).toHaveLength(3)
                 expect(structuredContent.totalCount).toBe(3)
             })
@@ -942,9 +923,8 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
                 // Verify result structure
-                const textContent = extractTextContent(result)
-                expect(textContent).toContain('Updated 1 task')
-                const structuredContent = extractStructuredContent(result)
+                expect(result.textContent).toContain('Updated 1 task')
+                const { structuredContent } = result
                 expect(structuredContent).toEqual(
                     expect.objectContaining({
                         tasks: expect.arrayContaining([
@@ -965,10 +945,9 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 expect(mockTodoistApi.updateTask).not.toHaveBeenCalled()
 
                 // Returns empty results since no moves were processed
-                const textContent = extractTextContent(result)
-                expect(textContent).toContain('Updated 0 tasks')
-                const structuredContent = extractStructuredContent(result)
-                expect(structuredContent.tasks).toBeUndefined() // Empty arrays are removed
+                expect(result.textContent).toContain('Updated 0 tasks')
+                const { structuredContent } = result
+                expect(structuredContent.tasks).toEqual([]) // Empty arrays are now kept as empty arrays
                 expect(structuredContent.totalCount).toBe(0)
             })
         })

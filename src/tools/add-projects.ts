@@ -1,6 +1,5 @@
 import type { PersonalProject, WorkspaceProject } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ProjectSchema as ProjectOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -38,16 +37,21 @@ const addProjects = {
     async execute({ projects }, client) {
         const newProjects = await Promise.all(projects.map((project) => client.addProject(project)))
         const textContent = generateTextContent({ projects: newProjects })
+        const mappedProjects = newProjects.map((project) => ({
+            ...project,
+            parentId: 'parentId' in project ? (project.parentId ?? undefined) : undefined,
+            inboxProject: 'inboxProject' in project ? project.inboxProject : false,
+        }))
 
-        return getToolOutput({
+        return {
             textContent,
             structuredContent: {
-                projects: newProjects,
-                totalCount: newProjects.length,
+                projects: mappedProjects,
+                totalCount: mappedProjects.length,
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent({ projects }: { projects: (PersonalProject | WorkspaceProject)[] }) {
     const count = projects.length

@@ -1,6 +1,5 @@
 import type { Task, UpdateTaskArgs } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { createMoveTaskArgs, mapTask } from '../tool-helpers.js'
 import { assignmentValidator } from '../utils/assignment-validator.js'
@@ -203,7 +202,7 @@ const updateTasks = {
             args,
         })
 
-        return getToolOutput({
+        return {
             textContent,
             structuredContent: {
                 tasks: mappedTasks,
@@ -214,9 +213,9 @@ const updateTasks = {
                     skippedCount: tasks.length - mappedTasks.length,
                 },
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent({
     tasks,

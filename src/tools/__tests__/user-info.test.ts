@@ -1,10 +1,6 @@
 import type { CurrentUser, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import {
-    extractStructuredContent,
-    extractTextContent,
-    TEST_ERRORS,
-} from '../../utils/test-helpers.js'
+import { TEST_ERRORS } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { userInfo } from '../user-info.js'
 
@@ -68,7 +64,7 @@ describe(`${USER_INFO} tool`, () => {
         expect(mockTodoistApi.getUser).toHaveBeenCalledWith()
 
         // Test text content contains expected information
-        const textContent = extractTextContent(result)
+        const textContent = result.textContent
         expect(textContent).toContain('User ID:** 123')
         expect(textContent).toContain('Test User')
         expect(textContent).toContain('test@example.com')
@@ -78,7 +74,7 @@ describe(`${USER_INFO} tool`, () => {
         expect(textContent).toContain('Plan:** Todoist Pro')
 
         // Test structured content
-        const structuredContent = extractStructuredContent(result)
+        const structuredContent = result.structuredContent
         expect(structuredContent).toEqual(
             expect.objectContaining({
                 type: 'user_info',
@@ -123,12 +119,12 @@ describe(`${USER_INFO} tool`, () => {
 
         const result = await userInfo.execute({}, mockTodoistApi)
 
-        const textContent = extractTextContent(result)
+        const textContent = result.textContent
         expect(textContent).toContain('UTC') // Should default to UTC
         expect(textContent).toContain('Monday (1)') // Should default to Monday
         expect(textContent).toContain('Plan:** Todoist Free')
 
-        const structuredContent = extractStructuredContent(result)
+        const structuredContent = result.structuredContent
         expect(structuredContent.timezone).toBe('UTC')
         expect(structuredContent.startDay).toBe(1)
         expect(structuredContent.startDayName).toBe('Monday')
@@ -151,11 +147,11 @@ describe(`${USER_INFO} tool`, () => {
 
         const result = await userInfo.execute({}, mockTodoistApi)
 
-        const textContent = extractTextContent(result)
+        const textContent = result.textContent
         expect(textContent).toContain('UTC') // Should fallback to UTC
         expect(textContent).toContain('Tuesday (2)')
 
-        const structuredContent = extractStructuredContent(result)
+        const structuredContent = result.structuredContent
         expect(structuredContent.timezone).toBe('UTC') // Should be UTC, not the invalid timezone
         expect(structuredContent.startDay).toBe(2)
         expect(structuredContent.startDayName).toBe('Tuesday')

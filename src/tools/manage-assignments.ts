@@ -1,6 +1,5 @@
 import type { Task } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import {
     type Assignment,
@@ -47,8 +46,8 @@ export type OperationResult = {
     taskId: string
     success: boolean
     error?: string
-    originalAssigneeId?: string | null
-    newAssigneeId?: string | null
+    originalAssigneeId?: string
+    newAssigneeId?: string
 }
 
 const OutputSchema = {
@@ -76,6 +75,7 @@ const OutputSchema = {
             failed: z.number().describe('Number of failed operations.'),
             dryRun: z.boolean().describe('Whether this was a dry run.'),
         })
+        .optional()
         .describe('Summary of the operation.'),
 }
 
@@ -133,7 +133,7 @@ const manageAssignments = {
                 dryRun,
             })
 
-            return getToolOutput({
+            return {
                 textContent,
                 structuredContent: {
                     operation,
@@ -143,7 +143,7 @@ const manageAssignments = {
                     failed: taskErrors.length,
                     dryRun,
                 },
-            })
+            }
         }
 
         // Pre-resolve fromAssigneeUser once for reassign operations
@@ -177,8 +177,8 @@ const manageAssignments = {
                 const results: OperationResult[] = validTasks.map((task) => ({
                     taskId: task.id,
                     success: true,
-                    originalAssigneeId: task.responsibleUid,
-                    newAssigneeId: null,
+                    originalAssigneeId: task.responsibleUid ?? undefined,
+                    newAssigneeId: undefined,
                 }))
 
                 const textContent = generateTextContent({
@@ -187,7 +187,7 @@ const manageAssignments = {
                     dryRun: true,
                 })
 
-                return getToolOutput({
+                return {
                     textContent,
                     structuredContent: {
                         operation,
@@ -197,7 +197,7 @@ const manageAssignments = {
                         failed: taskErrors.length,
                         dryRun: true,
                     },
-                })
+                }
             }
 
             // Execute unassign operations
@@ -207,15 +207,15 @@ const manageAssignments = {
                     return {
                         taskId: task.id,
                         success: true,
-                        originalAssigneeId: task.responsibleUid,
-                        newAssigneeId: null,
+                        originalAssigneeId: task.responsibleUid ?? undefined,
+                        newAssigneeId: undefined,
                     }
                 } catch (error) {
                     return {
                         taskId: task.id,
                         success: false,
                         error: error instanceof Error ? error.message : 'Update failed',
-                        originalAssigneeId: task.responsibleUid,
+                        originalAssigneeId: task.responsibleUid ?? undefined,
                     }
                 }
             })
@@ -229,7 +229,7 @@ const manageAssignments = {
                 dryRun: false,
             })
 
-            return getToolOutput({
+            return {
                 textContent,
                 structuredContent: {
                     operation,
@@ -239,7 +239,7 @@ const manageAssignments = {
                     failed: allResults.filter((r) => !r.success).length,
                     dryRun: false,
                 },
-            })
+            }
         }
 
         // Validate all assignments
@@ -289,7 +289,7 @@ const manageAssignments = {
                     return {
                         taskId: assignment.taskId,
                         success: true,
-                        originalAssigneeId: task?.responsibleUid || null,
+                        originalAssigneeId: task?.responsibleUid ?? undefined,
                         newAssigneeId: validation.resolvedUser.userId,
                     }
                 })
@@ -305,7 +305,7 @@ const manageAssignments = {
                             taskId: assignment.taskId || 'unknown-task',
                             success: false,
                             error: 'Invalid assignment data - missing task ID or resolved user',
-                            originalAssigneeId: task?.responsibleUid || null,
+                            originalAssigneeId: task?.responsibleUid ?? undefined,
                         }
                     }
 
@@ -317,7 +317,7 @@ const manageAssignments = {
                         return {
                             taskId: assignment.taskId,
                             success: true,
-                            originalAssigneeId: task?.responsibleUid || null,
+                            originalAssigneeId: task?.responsibleUid ?? undefined,
                             newAssigneeId: validation.resolvedUser.userId,
                         }
                     } catch (error) {
@@ -325,7 +325,7 @@ const manageAssignments = {
                             taskId: assignment.taskId,
                             success: false,
                             error: error instanceof Error ? error.message : 'Update failed',
-                            originalAssigneeId: task?.responsibleUid || null,
+                            originalAssigneeId: task?.responsibleUid ?? undefined,
                         }
                     }
                 },
@@ -344,7 +344,7 @@ const manageAssignments = {
             dryRun,
         })
 
-        return getToolOutput({
+        return {
             textContent,
             structuredContent: {
                 operation,
@@ -354,9 +354,9 @@ const manageAssignments = {
                 failed: allResults.filter((r) => !r.success).length,
                 dryRun,
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent({
     operation,

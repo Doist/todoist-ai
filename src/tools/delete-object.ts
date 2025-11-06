@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -43,34 +42,14 @@ const deleteObject = {
                 break
         }
 
-        const textContent = generateTextContent({
-            type: args.type,
-            id: args.id,
-        })
-
-        return getToolOutput({
-            textContent,
+        return {
+            textContent: `Deleted ${args.type}: id=${args.id}`,
             structuredContent: {
-                deletedEntity: {
-                    type: args.type,
-                    id: args.id,
-                },
+                deletedEntity: { type: args.type, id: args.id },
                 success: true,
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
-
-function generateTextContent({
-    type,
-    id,
-}: {
-    type: 'project' | 'section' | 'task' | 'comment'
-    id: string
-}): string {
-    const summary = `Deleted ${type}: id=${id}`
-
-    return summary
-}
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 export { deleteObject }

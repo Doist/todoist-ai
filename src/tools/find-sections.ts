@@ -1,6 +1,5 @@
 import type { Section } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { SectionSchema as SectionOutputSchema } from '../utils/output-schemas.js'
 import { summarizeList } from '../utils/response-builders.js'
@@ -52,10 +51,7 @@ const findSections = {
             ? results.filter((section: Section) => section.name.toLowerCase().includes(searchLower))
             : results
 
-        const sections = filtered.map((section) => ({
-            id: section.id,
-            name: section.name,
-        }))
+        const sections = filtered.map(({ id, name }) => ({ id, name }))
 
         const textContent = generateTextContent({
             sections,
@@ -63,16 +59,16 @@ const findSections = {
             search: args.search,
         })
 
-        return getToolOutput({
+        return {
             textContent,
             structuredContent: {
                 sections,
                 totalCount: sections.length,
                 appliedFilters: args,
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent({
     sections,

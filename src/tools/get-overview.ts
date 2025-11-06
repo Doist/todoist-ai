@@ -1,6 +1,5 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { isPersonalProject, mapTask, type Project } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
@@ -24,7 +23,7 @@ const OutputSchema = {
         .number()
         .optional()
         .describe('Total number of projects (account overview only).'),
-    totalTasks: z.number().describe('Total number of tasks.'),
+    totalTasks: z.number().optional().describe('Total number of tasks.'),
     totalSections: z
         .number()
         .optional()
@@ -42,6 +41,17 @@ const OutputSchema = {
         })
         .optional()
         .describe('Project information (project overview only).'),
+    // Additional fields that exist in structured outputs
+    hasNestedProjects: z
+        .boolean()
+        .optional()
+        .describe('Whether account has nested projects (account overview only).'),
+    inbox: z.any().optional().describe('Inbox information (account overview only).'),
+    projects: z.array(z.any()).optional().describe('List of projects (account overview only).'),
+    project: z.any().optional().describe('Project details (project overview only).'),
+    sections: z.array(z.any()).optional().describe('List of sections (project overview only).'),
+    tasks: z.array(z.any()).optional().describe('List of tasks (project overview only).'),
+    stats: z.any().optional().describe('Statistics object (project overview only).'),
 }
 
 // Types and helpers from account-overview
@@ -360,11 +370,11 @@ const getOverview = {
             ? await generateProjectOverview(client, args.projectId)
             : await generateAccountOverview(client)
 
-        return getToolOutput({
+        return {
             textContent: result.textContent,
             structuredContent: result.structuredContent,
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 export { getOverview, type AccountOverviewStructured, type ProjectOverviewStructured }

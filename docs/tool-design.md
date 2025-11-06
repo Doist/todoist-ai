@@ -23,10 +23,10 @@ We use **specialized workflow tools** instead of 30+ API-endpoint tools.
 // update-projects: modifies existing projects
 
 // Always return both structured data AND human-readable text with next steps
-return getToolOutput({
+return {
     textContent: `Action completed: ${result}\n${formatNextSteps(suggestions)}`,
     structuredContent: { data, metadata },
-});
+};
 ```
 
 ## Key Design Decisions
@@ -64,8 +64,8 @@ return getToolOutput({
 
 **Exception to the Design Philosophy**: The `search` and `fetch` tools follow the [OpenAI MCP specification](https://platform.openai.com/docs/mcp) which requires specific return formats:
 
-- **`search`**: Returns JSON-encoded array of results with `id`, `title`, `url`
-- **`fetch`**: Returns JSON-encoded object with `id`, `title`, `text`, `url`, `metadata`
+-   **`search`**: Returns JSON-encoded array of results with `id`, `title`, `url`
+-   **`fetch`**: Returns JSON-encoded object with `id`, `title`, `text`, `url`, `metadata`
 
 These tools return raw JSON strings instead of rich responses with next steps, as required by OpenAI's protocol. They use composite IDs (`task:{id}` or `project:{id}`) to distinguish between entity types.
 

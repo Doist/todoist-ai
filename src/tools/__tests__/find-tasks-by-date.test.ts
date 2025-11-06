@@ -1,12 +1,9 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, type MockedFunction, vi } from 'vitest'
-import { getTasksByFilter } from '../../tool-helpers.js'
+import { getTasksByFilter, MappedTask } from '../../tool-helpers.js'
 import {
     createMappedTask,
     createMockUser,
-    extractStructuredContent,
-    extractTextContent,
-    type MappedTask,
     TEST_ERRORS,
     TEST_IDS,
 } from '../../utils/test-helpers.js'
@@ -95,7 +92,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 limit: 50,
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
         })
 
@@ -116,7 +113,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 limit: 50,
             })
             // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
 
         it.each([
@@ -161,7 +158,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 limit: params.limit,
             })
             // Verify result is a concise summary
-            expect(extractTextContent(result)).toMatchSnapshot()
+            expect(result.textContent).toMatchSnapshot()
         })
     })
 
@@ -217,7 +214,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             expect(mockGetTasksByFilter).toHaveBeenCalledTimes(1)
             if (shouldReturnResult) {
                 // Verify result is a concise summary
-                expect(extractTextContent(result)).toMatchSnapshot()
+                expect(result.textContent).toMatchSnapshot()
             }
         })
     })
@@ -243,7 +240,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
         })
 
@@ -263,7 +260,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
         })
 
@@ -276,7 +273,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Great job! No tasks for today or overdue')
         })
@@ -294,7 +291,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 mockTodoistApi,
             )
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain("Expand date range with larger 'daysCount'")
             expect(textContent).toContain("Check today's tasks with startDate='today'")
@@ -367,7 +364,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 })
             }
 
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent.appliedFilters).toEqual(
                 expect.objectContaining({
                     labels: params.labels,
@@ -425,7 +422,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 limit: 25,
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
         })
     })
@@ -444,7 +441,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     id: TEST_IDS.TASK_2,
                     content: 'Unassigned task',
                     dueDate: '2025-08-15',
-                    responsibleUid: null, // Unassigned
+                    responsibleUid: undefined, // Unassigned
                 }),
             ]
 
@@ -469,7 +466,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 limit: 50,
             })
 
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             // Should only return tasks 1 and 2, not task 3
             expect(structuredContent.tasks as MappedTask[]).toHaveLength(2)
             expect((structuredContent.tasks as MappedTask[]).map((t: MappedTask) => t.id)).toEqual([
@@ -491,7 +488,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     id: TEST_IDS.TASK_2,
                     content: 'Unassigned overdue task',
                     dueDate: '2025-08-10',
-                    responsibleUid: null, // Unassigned
+                    responsibleUid: undefined, // Unassigned
                 }),
             ]
 
@@ -516,7 +513,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 limit: 50,
             })
 
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             // Should only return tasks 1 and 2, not task 3
             expect(structuredContent.tasks).toHaveLength(2)
             expect((structuredContent.tasks as MappedTask[]).map((t: MappedTask) => t.id)).toEqual([
@@ -564,7 +561,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 limit: 50,
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toContain('assigned to john@example.com')
             expect(textContent).toMatchSnapshot()
         })

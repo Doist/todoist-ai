@@ -87,7 +87,7 @@ const CommentSchema = z.object({
  * Schema for an activity event object returned by tools
  */
 const ActivityEventSchema = z.object({
-    id: z.string().describe('The unique ID of the activity event.'),
+    id: z.string().optional().describe('The unique ID of the activity event.'),
     objectType: z
         .string()
         .describe('The type of object this event relates to (task, project, etc).'),
@@ -97,7 +97,7 @@ const ActivityEventSchema = z.object({
     parentProjectId: z.string().optional().describe('The ID of the parent project.'),
     parentItemId: z.string().optional().describe('The ID of the parent item.'),
     initiatorId: z.string().optional().describe('The ID of the user who initiated this event.'),
-    extraData: z.record(z.unknown()).describe('Additional event data.'),
+    extraData: z.record(z.unknown()).optional().describe('Additional event data.'),
 })
 
 /**

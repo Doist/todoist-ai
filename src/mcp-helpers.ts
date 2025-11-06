@@ -32,26 +32,31 @@ function getToolOutput<StructuredContent extends Record<string, unknown>>({
     textContent,
     structuredContent,
 }: {
-    textContent: string
-    structuredContent: StructuredContent
+    textContent: string | undefined
+    structuredContent: StructuredContent | undefined
 }) {
     // Remove null fields from structured content before returning
     const sanitizedContent = removeNullFields(structuredContent)
 
-    if (USE_STRUCTURED_CONTENT) {
-        return {
-            content: [{ type: 'text' as const, text: textContent }],
-            structuredContent: sanitizedContent,
+    // Always include structuredContent when available since all tools have outputSchema
+    const result: Record<string, unknown> = {}
+    if (textContent) result.content = [{ type: 'text' as const, text: textContent }]
+    if (structuredContent) result.structuredContent = sanitizedContent
+
+    // Legacy support: also include JSON in content when USE_STRUCTURED_CONTENT is false
+    if (!USE_STRUCTURED_CONTENT && structuredContent) {
+        const json = JSON.stringify(sanitizedContent)
+        if (!result.content) {
+            result.content = []
         }
+        ;(result.content as Array<{ type: 'text'; text: string; mimeType?: string }>).push({
+            type: 'text',
+            mimeType: 'application/json',
+            text: json,
+        })
     }
 
-    const json = JSON.stringify(sanitizedContent)
-    return {
-        content: [
-            { type: 'text' as const, text: textContent },
-            { type: 'text' as const, mimeType: 'application/json', text: json },
-        ],
-    }
+    return result
 }
 
 function getErrorOutput(error: string) {
@@ -78,13 +83,13 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
         _context,
     ) => {
         try {
-            const result = await tool.execute(args as z.infer<z.ZodObject<Params>>, client)
-            return result
+            const { textContent, structuredContent } = await tool.execute(
+                args as z.infer<z.ZodObject<Params>>,
+                client,
+            )
+            return getToolOutput({ textContent, structuredContent })
         } catch (error) {
-            console.error(`Error executing tool ${tool.name}:`, {
-                args,
-                error,
-            })
+            console.error(`Error executing tool ${tool.name}:`, { args, error })
             const message = error instanceof Error ? error.message : 'An unknown error occurred'
             return getErrorOutput(message)
         }
@@ -102,4 +107,4 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
     )
 }
 
-export { registerTool, getErrorOutput, getToolOutput }
+export { registerTool }

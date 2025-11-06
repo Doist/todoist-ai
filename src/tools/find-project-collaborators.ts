@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { type Project } from '../tool-helpers.js'
 import { CollaboratorSchema } from '../utils/output-schemas.js'
@@ -58,7 +57,7 @@ const findProjectCollaborators = {
             if (!project.isShared) {
                 const textContent = `Project "${projectName}" is not shared and has no collaborators.\n\n**Next steps:**\n• Share the project to enable collaboration\n• Use ${ADD_TASKS} and ${UPDATE_TASKS} for assignment features once shared`
 
-                return getToolOutput({
+                return {
                     textContent,
                     structuredContent: {
                         collaborators: [],
@@ -70,7 +69,7 @@ const findProjectCollaborators = {
                         totalCount: 0,
                         appliedFilters: args,
                     },
-                })
+                }
             }
         } catch (error) {
             throw new Error(
@@ -84,7 +83,7 @@ const findProjectCollaborators = {
         if (allCollaborators.length === 0) {
             const textContent = `Project "${projectName}" has no collaborators or collaborator data is not accessible.\n\n**Next steps:**\n• Check project sharing settings\n• Ensure you have permission to view collaborators\n• Try refreshing or re-sharing the project`
 
-            return getToolOutput({
+            return {
                 textContent,
                 structuredContent: {
                     collaborators: [],
@@ -96,7 +95,7 @@ const findProjectCollaborators = {
                     totalCount: 0,
                     appliedFilters: args,
                 },
-            })
+            }
         }
 
         // Filter collaborators if search term provided
@@ -117,7 +116,7 @@ const findProjectCollaborators = {
             totalAvailable: allCollaborators.length,
         })
 
-        return getToolOutput({
+        return {
             textContent,
             structuredContent: {
                 collaborators: filteredCollaborators,
@@ -130,9 +129,9 @@ const findProjectCollaborators = {
                 totalAvailable: allCollaborators.length,
                 appliedFilters: args,
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent({
     collaborators,

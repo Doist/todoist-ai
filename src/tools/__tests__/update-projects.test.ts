@@ -1,10 +1,6 @@
 import type { PersonalProject, TodoistApi, WorkspaceProject } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import {
-    createMockProject,
-    extractStructuredContent,
-    extractTextContent,
-} from '../../utils/test-helpers.js'
+import { createMockProject } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { updateProjects } from '../update-projects.js'
 
@@ -55,13 +51,13 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
                 name: 'Updated Project Name',
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Updated 1 project:')
             expect(textContent).toContain('Updated Project Name (id=existing-project-123)')
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     projects: expect.arrayContaining([
@@ -125,7 +121,7 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
                 viewStyle: 'board',
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Updated 1 project:')
             expect(textContent).toContain('Updated Favorite Project (id=project-123)')
@@ -170,7 +166,7 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
                 name: 'Updated Third Project',
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Updated 3 projects:')
             expect(textContent).toContain('Updated First Project (id=project-1)')
@@ -178,7 +174,7 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
             expect(textContent).toContain('Updated Third Project (id=project-3)')
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     projects: expect.arrayContaining([
@@ -223,13 +219,13 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
                 name: 'Updated Project',
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Updated 1 project (1 skipped - no changes):')
             expect(textContent).toContain('Updated Project (id=project-1)')
 
             // Verify structured content reflects skipped count
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     appliedOperations: {

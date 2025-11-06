@@ -1,11 +1,6 @@
 import type { PersonalProject, TodoistApi, WorkspaceProject } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import {
-    createMockProject,
-    extractStructuredContent,
-    extractTextContent,
-    TEST_IDS,
-} from '../../utils/test-helpers.js'
+import { createMockProject, TEST_IDS } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { addProjects } from '../add-projects.js'
 
@@ -42,14 +37,14 @@ describe(`${ADD_PROJECTS} tool`, () => {
                 name: 'test-abc123def456-project',
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Added 1 project:')
             expect(textContent).toContain('test-abc123def456-project')
             expect(textContent).toContain(`id=${TEST_IDS.PROJECT_TEST}`)
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     projects: [
@@ -90,7 +85,7 @@ describe(`${ADD_PROJECTS} tool`, () => {
                 viewStyle: undefined,
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Added 1 project:')
             expect(textContent).toContain('My Blue Project')
@@ -118,7 +113,7 @@ describe(`${ADD_PROJECTS} tool`, () => {
                 viewStyle: 'board',
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Added 1 project:')
             expect(textContent).toContain('Board Project')
@@ -144,7 +139,7 @@ describe(`${ADD_PROJECTS} tool`, () => {
                 parentId: 'project-parent',
             })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Added 1 project:')
             expect(textContent).toContain('Child Project')
@@ -184,7 +179,7 @@ describe(`${ADD_PROJECTS} tool`, () => {
             expect(mockTodoistApi.addProject).toHaveBeenNthCalledWith(2, { name: 'Second Project' })
             expect(mockTodoistApi.addProject).toHaveBeenNthCalledWith(3, { name: 'Third Project' })
 
-            const textContent = extractTextContent(result)
+            const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Added 3 projects:')
             expect(textContent).toContain('First Project (id=project-1)')
@@ -192,7 +187,7 @@ describe(`${ADD_PROJECTS} tool`, () => {
             expect(textContent).toContain('Third Project (id=project-3)')
 
             // Verify structured content
-            const structuredContent = extractStructuredContent(result)
+            const structuredContent = result.structuredContent
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     projects: expect.arrayContaining([

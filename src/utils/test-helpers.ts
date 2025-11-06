@@ -1,28 +1,5 @@
 import type { CurrentUser, PersonalProject, Section, Task } from '@doist/todoist-api-typescript'
-import { getToolOutput } from '../mcp-helpers'
-
-/**
- * Mapped task type matching the output of mapTask function.
- * Used for filter-based query test mocks.
- */
-export type MappedTask = {
-    id: string
-    content: string
-    description: string
-    dueDate: string | undefined
-    recurring: string | boolean
-    deadlineDate: string | undefined
-    priority: number
-    projectId: string
-    sectionId: string | null
-    parentId: string | null
-    labels: string[]
-    duration: string | null
-    responsibleUid: string | null
-    assignedByUid: string | null
-    checked: boolean
-    completedAt: string | null
-}
+import { MappedTask } from '../tool-helpers'
 
 /**
  * Creates a mock Task with all required properties and sensible defaults.
@@ -140,14 +117,14 @@ export function createMappedTask(overrides: Partial<MappedTask> = {}): MappedTas
         deadlineDate: undefined,
         priority: 1,
         projectId: TEST_IDS.PROJECT_TEST,
-        sectionId: null,
-        parentId: null,
+        sectionId: undefined,
+        parentId: undefined,
         labels: [],
-        duration: null,
-        responsibleUid: null,
-        assignedByUid: null,
+        duration: undefined,
+        responsibleUid: undefined,
+        assignedByUid: undefined,
         checked: false,
-        completedAt: null,
+        completedAt: undefined,
         ...overrides,
     }
 }
@@ -169,64 +146,6 @@ export function createTestCases<T, E = unknown>(
     cases: Array<{ name: string; input: T; expected?: E }>,
 ) {
     return cases
-}
-
-/**
- * Extracts the text content from a tool output for snapshot testing.
- * This allows tests to match against just the text content while tools return structured output.
- */
-export function extractTextContent(toolOutput: unknown): string {
-    if (typeof toolOutput === 'string') {
-        return toolOutput
-    }
-
-    if (typeof toolOutput === 'object' && toolOutput !== null && 'content' in toolOutput) {
-        const output = toolOutput as { content: unknown }
-        if (
-            Array.isArray(output.content) &&
-            output.content[0] &&
-            typeof output.content[0] === 'object' &&
-            output.content[0] !== null &&
-            'type' in output.content[0] &&
-            'text' in output.content[0] &&
-            output.content[0].type === 'text'
-        ) {
-            return output.content[0].text as string
-        }
-    }
-
-    throw new Error('Expected tool output to have text content')
-}
-
-/**
- * Extracts the structured content from a tool output for testing.
- * This handles both the new `structuredContent` field and legacy JSON-encoded content.
- */
-export function extractStructuredContent(
-    output: ReturnType<typeof getToolOutput>,
-): Record<string, unknown> {
-    // Check for new structuredContent field first
-    if ('structuredContent' in output && typeof output.structuredContent === 'object') {
-        return output.structuredContent as Record<string, unknown>
-    }
-
-    // Fall back to checking for JSON content in the content array
-    if ('content' in output && Array.isArray(output.content)) {
-        for (const item of output.content) {
-            if (
-                typeof item === 'object' &&
-                item !== null &&
-                'type' in item &&
-                'text' in item &&
-                item.type === 'text' &&
-                item.mimeType === 'application/json'
-            ) {
-                return JSON.parse(item.text) as Record<string, unknown>
-            }
-        }
-    }
-
-    throw new Error('Expected tool output to have structured content')
 }
 
 /**

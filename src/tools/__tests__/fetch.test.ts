@@ -44,12 +44,8 @@ describe(`${FETCH} tool`, () => {
             // Verify API was called correctly
             expect(mockTodoistApi.getTask).toHaveBeenCalledWith(TEST_IDS.TASK_1)
 
-            // Verify result structure
-            expect(result.content).toHaveLength(1)
-            expect(result.content[0]?.type).toBe('text')
-
             // Parse the JSON response
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse).toEqual({
                 id: `task:${TEST_IDS.TASK_1}`,
                 title: 'Important meeting with team',
@@ -59,13 +55,8 @@ describe(`${FETCH} tool`, () => {
                     priority: 2,
                     projectId: TEST_IDS.PROJECT_WORK,
                     sectionId: TEST_IDS.SECTION_1,
-                    parentId: null,
                     recurring: false,
-                    duration: null,
-                    responsibleUid: null,
-                    assignedByUid: null,
                     checked: false,
-                    completedAt: null,
                 },
             })
         })
@@ -83,20 +74,14 @@ describe(`${FETCH} tool`, () => {
 
             const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_2}` }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse.title).toBe('Simple task')
             expect(jsonResponse.text).toBe('Simple task')
             expect(jsonResponse.metadata).toEqual({
                 priority: 1,
                 projectId: TEST_IDS.PROJECT_TEST,
-                sectionId: null,
-                parentId: null,
                 recurring: false,
-                duration: null,
-                responsibleUid: null,
-                assignedByUid: null,
                 checked: false,
-                completedAt: null,
             })
         })
 
@@ -118,7 +103,7 @@ describe(`${FETCH} tool`, () => {
 
             const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_3}` }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse.metadata.recurring).toBe('every monday')
         })
 
@@ -136,7 +121,7 @@ describe(`${FETCH} tool`, () => {
 
             const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse.metadata.duration).toBe('1h30m')
         })
 
@@ -152,7 +137,7 @@ describe(`${FETCH} tool`, () => {
 
             const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse.metadata.responsibleUid).toBe('user-123')
             expect(jsonResponse.metadata.assignedByUid).toBe('user-456')
         })
@@ -181,12 +166,8 @@ describe(`${FETCH} tool`, () => {
             // Verify API was called correctly
             expect(mockTodoistApi.getProject).toHaveBeenCalledWith(TEST_IDS.PROJECT_WORK)
 
-            // Verify result structure
-            expect(result.content).toHaveLength(1)
-            expect(result.content[0]?.type).toBe('text')
-
             // Parse the JSON response
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse).toEqual({
                 id: `project:${TEST_IDS.PROJECT_WORK}`,
                 title: 'Work Project',
@@ -196,7 +177,6 @@ describe(`${FETCH} tool`, () => {
                     color: 'blue',
                     isFavorite: true,
                     isShared: true,
-                    parentId: null,
                     inboxProject: false,
                     viewStyle: 'board',
                 },
@@ -218,7 +198,7 @@ describe(`${FETCH} tool`, () => {
                 mockTodoistApi,
             )
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse.title).toBe('Simple Project')
             expect(jsonResponse.text).toBe('Simple Project')
             expect(jsonResponse.metadata.isFavorite).toBe(false)
@@ -239,7 +219,7 @@ describe(`${FETCH} tool`, () => {
                 mockTodoistApi,
             )
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse.metadata.inboxProject).toBe(true)
         })
 
@@ -254,80 +234,61 @@ describe(`${FETCH} tool`, () => {
 
             const result = await fetch.execute({ id: 'project:sub-project-id' }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse.metadata.parentId).toBe(TEST_IDS.PROJECT_WORK)
         })
     })
 
     describe('error handling', () => {
-        it('should return error response for invalid ID format (missing colon)', async () => {
-            const result = await fetch.execute({ id: 'invalid-id' }, mockTodoistApi)
-
-            expect(result.isError).toBe(true)
-            expect(result.content[0]?.text).toContain('Invalid ID format')
+        it('should throw error for invalid ID format (missing colon)', async () => {
+            await expect(fetch.execute({ id: 'invalid-id' }, mockTodoistApi)).rejects.toThrow(
+                'Invalid ID format',
+            )
         })
 
-        it('should return error response for invalid ID format (missing type)', async () => {
-            const result = await fetch.execute({ id: ':8485093748' }, mockTodoistApi)
-
-            expect(result.isError).toBe(true)
-            expect(result.content[0]?.text).toContain('Invalid ID format')
+        it('should throw error for invalid ID format (missing type)', async () => {
+            await expect(fetch.execute({ id: ':8485093748' }, mockTodoistApi)).rejects.toThrow(
+                'Invalid ID format',
+            )
         })
 
-        it('should return error response for invalid ID format (missing object ID)', async () => {
-            const result = await fetch.execute({ id: 'task:' }, mockTodoistApi)
-
-            expect(result.isError).toBe(true)
-            expect(result.content[0]?.text).toContain('Invalid ID format')
+        it('should throw error for invalid ID format (missing object ID)', async () => {
+            await expect(fetch.execute({ id: 'task:' }, mockTodoistApi)).rejects.toThrow(
+                'Invalid ID format',
+            )
         })
 
-        it('should return error response for invalid type', async () => {
-            const result = await fetch.execute({ id: 'section:123' }, mockTodoistApi)
-
-            expect(result.isError).toBe(true)
-            expect(result.content[0]?.text).toContain('Invalid ID format')
+        it('should throw error for invalid type', async () => {
+            await expect(fetch.execute({ id: 'section:123' }, mockTodoistApi)).rejects.toThrow(
+                'Invalid ID format',
+            )
         })
 
-        it('should return error response for task fetch failure', async () => {
+        it('should throw error for task fetch failure', async () => {
             mockTodoistApi.getTask.mockRejectedValue(new Error('Task not found'))
 
-            const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi)
-
-            expect(result.isError).toBe(true)
-            expect(result.content[0]?.text).toBe('Task not found')
+            await expect(
+                fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi),
+            ).rejects.toThrow('Task not found')
         })
 
-        it('should return error response for project fetch failure', async () => {
+        it('should throw error for project fetch failure', async () => {
             mockTodoistApi.getProject.mockRejectedValue(new Error('Project not found'))
 
-            const result = await fetch.execute(
-                { id: `project:${TEST_IDS.PROJECT_WORK}` },
-                mockTodoistApi,
-            )
-
-            expect(result.isError).toBe(true)
-            expect(result.content[0]?.text).toBe('Project not found')
+            await expect(
+                fetch.execute({ id: `project:${TEST_IDS.PROJECT_WORK}` }, mockTodoistApi),
+            ).rejects.toThrow('Project not found')
         })
     })
 
     describe('OpenAI MCP spec compliance', () => {
-        it('should return exactly one content item with type "text"', async () => {
-            const mockTask = createMockTask({ id: TEST_IDS.TASK_1, content: 'Test' })
-            mockTodoistApi.getTask.mockResolvedValue(mockTask)
-
-            const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi)
-
-            expect(result.content).toHaveLength(1)
-            expect(result.content[0]?.type).toBe('text')
-        })
-
         it('should return valid JSON string in text field', async () => {
             const mockTask = createMockTask({ id: TEST_IDS.TASK_1, content: 'Test' })
             mockTodoistApi.getTask.mockResolvedValue(mockTask)
 
             const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi)
 
-            expect(() => JSON.parse(result.content[0]?.text ?? '{}')).not.toThrow()
+            expect(() => JSON.parse(result.textContent ?? '{}')).not.toThrow()
         })
 
         it('should include all required fields (id, title, text, url)', async () => {
@@ -336,7 +297,7 @@ describe(`${FETCH} tool`, () => {
 
             const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse).toHaveProperty('id')
             expect(jsonResponse).toHaveProperty('title')
             expect(jsonResponse).toHaveProperty('text')
@@ -353,7 +314,7 @@ describe(`${FETCH} tool`, () => {
 
             const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.content[0]?.text ?? '{}')
+            const jsonResponse = JSON.parse(result.textContent ?? '{}')
             expect(jsonResponse).toHaveProperty('metadata')
             expect(typeof jsonResponse.metadata).toBe('object')
         })

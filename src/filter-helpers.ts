@@ -90,7 +90,7 @@ export function buildResponsibleUserQueryFilter({
  * @param currentUserId - The current authenticated user's ID
  * @returns Filtered array of tasks
  */
-export function filterTasksByResponsibleUser<T extends { responsibleUid: string | null }>({
+export function filterTasksByResponsibleUser<T extends { responsibleUid?: string }>({
     tasks,
     resolvedAssigneeId,
     currentUserId,

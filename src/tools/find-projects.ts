@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { getToolOutput } from '../mcp-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapProject } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
@@ -56,22 +55,18 @@ const findProjects = {
             : results
         const projects = filtered.map(mapProject)
 
-        return getToolOutput({
-            textContent: generateTextContent({
-                projects,
-                args,
-                nextCursor,
-            }),
+        return {
+            textContent: generateTextContent({ projects, args, nextCursor }),
             structuredContent: {
                 projects,
-                nextCursor,
+                nextCursor: nextCursor ?? undefined,
                 totalCount: projects.length,
                 hasMore: Boolean(nextCursor),
                 appliedFilters: args,
             },
-        })
+        }
     },
-} satisfies TodoistTool<typeof ArgsSchema>
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent({
     projects,
