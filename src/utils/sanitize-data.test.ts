@@ -47,7 +47,7 @@ describe('removeNullFields', () => {
         expect(result).toBeNull()
     })
 
-    it('should remove empty objects and empty arrays', () => {
+    it('should remove empty objects but keep empty arrays', () => {
         const input = {
             something: 'hello',
             another: {},
@@ -58,10 +58,11 @@ describe('removeNullFields', () => {
 
         expect(result).toEqual({
             something: 'hello',
+            yetAnother: [],
         })
     })
 
-    it('should remove empty objects and empty arrays in nested structures', () => {
+    it('should remove empty objects but keep empty arrays in nested structures', () => {
         const input = {
             name: 'Test',
             metadata: {},
@@ -84,14 +85,19 @@ describe('removeNullFields', () => {
 
         expect(result).toEqual({
             name: 'Test',
+            tags: [],
             nested: {
                 data: 'value',
+                emptyArr: [],
             },
-            items: [{ id: 1, data: 'test' }, { id: 2 }],
+            items: [
+                { id: 1, data: 'test' },
+                { id: 2, list: [] },
+            ],
         })
     })
 
-    it('should keep arrays with values and objects with properties', () => {
+    it('should keep both empty and non-empty arrays, but remove empty objects', () => {
         const input = {
             emptyArray: [],
             arrayWithValues: [1, 2, 3],
@@ -102,6 +108,7 @@ describe('removeNullFields', () => {
         const result = removeNullFields(input)
 
         expect(result).toEqual({
+            emptyArray: [],
             arrayWithValues: [1, 2, 3],
             objectWithProps: { key: 'value' },
         })
