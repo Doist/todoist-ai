@@ -19,7 +19,7 @@ const TaskSchema = z.object({
     projectId: z.string().describe('The ID of the project this task belongs to.'),
     sectionId: z.string().optional().describe('The ID of the section this task belongs to.'),
     parentId: z.string().optional().describe('The ID of the parent task (for subtasks).'),
-    labels: z.array(z.string()).describe('The labels attached to this task.'),
+    labels: z.array(z.string()).optional().describe('The labels attached to this task.'),
     duration: z.string().optional().describe('The duration of the task (e.g., "2h30m").'),
     responsibleUid: z
         .string()
@@ -80,7 +80,7 @@ const CommentSchema = z.object({
     projectId: z.string().optional().describe('The ID of the project this comment belongs to.'),
     content: z.string().describe('The content of the comment.'),
     postedAt: z.string().describe('When the comment was posted (ISO 8601 format).'),
-    attachment: AttachmentSchema.optional().describe('File attachment information, if any.'),
+    fileAttachment: AttachmentSchema.optional().describe('File attachment information, if any.'),
 })
 
 /**
