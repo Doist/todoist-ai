@@ -1,5 +1,6 @@
 import type {
     ActivityEvent,
+    Comment,
     MoveTaskArgs,
     PersonalProject,
     Task,
@@ -114,6 +115,32 @@ function mapProject(project: Project) {
 }
 
 /**
+ * Map a single Todoist comment to a more structured format, for LLM consumption.
+ * @param comment - The comment to map.
+ * @returns The mapped comment.
+ */
+function mapComment(comment: Comment) {
+    return {
+        id: comment.id,
+        taskId: comment.taskId ?? undefined,
+        projectId: comment.projectId ?? undefined,
+        content: comment.content,
+        postedAt: comment.postedAt,
+        fileAttachment: comment.fileAttachment
+            ? {
+                  resourceType: comment.fileAttachment.resourceType,
+                  fileName: comment.fileAttachment.fileName ?? undefined,
+                  fileSize: comment.fileAttachment.fileSize ?? undefined,
+                  fileType: comment.fileAttachment.fileType ?? undefined,
+                  fileUrl: comment.fileAttachment.fileUrl ?? undefined,
+                  fileDuration: comment.fileAttachment.fileDuration ?? undefined,
+                  uploadState: comment.fileAttachment.uploadState ?? undefined,
+              }
+            : undefined,
+    }
+}
+
+/**
  * Map a single Todoist activity event to a more structured format, for LLM consumption.
  * @param event - The activity event to map.
  * @returns The mapped activity event.
@@ -171,5 +198,5 @@ async function getTasksByFilter({
     }
 }
 
-export { getTasksByFilter, mapActivityEvent, mapProject, mapTask }
+export { getTasksByFilter, mapActivityEvent, mapComment, mapProject, mapTask }
 export type { MappedTask }
