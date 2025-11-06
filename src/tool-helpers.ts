@@ -82,16 +82,18 @@ function mapTask(task: Task) {
         deadlineDate: task.deadline?.date,
         priority: task.priority,
         projectId: task.projectId,
-        sectionId: task.sectionId,
-        parentId: task.parentId,
+        sectionId: task.sectionId ?? undefined,
+        parentId: task.parentId ?? undefined,
         labels: task.labels,
-        duration: task.duration ? formatDuration(task.duration.amount) : null,
-        responsibleUid: task.responsibleUid,
-        assignedByUid: task.assignedByUid,
+        duration: task.duration ? formatDuration(task.duration.amount) : undefined,
+        responsibleUid: task.responsibleUid ?? undefined,
+        assignedByUid: task.assignedByUid ?? undefined,
         checked: task.checked,
-        completedAt: task.completedAt,
+        completedAt: task.completedAt ?? undefined,
     }
 }
+
+type MappedTask = ReturnType<typeof mapTask>
 
 /**
  * Map a single Todoist project to a more structured format, for LLM consumption.
@@ -105,7 +107,7 @@ function mapProject(project: Project) {
         color: project.color,
         isFavorite: project.isFavorite,
         isShared: project.isShared,
-        parentId: isPersonalProject(project) ? (project.parentId ?? null) : null,
+        parentId: isPersonalProject(project) ? (project.parentId ?? undefined) : undefined,
         inboxProject: isPersonalProject(project) ? (project.inboxProject ?? false) : false,
         viewStyle: project.viewStyle,
     }
@@ -118,15 +120,15 @@ function mapProject(project: Project) {
  */
 function mapActivityEvent(event: ActivityEvent) {
     return {
-        id: event.id,
+        id: event.id ?? undefined,
         objectType: event.objectType,
         objectId: event.objectId,
         eventType: event.eventType,
         eventDate: event.eventDate,
-        parentProjectId: event.parentProjectId,
-        parentItemId: event.parentItemId,
-        initiatorId: event.initiatorId,
-        extraData: event.extraData,
+        parentProjectId: event.parentProjectId ?? undefined,
+        parentItemId: event.parentItemId ?? undefined,
+        initiatorId: event.initiatorId ?? undefined,
+        extraData: event.extraData ?? undefined,
     }
 }
 
@@ -170,3 +172,4 @@ async function getTasksByFilter({
 }
 
 export { getTasksByFilter, mapActivityEvent, mapProject, mapTask }
+export type { MappedTask }

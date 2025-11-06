@@ -7,12 +7,11 @@ import {
     resolveResponsibleUser,
 } from '../filter-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { getTasksByFilter, mapTask } from '../tool-helpers.js'
+import { getTasksByFilter, type MappedTask, mapTask } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
-import { MappedTask } from '../utils/test-helpers.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const { FIND_COMPLETED_TASKS, ADD_TASKS } = ToolNames
@@ -55,7 +54,7 @@ const ArgsSchema = {
 
 const OutputSchema = {
     tasks: z.array(TaskOutputSchema).describe('The found tasks.'),
-    nextCursor: z.string().nullable().describe('Cursor for the next page of results.'),
+    nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
     totalCount: z.number().describe('The total number of tasks in this page.'),
     hasMore: z.boolean().describe('Whether there are more results available.'),
     appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
@@ -161,7 +160,7 @@ const findTasks = {
                 textContent,
                 structuredContent: {
                     tasks: filteredTasks,
-                    nextCursor,
+                    nextCursor: nextCursor ?? undefined,
                     totalCount: filteredTasks.length,
                     hasMore: Boolean(nextCursor),
                     appliedFilters: args,
@@ -171,19 +170,19 @@ const findTasks = {
 
         // If only responsibleUid is provided (without containers), use assignee filter
         if (resolvedAssigneeId && !searchText && !hasLabels) {
-            const tasks = await client.getTasksByFilter({
+            const { results: tasks, nextCursor } = await client.getTasksByFilter({
                 query: `assigned to: ${assigneeEmail}`,
                 lang: 'en',
                 limit,
                 cursor: cursor ?? null,
             })
 
-            const mappedTasks = tasks.results.map(mapTask)
+            const mappedTasks = tasks.map(mapTask)
 
             const textContent = generateTextContent({
                 tasks: mappedTasks,
                 args,
-                nextCursor: tasks.nextCursor,
+                nextCursor,
                 isContainerSearch: false,
                 assigneeEmail,
             })
@@ -192,9 +191,9 @@ const findTasks = {
                 textContent,
                 structuredContent: {
                     tasks: mappedTasks,
-                    nextCursor: tasks.nextCursor,
+                    nextCursor: nextCursor ?? undefined,
                     totalCount: mappedTasks.length,
-                    hasMore: Boolean(tasks.nextCursor),
+                    hasMore: Boolean(nextCursor),
                     appliedFilters: args,
                 },
             }
@@ -213,24 +212,24 @@ const findTasks = {
         query = appendToQuery(query, labelsFilter)
 
         // Execute filter query
-        const result = await getTasksByFilter({
+        const { tasks, nextCursor } = await getTasksByFilter({
             client,
             query,
             cursor: args.cursor,
             limit: args.limit,
         })
 
-        const tasks = filterTasksByResponsibleUser({
-            tasks: result.tasks,
+        const filteredTasks = filterTasksByResponsibleUser({
+            tasks,
             resolvedAssigneeId,
             currentUserId: todoistUser.id,
             responsibleUserFiltering,
         })
 
         const textContent = generateTextContent({
-            tasks,
+            tasks: filteredTasks,
             args,
-            nextCursor: result.nextCursor,
+            nextCursor,
             isContainerSearch: false,
             assigneeEmail,
         })
@@ -238,10 +237,10 @@ const findTasks = {
         return {
             textContent,
             structuredContent: {
-                tasks,
-                nextCursor: result.nextCursor,
+                tasks: filteredTasks,
+                nextCursor: nextCursor ?? undefined,
                 totalCount: tasks.length,
-                hasMore: Boolean(result.nextCursor),
+                hasMore: Boolean(nextCursor),
                 appliedFilters: args,
             },
         }

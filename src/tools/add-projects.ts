@@ -39,7 +39,7 @@ const addProjects = {
         const textContent = generateTextContent({ projects: newProjects })
         const mappedProjects = newProjects.map((project) => ({
             ...project,
-            parentId: 'parentId' in project ? project.parentId : null,
+            parentId: 'parentId' in project ? (project.parentId ?? undefined) : undefined,
             inboxProject: 'inboxProject' in project ? project.inboxProject : false,
         }))
 

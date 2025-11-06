@@ -55,13 +55,8 @@ describe(`${FETCH} tool`, () => {
                     priority: 2,
                     projectId: TEST_IDS.PROJECT_WORK,
                     sectionId: TEST_IDS.SECTION_1,
-                    parentId: null,
                     recurring: false,
-                    duration: null,
-                    responsibleUid: null,
-                    assignedByUid: null,
                     checked: false,
-                    completedAt: null,
                 },
             })
         })
@@ -85,14 +80,8 @@ describe(`${FETCH} tool`, () => {
             expect(jsonResponse.metadata).toEqual({
                 priority: 1,
                 projectId: TEST_IDS.PROJECT_TEST,
-                sectionId: null,
-                parentId: null,
                 recurring: false,
-                duration: null,
-                responsibleUid: null,
-                assignedByUid: null,
                 checked: false,
-                completedAt: null,
             })
         })
 
@@ -188,7 +177,6 @@ describe(`${FETCH} tool`, () => {
                     color: 'blue',
                     isFavorite: true,
                     isShared: true,
-                    parentId: null,
                     inboxProject: false,
                     viewStyle: 'board',
                 },

@@ -1,27 +1,5 @@
 import type { CurrentUser, PersonalProject, Section, Task } from '@doist/todoist-api-typescript'
-
-/**
- * Mapped task type matching the output of mapTask function.
- * Used for filter-based query test mocks.
- */
-export type MappedTask = {
-    id: string
-    content: string
-    description: string
-    dueDate: string | undefined
-    recurring: string | boolean
-    deadlineDate: string | undefined
-    priority: number
-    projectId: string
-    sectionId: string | null
-    parentId: string | null
-    labels: string[]
-    duration: string | null
-    responsibleUid: string | null
-    assignedByUid: string | null
-    checked: boolean
-    completedAt: string | null
-}
+import { MappedTask } from '../tool-helpers'
 
 /**
  * Creates a mock Task with all required properties and sensible defaults.
@@ -139,14 +117,14 @@ export function createMappedTask(overrides: Partial<MappedTask> = {}): MappedTas
         deadlineDate: undefined,
         priority: 1,
         projectId: TEST_IDS.PROJECT_TEST,
-        sectionId: null,
-        parentId: null,
+        sectionId: undefined,
+        parentId: undefined,
         labels: [],
-        duration: null,
-        responsibleUid: null,
-        assignedByUid: null,
+        duration: undefined,
+        responsibleUid: undefined,
+        assignedByUid: undefined,
         checked: false,
-        completedAt: null,
+        completedAt: undefined,
         ...overrides,
     }
 }

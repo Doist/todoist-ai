@@ -27,7 +27,7 @@ const ArgsSchema = {
 
 const OutputSchema = {
     comments: z.array(CommentOutputSchema).describe('The found comments.'),
-    nextCursor: z.string().nullable().describe('Cursor for the next page of results.'),
+    nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
     totalCount: z.number().describe('The total number of comments in this page.'),
 }
 
@@ -101,7 +101,7 @@ const findComments = {
                 searchType: args.commentId ? 'single' : args.taskId ? 'task' : 'project',
                 searchId: args.commentId || args.taskId || args.projectId || '',
                 hasMore,
-                nextCursor,
+                nextCursor: nextCursor ?? undefined,
                 totalCount: comments.length,
             },
         }

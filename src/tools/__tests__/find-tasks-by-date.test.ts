@@ -1,10 +1,9 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, type MockedFunction, vi } from 'vitest'
-import { getTasksByFilter } from '../../tool-helpers.js'
+import { getTasksByFilter, MappedTask } from '../../tool-helpers.js'
 import {
     createMappedTask,
     createMockUser,
-    type MappedTask,
     TEST_ERRORS,
     TEST_IDS,
 } from '../../utils/test-helpers.js'
@@ -442,7 +441,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     id: TEST_IDS.TASK_2,
                     content: 'Unassigned task',
                     dueDate: '2025-08-15',
-                    responsibleUid: null, // Unassigned
+                    responsibleUid: undefined, // Unassigned
                 }),
             ]
 
@@ -489,7 +488,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                     id: TEST_IDS.TASK_2,
                     content: 'Unassigned overdue task',
                     dueDate: '2025-08-10',
-                    responsibleUid: null, // Unassigned
+                    responsibleUid: undefined, // Unassigned
                 }),
             ]
 

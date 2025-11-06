@@ -61,7 +61,7 @@ const ArgsSchema = {
 
 const OutputSchema = {
     tasks: z.array(TaskOutputSchema).describe('The found completed tasks.'),
-    nextCursor: z.string().nullable().describe('Cursor for the next page of results.'),
+    nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
     totalCount: z.number().describe('The total number of tasks in this page.'),
     hasMore: z.boolean().describe('Whether there are more results available.'),
     appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
@@ -134,7 +134,7 @@ const findCompletedTasks = {
             textContent,
             structuredContent: {
                 tasks: mappedTasks,
-                nextCursor,
+                nextCursor: nextCursor ?? undefined,
                 totalCount: mappedTasks.length,
                 hasMore: Boolean(nextCursor),
                 appliedFilters: args,

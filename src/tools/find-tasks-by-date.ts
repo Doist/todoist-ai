@@ -63,7 +63,7 @@ const ArgsSchema = {
 
 const OutputSchema = {
     tasks: z.array(TaskOutputSchema).describe('The found tasks.'),
-    nextCursor: z.string().nullable().describe('Cursor for the next page of results.'),
+    nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
     totalCount: z.number().describe('The total number of tasks in this page.'),
     hasMore: z.boolean().describe('Whether there are more results available.'),
     appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
@@ -117,7 +117,7 @@ const findTasksByDate = {
         })
         query = appendToQuery(query, responsibleUserFilter)
 
-        const result = await getTasksByFilter({
+        const { tasks, nextCursor } = await getTasksByFilter({
             client,
             query,
             cursor: args.cursor,
@@ -125,22 +125,17 @@ const findTasksByDate = {
         })
 
         // No need for post-fetch filtering since it's handled in the query
-        const filteredTasks = result.tasks
+        // const filteredTasks = result.tasks
 
-        const textContent = generateTextContent({
-            tasks: filteredTasks,
-            args,
-            nextCursor: result.nextCursor,
-            assigneeEmail,
-        })
+        const textContent = generateTextContent({ tasks, args, nextCursor, assigneeEmail })
 
         return {
             textContent,
             structuredContent: {
-                tasks: filteredTasks,
-                nextCursor: result.nextCursor,
-                totalCount: filteredTasks.length,
-                hasMore: Boolean(result.nextCursor),
+                tasks,
+                nextCursor: nextCursor ?? undefined,
+                totalCount: tasks.length,
+                hasMore: Boolean(nextCursor),
                 appliedFilters: args,
             },
         }

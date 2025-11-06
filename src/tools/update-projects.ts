@@ -51,7 +51,7 @@ const updateProjects = {
             )
             .map((project) => ({
                 ...project,
-                parentId: 'parentId' in project ? project.parentId : null,
+                parentId: 'parentId' in project ? (project.parentId ?? undefined) : undefined,
                 inboxProject: 'inboxProject' in project ? project.inboxProject : false,
             }))
 
@@ -79,7 +79,7 @@ function generateTextContent({
     projects,
     args,
 }: {
-    projects: (PersonalProject | WorkspaceProject)[]
+    projects: Array<{ id: string; name: string }>
     args: z.infer<z.ZodObject<typeof ArgsSchema>>
 }) {
     const totalRequested = args.projects.length

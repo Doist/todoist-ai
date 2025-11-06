@@ -32,7 +32,7 @@ const ArgsSchema = {
 
 const OutputSchema = {
     projects: z.array(ProjectOutputSchema).describe('The found projects.'),
-    nextCursor: z.string().nullable().describe('Cursor for the next page of results.'),
+    nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
     totalCount: z.number().describe('The total number of projects in this page.'),
     hasMore: z.boolean().describe('Whether there are more results available.'),
     appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
@@ -56,14 +56,10 @@ const findProjects = {
         const projects = filtered.map(mapProject)
 
         return {
-            textContent: generateTextContent({
-                projects,
-                args,
-                nextCursor,
-            }),
+            textContent: generateTextContent({ projects, args, nextCursor }),
             structuredContent: {
                 projects,
-                nextCursor,
+                nextCursor: nextCursor ?? undefined,
                 totalCount: projects.length,
                 hasMore: Boolean(nextCursor),
                 appliedFilters: args,

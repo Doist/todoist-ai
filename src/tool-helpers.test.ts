@@ -36,10 +36,15 @@ describe('shared utilities', () => {
                 recurring: false,
                 priority: 1,
                 projectId: 'proj-1',
-                sectionId: null,
-                parentId: null,
+                sectionId: undefined,
+                parentId: undefined,
                 labels: ['work'],
-                duration: null,
+                duration: undefined,
+                assignedByUid: undefined,
+                checked: undefined,
+                completedAt: undefined,
+                deadlineDate: undefined,
+                responsibleUid: undefined,
             })
         })
 
@@ -65,7 +70,7 @@ describe('shared utilities', () => {
             const result = mapTask(mockTask)
 
             expect(result.recurring).toBe('every day')
-            expect(result.duration).toBe(null)
+            expect(result.duration).toBe(undefined)
         })
 
         it('should handle task with duration', () => {
@@ -161,7 +166,7 @@ End of description.`)
                 color: 'blue',
                 isFavorite: false,
                 isShared: false,
-                parentId: null,
+                parentId: undefined,
                 inboxProject: false,
                 viewStyle: 'list',
             })
@@ -183,7 +188,7 @@ End of description.`)
                 color: 'red',
                 isFavorite: true,
                 isShared: true,
-                parentId: null,
+                parentId: undefined,
                 inboxProject: false,
                 viewStyle: 'board',
             })

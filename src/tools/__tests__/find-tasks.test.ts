@@ -1,12 +1,11 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, type MockedFunction, vi } from 'vitest'
-import { getTasksByFilter } from '../../tool-helpers.js'
+import { getTasksByFilter, MappedTask } from '../../tool-helpers.js'
 import {
     createMappedTask,
     createMockApiResponse,
     createMockTask,
     createMockUser,
-    type MappedTask,
     TEST_ERRORS,
     TEST_IDS,
     TODAY,
@@ -193,7 +192,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 tasks: [], // tasks array is now kept as empty array
                 totalCount: 0,
                 hasMore: false,
-                nextCursor: null,
+                nextCursor: undefined,
                 appliedFilters: expect.objectContaining({
                     searchText: searchText,
                 }),
@@ -795,7 +794,7 @@ End of test content.`
                     createMappedTask({
                         id: TEST_IDS.TASK_2,
                         content: 'Unassigned task',
-                        responsibleUid: null, // Unassigned
+                        responsibleUid: undefined, // Unassigned
                     }),
                     createMappedTask({
                         id: TEST_IDS.TASK_3,
@@ -871,7 +870,7 @@ End of test content.`
                     createMappedTask({
                         id: TEST_IDS.TASK_3,
                         content: 'Unassigned task',
-                        responsibleUid: null, // Unassigned
+                        responsibleUid: undefined, // Unassigned
                     }),
                 ]
 

@@ -46,8 +46,8 @@ export type OperationResult = {
     taskId: string
     success: boolean
     error?: string
-    originalAssigneeId?: string | null
-    newAssigneeId?: string | null
+    originalAssigneeId?: string
+    newAssigneeId?: string
 }
 
 const OutputSchema = {
@@ -60,12 +60,10 @@ const OutputSchema = {
                 originalAssigneeId: z
                     .string()
                     .optional()
-                    .nullable()
                     .describe('The original assignee ID before the operation.'),
                 newAssigneeId: z
                     .string()
                     .optional()
-                    .nullable()
                     .describe('The new assignee ID after the operation.'),
             }),
         )
@@ -179,8 +177,8 @@ const manageAssignments = {
                 const results: OperationResult[] = validTasks.map((task) => ({
                     taskId: task.id,
                     success: true,
-                    originalAssigneeId: task.responsibleUid,
-                    newAssigneeId: null,
+                    originalAssigneeId: task.responsibleUid ?? undefined,
+                    newAssigneeId: undefined,
                 }))
 
                 const textContent = generateTextContent({
@@ -209,15 +207,15 @@ const manageAssignments = {
                     return {
                         taskId: task.id,
                         success: true,
-                        originalAssigneeId: task.responsibleUid,
-                        newAssigneeId: null,
+                        originalAssigneeId: task.responsibleUid ?? undefined,
+                        newAssigneeId: undefined,
                     }
                 } catch (error) {
                     return {
                         taskId: task.id,
                         success: false,
                         error: error instanceof Error ? error.message : 'Update failed',
-                        originalAssigneeId: task.responsibleUid,
+                        originalAssigneeId: task.responsibleUid ?? undefined,
                     }
                 }
             })
@@ -291,7 +289,7 @@ const manageAssignments = {
                     return {
                         taskId: assignment.taskId,
                         success: true,
-                        originalAssigneeId: task?.responsibleUid || null,
+                        originalAssigneeId: task?.responsibleUid ?? undefined,
                         newAssigneeId: validation.resolvedUser.userId,
                     }
                 })
@@ -307,7 +305,7 @@ const manageAssignments = {
                             taskId: assignment.taskId || 'unknown-task',
                             success: false,
                             error: 'Invalid assignment data - missing task ID or resolved user',
-                            originalAssigneeId: task?.responsibleUid || null,
+                            originalAssigneeId: task?.responsibleUid ?? undefined,
                         }
                     }
 
@@ -319,7 +317,7 @@ const manageAssignments = {
                         return {
                             taskId: assignment.taskId,
                             success: true,
-                            originalAssigneeId: task?.responsibleUid || null,
+                            originalAssigneeId: task?.responsibleUid ?? undefined,
                             newAssigneeId: validation.resolvedUser.userId,
                         }
                     } catch (error) {
@@ -327,7 +325,7 @@ const manageAssignments = {
                             taskId: assignment.taskId,
                             success: false,
                             error: error instanceof Error ? error.message : 'Update failed',
-                            originalAssigneeId: task?.responsibleUid || null,
+                            originalAssigneeId: task?.responsibleUid ?? undefined,
                         }
                     }
                 },

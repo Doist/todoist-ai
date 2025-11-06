@@ -285,7 +285,7 @@ describe(`${FIND_COMMENTS} tool`, () => {
                 hasMore: false,
                 totalCount: 0,
                 comments: [], // comments array is now kept as empty array
-                nextCursor: null,
+                nextCursor: undefined,
             })
         })
     })
