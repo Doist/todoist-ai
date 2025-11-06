@@ -19,7 +19,7 @@ const TaskSchema = z.object({
     projectId: z.string().describe('The ID of the project this task belongs to.'),
     sectionId: z.string().optional().describe('The ID of the section this task belongs to.'),
     parentId: z.string().optional().describe('The ID of the parent task (for subtasks).'),
-    labels: z.array(z.string()).describe('The labels attached to this task.'),
+    labels: z.array(z.string()).optional().describe('The labels attached to this task.'),
     duration: z.string().optional().describe('The duration of the task (e.g., "2h30m").'),
     responsibleUid: z
         .string()
@@ -56,7 +56,7 @@ const SectionSchema = z.object({
  * Schema for a file attachment in a comment
  */
 const AttachmentSchema = z.object({
-    resourceType: z.string().describe('The type of resource.'),
+    resourceType: z.string().describe('The type of resource (file, url, image, etc).'),
     fileName: z.string().optional().describe('The name of the file.'),
     fileSize: z.number().optional().describe('The size of the file in bytes.'),
     fileType: z.string().optional().describe('The MIME type of the file.'),
@@ -69,6 +69,11 @@ const AttachmentSchema = z.object({
         .enum(['pending', 'completed'])
         .optional()
         .describe('The upload state of the file.'),
+    url: z.string().optional().describe('The URL for link/url resource types.'),
+    title: z.string().optional().describe('The title for link/url resource types.'),
+    image: z.string().optional().describe('The image URL for image resource types.'),
+    imageWidth: z.number().optional().describe('The width of the image in pixels.'),
+    imageHeight: z.number().optional().describe('The height of the image in pixels.'),
 })
 
 /**
@@ -80,7 +85,8 @@ const CommentSchema = z.object({
     projectId: z.string().optional().describe('The ID of the project this comment belongs to.'),
     content: z.string().describe('The content of the comment.'),
     postedAt: z.string().describe('When the comment was posted (ISO 8601 format).'),
-    attachment: AttachmentSchema.optional().describe('File attachment information, if any.'),
+    postedUid: z.string().optional().describe('The UID of the user who posted this comment.'),
+    fileAttachment: AttachmentSchema.optional().describe('File attachment information, if any.'),
 })
 
 /**

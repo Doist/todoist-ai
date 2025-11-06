@@ -1,9 +1,10 @@
 /**
- * Removes all null fields, empty objects, and empty arrays from an object recursively.
+ * Removes all null fields and empty objects from an object recursively.
+ * Empty arrays are preserved as they carry semantic meaning (e.g., "no results found").
  * This ensures that data sent to agents doesn't include unnecessary empty values.
  *
  * @param obj - The object to sanitize
- * @returns A new object with all null fields, empty objects, and empty arrays removed
+ * @returns A new object with all null fields and empty objects removed
  */
 export function removeNullFields<T>(obj: T): T {
     if (obj === null || obj === undefined) {
@@ -20,12 +21,8 @@ export function removeNullFields<T>(obj: T): T {
             if (value !== null) {
                 const cleanedValue = removeNullFields(value)
 
-                // Skip empty arrays
-                if (Array.isArray(cleanedValue) && cleanedValue.length === 0) {
-                    continue
-                }
-
-                // Skip empty objects
+                // Keep empty arrays - they indicate "no results" which is semantically meaningful
+                // Only skip empty objects
                 if (
                     cleanedValue !== null &&
                     typeof cleanedValue === 'object' &&

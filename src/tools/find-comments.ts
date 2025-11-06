@@ -1,6 +1,7 @@
 import type { Comment } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
+import { mapComment } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { CommentSchema as CommentOutputSchema } from '../utils/output-schemas.js'
 import { formatNextSteps } from '../utils/response-builders.js'
@@ -53,14 +54,14 @@ const findComments = {
         const resolvedProjectId =
             args.projectId === 'inbox' ? (await client.getUser()).inboxProjectId : args.projectId
 
-        let comments: Comment[]
         let hasMore = false
         let nextCursor: string | null = null
+        let rawComments: Comment[]
 
         if (args.commentId) {
             // Get single comment
             const comment = await client.getComment(args.commentId)
-            comments = [comment]
+            rawComments = [comment]
         } else if (args.taskId) {
             // Get comments by task
             const response = await client.getComments({
@@ -68,7 +69,7 @@ const findComments = {
                 cursor: args.cursor || null,
                 limit: args.limit || ApiLimits.COMMENTS_DEFAULT,
             })
-            comments = response.results
+            rawComments = response.results
             hasMore = response.nextCursor !== null
             nextCursor = response.nextCursor
         } else if (resolvedProjectId) {
@@ -78,13 +79,15 @@ const findComments = {
                 cursor: args.cursor || null,
                 limit: args.limit || ApiLimits.COMMENTS_DEFAULT,
             })
-            comments = response.results
+            rawComments = response.results
             hasMore = response.nextCursor !== null
             nextCursor = response.nextCursor
         } else {
             // This should never happen due to validation, but TypeScript needs it
             throw new Error('Invalid state: no search parameter provided')
         }
+
+        const comments = rawComments.map(mapComment)
 
         const textContent = generateTextContent({
             comments,
@@ -115,7 +118,7 @@ function generateTextContent({
     hasMore,
     nextCursor,
 }: {
-    comments: Comment[]
+    comments: ReturnType<typeof mapComment>[]
     searchType: 'single' | 'task' | 'project'
     searchId: string
     hasMore: boolean
@@ -132,13 +135,13 @@ function generateTextContent({
         if (!comment) {
             return 'Comment not found'
         }
-        const hasAttachment = comment.fileAttachment !== null
+        const hasAttachment = comment.fileAttachment !== undefined
         const attachmentInfo = hasAttachment
             ? ` • Has attachment: ${comment.fileAttachment?.fileName || 'file'}`
             : ''
         summary = `Found comment${attachmentInfo} • id=${comment.id}`
     } else {
-        const attachmentCount = comments.filter((c) => c.fileAttachment !== null).length
+        const attachmentCount = comments.filter((c) => c.fileAttachment !== undefined).length
         const attachmentInfo = attachmentCount > 0 ? ` (${attachmentCount} with attachments)` : ''
         const commentsLabel = comments.length === 1 ? 'comment' : 'comments'
         summary = `Found ${comments.length} ${commentsLabel} for ${searchType} ${searchId}${attachmentInfo}`

@@ -1,6 +1,6 @@
-import type { Comment } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
+import { mapComment } from '../tool-helpers.js'
 import { CommentSchema as CommentOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -37,26 +37,27 @@ const updateComments = {
         })
 
         const updatedComments = await Promise.all(updateCommentPromises)
+        const mappedComments = updatedComments.map(mapComment)
 
         const textContent = generateTextContent({
-            comments: updatedComments,
+            comments: mappedComments,
         })
 
         return {
             textContent,
             structuredContent: {
-                comments: updatedComments,
-                totalCount: updatedComments.length,
-                updatedCommentIds: updatedComments.map((comment) => comment.id),
+                comments: mappedComments,
+                totalCount: mappedComments.length,
+                updatedCommentIds: mappedComments.map((comment) => comment.id),
                 appliedOperations: {
-                    updateCount: updatedComments.length,
+                    updateCount: mappedComments.length,
                 },
             },
         }
     },
 } satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
-function generateTextContent({ comments }: { comments: Comment[] }): string {
+function generateTextContent({ comments }: { comments: ReturnType<typeof mapComment>[] }): string {
     // Group comments by entity type and count
     const taskComments = comments.filter((c) => c.taskId).length
     const projectComments = comments.filter((c) => c.projectId).length
