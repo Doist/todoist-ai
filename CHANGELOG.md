@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.17.3](https://github.com/Doist/todoist-ai/compare/v4.17.2...v4.17.3) (2025-11-06)
+
+
+### Bug Fixes
+
+* **deps:** Bump `@doist/todoist-api-typescript` package ([#210](https://github.com/Doist/todoist-ai/issues/210)) ([85fbfb5](https://github.com/Doist/todoist-ai/commit/85fbfb591f2e4ee165b71ff1386a39ab96d7e31a))
+
 ## [4.17.2](https://github.com/Doist/todoist-ai/compare/v4.17.1...v4.17.2) (2025-11-06)
 
 
