@@ -49,10 +49,10 @@
     },
     "dependencies": {
         "@doist/todoist-api-typescript": "6.0.1",
-        "@modelcontextprotocol/sdk": "^1.11.1",
-        "date-fns": "^4.1.0",
-        "dotenv": "^17.0.0",
-        "zod": "^3.25.7"
+        "@modelcontextprotocol/sdk": "1.21.0",
+        "date-fns": "4.1.0",
+        "dotenv": "17.2.3",
+        "zod": "3.25.76"
     },
     "devDependencies": {
         "@biomejs/biome": "2.3.2",
