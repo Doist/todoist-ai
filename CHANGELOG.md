@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.17.4](https://github.com/Doist/todoist-ai/compare/v4.17.3...v4.17.4) (2025-11-13)
+
+
+### Bug Fixes
+
+* correct priority inversion for task outputs ([#216](https://github.com/Doist/todoist-ai/issues/216)) ([b4b4809](https://github.com/Doist/todoist-ai/commit/b4b4809f129d6aa029f0ef4aa28352760c879aee))
+* **deps:** pin dependencies ([#212](https://github.com/Doist/todoist-ai/issues/212)) ([2049ebf](https://github.com/Doist/todoist-ai/commit/2049ebf4e5eedd2465650c79c16e39f04a5e4ddd))
+
 ## [4.17.3](https://github.com/Doist/todoist-ai/compare/v4.17.2...v4.17.3) (2025-11-06)
 
 
