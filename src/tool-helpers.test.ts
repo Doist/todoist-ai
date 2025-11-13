@@ -34,7 +34,7 @@ describe('shared utilities', () => {
                 description: 'Test description',
                 dueDate: '2024-01-15',
                 recurring: false,
-                priority: 1,
+                priority: 4,
                 projectId: 'proj-1',
                 sectionId: undefined,
                 parentId: undefined,
