@@ -15,7 +15,9 @@ const TaskSchema = z.object({
         .string()
         .optional()
         .describe('The deadline date of the task (ISO 8601 format).'),
-    priority: z.number().describe('The priority level (1-4, where 1 is highest priority).'),
+    priority: z
+        .number()
+        .describe('The priority level (1-4, where 4 is highest priority and 1 is lowest).'),
     projectId: z.string().describe('The ID of the project this task belongs to.'),
     sectionId: z.string().optional().describe('The ID of the section this task belongs to.'),
     parentId: z.string().optional().describe('The ID of the parent task (for subtasks).'),

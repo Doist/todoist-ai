@@ -52,7 +52,7 @@ describe(`${FETCH} tool`, () => {
                 text: 'Important meeting with team\n\nDescription: Discuss project roadmap and timeline\nDue: 2025-10-15\nLabels: work, urgent',
                 url: `https://app.todoist.com/app/task/${TEST_IDS.TASK_1}`,
                 metadata: {
-                    priority: 2,
+                    priority: 3,
                     projectId: TEST_IDS.PROJECT_WORK,
                     sectionId: TEST_IDS.SECTION_1,
                     recurring: false,
@@ -78,7 +78,7 @@ describe(`${FETCH} tool`, () => {
             expect(jsonResponse.title).toBe('Simple task')
             expect(jsonResponse.text).toBe('Simple task')
             expect(jsonResponse.metadata).toEqual({
-                priority: 1,
+                priority: 4,
                 projectId: TEST_IDS.PROJECT_TEST,
                 recurring: false,
                 checked: false,
