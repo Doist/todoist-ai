@@ -117,7 +117,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 id: '8485093749',
                 content: 'Original task content',
                 labels: ['urgent'],
-                priority: convertPriorityToNumber('p2'),
+                priority: 'p2',
                 url: 'https://todoist.com/showTask?id=8485093749',
                 addedAt: '2025-08-13T22:09:56.123456Z',
                 due: {
@@ -234,7 +234,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 id: '8485093752',
                 content: 'Completely updated task',
                 description: 'New description with details',
-                priority: convertPriorityToNumber('p1'),
+                priority: 'p1',
                 projectId: 'different-project-id',
                 url: 'https://todoist.com/showTask?id=8485093752',
                 addedAt: '2025-08-13T22:09:56.123456Z',
@@ -583,7 +583,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 id: '8485093752',
                 content: 'Updated content',
                 labels: ['personal', 'todo'],
-                priority: convertPriorityToNumber('p2'),
+                priority: 'p2',
                 url: 'https://todoist.com/showTask?id=8485093752',
                 addedAt: '2025-08-13T22:09:56.123456Z',
             })

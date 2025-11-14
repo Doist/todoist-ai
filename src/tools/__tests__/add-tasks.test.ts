@@ -34,7 +34,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 description: 'Task description',
                 labels: ['work', 'urgent'],
                 childOrder: 2,
-                priority: convertPriorityToNumber('p3'),
+                priority: 'p3',
                 url: 'https://todoist.com/showTask?id=8485093749',
                 addedAt: '2025-08-13T22:09:57.123456Z',
                 due: {
@@ -109,7 +109,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 id: '8485093750',
                 content: 'Subtask content',
                 description: 'Subtask description',
-                priority: convertPriorityToNumber('p2'),
+                priority: 'p2',
                 sectionId: 'section-123',
                 parentId: 'parent-task-456',
                 url: 'https://todoist.com/showTask?id=8485093750',

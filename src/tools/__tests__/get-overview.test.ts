@@ -1,6 +1,5 @@
 import type { PersonalProject, Section, Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import { convertPriorityToNumber } from '../../utils/priorities.js'
 import {
     createMockProject,
     createMockSection,
@@ -148,7 +147,7 @@ describe(`${GET_OVERVIEW} tool`, () => {
                     content: 'Task in To Do section',
                     description: 'Important task',
                     labels: ['work'],
-                    priority: convertPriorityToNumber('p3'),
+                    priority: 'p3',
                     projectId: TEST_IDS.PROJECT_TEST,
                     sectionId: TEST_IDS.SECTION_1,
                 }),

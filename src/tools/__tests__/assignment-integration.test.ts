@@ -1,8 +1,7 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
 import { AssignmentErrorType, assignmentValidator } from '../../utils/assignment-validator.js'
-import { convertPriorityToNumber } from '../../utils/priorities.js'
-import { createMockProject } from '../../utils/test-helpers.js'
+import { createMockProject, createMockTask } from '../../utils/test-helpers.js'
 import { userResolver } from '../../utils/user-resolver.js'
 import { addTasks } from '../add-tasks.js'
 import { findProjectCollaborators } from '../find-project-collaborators.js'
@@ -40,33 +39,17 @@ describe('Assignment Integration Tests', () => {
         displayName: 'John Doe',
     }
 
-    const mockTask: Task = {
+    const mockTask: Task = createMockTask({
         id: 'task-123',
         content: 'Test task',
         projectId: 'project-123',
-        sectionId: null,
-        parentId: null,
-        priority: convertPriorityToNumber('p4'),
-        labels: [],
-        description: '',
         url: 'https://todoist.com/showTask?id=task-123',
-        noteCount: 0,
         addedByUid: 'creator-123',
         addedAt: new Date().toISOString(),
-        deadline: null,
-        responsibleUid: null,
-        assignedByUid: null,
-        isCollapsed: false,
-        isDeleted: false,
-        duration: null,
-        checked: false,
         updatedAt: new Date().toISOString(),
-        due: null,
-        dayOrder: 0,
         userId: 'creator-123',
         completedAt: null,
-        childOrder: 1,
-    }
+    })
 
     const mockProject = createMockProject({
         id: 'project-123',
