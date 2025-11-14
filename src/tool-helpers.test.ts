@@ -1,4 +1,4 @@
-import type { PersonalProject, Task, WorkspaceProject } from '@doist/todoist-api-typescript'
+import type { PersonalProject, WorkspaceProject } from '@doist/todoist-api-typescript'
 import {
     createMoveTaskArgs,
     isPersonalProject,
@@ -6,19 +6,17 @@ import {
     mapProject,
     mapTask,
 } from './tool-helpers.js'
+import { createMockTask } from './utils/test-helpers.js'
 
 describe('shared utilities', () => {
     describe('mapTask', () => {
         it('should map a basic task correctly', () => {
-            const mockTask = {
+            const mockTask = createMockTask({
                 id: '123',
                 content: 'Test task',
                 description: 'Test description',
                 projectId: 'proj-1',
-                sectionId: null,
-                parentId: null,
                 labels: ['work'],
-                priority: 1,
                 due: {
                     date: '2024-01-15',
                     isRecurring: false,
@@ -26,7 +24,7 @@ describe('shared utilities', () => {
                     string: 'Jan 15',
                     timezone: 'UTC',
                 },
-            } as unknown as Task
+            })
 
             expect(mapTask(mockTask)).toEqual({
                 id: '123',
@@ -34,14 +32,14 @@ describe('shared utilities', () => {
                 description: 'Test description',
                 dueDate: '2024-01-15',
                 recurring: false,
-                priority: 4,
+                priority: 'p4',
                 projectId: 'proj-1',
                 sectionId: undefined,
                 parentId: undefined,
                 labels: ['work'],
                 duration: undefined,
                 assignedByUid: undefined,
-                checked: undefined,
+                checked: false,
                 completedAt: undefined,
                 deadlineDate: undefined,
                 responsibleUid: undefined,
@@ -49,15 +47,10 @@ describe('shared utilities', () => {
         })
 
         it('should handle recurring tasks', () => {
-            const mockTask = {
+            const mockTask = createMockTask({
                 id: '456',
                 content: 'Recurring task',
-                description: '',
                 projectId: 'proj-1',
-                sectionId: null,
-                parentId: null,
-                labels: [],
-                priority: 1,
                 due: {
                     date: '2024-01-15',
                     isRecurring: true,
@@ -65,7 +58,7 @@ describe('shared utilities', () => {
                     string: 'every day',
                     timezone: 'UTC',
                 },
-            } as unknown as Task
+            })
 
             const result = mapTask(mockTask)
 
@@ -74,28 +67,19 @@ describe('shared utilities', () => {
         })
 
         it('should handle task with duration', () => {
-            const mockTask = {
+            const mockTask = createMockTask({
                 id: '789',
                 content: 'Task with duration',
-                description: '',
                 projectId: 'proj-1',
-                sectionId: null,
-                parentId: null,
-                labels: [],
-                priority: 1,
-                duration: {
-                    amount: 150,
-                    unit: 'minute',
-                },
-            } as unknown as Task
+                duration: { amount: 150, unit: 'minute' },
+            })
 
             const result = mapTask(mockTask)
-
             expect(result.duration).toBe('2h30m')
         })
 
         it('should preserve markdown links and formatting in content and description', () => {
-            const mockTask = {
+            const mockTask = createMockTask({
                 id: '123',
                 content: 'Task with **bold** and [link](https://example.com)',
                 description: `Rich markdown description:
@@ -111,11 +95,7 @@ describe('shared utilities', () => {
 
 End of description.`,
                 projectId: 'proj-1',
-                sectionId: null,
-                parentId: null,
-                labels: [],
-                priority: 1,
-            } as unknown as Task
+            })
 
             const result = mapTask(mockTask)
 

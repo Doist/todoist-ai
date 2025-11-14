@@ -9,7 +9,7 @@ import type {
 } from '@doist/todoist-api-typescript'
 import z from 'zod'
 import { formatDuration } from './utils/duration-parser.js'
-import { invertPriorityForOutput } from './utils/priorities.js'
+import { convertNumberToPriority } from './utils/priorities.js'
 
 // Re-export filter helpers for backward compatibility
 export {
@@ -82,7 +82,7 @@ function mapTask(task: Task) {
         dueDate: task.due?.date,
         recurring: task.due?.isRecurring && task.due.string ? task.due.string : false,
         deadlineDate: task.deadline?.date,
-        priority: invertPriorityForOutput(task.priority),
+        priority: convertNumberToPriority(task.priority) ?? 'p4',
         projectId: task.projectId,
         sectionId: task.sectionId ?? undefined,
         parentId: task.parentId ?? undefined,

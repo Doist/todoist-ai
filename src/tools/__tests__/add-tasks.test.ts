@@ -1,5 +1,6 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
+import { convertPriorityToNumber } from '../../utils/priorities.js'
 import { createMockTask, createMockUser, TEST_IDS, TODAY } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { addTasks } from '../add-tasks.js'
@@ -33,7 +34,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 description: 'Task description',
                 labels: ['work', 'urgent'],
                 childOrder: 2,
-                priority: 2,
+                priority: 'p3',
                 url: 'https://todoist.com/showTask?id=8485093749',
                 addedAt: '2025-08-13T22:09:57.123456Z',
                 due: {
@@ -79,7 +80,7 @@ describe(`${ADD_TASKS} tool`, () => {
             expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(2, {
                 content: 'Second task content',
                 description: 'Task description',
-                priority: 3,
+                priority: convertPriorityToNumber('p2'),
                 dueString: 'Aug 15',
                 projectId: '6cfCcrrCFg2xP94Q',
                 sectionId: undefined,
@@ -108,7 +109,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 id: '8485093750',
                 content: 'Subtask content',
                 description: 'Subtask description',
-                priority: 3,
+                priority: 'p2',
                 sectionId: 'section-123',
                 parentId: 'parent-task-456',
                 url: 'https://todoist.com/showTask?id=8485093750',
@@ -136,7 +137,7 @@ describe(`${ADD_TASKS} tool`, () => {
             expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
                 content: 'Subtask content',
                 description: 'Subtask description',
-                priority: 2,
+                priority: convertPriorityToNumber('p3'),
                 projectId: '6cfCcrrCFg2xP94Q',
                 sectionId: 'section-123',
                 parentId: 'parent-task-456',

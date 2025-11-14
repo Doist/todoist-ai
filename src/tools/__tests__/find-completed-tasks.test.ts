@@ -41,7 +41,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                     description: 'Task completed yesterday',
                     completedAt: '2024-01-01T00:00:00Z',
                     labels: ['work'],
-                    priority: 2,
+                    priority: 'p3',
                     url: 'https://todoist.com/showTask?id=8485093748',
                     addedAt: '2025-08-13T22:09:56.123456Z',
                     due: {
@@ -121,7 +121,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                     description: 'This task was due and completed',
                     completedAt: '2024-01-01T00:00:00Z',
                     labels: ['urgent'],
-                    priority: 3,
+                    priority: 'p2',
                     url: 'https://todoist.com/showTask?id=8485093750',
                     addedAt: '2025-08-13T22:09:58.123456Z',
                     due: {

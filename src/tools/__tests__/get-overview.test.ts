@@ -147,7 +147,7 @@ describe(`${GET_OVERVIEW} tool`, () => {
                     content: 'Task in To Do section',
                     description: 'Important task',
                     labels: ['work'],
-                    priority: 2,
+                    priority: 'p3',
                     projectId: TEST_IDS.PROJECT_TEST,
                     sectionId: TEST_IDS.SECTION_1,
                 }),

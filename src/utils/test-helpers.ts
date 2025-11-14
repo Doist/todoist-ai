@@ -1,11 +1,19 @@
 import type { CurrentUser, PersonalProject, Section, Task } from '@doist/todoist-api-typescript'
-import { MappedTask } from '../tool-helpers'
+import { type MappedTask } from '../tool-helpers'
+import { convertPriorityToNumber, type Priority } from './priorities'
+
+type TaskWithUserFacingPriority = Omit<Task, 'priority'> & {
+    priority: Priority
+}
 
 /**
  * Creates a mock Task with all required properties and sensible defaults.
  * Pass only the properties you want to override for your specific test.
  */
-export function createMockTask(overrides: Partial<Task> = {}): Task {
+export function createMockTask({
+    priority = 'p4',
+    ...overrides
+}: Partial<TaskWithUserFacingPriority> = {}): Task {
     return {
         id: '8485093748',
         content: 'Test task content',
@@ -13,7 +21,6 @@ export function createMockTask(overrides: Partial<Task> = {}): Task {
         completedAt: null,
         labels: [],
         childOrder: 1,
-        priority: 1,
         projectId: '6cfCcrrCFg2xP94Q',
         sectionId: null,
         parentId: null,
@@ -33,6 +40,7 @@ export function createMockTask(overrides: Partial<Task> = {}): Task {
         due: null,
         dayOrder: 0,
         userId: '713437',
+        priority: convertPriorityToNumber(priority),
         ...overrides,
     }
 }
@@ -115,7 +123,7 @@ export function createMappedTask(overrides: Partial<MappedTask> = {}): MappedTas
         dueDate: undefined,
         recurring: false,
         deadlineDate: undefined,
-        priority: 1,
+        priority: 'p4',
         projectId: TEST_IDS.PROJECT_TEST,
         sectionId: undefined,
         parentId: undefined,
