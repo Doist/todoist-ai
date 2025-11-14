@@ -1,5 +1,16 @@
 # Changelog
 
+## [5.0.0](https://github.com/Doist/todoist-ai/compare/v4.17.4...v5.0.0) (2025-11-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* semantic priority values (P1, P2, P3, P4) instead of numeric ([#217](https://github.com/Doist/todoist-ai/issues/217))
+
+### Features
+
+* semantic priority values (P1, P2, P3, P4) instead of numeric ([#217](https://github.com/Doist/todoist-ai/issues/217)) ([9bb906b](https://github.com/Doist/todoist-ai/commit/9bb906b48d836898bf616df60cef38aaa7ae2894))
+
 ## [4.17.4](https://github.com/Doist/todoist-ai/compare/v4.17.3...v4.17.4) (2025-11-13)
 
 
