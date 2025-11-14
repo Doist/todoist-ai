@@ -1,5 +1,6 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
+import { convertPriorityToNumber } from '../../utils/priorities.js'
 import { createMockTask, TEST_IDS } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { updateTasks } from '../update-tasks.js'
@@ -116,7 +117,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 id: '8485093749',
                 content: 'Original task content',
                 labels: ['urgent'],
-                priority: 3,
+                priority: convertPriorityToNumber('p2'),
                 url: 'https://todoist.com/showTask?id=8485093749',
                 addedAt: '2025-08-13T22:09:56.123456Z',
                 due: {
@@ -144,7 +145,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
             )
 
             expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093749', {
-                priority: 2,
+                priority: convertPriorityToNumber('p3'),
                 dueString: 'Aug 20',
             })
 
@@ -233,7 +234,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 id: '8485093752',
                 content: 'Completely updated task',
                 description: 'New description with details',
-                priority: 4,
+                priority: convertPriorityToNumber('p1'),
                 projectId: 'different-project-id',
                 url: 'https://todoist.com/showTask?id=8485093752',
                 addedAt: '2025-08-13T22:09:56.123456Z',
@@ -274,7 +275,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
             expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093752', {
                 content: 'Completely updated task',
                 description: 'New description with details',
-                priority: 1,
+                priority: convertPriorityToNumber('p4'),
                 dueString: 'every Friday',
             })
 
@@ -582,7 +583,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 id: '8485093752',
                 content: 'Updated content',
                 labels: ['personal', 'todo'],
-                priority: 3,
+                priority: convertPriorityToNumber('p2'),
                 url: 'https://todoist.com/showTask?id=8485093752',
                 addedAt: '2025-08-13T22:09:56.123456Z',
             })
@@ -606,7 +607,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
             expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093752', {
                 content: 'Updated content',
                 labels: ['personal', 'todo'],
-                priority: 3,
+                priority: convertPriorityToNumber('p2'),
             })
         })
     })

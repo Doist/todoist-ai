@@ -1,5 +1,6 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
+import { convertPriorityToNumber } from '../../utils/priorities.js'
 import { createMockProject, createMockTask, TEST_IDS } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { fetch } from '../fetch.js'
@@ -24,7 +25,7 @@ describe(`${FETCH} tool`, () => {
                 content: 'Important meeting with team',
                 description: 'Discuss project roadmap and timeline',
                 labels: ['work', 'urgent'],
-                priority: 2,
+                priority: convertPriorityToNumber('p3'),
                 projectId: TEST_IDS.PROJECT_WORK,
                 sectionId: TEST_IDS.SECTION_1,
                 due: {

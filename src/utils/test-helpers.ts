@@ -1,5 +1,6 @@
 import type { CurrentUser, PersonalProject, Section, Task } from '@doist/todoist-api-typescript'
 import { MappedTask } from '../tool-helpers'
+import { convertPriorityToNumber } from './priorities'
 
 /**
  * Creates a mock Task with all required properties and sensible defaults.
@@ -13,7 +14,7 @@ export function createMockTask(overrides: Partial<Task> = {}): Task {
         completedAt: null,
         labels: [],
         childOrder: 1,
-        priority: 1,
+        priority: convertPriorityToNumber('p4'),
         projectId: '6cfCcrrCFg2xP94Q',
         sectionId: null,
         parentId: null,

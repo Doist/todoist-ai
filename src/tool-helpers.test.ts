@@ -6,6 +6,7 @@ import {
     mapProject,
     mapTask,
 } from './tool-helpers.js'
+import { convertPriorityToNumber } from './utils/priorities.js'
 
 describe('shared utilities', () => {
     describe('mapTask', () => {
@@ -18,7 +19,7 @@ describe('shared utilities', () => {
                 sectionId: null,
                 parentId: null,
                 labels: ['work'],
-                priority: 1,
+                priority: convertPriorityToNumber('p4'),
                 due: {
                     date: '2024-01-15',
                     isRecurring: false,
@@ -57,7 +58,7 @@ describe('shared utilities', () => {
                 sectionId: null,
                 parentId: null,
                 labels: [],
-                priority: 1,
+                priority: convertPriorityToNumber('p4'),
                 due: {
                     date: '2024-01-15',
                     isRecurring: true,
@@ -82,7 +83,7 @@ describe('shared utilities', () => {
                 sectionId: null,
                 parentId: null,
                 labels: [],
-                priority: 1,
+                priority: convertPriorityToNumber('p4'),
                 duration: {
                     amount: 150,
                     unit: 'minute',
@@ -114,7 +115,7 @@ End of description.`,
                 sectionId: null,
                 parentId: null,
                 labels: [],
-                priority: 1,
+                priority: convertPriorityToNumber('p4'),
             } as unknown as Task
 
             const result = mapTask(mockTask)

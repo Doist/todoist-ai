@@ -1,6 +1,7 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
 import { AssignmentErrorType, assignmentValidator } from '../../utils/assignment-validator.js'
+import { convertPriorityToNumber } from '../../utils/priorities.js'
 import { createMockProject } from '../../utils/test-helpers.js'
 import { userResolver } from '../../utils/user-resolver.js'
 import { addTasks } from '../add-tasks.js'
@@ -45,7 +46,7 @@ describe('Assignment Integration Tests', () => {
         projectId: 'project-123',
         sectionId: null,
         parentId: null,
-        priority: 1,
+        priority: convertPriorityToNumber('p4'),
         labels: [],
         description: '',
         url: 'https://todoist.com/showTask?id=task-123',
