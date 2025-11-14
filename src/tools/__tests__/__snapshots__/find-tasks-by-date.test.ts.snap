@@ -10,29 +10,29 @@ exports[`find-tasks-by-date tool > label filtering > should combine date filters
 "Tasks for 2025-08-15: 1 (limit 25).
 Filter: 2025-08-15; labels: @important.
 Preview:
-    Important task for specific date • due 2025-08-15 • P1 • id=8485093748"
+    Important task for specific date • due 2025-08-15 • P4 • id=8485093748"
 `;
 
 exports[`find-tasks-by-date tool > listing tasks by date range > only returns tasks for the startDate when daysCount is 1 1`] = `
 "Tasks for 2025-08-20: 1 (limit 50).
 Filter: 2025-08-20.
 Preview:
-    Task for specific date • due 2025-08-20 • P1 • id=8485093748"
+    Task for specific date • due 2025-08-20 • P4 • id=8485093748"
 `;
 
 exports[`find-tasks-by-date tool > listing tasks by date range > should get tasks for today when startDate is "today" (includes overdue) 1`] = `
 "Today's tasks + overdue: 1 (limit 50).
 Filter: today + overdue tasks + 6 more days.
 Preview:
-    Today task • due 2025-08-15 • P1 • id=8485093748"
+    Today task • due 2025-08-15 • P4 • id=8485093748"
 `;
 
 exports[`find-tasks-by-date tool > listing tasks by date range > should handle 'multiple days with pagination' 1`] = `
 "Tasks for 2025-08-20: 2 (limit 20), more available.
 Filter: 2025-08-20 to 2025-08-23.
 Preview:
-    Multi-day task 1 • due 2025-08-20 • P1 • id=8485093749
-    Multi-day task 2 • due 2025-08-21 • P1 • id=8485093750
+    Multi-day task 1 • due 2025-08-20 • P4 • id=8485093749
+    Multi-day task 2 • due 2025-08-21 • P4 • id=8485093750
 Possible suggested next step:
 - Pass cursor 'next-page-cursor' to fetch more results."
 `;
@@ -41,7 +41,7 @@ exports[`find-tasks-by-date tool > listing tasks by date range > should handle '
 "Tasks for 2025-08-20: 1 (limit 50).
 Filter: 2025-08-20 to 2025-08-27.
 Preview:
-    Specific date task • due 2025-08-20 • P1 • id=8485093748"
+    Specific date task • due 2025-08-20 • P4 • id=8485093748"
 `;
 
 exports[`find-tasks-by-date tool > next steps logic > should provide helpful suggestions for empty date range results 1`] = `
@@ -60,19 +60,19 @@ exports[`find-tasks-by-date tool > next steps logic > should suggest appropriate
 "Tasks for 2025-08-15: 1 (limit 10).
 Filter: 2025-08-15.
 Preview:
-    Overdue task from list • due 2025-08-10 • P1 • id=8485093748"
+    Overdue task from list • due 2025-08-10 • P4 • id=8485093748"
 `;
 
 exports[`find-tasks-by-date tool > next steps logic > should suggest today-focused actions when startDate is today 1`] = `
 "Today's tasks + overdue: 1 (limit 10).
 Filter: today + overdue tasks.
 Preview:
-    Today's task • due 2025-08-15 • P1 • id=8485093748"
+    Today's task • due 2025-08-15 • P4 • id=8485093748"
 `;
 
 exports[`find-tasks-by-date tool > responsibleUser parameter > should filter tasks by specific user email 1`] = `
 "Today's tasks + overdue assigned to john@example.com: 1 (limit 50).
 Filter: today + overdue tasks; assigned to: john@example.com.
 Preview:
-    Task assigned to John • due 2025-08-15 • P1 • id=8485093748"
+    Task assigned to John • due 2025-08-15 • P4 • id=8485093748"
 `;

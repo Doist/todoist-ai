@@ -62,7 +62,7 @@ describe(`${FIND_TASKS} tool`, () => {
                 createMappedTask({
                     id: TEST_IDS.TASK_2,
                     content: 'Another matching task',
-                    priority: 2,
+                    priority: 'p3',
                     sectionId: TEST_IDS.SECTION_1,
                 }),
             ]
@@ -70,10 +70,7 @@ describe(`${FIND_TASKS} tool`, () => {
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasks.execute(
-                {
-                    searchText: 'important meeting',
-                    limit: 10,
-                },
+                { searchText: 'important meeting', limit: 10 },
                 mockTodoistApi,
             )
 

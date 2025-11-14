@@ -1,5 +1,5 @@
 import { DisplayLimits } from './constants.js'
-import { formatPriorityForDisplay } from './priorities.js'
+import { type Priority } from './priorities.js'
 import { ToolNames } from './tool-names.js'
 
 /**
@@ -17,7 +17,7 @@ type TaskLike = {
     content?: string
     title?: string
     dueDate?: string
-    priority?: number
+    priority?: Priority
     projectName?: string
 }
 
@@ -116,7 +116,7 @@ export function summarizeBatch(params: BatchOperationParams): string {
 function formatTaskPreview(task: TaskLike): string {
     const content = task.content || task.title || 'Untitled'
     const due = task.dueDate ? ` • due ${task.dueDate}` : ''
-    const priority = task.priority ? ` • ${formatPriorityForDisplay(task.priority)}` : ''
+    const priority = task.priority ? ` • ${task.priority.toUpperCase()}` : ''
     const project = task.projectName ? ` • ${task.projectName}` : ''
     const id = task.id ? ` • id=${task.id}` : ''
     return `    ${content}${due}${priority}${project}${id}`

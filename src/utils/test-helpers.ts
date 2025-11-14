@@ -115,7 +115,7 @@ export function createMappedTask(overrides: Partial<MappedTask> = {}): MappedTas
         dueDate: undefined,
         recurring: false,
         deadlineDate: undefined,
-        priority: 1,
+        priority: 'p4',
         projectId: TEST_IDS.PROJECT_TEST,
         sectionId: undefined,
         parentId: undefined,

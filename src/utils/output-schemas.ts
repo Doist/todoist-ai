@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { PrioritySchema } from './priorities.js'
 
 /**
  * Schema for a mapped task object returned by tools
@@ -15,9 +16,9 @@ const TaskSchema = z.object({
         .string()
         .optional()
         .describe('The deadline date of the task (ISO 8601 format).'),
-    priority: z
-        .number()
-        .describe('The priority level (1-4, where 4 is highest priority and 1 is lowest).'),
+    priority: PrioritySchema.describe(
+        'The priority level: p1 (highest), p2 (high), p3 (medium), p4 (lowest).',
+    ),
     projectId: z.string().describe('The ID of the project this task belongs to.'),
     sectionId: z.string().optional().describe('The ID of the section this task belongs to.'),
     parentId: z.string().optional().describe('The ID of the parent task (for subtasks).'),
