@@ -37,6 +37,18 @@ type TodoistTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape> = {
     outputSchema: Output
 
     /**
+     * Optional annotations for the tool.
+     *
+     * These annotations provide metadata about the tool's behavior, such as whether it's read-only.
+     */
+    annotations?: {
+        /**
+         * Indicates whether this tool only reads data and doesn't modify the environment.
+         */
+        readOnlyHint?: boolean
+    }
+
+    /**
      * The function that executes the tool.
      *
      * This is the main function that will be called when the tool is used.

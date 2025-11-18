@@ -102,6 +102,7 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
             description: tool.description,
             inputSchema: tool.parameters,
             outputSchema: tool.outputSchema as Output,
+            annotations: tool.annotations,
         },
         cb,
     )

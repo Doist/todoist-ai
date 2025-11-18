@@ -41,6 +41,9 @@ const findProjectCollaborators = {
     description: 'Search for collaborators by name or other criteria in a project.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
+    annotations: {
+        readOnlyHint: true,
+    },
     async execute(args, client) {
         const { projectId, searchTerm } = args
 

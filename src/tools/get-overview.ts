@@ -365,6 +365,9 @@ const getOverview = {
         'Get a Markdown overview. If no projectId is provided, shows all projects with hierarchy and sections (useful for navigation). If projectId is provided, shows detailed overview of that specific project including all tasks grouped by sections.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
+    annotations: {
+        readOnlyHint: true,
+    },
     async execute(args, client) {
         const result = args.projectId
             ? await generateProjectOverview(client, args.projectId)
