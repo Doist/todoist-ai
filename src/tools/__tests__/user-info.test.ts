@@ -18,6 +18,7 @@ function createMockUser(overrides: Partial<CurrentUser> = {}): CurrentUser {
         fullName: 'Test User',
         email: 'test@example.com',
         isPremium: true,
+        premiumStatus: 'current_personal_plan',
         completedToday: 12,
         dailyGoal: 10,
         weeklyGoal: 100,
