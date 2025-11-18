@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.1](https://github.com/Doist/todoist-ai/compare/v5.0.0...v5.0.1) (2025-11-18)
+
+
+### Bug Fixes
+
+* **deps:** update production dependencies ([#220](https://github.com/Doist/todoist-ai/issues/220)) ([f6121b0](https://github.com/Doist/todoist-ai/commit/f6121b0fcc7bf432e07df7a8ef9c11291ba09dfb))
+
 ## [5.0.0](https://github.com/Doist/todoist-ai/compare/v4.17.4...v5.0.0) (2025-11-14)
 
 
