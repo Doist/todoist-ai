@@ -111,7 +111,7 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
         },
     )
 
-    const todoist = new TodoistApi(todoistApiKey, baseUrl)
+    const todoist = new TodoistApi(todoistApiKey, { baseUrl })
 
     // Task management tools
     registerTool(addTasks, server, todoist)

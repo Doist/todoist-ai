@@ -188,6 +188,7 @@ export function createMockUser(overrides: Partial<CurrentUser> = {}): CurrentUse
         fullName: 'Test User',
         businessAccountId: null,
         isPremium: false,
+        premiumStatus: 'not_premium',
         dateFormat: 0,
         timeFormat: 0,
         weeklyGoal: 5,

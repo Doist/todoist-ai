@@ -54,7 +54,8 @@ describe(`${GET_OVERVIEW} tool`, () => {
                 results: mockProjects,
                 nextCursor: null,
             })
-            mockTodoistApi.getSections.mockImplementation(({ projectId }) => {
+            mockTodoistApi.getSections.mockImplementation((args) => {
+                const { projectId } = args as { projectId: string }
                 if (projectId === TEST_IDS.PROJECT_TEST) {
                     return Promise.resolve({ results: mockSections, nextCursor: null })
                 }
