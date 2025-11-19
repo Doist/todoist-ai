@@ -1,7 +1,7 @@
 import { getProjectUrl, getTaskUrl } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { getTasksByFilter } from '../tool-helpers.js'
+import { fetchAllProjects, getTasksByFilter } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -45,19 +45,20 @@ const search = {
 
         // Search both tasks and projects in parallel
         // Use TASKS_MAX for search since this tool doesn't support pagination
-        const [tasksResult, projectsResponse] = await Promise.all([
+        // For projects, fetch ALL to ensure we don't miss matches beyond first page
+        const [tasksResult, allProjects] = await Promise.all([
             getTasksByFilter({
                 client,
                 query: `search: ${query}`,
                 limit: ApiLimits.TASKS_MAX,
                 cursor: undefined,
             }),
-            client.getProjects({ limit: ApiLimits.PROJECTS_MAX }),
+            fetchAllProjects(client),
         ])
 
         // Filter projects by search query (case-insensitive)
         const searchLower = query.toLowerCase()
-        const matchingProjects = projectsResponse.results.filter((project) =>
+        const matchingProjects = allProjects.filter((project) =>
             project.name.toLowerCase().includes(searchLower),
         )
 

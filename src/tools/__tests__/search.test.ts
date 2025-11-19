@@ -71,6 +71,7 @@ describe(`${SEARCH} tool`, () => {
             })
             expect(mockTodoistApi.getProjects).toHaveBeenCalledWith({
                 limit: 200, // PROJECTS_MAX
+                cursor: null,
             })
 
             // Parse the JSON response

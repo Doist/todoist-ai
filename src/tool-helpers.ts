@@ -8,6 +8,7 @@ import type {
     WorkspaceProject,
 } from '@doist/todoist-api-typescript'
 import z from 'zod'
+import { ApiLimits } from './utils/constants.js'
 import { formatDuration } from './utils/duration-parser.js'
 import { convertNumberToPriority } from './utils/priorities.js'
 
@@ -29,6 +30,30 @@ export function isPersonalProject(project: Project): project is PersonalProject 
 
 export function isWorkspaceProject(project: Project): project is WorkspaceProject {
     return 'accessLevel' in project
+}
+
+/**
+ * Fetches all projects from Todoist by looping through paginated results.
+ * This is useful when you need to search/filter projects client-side and want
+ * to ensure no matches are missed due to pagination boundaries.
+ *
+ * @param client - The Todoist API client
+ * @returns Promise resolving to array of all projects
+ */
+export async function fetchAllProjects(client: TodoistApi): Promise<Project[]> {
+    const allProjects: Project[] = []
+    let cursor: string | null = null
+
+    do {
+        const response = await client.getProjects({
+            limit: ApiLimits.PROJECTS_MAX,
+            cursor,
+        })
+        allProjects.push(...response.results)
+        cursor = response.nextCursor
+    } while (cursor)
+
+    return allProjects
 }
 
 /**

@@ -1,12 +1,14 @@
-import type { PersonalProject, WorkspaceProject } from '@doist/todoist-api-typescript'
+import type { PersonalProject, TodoistApi, WorkspaceProject } from '@doist/todoist-api-typescript'
+import { type Mocked, vi } from 'vitest'
 import {
     createMoveTaskArgs,
+    fetchAllProjects,
     isPersonalProject,
     isWorkspaceProject,
     mapProject,
     mapTask,
 } from './tool-helpers.js'
-import { createMockTask } from './utils/test-helpers.js'
+import { createMockProject, createMockTask, createMockApiResponse } from './utils/test-helpers.js'
 
 describe('shared utilities', () => {
     describe('mapTask', () => {
@@ -248,6 +250,74 @@ End of description.`)
             expect(() => createMoveTaskArgs('task-1', '', '', '')).toThrow(
                 'Task task-1: At least one of projectId, sectionId, or parentId must be provided',
             )
+        })
+    })
+
+    describe('fetchAllProjects', () => {
+        const mockTodoistApi = {
+            getProjects: vi.fn(),
+        } as unknown as Mocked<TodoistApi>
+
+        beforeEach(() => {
+            vi.clearAllMocks()
+        })
+
+        it('should fetch all projects when there are multiple pages', async () => {
+            const page1Projects = [
+                createMockProject({ id: 'proj-1', name: 'Project 1' }),
+                createMockProject({ id: 'proj-2', name: 'Project 2' }),
+            ]
+            const page2Projects = [
+                createMockProject({ id: 'proj-3', name: 'Project 3' }),
+            ]
+
+            mockTodoistApi.getProjects
+                .mockResolvedValueOnce(createMockApiResponse(page1Projects, 'cursor-page-2'))
+                .mockResolvedValueOnce(createMockApiResponse(page2Projects, null))
+
+            const result = await fetchAllProjects(mockTodoistApi)
+
+            expect(mockTodoistApi.getProjects).toHaveBeenCalledTimes(2)
+            expect(mockTodoistApi.getProjects).toHaveBeenNthCalledWith(1, {
+                limit: 200,
+                cursor: null,
+            })
+            expect(mockTodoistApi.getProjects).toHaveBeenNthCalledWith(2, {
+                limit: 200,
+                cursor: 'cursor-page-2',
+            })
+            expect(result).toHaveLength(3)
+            expect(result.map(p => p.id)).toEqual(['proj-1', 'proj-2', 'proj-3'])
+        })
+
+        it('should fetch all projects when there is only one page', async () => {
+            const projects = [
+                createMockProject({ id: 'proj-1', name: 'Project 1' }),
+                createMockProject({ id: 'proj-2', name: 'Project 2' }),
+            ]
+
+            mockTodoistApi.getProjects
+                .mockResolvedValueOnce(createMockApiResponse(projects, null))
+
+            const result = await fetchAllProjects(mockTodoistApi)
+
+            expect(mockTodoistApi.getProjects).toHaveBeenCalledTimes(1)
+            expect(mockTodoistApi.getProjects).toHaveBeenCalledWith({
+                limit: 200,
+                cursor: null,
+            })
+            expect(result).toHaveLength(2)
+            expect(result.map(p => p.id)).toEqual(['proj-1', 'proj-2'])
+        })
+
+        it('should handle empty project list', async () => {
+            mockTodoistApi.getProjects
+                .mockResolvedValueOnce(createMockApiResponse([], null))
+
+            const result = await fetchAllProjects(mockTodoistApi)
+
+            expect(mockTodoistApi.getProjects).toHaveBeenCalledTimes(1)
+            expect(result).toHaveLength(0)
         })
     })
 })
