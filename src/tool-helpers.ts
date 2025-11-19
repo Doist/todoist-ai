@@ -3,6 +3,7 @@ import type {
     Comment,
     MoveTaskArgs,
     PersonalProject,
+    Section,
     Task,
     TodoistApi,
     WorkspaceProject,
@@ -33,6 +34,56 @@ export function isWorkspaceProject(project: Project): project is WorkspaceProjec
 }
 
 /**
+ * Generic pagination utility for Todoist API methods
+ *
+ * Recursively fetches all pages of data from paginated Todoist API endpoints.
+ *
+ * @template TArgs - The type of arguments accepted by the API method
+ * @template TResponse - The type of response returned by the API method
+ * @template TResult - The type of individual result items in the response
+ *
+ * @param options - Configuration options
+ * @param options.apiMethod - The Todoist API method to call (e.g., todoistApi.getLabels)
+ * @param options.args - Initial arguments to pass to the API method (excluding cursor and limit)
+ * @param options.limit - Number of items to fetch per page (default: 100)
+ * @returns Promise resolving to an array of all result items across all pages
+ *
+ * @example
+ * const allLabels = await fetchAllPages({
+ *   apiMethod: (args) => todoistApi.getLabels(args),
+ *   args: {},
+ *   limit: 100
+ * })
+ */
+export async function fetchAllPages<
+    TArgs extends { cursor?: string | null; limit?: number },
+    TResponse extends { results: TResult[]; nextCursor: string | null },
+    TResult,
+>(options: {
+    apiMethod: (args: TArgs) => Promise<TResponse>
+    args?: Omit<TArgs, 'cursor' | 'limit'>
+    limit?: number
+}): Promise<TResult[]> {
+    const { apiMethod, args, limit = 100 } = options
+    const allResults: TResult[] = []
+    let cursor: string | null = null
+
+    // Keep fetching pages until there's no nextCursor
+    do {
+        const response = await apiMethod({
+            ...args,
+            cursor,
+            limit,
+        } as TArgs)
+
+        allResults.push(...response.results)
+        cursor = response.nextCursor ?? null
+    } while (cursor !== null)
+
+    return allResults
+}
+
+/**
  * Fetches all projects from Todoist by looping through paginated results.
  * This is useful when you need to search/filter projects client-side and want
  * to ensure no matches are missed due to pagination boundaries.
@@ -41,19 +92,27 @@ export function isWorkspaceProject(project: Project): project is WorkspaceProjec
  * @returns Promise resolving to array of all projects
  */
 export async function fetchAllProjects(client: TodoistApi): Promise<Project[]> {
-    const allProjects: Project[] = []
-    let cursor: string | null = null
+    return fetchAllPages({
+        apiMethod: (args) => client.getProjects(args),
+        limit: ApiLimits.PROJECTS_MAX,
+    })
+}
 
-    do {
-        const response = await client.getProjects({
-            limit: ApiLimits.PROJECTS_MAX,
-            cursor,
-        })
-        allProjects.push(...response.results)
-        cursor = response.nextCursor
-    } while (cursor)
-
-    return allProjects
+/**
+ * Fetches all sections for a project from Todoist by looping through paginated results.
+ * This is useful when you need to search/filter sections client-side and want
+ * to ensure no matches are missed due to pagination boundaries.
+ *
+ * @param client - The Todoist API client
+ * @param projectId - The ID of the project to fetch sections from
+ * @returns Promise resolving to array of all sections in the project
+ */
+export async function fetchAllSections(client: TodoistApi, projectId?: string): Promise<Section[]> {
+    return fetchAllPages({
+        apiMethod: (args) => client.getSections(args),
+        args: projectId ? { projectId } : {},
+        limit: ApiLimits.SECTIONS_MAX,
+    })
 }
 
 /**

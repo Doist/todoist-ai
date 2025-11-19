@@ -19,6 +19,8 @@ export const ApiLimits = {
     PROJECTS_DEFAULT: 50,
     /** Maximum limit for project listings */
     PROJECTS_MAX: 200,
+    /** Maximum limit for section listings */
+    SECTIONS_MAX: 200,
     /** Batch size for fetching all tasks in a project */
     TASKS_BATCH_SIZE: 50,
     /** Default limit for comment listings */
