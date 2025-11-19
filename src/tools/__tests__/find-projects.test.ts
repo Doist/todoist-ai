@@ -115,7 +115,7 @@ describe(`${FIND_PROJECTS} tool`, () => {
     })
 
     describe('searching projects', () => {
-        it('should filter projects by search term (case insensitive)', async () => {
+        it('should filter projects by search term (case insensitive) and fetch all projects', async () => {
             const mockProjects = [
                 createMockProject({
                     id: TEST_IDS.PROJECT_WORK,
@@ -133,19 +133,69 @@ describe(`${FIND_PROJECTS} tool`, () => {
             mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse(mockProjects))
             const result = await findProjects.execute({ search: 'work', limit: 50 }, mockTodoistApi)
 
-            expect(mockTodoistApi.getProjects).toHaveBeenCalledWith({ limit: 50, cursor: null })
+            // When searching, should use maximum limit and ignore user's limit parameter
+            expect(mockTodoistApi.getProjects).toHaveBeenCalledWith({ limit: 200, cursor: null })
             expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content with search filter
             const structuredContent = result.structuredContent
             expect(structuredContent.projects).toHaveLength(2) // Should match filtered results
             expect(structuredContent.totalCount).toBe(2)
-            expect(structuredContent.hasMore).toBe(false)
+            expect(structuredContent.hasMore).toBe(false) // Always false when searching
+            expect(structuredContent.nextCursor).toBeUndefined() // No cursor when searching
             expect(structuredContent.appliedFilters).toEqual({
                 search: 'work',
                 limit: 50,
                 cursor: undefined,
             })
+        })
+
+        it('should find matching projects across multiple pages', async () => {
+            // Simulate the original problem: matching project is on "page 2"
+            const page1Projects = Array.from({ length: 50 }, (_, i) =>
+                createMockProject({
+                    id: `page1-project-${i}`,
+                    name: `Page 1 Project ${i}`,
+                }),
+            )
+            const page2Projects = [
+                createMockProject({
+                    id: 'matching-project',
+                    name: 'Important Work Project', // This matches 'work' search
+                }),
+                createMockProject({
+                    id: 'other-project',
+                    name: 'Other Project',
+                }),
+            ]
+
+            // Set up multiple API calls to simulate pagination
+            mockTodoistApi.getProjects
+                .mockResolvedValueOnce(
+                    createMockApiResponse(page1Projects.slice(0, 200), 'page-2-cursor'),
+                )
+                .mockResolvedValueOnce(createMockApiResponse(page2Projects, null))
+
+            const result = await findProjects.execute({ search: 'work', limit: 10 }, mockTodoistApi)
+
+            // Should have made 2 API calls to get all projects
+            expect(mockTodoistApi.getProjects).toHaveBeenCalledTimes(2)
+            expect(mockTodoistApi.getProjects).toHaveBeenNthCalledWith(1, {
+                limit: 200,
+                cursor: null,
+            })
+            expect(mockTodoistApi.getProjects).toHaveBeenNthCalledWith(2, {
+                limit: 200,
+                cursor: 'page-2-cursor',
+            })
+
+            // Should find the matching project even though it was on "page 2"
+            const structuredContent = result.structuredContent
+            expect(structuredContent.projects).toHaveLength(1)
+            expect(structuredContent.projects[0]?.name).toBe('Important Work Project')
+            expect(structuredContent.totalCount).toBe(1)
+            expect(structuredContent.hasMore).toBe(false)
+            expect(structuredContent.nextCursor).toBeUndefined()
         })
 
         it.each([

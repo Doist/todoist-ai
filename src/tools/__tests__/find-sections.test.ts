@@ -149,6 +149,8 @@ describe(`${FIND_SECTIONS} tool`, () => {
 
             expect(mockTodoistApi.getSections).toHaveBeenCalledWith({
                 projectId: TEST_IDS.PROJECT_TEST,
+                cursor: null,
+                limit: 200, // SECTIONS_MAX
             })
 
             // Should return both "In Progress" and "Progress Review" (case insensitive partial match)

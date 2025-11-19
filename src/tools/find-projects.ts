@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { mapProject } from '../tool-helpers.js'
+import { fetchAllProjects, mapProject } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { ProjectSchema as ProjectOutputSchema } from '../utils/output-schemas.js'
 import { formatProjectPreview, summarizeList } from '../utils/response-builders.js'
@@ -41,14 +41,28 @@ const OutputSchema = {
 const findProjects = {
     name: ToolNames.FIND_PROJECTS,
     description:
-        'List all projects or search for projects by name. If search parameter is omitted, all projects are returned.',
+        'List all projects or search for projects by name. When searching, all matching projects are returned (pagination is ignored). When not searching, projects are returned with pagination.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     async execute(args, client) {
-        const { results, nextCursor } = await client.getProjects({
-            limit: args.limit,
-            cursor: args.cursor ?? null,
-        })
+        let results: Awaited<ReturnType<typeof client.getProjects>>['results']
+        let nextCursor = null
+
+        if (args.search) {
+            // When searching, fetch ALL projects to ensure we don't miss any matches
+            results = await fetchAllProjects(client)
+            // When searching, we have all results so no pagination
+            nextCursor = null
+        } else {
+            // Normal pagination when not searching
+            const response = await client.getProjects({
+                limit: args.limit,
+                cursor: args.cursor ?? null,
+            })
+            results = response.results
+            nextCursor = response.nextCursor
+        }
+
         const searchLower = args.search ? args.search.toLowerCase() : undefined
         const filtered = searchLower
             ? results.filter((project) => project.name.toLowerCase().includes(searchLower))
@@ -78,7 +92,7 @@ function generateTextContent({
     nextCursor: string | null
 }) {
     // Generate subject description
-    const subject = args.search ? `Projects matching "${args.search}"` : 'Projects'
+    const subject = args.search ? `All projects matching "${args.search}"` : 'Projects'
 
     // Generate filter hints
     const filterHints: string[] = []

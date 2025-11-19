@@ -1,12 +1,21 @@
-import type { PersonalProject, WorkspaceProject } from '@doist/todoist-api-typescript'
+import type {
+    PersonalProject,
+    Section,
+    TodoistApi,
+    WorkspaceProject,
+} from '@doist/todoist-api-typescript'
+import { type Mocked, vi } from 'vitest'
 import {
     createMoveTaskArgs,
+    fetchAllPages,
+    fetchAllProjects,
+    fetchAllSections,
     isPersonalProject,
     isWorkspaceProject,
     mapProject,
     mapTask,
 } from './tool-helpers.js'
-import { createMockTask } from './utils/test-helpers.js'
+import { createMockApiResponse, createMockProject, createMockTask } from './utils/test-helpers.js'
 
 describe('shared utilities', () => {
     describe('mapTask', () => {
@@ -248,6 +257,148 @@ End of description.`)
             expect(() => createMoveTaskArgs('task-1', '', '', '')).toThrow(
                 'Task task-1: At least one of projectId, sectionId, or parentId must be provided',
             )
+        })
+    })
+
+    describe('fetchAllPages', () => {
+        const mockApiMethod = vi.fn()
+
+        beforeEach(() => {
+            vi.clearAllMocks()
+        })
+
+        it('should fetch all pages when there are multiple pages', async () => {
+            const page1Items = [
+                { id: '1', name: 'Item 1' },
+                { id: '2', name: 'Item 2' },
+            ]
+            const page2Items = [{ id: '3', name: 'Item 3' }]
+
+            mockApiMethod
+                .mockResolvedValueOnce({ results: page1Items, nextCursor: 'cursor-page-2' })
+                .mockResolvedValueOnce({ results: page2Items, nextCursor: null })
+
+            const result = await fetchAllPages({
+                apiMethod: mockApiMethod,
+                args: { someParam: 'test' },
+                limit: 100,
+            })
+
+            expect(mockApiMethod).toHaveBeenCalledTimes(2)
+            expect(mockApiMethod).toHaveBeenNthCalledWith(1, {
+                someParam: 'test',
+                cursor: null,
+                limit: 100,
+            })
+            expect(mockApiMethod).toHaveBeenNthCalledWith(2, {
+                someParam: 'test',
+                cursor: 'cursor-page-2',
+                limit: 100,
+            })
+            expect(result).toHaveLength(3)
+            expect(result.map((item) => (item as { id: string }).id)).toEqual(['1', '2', '3'])
+        })
+
+        it('should fetch single page when there is no next cursor', async () => {
+            const items = [{ id: '1', name: 'Item 1' }]
+
+            mockApiMethod.mockResolvedValueOnce({ results: items, nextCursor: null })
+
+            const result = await fetchAllPages({
+                apiMethod: mockApiMethod,
+                args: {},
+                limit: 50,
+            })
+
+            expect(mockApiMethod).toHaveBeenCalledTimes(1)
+            expect(mockApiMethod).toHaveBeenCalledWith({
+                cursor: null,
+                limit: 50,
+            })
+            expect(result).toHaveLength(1)
+        })
+
+        it('should use default limit when not specified', async () => {
+            mockApiMethod.mockResolvedValueOnce({ results: [], nextCursor: null })
+
+            await fetchAllPages({
+                apiMethod: mockApiMethod,
+            })
+
+            expect(mockApiMethod).toHaveBeenCalledWith({
+                cursor: null,
+                limit: 100, // default
+            })
+        })
+    })
+
+    describe('fetchAllProjects', () => {
+        const mockTodoistApi = {
+            getProjects: vi.fn(),
+        } as unknown as Mocked<TodoistApi>
+
+        beforeEach(() => {
+            vi.clearAllMocks()
+        })
+
+        it('should delegate to fetchAllPages with correct parameters', async () => {
+            const projects = [createMockProject({ id: 'proj-1', name: 'Project 1' })]
+
+            mockTodoistApi.getProjects.mockResolvedValueOnce(createMockApiResponse(projects, null))
+
+            const result = await fetchAllProjects(mockTodoistApi)
+
+            expect(mockTodoistApi.getProjects).toHaveBeenCalledWith({
+                cursor: null,
+                limit: 200, // PROJECTS_MAX
+            })
+            expect(result).toHaveLength(1)
+            expect(result[0]?.id).toBe('proj-1')
+        })
+    })
+
+    describe('fetchAllSections', () => {
+        const mockTodoistApi = {
+            getSections: vi.fn(),
+        } as unknown as Mocked<TodoistApi>
+
+        beforeEach(() => {
+            vi.clearAllMocks()
+        })
+
+        const createMockSection = (overrides: Partial<Section> = {}): Section => ({
+            id: 'section-id',
+            name: 'Section Name',
+            projectId: 'project-id',
+            sectionOrder: 1,
+            url: 'https://todoist.com/app/section/section-id',
+            userId: 'user-id',
+            addedAt: '2024-01-01T00:00:00.000Z',
+            updatedAt: '2024-01-01T00:00:00.000Z',
+            archivedAt: null,
+            isArchived: false,
+            isDeleted: false,
+            isCollapsed: false,
+            ...overrides,
+        })
+
+        it('should delegate to fetchAllPages with correct parameters', async () => {
+            const sections = [createMockSection({ id: 'sect-1', name: 'Section 1' })]
+
+            mockTodoistApi.getSections.mockResolvedValueOnce({
+                results: sections,
+                nextCursor: null,
+            })
+
+            const result = await fetchAllSections(mockTodoistApi, 'project-123')
+
+            expect(mockTodoistApi.getSections).toHaveBeenCalledWith({
+                projectId: 'project-123',
+                cursor: null,
+                limit: 200, // SECTIONS_MAX
+            })
+            expect(result).toHaveLength(1)
+            expect(result[0]?.id).toBe('sect-1')
         })
     })
 })

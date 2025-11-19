@@ -16,8 +16,8 @@ Preview:
     Work Project • ⭐ • Shared • board • id=work-project-id"
 `;
 
-exports[`find-projects tool > searching projects > should filter projects by search term (case insensitive) 1`] = `
-"Projects matching "work": 2 (limit 50).
+exports[`find-projects tool > searching projects > should filter projects by search term (case insensitive) and fetch all projects 1`] = `
+"All projects matching "work": 2 (limit 50).
 Filter: search: "work".
 Preview:
     Work Project • id=work-project-id
@@ -25,14 +25,14 @@ Preview:
 `;
 
 exports[`find-projects tool > searching projects > should handle search with 'case insensitive matching' 1`] = `
-"Projects matching "IMPORTANT": 1 (limit 50).
+"All projects matching "IMPORTANT": 1 (limit 50).
 Filter: search: "IMPORTANT".
 Preview:
     Important Project • id=6cfCcrrCFg2xP94Q"
 `;
 
 exports[`find-projects tool > searching projects > should handle search with 'no matches' 1`] = `
-"Projects matching "nonexistent": 0 (limit 50).
+"All projects matching "nonexistent": 0 (limit 50).
 Filter: search: "nonexistent".
 No results. Try broader search terms; Check spelling; Remove search to see all projects."
 `;
