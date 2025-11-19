@@ -32,6 +32,7 @@ const addComments = {
         'Add multiple comments to tasks or projects. Each comment must specify either taskId or projectId.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
+    mutability: 'additive' as const,
     async execute(args, client) {
         const { comments } = args
 

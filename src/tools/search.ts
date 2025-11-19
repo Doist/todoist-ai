@@ -40,9 +40,7 @@ const search = {
         'Search across tasks and projects in Todoist. Returns a list of relevant results with IDs, titles, and URLs.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    annotations: {
-        readOnlyHint: true,
-    },
+    mutability: 'readonly' as const,
     async execute(args, client) {
         const { query } = args
 

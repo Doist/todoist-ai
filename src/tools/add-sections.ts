@@ -28,6 +28,7 @@ const addSections = {
     description: 'Add one or more new sections to projects.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
+    mutability: 'additive' as const,
     async execute({ sections }, client) {
         // Check if any section needs inbox resolution
         const needsInboxResolution = sections.some((section) => section.projectId === 'inbox')

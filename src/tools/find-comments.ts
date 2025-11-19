@@ -38,9 +38,7 @@ const findComments = {
         'Find comments by task, project, or get a specific comment by ID. Exactly one of taskId, projectId, or commentId must be provided.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    annotations: {
-        readOnlyHint: true,
-    },
+    mutability: 'readonly' as const,
     async execute(args, client) {
         // Validate that exactly one search parameter is provided
         const searchParams = [args.taskId, args.projectId, args.commentId].filter(Boolean)

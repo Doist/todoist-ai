@@ -41,9 +41,7 @@ const fetch = {
         'Fetch the full contents of a task or project by its ID. The ID should be in the format "task:{id}" or "project:{id}".',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    annotations: {
-        readOnlyHint: true,
-    },
+    mutability: 'readonly' as const,
     async execute(args, client) {
         const { id } = args
 

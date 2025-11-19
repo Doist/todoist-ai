@@ -38,9 +38,7 @@ const findSections = {
     description: 'Search for sections by name or other criteria in a project.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    annotations: {
-        readOnlyHint: true,
-    },
+    mutability: 'readonly' as const,
     async execute(args, client) {
         // Resolve "inbox" to actual inbox project ID if needed
         const resolvedProjectId =

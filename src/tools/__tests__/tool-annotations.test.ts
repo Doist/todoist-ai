@@ -1,34 +1,34 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getMcpServer } from '../../mcp-server.js'
+import type { ToolMutability } from '../../todoist-tool.js'
 import { ToolNames } from '../../utils/tool-names.js'
 
-// Tool read-only or read-write categorization.
+// Tool mutability categorization.
 // Update this when adding new tools.
-// true = read-only, false = read-write
-const TOOL_READ_ONLY_CATEGORIZATION = {
-    'find-projects': true,
-    'find-tasks': true,
-    'find-tasks-by-date': true,
-    'find-completed-tasks': true,
-    'find-sections': true,
-    'find-comments': true,
-    'find-activity': true,
-    'find-project-collaborators': true,
-    'user-info': true,
-    'get-overview': true,
-    search: true,
-    fetch: true,
-    'add-tasks': false,
-    'update-tasks': false,
-    'complete-tasks': false,
-    'add-projects': false,
-    'update-projects': false,
-    'add-sections': false,
-    'update-sections': false,
-    'add-comments': false,
-    'update-comments': false,
-    'delete-object': false,
-    'manage-assignments': false,
+const TOOL_MUTABILITY_CATEGORIZATION: Record<string, ToolMutability> = {
+    'find-projects': 'readonly',
+    'find-tasks': 'readonly',
+    'find-tasks-by-date': 'readonly',
+    'find-completed-tasks': 'readonly',
+    'find-sections': 'readonly',
+    'find-comments': 'readonly',
+    'find-activity': 'readonly',
+    'find-project-collaborators': 'readonly',
+    'user-info': 'readonly',
+    'get-overview': 'readonly',
+    search: 'readonly',
+    fetch: 'readonly',
+    'add-tasks': 'additive',
+    'add-projects': 'additive',
+    'add-sections': 'additive',
+    'add-comments': 'additive',
+    'update-tasks': 'mutating',
+    'update-projects': 'mutating',
+    'update-sections': 'mutating',
+    'update-comments': 'mutating',
+    'complete-tasks': 'mutating',
+    'delete-object': 'mutating',
+    'manage-assignments': 'mutating',
 } as const
 
 describe('Tool annotations', () => {
@@ -39,11 +39,11 @@ describe('Tool annotations', () => {
     it('should have all tools categorized', () => {
         // Ensure all tools from ToolNames are categorized
         expect(Object.values(ToolNames).sort()).toEqual(
-            Object.keys(TOOL_READ_ONLY_CATEGORIZATION).sort(),
+            Object.keys(TOOL_MUTABILITY_CATEGORIZATION).sort(),
         )
     })
 
-    it('should register tools with correct readOnlyHint annotations', async () => {
+    it('should register tools with correct mutability', async () => {
         // Spy on registerTool to capture registered tools
         const mcpHelpersModule = await import('../../mcp-helpers.js')
         const registerSpy = vi.spyOn(mcpHelpersModule, 'registerTool')
@@ -51,14 +51,16 @@ describe('Tool annotations', () => {
         // Initialize MCP server (triggers registerTool for all tools)
         await getMcpServer({ todoistApiKey: 'test-token' })
 
-        // Verify each tool's annotation matches its categorization
+        // Verify each tool has mutability set correctly
         for (const call of registerSpy.mock.calls) {
             const tool = call[0] // First argument is the tool object
-            const toolName = tool.name as keyof typeof TOOL_READ_ONLY_CATEGORIZATION
-            const expectedReadOnly = TOOL_READ_ONLY_CATEGORIZATION[toolName]
-            const hasReadOnlyHint = tool.annotations?.readOnlyHint === true
+            const toolName = tool.name as keyof typeof TOOL_MUTABILITY_CATEGORIZATION
+            const expectedMutability = TOOL_MUTABILITY_CATEGORIZATION[toolName]
 
-            expect(hasReadOnlyHint).toBe(expectedReadOnly)
+            // Verify mutability is set on tool
+            expect(tool.mutability).toBe(expectedMutability)
         }
+
+        registerSpy.mockRestore()
     })
 })

@@ -26,6 +26,7 @@ const deleteObject = {
     description: 'Delete a project, section, task, or comment by its ID.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
+    mutability: 'mutating' as const,
     async execute(args, client) {
         switch (args.type) {
             case 'project':

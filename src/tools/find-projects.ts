@@ -44,9 +44,7 @@ const findProjects = {
         'List all projects or search for projects by name. If search parameter is omitted, all projects are returned.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    annotations: {
-        readOnlyHint: true,
-    },
+    mutability: 'readonly' as const,
     async execute(args, client) {
         const { results, nextCursor } = await client.getProjects({
             limit: args.limit,
