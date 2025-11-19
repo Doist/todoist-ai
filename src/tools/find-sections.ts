@@ -36,7 +36,8 @@ const OutputSchema = {
 
 const findSections = {
     name: ToolNames.FIND_SECTIONS,
-    description: 'Search for sections by name or other criteria in a project. When searching, all sections in the project are fetched to ensure complete results.',
+    description:
+        'Search for sections by name or other criteria in a project. When searching, all sections in the project are fetched to ensure complete results.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     async execute(args, client) {
