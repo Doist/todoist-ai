@@ -1,4 +1,9 @@
-import type { PersonalProject, Section, TodoistApi, WorkspaceProject } from '@doist/todoist-api-typescript'
+import type {
+    PersonalProject,
+    Section,
+    TodoistApi,
+    WorkspaceProject,
+} from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
 import {
     createMoveTaskArgs,
@@ -10,7 +15,7 @@ import {
     mapProject,
     mapTask,
 } from './tool-helpers.js'
-import { createMockProject, createMockTask, createMockApiResponse } from './utils/test-helpers.js'
+import { createMockApiResponse, createMockProject, createMockTask } from './utils/test-helpers.js'
 
 describe('shared utilities', () => {
     describe('mapTask', () => {
@@ -263,7 +268,10 @@ End of description.`)
         })
 
         it('should fetch all pages when there are multiple pages', async () => {
-            const page1Items = [{ id: '1', name: 'Item 1' }, { id: '2', name: 'Item 2' }]
+            const page1Items = [
+                { id: '1', name: 'Item 1' },
+                { id: '2', name: 'Item 2' },
+            ]
             const page2Items = [{ id: '3', name: 'Item 3' }]
 
             mockApiMethod
@@ -288,7 +296,7 @@ End of description.`)
                 limit: 100,
             })
             expect(result).toHaveLength(3)
-            expect(result.map(item => item.id)).toEqual(['1', '2', '3'])
+            expect(result.map((item) => (item as { id: string }).id)).toEqual(['1', '2', '3'])
         })
 
         it('should fetch single page when there is no next cursor', async () => {
@@ -334,9 +342,7 @@ End of description.`)
         })
 
         it('should delegate to fetchAllPages with correct parameters', async () => {
-            const projects = [
-                createMockProject({ id: 'proj-1', name: 'Project 1' }),
-            ]
+            const projects = [createMockProject({ id: 'proj-1', name: 'Project 1' })]
 
             mockTodoistApi.getProjects.mockResolvedValueOnce(createMockApiResponse(projects, null))
 
@@ -347,7 +353,7 @@ End of description.`)
                 limit: 200, // PROJECTS_MAX
             })
             expect(result).toHaveLength(1)
-            expect(result[0].id).toBe('proj-1')
+            expect(result[0]?.id).toBe('proj-1')
         })
     })
 
@@ -364,18 +370,24 @@ End of description.`)
             id: 'section-id',
             name: 'Section Name',
             projectId: 'project-id',
-            order: 1,
+            sectionOrder: 1,
+            url: 'https://todoist.com/app/section/section-id',
+            userId: 'user-id',
+            addedAt: '2024-01-01T00:00:00.000Z',
+            updatedAt: '2024-01-01T00:00:00.000Z',
+            archivedAt: null,
+            isArchived: false,
+            isDeleted: false,
+            isCollapsed: false,
             ...overrides,
         })
 
         it('should delegate to fetchAllPages with correct parameters', async () => {
-            const sections = [
-                createMockSection({ id: 'sect-1', name: 'Section 1' }),
-            ]
+            const sections = [createMockSection({ id: 'sect-1', name: 'Section 1' })]
 
             mockTodoistApi.getSections.mockResolvedValueOnce({
                 results: sections,
-                nextCursor: null
+                nextCursor: null,
             })
 
             const result = await fetchAllSections(mockTodoistApi, 'project-123')
@@ -386,7 +398,7 @@ End of description.`)
                 limit: 200, // SECTIONS_MAX
             })
             expect(result).toHaveLength(1)
-            expect(result[0].id).toBe('sect-1')
+            expect(result[0]?.id).toBe('sect-1')
         })
     })
 })
