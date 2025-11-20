@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.0](https://github.com/Doist/todoist-ai/compare/v5.0.2...v5.1.0) (2025-11-20)
+
+
+### Features
+
+* add read-only and destructive hints to all tools ([#222](https://github.com/Doist/todoist-ai/issues/222)) ([5d8ce22](https://github.com/Doist/todoist-ai/commit/5d8ce225c92a688834881bde13d5956bbe7e59ff))
+
 ## [5.0.2](https://github.com/Doist/todoist-ai/compare/v5.0.1...v5.0.2) (2025-11-19)
 
 
