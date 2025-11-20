@@ -70,6 +70,7 @@ const addTasks = {
         'Add one or more tasks to a project, section, or parent. Supports assignment to project collaborators.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
+    mutability: 'additive' as const,
     async execute({ tasks }, client) {
         const addTaskPromises = tasks.map((task) => processTask(task, client))
         const newTasks = await Promise.all(addTaskPromises)

@@ -24,6 +24,7 @@ const updateSections = {
     description: 'Update multiple existing sections with new values.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
+    mutability: 'mutating' as const,
     async execute({ sections }, client) {
         const updatedSections = await Promise.all(
             sections.map((section) => client.updateSection(section.id, { name: section.name })),

@@ -40,6 +40,7 @@ const findSections = {
         'Search for sections by name or other criteria in a project. When searching, all sections in the project are fetched to ensure complete results.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
+    mutability: 'readonly' as const,
     async execute(args, client) {
         // Resolve "inbox" to actual inbox project ID if needed
         const resolvedProjectId =

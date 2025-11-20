@@ -29,6 +29,7 @@ const updateComments = {
     description: 'Update multiple existing comments with new content.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
+    mutability: 'mutating' as const,
     async execute(args, client) {
         const { comments } = args
 

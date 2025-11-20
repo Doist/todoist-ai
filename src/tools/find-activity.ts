@@ -66,6 +66,7 @@ const findActivity = {
         'Retrieve recent activity logs to monitor and audit changes in Todoist. Shows events from all users by default (use initiatorId to filter by specific user). Track task completions, updates, deletions, project changes, and more with flexible filtering. Note: Date-based filtering is not supported by the Todoist API.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
+    mutability: 'readonly' as const,
     async execute(args, client) {
         const { objectType, objectId, eventType, projectId, taskId, initiatorId, limit, cursor } =
             args

@@ -21,6 +21,7 @@ const completeTasks = {
     description: 'Complete one or more tasks by their IDs.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
+    mutability: 'mutating' as const,
     async execute(args, client) {
         const completed: string[] = []
         const failures: Array<{ item: string; error: string; code?: string }> = []

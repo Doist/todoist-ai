@@ -1,7 +1,7 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/mcp.js'
 import type { ZodTypeAny, z } from 'zod'
-import type { TodoistTool } from './todoist-tool.js'
+import type { TodoistTool, ToolMutability } from './todoist-tool.js'
 import { removeNullFields } from './utils/sanitize-data.js'
 
 /**
@@ -67,6 +67,23 @@ function getErrorOutput(error: string) {
 }
 
 /**
+ * Convert tool mutability level to MCP annotation hints.
+ *
+ * @param mutability - The mutability level of the tool.
+ * @returns MCP annotations with readOnlyHint and destructiveHint set appropriately.
+ */
+function getMcpAnnotations(mutability: ToolMutability) {
+    switch (mutability) {
+        case 'readonly':
+            return { readOnlyHint: true, destructiveHint: false }
+        case 'additive':
+            return { readOnlyHint: false, destructiveHint: false }
+        case 'mutating':
+            return { readOnlyHint: false, destructiveHint: true }
+    }
+}
+
+/**
  * Register a Todoist tool in an MCP server.
  * @param tool - The tool to register.
  * @param server - The server to register the tool on.
@@ -102,6 +119,7 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
             description: tool.description,
             inputSchema: tool.parameters,
             outputSchema: tool.outputSchema as Output,
+            annotations: getMcpAnnotations(tool.mutability),
         },
         cb,
     )
