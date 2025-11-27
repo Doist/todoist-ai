@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.0](https://github.com/Doist/todoist-ai/compare/v5.1.1...v5.2.0) (2025-11-27)
+
+
+### Features
+
+* Add isUncompletable parameter support to add/update tools ([#230](https://github.com/Doist/todoist-ai/issues/230)) ([0c295ac](https://github.com/Doist/todoist-ai/commit/0c295ac7d7d1b81f5512b1c782eaba4ef24aeafd))
+
 ## [5.1.1](https://github.com/Doist/todoist-ai/compare/v5.1.0...v5.1.1) (2025-11-27)
 
 
