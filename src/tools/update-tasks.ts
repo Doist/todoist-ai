@@ -61,6 +61,12 @@ const TasksUpdateSchema = z.object({
         .array(z.string())
         .optional()
         .describe('The new labels for the task. Replaces all existing labels.'),
+    isUncompletable: z
+        .boolean()
+        .optional()
+        .describe(
+            'Whether this task should be uncompletable (organizational header). Tasks with isUncompletable: true appear as organizational headers and cannot be completed.',
+        ),
 })
 
 type TaskUpdate = z.infer<typeof TasksUpdateSchema>

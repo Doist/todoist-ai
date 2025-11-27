@@ -1031,4 +1031,33 @@ describe(`${UPDATE_TASKS} tool`, () => {
             })
         })
     })
+
+    describe('isUncompletable parameter', () => {
+        it('should pass isUncompletable parameter to SDK', async () => {
+            // Mock API response - minimal mock just to prevent errors
+            const mockUpdatedTask: Task = createMockTask({
+                id: 'task123',
+                content: 'Updated Header',
+            })
+
+            mockTodoistApi.updateTask.mockResolvedValueOnce(mockUpdatedTask)
+
+            await updateTasks.execute(
+                {
+                    tasks: [
+                        {
+                            id: 'task123',
+                            isUncompletable: true,
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Verify the parameter was passed to the SDK - this is the key test
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('task123', {
+                isUncompletable: true,
+            })
+        })
+    })
 })

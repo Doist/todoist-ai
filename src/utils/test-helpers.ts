@@ -41,6 +41,7 @@ export function createMockTask({
         dayOrder: 0,
         userId: '713437',
         priority: convertPriorityToNumber(priority),
+        isUncompletable: false,
         ...overrides,
     }
 }
