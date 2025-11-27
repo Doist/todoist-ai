@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.1.1](https://github.com/Doist/todoist-ai/compare/v5.1.0...v5.1.1) (2025-11-27)
+
+
+### Bug Fixes
+
+* **deps:** Update `@doist/todoist-api-typescript` to 6.1.12 ([#229](https://github.com/Doist/todoist-ai/issues/229)) ([54e3552](https://github.com/Doist/todoist-ai/commit/54e3552b68d648a042bac9991cb600fd8f8f5be1))
+* **deps:** update dependency @modelcontextprotocol/sdk to v1.22.0 ([#227](https://github.com/Doist/todoist-ai/issues/227)) ([b20c05e](https://github.com/Doist/todoist-ai/commit/b20c05e3273ff6a565380cdddb9be5743ba7bb66))
+
 ## [5.1.0](https://github.com/Doist/todoist-ai/compare/v5.0.2...v5.1.0) (2025-11-20)
 
 
