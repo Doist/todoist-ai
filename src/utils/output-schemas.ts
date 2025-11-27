@@ -28,6 +28,10 @@ const TaskSchema = z.object({
         .string()
         .optional()
         .describe('The UID of the user responsible for this task.'),
+    isUncompletable: z
+        .boolean()
+        .optional()
+        .describe('Whether the task is uncompletable (organizational header).'),
     assignedByUid: z.string().optional().describe('The UID of the user who assigned this task.'),
     checked: z.boolean().describe('Whether the task is checked/completed.'),
     completedAt: z.string().optional().describe('When the task was completed (ISO 8601 format).'),

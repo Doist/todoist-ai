@@ -786,4 +786,38 @@ describe(`${ADD_TASKS} tool`, () => {
             })
         })
     })
+
+    describe('isUncompletable parameter', () => {
+        it('should pass isUncompletable parameter to SDK', async () => {
+            // Mock API response - minimal mock just to prevent errors
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093999',
+                content: 'Project Header',
+            })
+
+            mockTodoistApi.addTask.mockResolvedValueOnce(mockApiResponse)
+
+            await addTasks.execute(
+                {
+                    tasks: [
+                        {
+                            content: 'Project Header',
+                            isUncompletable: true,
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Verify the parameter was passed to the SDK - this is the key test
+            expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
+                content: 'Project Header',
+                projectId: undefined,
+                sectionId: undefined,
+                parentId: undefined,
+                labels: undefined,
+                isUncompletable: true,
+            })
+        })
+    })
 })

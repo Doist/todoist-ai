@@ -53,6 +53,12 @@ const TaskSchema = z.object({
         .describe(
             'Assign task to this user. Can be a user ID, name, or email address. User must be a collaborator on the target project.',
         ),
+    isUncompletable: z
+        .boolean()
+        .optional()
+        .describe(
+            'Whether this task should be uncompletable (organizational header). Tasks with isUncompletable: true appear as organizational headers and cannot be completed.',
+        ),
 })
 
 const ArgsSchema = {
