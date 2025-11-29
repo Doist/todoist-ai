@@ -13,7 +13,7 @@ import { search } from '../search.js'
 vi.mock('../../tool-helpers', async () => {
     const actual = (await vi.importActual(
         '../../tool-helpers',
-    )) as typeof import('../../tool-helpers')
+    )) as typeof import('../../tool-helpers.js')
     return {
         ...actual,
         getTasksByFilter: vi.fn(),

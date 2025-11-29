@@ -1,6 +1,7 @@
 import type { PersonalProject, WorkspaceProject } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
+import { mapProject } from '../tool-helpers.js'
 import { ProjectSchema as ProjectOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -38,11 +39,7 @@ const addProjects = {
     async execute({ projects }, client) {
         const newProjects = await Promise.all(projects.map((project) => client.addProject(project)))
         const textContent = generateTextContent({ projects: newProjects })
-        const mappedProjects = newProjects.map((project) => ({
-            ...project,
-            parentId: 'parentId' in project ? (project.parentId ?? undefined) : undefined,
-            inboxProject: 'inboxProject' in project ? project.inboxProject : false,
-        }))
+        const mappedProjects = newProjects.map(mapProject)
 
         return {
             textContent,
