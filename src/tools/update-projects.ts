@@ -1,6 +1,7 @@
 import type { PersonalProject, WorkspaceProject } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
+import { mapProject } from '../tool-helpers.js'
 import { ProjectSchema as ProjectOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -50,11 +51,7 @@ const updateProjects = {
             .filter(
                 (project): project is PersonalProject | WorkspaceProject => project !== undefined,
             )
-            .map((project) => ({
-                ...project,
-                parentId: 'parentId' in project ? (project.parentId ?? undefined) : undefined,
-                inboxProject: 'inboxProject' in project ? project.inboxProject : false,
-            }))
+            .map(mapProject)
 
         const textContent = generateTextContent({
             projects: updatedProjects,

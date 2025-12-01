@@ -1,5 +1,6 @@
 import type { PersonalProject, TodoistApi, WorkspaceProject } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
+import { ProjectSchema } from '../../utils/output-schemas.js'
 import { createMockProject } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { updateProjects } from '../update-projects.js'
@@ -234,6 +235,126 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
                     },
                 }),
             )
+        })
+    })
+
+    describe('output schema validation', () => {
+        it('should return structured content that strictly matches ProjectSchema (no extra API properties)', async () => {
+            // Mock API response includes ALL properties from Todoist API
+            const mockApiResponse: PersonalProject = {
+                id: 'project-schema-test',
+                name: 'Schema Test Project',
+                color: 'blue',
+                isFavorite: true,
+                isShared: false,
+                parentId: 'parent-123',
+                inboxProject: false,
+                viewStyle: 'board',
+                // Extra properties that should NOT appear in structured output:
+                childOrder: 5,
+                createdAt: '2024-01-01T00:00:00Z',
+                updatedAt: '2024-06-15T12:00:00Z',
+                defaultOrder: 10,
+                description: 'This should not appear in output',
+                isArchived: false,
+                isCollapsed: true,
+                isDeleted: false,
+                isFrozen: false,
+                canAssignTasks: true,
+                url: 'https://todoist.com/projects/test',
+            }
+
+            mockTodoistApi.updateProject.mockResolvedValue(mockApiResponse)
+
+            const result = await updateProjects.execute(
+                { projects: [{ id: 'project-schema-test', name: 'Schema Test Project' }] },
+                mockTodoistApi,
+            )
+
+            const structuredContent = result.structuredContent
+            expect(structuredContent.projects).toHaveLength(1)
+
+            const project = structuredContent.projects.at(0)
+            expect(project).toBeDefined()
+            if (!project) return // Type narrowing
+
+            // Verify ONLY the schema-allowed properties are present
+            const allowedKeys = [
+                'id',
+                'name',
+                'color',
+                'isFavorite',
+                'isShared',
+                'parentId',
+                'inboxProject',
+                'viewStyle',
+            ]
+            const actualKeys = Object.keys(project)
+            expect(actualKeys.sort()).toEqual(allowedKeys.sort())
+
+            // Verify NO extra API properties leaked through
+            const disallowedKeys = [
+                'childOrder',
+                'createdAt',
+                'updatedAt',
+                'defaultOrder',
+                'description',
+                'isArchived',
+                'isCollapsed',
+                'isDeleted',
+                'isFrozen',
+                'canAssignTasks',
+                'url',
+            ]
+            for (const key of disallowedKeys) {
+                expect(project).not.toHaveProperty(key)
+            }
+
+            // Validate against the actual Zod schema (strict mode rejects extra properties)
+            const parseResult = ProjectSchema.strict().safeParse(project)
+            expect(parseResult.success).toBe(true)
+        })
+
+        it('should produce output that passes strict schema validation for multiple projects', async () => {
+            type Project = PersonalProject | WorkspaceProject
+            const mockProjects: [Project, Project] = [
+                createMockProject({
+                    id: 'project-1',
+                    name: 'First',
+                    childOrder: 1,
+                    url: 'https://todoist.com/1',
+                }),
+                createMockProject({
+                    id: 'project-2',
+                    name: 'Second',
+                    childOrder: 2,
+                    url: 'https://todoist.com/2',
+                }),
+            ]
+
+            const [project1, project2] = mockProjects
+            mockTodoistApi.updateProject
+                .mockResolvedValueOnce(project1)
+                .mockResolvedValueOnce(project2)
+
+            const result = await updateProjects.execute(
+                {
+                    projects: [
+                        { id: 'project-1', name: 'First' },
+                        { id: 'project-2', name: 'Second' },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Validate each project in structured content against strict schema
+            for (const project of result.structuredContent.projects) {
+                const parseResult = ProjectSchema.strict().safeParse(project)
+                expect(parseResult.success).toBe(true)
+                if (!parseResult.success) {
+                    console.error('Schema validation failed:', parseResult.error.format())
+                }
+            }
         })
     })
 
