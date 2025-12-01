@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.1](https://github.com/Doist/todoist-ai/compare/v5.2.0...v5.2.1) (2025-12-01)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @modelcontextprotocol/sdk to v1.23.0 ([#233](https://github.com/Doist/todoist-ai/issues/233)) ([217b824](https://github.com/Doist/todoist-ai/commit/217b82471fdfdf7982f4fe19c92f473c2098db73))
+
 ## [5.2.0](https://github.com/Doist/todoist-ai/compare/v5.1.1...v5.2.0) (2025-11-27)
 
 
