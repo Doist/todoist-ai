@@ -40,14 +40,16 @@ function walkZodSchema(
     issues: ValidationIssue[],
     toolName: string,
 ): void {
-    const typeName = schema._def.typeName
+    // biome-ignore lint/suspicious/noExplicitAny: accessing Zod internals
+    const def = schema._def as any
+    const typeName = def.typeName
 
     // Check for ZodOptional containing a ZodNullable ZodString
     if (typeName === 'ZodOptional') {
-        const innerSchema = schema._def.innerType
-        if (innerSchema._def.typeName === 'ZodNullable') {
+        const innerSchema = def.innerType
+        if (innerSchema?._def?.typeName === 'ZodNullable') {
             const nullableInner = innerSchema._def.innerType
-            if (nullableInner._def.typeName === 'ZodString') {
+            if (nullableInner?._def?.typeName === 'ZodString') {
                 issues.push({
                     toolName,
                     parameterPath: path,
@@ -61,10 +63,10 @@ function walkZodSchema(
 
     // Check for ZodNullable containing a ZodOptional ZodString
     if (typeName === 'ZodNullable') {
-        const innerSchema = schema._def.innerType
-        if (innerSchema._def.typeName === 'ZodOptional') {
+        const innerSchema = def.innerType
+        if (innerSchema?._def?.typeName === 'ZodOptional') {
             const optionalInner = innerSchema._def.innerType
-            if (optionalInner._def.typeName === 'ZodString') {
+            if (optionalInner?._def?.typeName === 'ZodString') {
                 issues.push({
                     toolName,
                     parameterPath: path,
@@ -79,26 +81,32 @@ function walkZodSchema(
     // Recursively check nested schemas
     switch (typeName) {
         case 'ZodObject': {
-            const shape = schema._def.shape()
-            for (const [key, value] of Object.entries(shape)) {
-                const newPath = path ? `${path}.${key}` : key
-                walkZodSchema(value as z.ZodTypeAny, newPath, issues, toolName)
+            const shape = typeof def.shape === 'function' ? def.shape() : def.shape
+            if (shape) {
+                for (const [key, value] of Object.entries(shape)) {
+                    const newPath = path ? `${path}.${key}` : key
+                    walkZodSchema(value as z.ZodTypeAny, newPath, issues, toolName)
+                }
             }
             break
         }
         case 'ZodArray':
-            walkZodSchema(schema._def.type, `${path}[]`, issues, toolName)
+            if (def.type) {
+                walkZodSchema(def.type, `${path}[]`, issues, toolName)
+            }
             break
 
         case 'ZodOptional':
         case 'ZodNullable':
         case 'ZodDefault':
-            walkZodSchema(schema._def.innerType, path, issues, toolName)
+            if (def.innerType) {
+                walkZodSchema(def.innerType, path, issues, toolName)
+            }
             break
 
         case 'ZodUnion':
         case 'ZodDiscriminatedUnion': {
-            const options = schema._def.options || schema._def.discriminatedUnion
+            const options = def.options || def.discriminatedUnion
             if (Array.isArray(options)) {
                 options.forEach((option: z.ZodTypeAny, index: number) => {
                     walkZodSchema(option, `${path}[union:${index}]`, issues, toolName)
@@ -107,19 +115,19 @@ function walkZodSchema(
             break
         }
         case 'ZodIntersection':
-            walkZodSchema(schema._def.left, `${path}[left]`, issues, toolName)
-            walkZodSchema(schema._def.right, `${path}[right]`, issues, toolName)
+            if (def.left) walkZodSchema(def.left, `${path}[left]`, issues, toolName)
+            if (def.right) walkZodSchema(def.right, `${path}[right]`, issues, toolName)
             break
 
         case 'ZodRecord':
-            if (schema._def.valueType) {
-                walkZodSchema(schema._def.valueType, `${path}[value]`, issues, toolName)
+            if (def.valueType) {
+                walkZodSchema(def.valueType, `${path}[value]`, issues, toolName)
             }
             break
 
         case 'ZodTuple':
-            if (schema._def.items) {
-                schema._def.items.forEach((item: z.ZodTypeAny, index: number) => {
+            if (def.items) {
+                def.items.forEach((item: z.ZodTypeAny, index: number) => {
                     walkZodSchema(item, `${path}[${index}]`, issues, toolName)
                 })
             }
@@ -174,8 +182,12 @@ async function validateAllSchemas(verbose: boolean = false): Promise<ValidationR
             if (tool.parameters) {
                 try {
                     const schema = z.object(tool.parameters)
-                    const shape = schema._def.shape()
-                    totalParameters += Object.keys(shape).length
+                    // biome-ignore lint/suspicious/noExplicitAny: accessing Zod internals
+                    const def = schema._def as any
+                    const shape = typeof def.shape === 'function' ? def.shape() : def.shape
+                    if (shape) {
+                        totalParameters += Object.keys(shape).length
+                    }
                 } catch {
                     // Skip counting if schema is invalid
                 }

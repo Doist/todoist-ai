@@ -64,7 +64,9 @@ const OutputSchema = {
     nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
     totalCount: z.number().describe('The total number of tasks in this page.'),
     hasMore: z.boolean().describe('Whether there are more results available.'),
-    appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
+    appliedFilters: z
+        .record(z.string(), z.unknown())
+        .describe('The filters that were applied to the search.'),
 }
 
 const findCompletedTasks = {
