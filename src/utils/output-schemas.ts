@@ -110,7 +110,7 @@ const ActivityEventSchema = z.object({
     parentProjectId: z.string().optional().describe('The ID of the parent project.'),
     parentItemId: z.string().optional().describe('The ID of the parent item.'),
     initiatorId: z.string().optional().describe('The ID of the user who initiated this event.'),
-    extraData: z.record(z.unknown()).optional().describe('Additional event data.'),
+    extraData: z.record(z.string(), z.unknown()).optional().describe('Additional event data.'),
 })
 
 /**

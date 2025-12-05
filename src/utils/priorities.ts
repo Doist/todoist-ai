@@ -3,9 +3,9 @@ import { z } from 'zod'
 const PRIORITY_VALUES = ['p1', 'p2', 'p3', 'p4'] as const
 export type Priority = (typeof PRIORITY_VALUES)[number]
 
-export const PrioritySchema = z.enum(PRIORITY_VALUES, {
-    description: 'Task priority: p1 (highest), p2 (high), p3 (medium), p4 (lowest/default)',
-})
+export const PrioritySchema = z
+    .enum(PRIORITY_VALUES)
+    .describe('Task priority: p1 (highest), p2 (high), p3 (medium), p4 (lowest/default)')
 
 export function convertPriorityToNumber(priority: Priority): number {
     // Todoist API uses inverse mapping: p1=4 (highest), p2=3, p3=2, p4=1 (lowest)

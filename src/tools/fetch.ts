@@ -26,7 +26,10 @@ const OutputSchema = {
     title: z.string().describe('The title of the document.'),
     text: z.string().describe('The text content of the document.'),
     url: z.string().describe('The URL of the document.'),
-    metadata: z.record(z.unknown()).optional().describe('Additional metadata about the document.'),
+    metadata: z
+        .record(z.string(), z.unknown())
+        .optional()
+        .describe('Additional metadata about the document.'),
 }
 
 /**
