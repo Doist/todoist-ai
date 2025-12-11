@@ -1,6 +1,7 @@
 import { TodoistApi } from '@doist/todoist-api-typescript'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { registerTool } from './mcp-helpers.js'
+
+import { addMetaToTool, registerResource, registerTool } from './mcp-helpers.js'
 import { addComments } from './tools/add-comments.js'
 import { addProjects } from './tools/add-projects.js'
 import { addSections } from './tools/add-sections.js'
@@ -16,6 +17,7 @@ import { findProjects } from './tools/find-projects.js'
 import { findSections } from './tools/find-sections.js'
 import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
+import { createFindTasksByDateResource } from './tools/find-tasks-by-date.resource.js'
 import { getOverview } from './tools/get-overview.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { search } from './tools/search.js'
@@ -24,6 +26,11 @@ import { updateProjects } from './tools/update-projects.js'
 import { updateSections } from './tools/update-sections.js'
 import { updateTasks } from './tools/update-tasks.js'
 import { userInfo } from './tools/user-info.js'
+import { loadTaskListWidget } from './utils/widget-loader.js'
+
+const taskListWidget = loadTaskListWidget()
+const TASK_CARD_FILE_NAME = taskListWidget.fileName
+const taskCardHtml = taskListWidget.content
 
 const instructions = `
 ## Todoist Task and Project Management Tools
@@ -85,7 +92,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 ### Common Workflows:
 
 - **Daily Planning**: Use find-tasks-by-date with 'today' and get-overview for project status
-- **Team Assignment**: find-project-collaborators → add-tasks with responsibleUser → manage-assignments for bulk changes  
+- **Team Assignment**: find-project-collaborators → add-tasks with responsibleUser → manage-assignments for bulk changes
 - **Task Search**: find-tasks with multiple filters → update-tasks or complete-tasks based on results
 - **Project Organization**: add-projects → add-sections → add-tasks with projectId and sectionId
 - **Progress Reviews**: find-completed-tasks with date ranges → get-overview for project summaries
@@ -113,12 +120,32 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
 
     const todoist = new TodoistApi(todoistApiKey, { baseUrl })
 
+    /**
+     * ChatGPT Apps
+     */
+    // Find Tasks by Date
+    // ChatGPT Apps are caching aggressively with no controls, we're injecting a
+    // build timestamp into the URI to bust the cache reliably. Ideally, in the
+    // future they offer best cache-controls.
+    // ref: https://www.epicai.pro/chat-gpt-app-code-walkthrough-kbh1e#rough-edges-for-now
+    const findTasksByDateUri = `ui://widget/${TASK_CARD_FILE_NAME}`
+    const enhancedFindTasksByDateTool = addMetaToTool(findTasksByDate, {
+        'openai/outputTemplate': findTasksByDateUri,
+        'openai/toolInvocation/invoking': 'Displaying the task list',
+        'openai/toolInvocation/invoked': 'Displayed the task list',
+    })
+    const findTasksByDateResource = createFindTasksByDateResource(findTasksByDateUri, taskCardHtml)
+    registerResource(server, findTasksByDateResource)
+
+    /**
+     * Tools
+     */
     // Task management tools
     registerTool(addTasks, server, todoist)
     registerTool(completeTasks, server, todoist)
     registerTool(updateTasks, server, todoist)
     registerTool(findTasks, server, todoist)
-    registerTool(findTasksByDate, server, todoist)
+    registerTool(enhancedFindTasksByDateTool, server, todoist)
     registerTool(findCompletedTasks, server, todoist)
 
     // Project management tools

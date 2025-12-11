@@ -53,6 +53,13 @@ type TodoistTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape> = {
     mutability: ToolMutability
 
     /**
+     * The meta data of the tool.
+     *
+     * This is used to store additional information about the tool.
+     */
+    _meta?: Record<string, unknown>
+
+    /**
      * The function that executes the tool.
      *
      * This is the main function that will be called when the tool is used.

@@ -1,0 +1,105 @@
+.taskListItem {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 6px;
+}
+
+.taskContent {
+    font-size: 14px;
+    line-height: 21px;
+    color: #202020;
+}
+
+.taskContent a {
+    color: inherit;
+}
+
+/**
+ * Checkbox Styles
+ */
+.checkbox {
+    --bounding-box-size: 24px;
+    --circle-diameter: 18px;
+    --tint: var(--product-library-priorities-p4-primary-idle-tint);
+    --fill: var(--product-library-priorities-p4-primary-idle-fill);
+    --check: var(--product-library-priorities-p4-primary-idle-fill);
+
+    width: var(--bounding-box-size);
+    height: var(--bounding-box-size);
+    cursor: pointer;
+    user-select: none;
+    display: grid;
+    grid-template-areas: "center" var(--bounding-box-size);
+    place-items: center;
+    flex-shrink: 0;
+    box-sizing: content-box;
+    background: none;
+    border: none;
+}
+
+.checkboxBackground,
+.checkboxBorder {
+    height: var(--circle-diameter);
+    width: var(--circle-diameter);
+
+    border: 2px solid transparent;
+    border-radius: 50%;
+
+    box-sizing: border-box;
+}
+
+.checkboxBackground {
+    grid-area: center;
+    z-index: 1;
+
+    background-color: var(--fill);
+
+    overflow: hidden;
+    opacity: 0.1;
+}
+
+.checkmark {
+    grid-area: center;
+    z-index: 3;
+    color: var(--check);
+    transition: opacity 150ms cubic-bezier(0.4, 0, 1, 1);
+    pointer-events: none;
+    opacity: 0;
+}
+
+.checkbox:hover .checkmark,
+.checkbox:focus .checkmark {
+    opacity: 1;
+}
+
+.checkboxBorder {
+    grid-area: center;
+    z-index: 2;
+    border-color: var(--tint);
+}
+
+.priority1 {
+    --tint: var(--product-library-priorities-p1-primary-idle-tint);
+    --fill: var(--product-library-priorities-p1-primary-idle-fill);
+    --check: var(--product-library-priorities-p1-primary-idle-fill);
+}
+
+.priority2 {
+    --tint: var(--product-library-priorities-p2-primary-idle-tint);
+    --fill: var(--product-library-priorities-p2-primary-idle-fill);
+    --check: var(--product-library-priorities-p2-primary-idle-fill);
+}
+
+.priority3 {
+    --tint: var(--product-library-priorities-p3-primary-idle-tint);
+    --fill: var(--product-library-priorities-p3-primary-idle-fill);
+    --check: var(--product-library-priorities-p3-primary-idle-fill);
+}
+
+.priority4 {
+    --fill: transparent;
+}
+.priority4 .checkboxBackground,
+.priority4 .checkboxBorder {
+    border-width: 1px;
+}

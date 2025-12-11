@@ -1,8 +1,13 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/mcp.js'
+import type { TextResourceContents } from '@modelcontextprotocol/sdk/types.js'
 import type { z } from 'zod'
 import type { TodoistTool, ToolMutability } from './todoist-tool.js'
 import { removeNullFields } from './utils/sanitize-data.js'
+
+type McpTextResource = {
+    name: string
+} & TextResourceContents
 
 /**
  * Wether to return the structured content directly, vs. in the `content` part of the output.
@@ -83,6 +88,16 @@ function getMcpAnnotations(mutability: ToolMutability) {
     }
 }
 
+function addMetaToTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape = z.ZodRawShape>(
+    tool: TodoistTool<Params, Output>,
+    meta: TodoistTool<Params, Output>['_meta'],
+): TodoistTool<Params, Output> {
+    return {
+        ...tool,
+        _meta: meta,
+    }
+}
+
 /**
  * Register a Todoist tool in an MCP server.
  * @param tool - The tool to register.
@@ -117,9 +132,17 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
             inputSchema: tool.parameters,
             outputSchema: tool.outputSchema as Output,
             annotations: getMcpAnnotations(tool.mutability),
+            ...(tool._meta ? { _meta: tool._meta } : {}),
         },
         cb,
     )
 }
 
-export { registerTool }
+function registerResource(server: McpServer, resource: McpTextResource) {
+    const { name, ...contents } = resource
+    server.registerResource(name, resource.uri, {}, async () => ({
+        contents: [contents],
+    }))
+}
+
+export { addMetaToTool, registerResource, registerTool }
