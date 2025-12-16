@@ -1,5 +1,23 @@
 # Changelog
 
+## [6.0.0](https://github.com/Doist/todoist-ai/compare/v5.2.0...v6.0.0) (2025-12-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade to Zod v4 ([#236](https://github.com/Doist/todoist-ai/issues/236))
+
+### Features
+
+* upgrade to Zod v4 ([#236](https://github.com/Doist/todoist-ai/issues/236)) ([539f59f](https://github.com/Doist/todoist-ai/commit/539f59fbd2e4d1b4b9b6c9f78255e34bad65c25e))
+
+
+### Bug Fixes
+
+* **deps:** update dependency @modelcontextprotocol/sdk to v1.23.0 ([#233](https://github.com/Doist/todoist-ai/issues/233)) ([217b824](https://github.com/Doist/todoist-ai/commit/217b82471fdfdf7982f4fe19c92f473c2098db73))
+* **deps:** update dependency @modelcontextprotocol/sdk to v1.24.1 ([#237](https://github.com/Doist/todoist-ai/issues/237)) ([5c1994b](https://github.com/Doist/todoist-ai/commit/5c1994b9ddf8ea2c0c0a5b1f36c434f0183ef876))
+* **deps:** update production dependencies ([#242](https://github.com/Doist/todoist-ai/issues/242)) ([4751103](https://github.com/Doist/todoist-ai/commit/47511031bd8471a7b9eb3514964a15ba7846df7b))
+
 ## [5.2.0](https://github.com/Doist/todoist-ai/compare/v5.1.1...v5.2.0) (2025-11-27)
 
 
