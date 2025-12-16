@@ -31,7 +31,9 @@ type SectionSummary = {
 const OutputSchema = {
     sections: z.array(SectionOutputSchema).describe('The found sections.'),
     totalCount: z.number().describe('The total number of sections found.'),
-    appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
+    appliedFilters: z
+        .record(z.string(), z.unknown())
+        .describe('The filters that were applied to the search.'),
 }
 
 const findSections = {

@@ -33,7 +33,9 @@ const OutputSchema = {
         .number()
         .optional()
         .describe('The total number of available collaborators in the project.'),
-    appliedFilters: z.record(z.unknown()).describe('The filters that were applied to the search.'),
+    appliedFilters: z
+        .record(z.string(), z.unknown())
+        .describe('The filters that were applied to the search.'),
 }
 
 const findProjectCollaborators = {

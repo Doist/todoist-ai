@@ -1,6 +1,6 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/mcp.js'
-import type { ZodTypeAny, z } from 'zod'
+import type { z } from 'zod'
 import type { TodoistTool, ToolMutability } from './todoist-tool.js'
 import { removeNullFields } from './utils/sanitize-data.js'
 
@@ -95,10 +95,7 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
     client: TodoistApi,
 ) {
     // @ts-expect-error I give up
-    const cb: ToolCallback<Params> = async (
-        args: z.objectOutputType<Params, ZodTypeAny>,
-        _context,
-    ) => {
+    const cb: ToolCallback<Params> = async (args: z.infer<z.ZodObject<Params>>, _context) => {
         try {
             const { textContent, structuredContent } = await tool.execute(
                 args as z.infer<z.ZodObject<Params>>,
