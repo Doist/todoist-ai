@@ -201,40 +201,41 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                 expectedMethod: 'getCompletedTasksByCompletionDate',
                 expectedFilter: '(@personal  |  @shopping)',
             },
-        ])(
-            'should filter completed tasks by labels: $name',
-            async ({ params, expectedMethod, expectedFilter }) => {
-                const mockCompletedTasks = [
-                    createMockTask({
-                        id: '8485093748',
-                        content: 'Completed task with label',
-                        labels: params.labels,
-                        completedAt: '2024-01-01T00:00:00Z',
-                    }),
-                ]
+        ])('should filter completed tasks by labels: $name', async ({
+            params,
+            expectedMethod,
+            expectedFilter,
+        }) => {
+            const mockCompletedTasks = [
+                createMockTask({
+                    id: '8485093748',
+                    content: 'Completed task with label',
+                    labels: params.labels,
+                    completedAt: '2024-01-01T00:00:00Z',
+                }),
+            ]
 
-                const mockResponse = { items: mockCompletedTasks, nextCursor: null }
-                const mockMethod = mockTodoistApi[
-                    expectedMethod as keyof typeof mockTodoistApi
-                ] as MockedFunction<
-                    (...args: never[]) => Promise<{ items: unknown[]; nextCursor: string | null }>
-                >
-                mockMethod.mockResolvedValue(mockResponse)
+            const mockResponse = { items: mockCompletedTasks, nextCursor: null }
+            const mockMethod = mockTodoistApi[
+                expectedMethod as keyof typeof mockTodoistApi
+            ] as MockedFunction<
+                (...args: never[]) => Promise<{ items: unknown[]; nextCursor: string | null }>
+            >
+            mockMethod.mockResolvedValue(mockResponse)
 
-                const result = await findCompletedTasks.execute(params, mockTodoistApi)
+            const result = await findCompletedTasks.execute(params, mockTodoistApi)
 
-                expect(mockMethod).toHaveBeenCalledWith({
-                    since: `${params.since}T00:00:00.000Z`,
-                    until: `${params.until}T23:59:59.000Z`,
-                    limit: params.limit,
-                    filterQuery: expectedFilter,
-                    filterLang: 'en',
-                })
+            expect(mockMethod).toHaveBeenCalledWith({
+                since: `${params.since}T00:00:00.000Z`,
+                until: `${params.until}T23:59:59.000Z`,
+                limit: params.limit,
+                filterQuery: expectedFilter,
+                filterLang: 'en',
+            })
 
-                const textContent = result.textContent
-                expect(textContent).toMatchSnapshot()
-            },
-        )
+            const textContent = result.textContent
+            expect(textContent).toMatchSnapshot()
+        })
 
         it('should handle empty labels array', async () => {
             const params = {

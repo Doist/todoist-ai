@@ -126,44 +126,46 @@ describe(`${FIND_TASKS} tool`, () => {
                 expectedLimit: 20,
                 expectedCursor: 'cursor-from-first-page',
             },
-        ])(
-            'should handle $name',
-            async ({ params, expectedQuery, expectedLimit, expectedCursor }) => {
-                const mockTask = createMappedTask({ content: 'Test result' })
-                const mockResponse = { tasks: [mockTask], nextCursor: null }
-                mockGetTasksByFilter.mockResolvedValue(mockResponse)
+        ])('should handle $name', async ({
+            params,
+            expectedQuery,
+            expectedLimit,
+            expectedCursor,
+        }) => {
+            const mockTask = createMappedTask({ content: 'Test result' })
+            const mockResponse = { tasks: [mockTask], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
-                const result = await findTasks.execute(params, mockTodoistApi)
+            const result = await findTasks.execute(params, mockTodoistApi)
 
-                expect(mockGetTasksByFilter).toHaveBeenCalledWith({
-                    client: mockTodoistApi,
-                    query: expectedQuery,
-                    cursor: expectedCursor,
-                    limit: expectedLimit,
-                })
-                // Verify result is a concise summary
-                expect(result.textContent).toMatchSnapshot()
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: expectedQuery,
+                cursor: expectedCursor,
+                limit: expectedLimit,
+            })
+            // Verify result is a concise summary
+            expect(result.textContent).toMatchSnapshot()
 
-                // Verify structured content
-                const structuredContent = result.structuredContent
-                expect(structuredContent).toEqual(
-                    expect.objectContaining({
-                        tasks: expect.any(Array),
-                        totalCount: 1,
-                        hasMore: false,
-                        appliedFilters: expect.objectContaining({
-                            searchText: params.searchText,
-                            limit: expectedLimit,
-                        }),
+            // Verify structured content
+            const structuredContent = result.structuredContent
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    tasks: expect.any(Array),
+                    totalCount: 1,
+                    hasMore: false,
+                    appliedFilters: expect.objectContaining({
+                        searchText: params.searchText,
+                        limit: expectedLimit,
                     }),
-                )
-                expect(structuredContent).toEqual(
-                    expect.objectContaining({
-                        tasks: expect.any(Array),
-                    }),
-                )
-            },
-        )
+                }),
+            )
+            expect(structuredContent).toEqual(
+                expect.objectContaining({
+                    tasks: expect.any(Array),
+                }),
+            )
+        })
 
         it.each([
             { searchText: '@work #urgent "exact phrase"', description: 'special characters' },
@@ -457,38 +459,38 @@ describe(`${FIND_TASKS} tool`, () => {
                 },
                 expectedQuery: 'search: follow up & (@personal  |  @shopping)',
             },
-        ])(
-            'should filter tasks by labels in text search: $name',
-            async ({ params, expectedQuery }) => {
-                const mockTasks = [
-                    createMappedTask({
-                        id: TEST_IDS.TASK_1,
-                        content: 'Task with work label',
-                        labels: ['work'],
-                    }),
-                ]
-                const mockResponse = { tasks: mockTasks, nextCursor: null }
-                mockGetTasksByFilter.mockResolvedValue(mockResponse)
+        ])('should filter tasks by labels in text search: $name', async ({
+            params,
+            expectedQuery,
+        }) => {
+            const mockTasks = [
+                createMappedTask({
+                    id: TEST_IDS.TASK_1,
+                    content: 'Task with work label',
+                    labels: ['work'],
+                }),
+            ]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
-                const result = await findTasks.execute(params, mockTodoistApi)
+            const result = await findTasks.execute(params, mockTodoistApi)
 
-                expect(mockGetTasksByFilter).toHaveBeenCalledWith({
-                    client: mockTodoistApi,
-                    query: expectedQuery,
-                    cursor: undefined,
-                    limit: params.limit,
-                })
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: expectedQuery,
+                cursor: undefined,
+                limit: params.limit,
+            })
 
-                const structuredContent = result.structuredContent
-                expect(structuredContent.appliedFilters).toEqual(
-                    expect.objectContaining({
-                        searchText: params.searchText,
-                        labels: params.labels,
-                        ...(params.labelsOperator ? { labelsOperator: params.labelsOperator } : {}),
-                    }),
-                )
-            },
-        )
+            const structuredContent = result.structuredContent
+            expect(structuredContent.appliedFilters).toEqual(
+                expect.objectContaining({
+                    searchText: params.searchText,
+                    labels: params.labels,
+                    ...(params.labelsOperator ? { labelsOperator: params.labelsOperator } : {}),
+                }),
+            )
+        })
 
         it.each([
             {
@@ -519,50 +521,48 @@ describe(`${FIND_TASKS} tool`, () => {
                 },
                 expectedApiParam: { parentId: TEST_IDS.TASK_1 },
             },
-        ])(
-            'should apply label filtering to container searches: $name',
-            async ({ params, expectedApiParam }) => {
-                const allTasks = [
-                    createMockTask({
-                        id: '1',
-                        content: 'Task with matching label',
-                        labels: params.labels,
-                    }),
-                    createMockTask({
-                        id: '2',
-                        content: 'Task without matching label',
-                        labels: ['other'],
-                    }),
-                ]
-                mockTodoistApi.getTasks.mockResolvedValue(createMockApiResponse(allTasks))
+        ])('should apply label filtering to container searches: $name', async ({
+            params,
+            expectedApiParam,
+        }) => {
+            const allTasks = [
+                createMockTask({
+                    id: '1',
+                    content: 'Task with matching label',
+                    labels: params.labels,
+                }),
+                createMockTask({
+                    id: '2',
+                    content: 'Task without matching label',
+                    labels: ['other'],
+                }),
+            ]
+            mockTodoistApi.getTasks.mockResolvedValue(createMockApiResponse(allTasks))
 
-                const result = await findTasks.execute(params, mockTodoistApi)
+            const result = await findTasks.execute(params, mockTodoistApi)
 
-                expect(mockTodoistApi.getTasks).toHaveBeenCalledWith({
-                    limit: 10,
-                    cursor: null,
-                    ...expectedApiParam,
-                })
+            expect(mockTodoistApi.getTasks).toHaveBeenCalledWith({
+                limit: 10,
+                cursor: null,
+                ...expectedApiParam,
+            })
 
-                // Should filter results client-side based on labels
-                const structuredContent = result.structuredContent
-                if (params.labelsOperator === 'and') {
-                    // AND operation: task must have all specified labels
-                    expect(structuredContent.tasks).toEqual(
-                        expect.arrayContaining([
-                            expect.objectContaining({
-                                labels: expect.arrayContaining(params.labels),
-                            }),
-                        ]),
-                    )
-                } else {
-                    // OR operation: task must have at least one of the specified labels
-                    expect((structuredContent.tasks as MappedTask[]).length).toBeGreaterThanOrEqual(
-                        0,
-                    )
-                }
-            },
-        )
+            // Should filter results client-side based on labels
+            const structuredContent = result.structuredContent
+            if (params.labelsOperator === 'and') {
+                // AND operation: task must have all specified labels
+                expect(structuredContent.tasks).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            labels: expect.arrayContaining(params.labels),
+                        }),
+                    ]),
+                )
+            } else {
+                // OR operation: task must have at least one of the specified labels
+                expect((structuredContent.tasks as MappedTask[]).length).toBeGreaterThanOrEqual(0)
+            }
+        })
 
         it('should handle empty labels array', async () => {
             const params = {
