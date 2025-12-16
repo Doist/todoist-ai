@@ -17,39 +17,37 @@
 
 import { z } from 'zod'
 
-interface ValidationIssue {
+type ValidationIssue = {
     toolName: string
     parameterPath: string
     issue: string
     suggestion: string
 }
 
-interface ValidationResult {
+type ValidationResult = {
     success: boolean
     issues: ValidationIssue[]
     toolsChecked: number
     parametersChecked: number
 }
 
+type AnyZodSchema = z.ZodTypeAny | { _zod: { def: unknown } }
+
 /**
  * Recursively walk a Zod schema and detect problematic patterns
  */
 function walkZodSchema(
-    schema: z.ZodTypeAny,
+    schema: AnyZodSchema,
     path: string,
     issues: ValidationIssue[],
     toolName: string,
 ): void {
-    // biome-ignore lint/suspicious/noExplicitAny: accessing Zod internals
-    const def = schema._def as any
-    const typeName = def.typeName
-
     // Check for ZodOptional containing a ZodNullable ZodString
-    if (typeName === 'ZodOptional') {
-        const innerSchema = def.innerType
-        if (innerSchema?._def?.typeName === 'ZodNullable') {
-            const nullableInner = innerSchema._def.innerType
-            if (nullableInner?._def?.typeName === 'ZodString') {
+    if (schema instanceof z.ZodOptional) {
+        const innerSchema = schema.unwrap()
+        if (innerSchema instanceof z.ZodNullable) {
+            const nullableInner = innerSchema.unwrap()
+            if (nullableInner instanceof z.ZodString) {
                 issues.push({
                     toolName,
                     parameterPath: path,
@@ -62,11 +60,11 @@ function walkZodSchema(
     }
 
     // Check for ZodNullable containing a ZodOptional ZodString
-    if (typeName === 'ZodNullable') {
-        const innerSchema = def.innerType
-        if (innerSchema?._def?.typeName === 'ZodOptional') {
-            const optionalInner = innerSchema._def.innerType
-            if (optionalInner?._def?.typeName === 'ZodString') {
+    if (schema instanceof z.ZodNullable) {
+        const innerSchema = schema.unwrap()
+        if (innerSchema instanceof z.ZodOptional) {
+            const optionalInner = innerSchema.unwrap()
+            if (optionalInner instanceof z.ZodString) {
                 issues.push({
                     toolName,
                     parameterPath: path,
@@ -79,67 +77,60 @@ function walkZodSchema(
     }
 
     // Recursively check nested schemas
-    switch (typeName) {
-        case 'ZodObject': {
-            const shape = typeof def.shape === 'function' ? def.shape() : def.shape
-            if (shape) {
-                for (const [key, value] of Object.entries(shape)) {
-                    const newPath = path ? `${path}.${key}` : key
-                    walkZodSchema(value as z.ZodTypeAny, newPath, issues, toolName)
-                }
-            }
-            break
+    if (schema instanceof z.ZodObject) {
+        const shape = schema.shape
+        for (const [key, value] of Object.entries(shape)) {
+            const newPath = path ? `${path}.${key}` : key
+            walkZodSchema(value as AnyZodSchema, newPath, issues, toolName)
         }
-        case 'ZodArray':
-            if (def.type) {
-                walkZodSchema(def.type, `${path}[]`, issues, toolName)
-            }
-            break
-
-        case 'ZodOptional':
-        case 'ZodNullable':
-        case 'ZodDefault':
-            if (def.innerType) {
-                walkZodSchema(def.innerType, path, issues, toolName)
-            }
-            break
-
-        case 'ZodUnion':
-        case 'ZodDiscriminatedUnion': {
-            const options = def.options || def.discriminatedUnion
-            if (Array.isArray(options)) {
-                options.forEach((option: z.ZodTypeAny, index: number) => {
-                    walkZodSchema(option, `${path}[union:${index}]`, issues, toolName)
-                })
-            }
-            break
-        }
-        case 'ZodIntersection':
-            if (def.left) walkZodSchema(def.left, `${path}[left]`, issues, toolName)
-            if (def.right) walkZodSchema(def.right, `${path}[right]`, issues, toolName)
-            break
-
-        case 'ZodRecord':
-            if (def.valueType) {
-                walkZodSchema(def.valueType, `${path}[value]`, issues, toolName)
-            }
-            break
-
-        case 'ZodTuple':
-            if (def.items) {
-                def.items.forEach((item: z.ZodTypeAny, index: number) => {
-                    walkZodSchema(item, `${path}[${index}]`, issues, toolName)
-                })
-            }
-            break
+    } else if (schema instanceof z.ZodArray) {
+        const element = (schema as unknown as { _zod: { def: { element: AnyZodSchema } } })._zod.def
+            .element
+        walkZodSchema(element, `${path}[]`, issues, toolName)
+    } else if (
+        schema instanceof z.ZodOptional ||
+        schema instanceof z.ZodNullable ||
+        schema instanceof z.ZodDefault
+    ) {
+        walkZodSchema(schema.unwrap() as AnyZodSchema, path, issues, toolName)
+    } else if (schema instanceof z.ZodUnion) {
+        const options = (schema as unknown as { _zod: { def: { options: AnyZodSchema[] } } })._zod
+            .def.options
+        options.forEach((option: AnyZodSchema, index: number) => {
+            walkZodSchema(option, `${path}[union:${index}]`, issues, toolName)
+        })
+    } else if (schema instanceof z.ZodDiscriminatedUnion) {
+        const options = (schema as unknown as { _zod: { def: { options: AnyZodSchema[] } } })._zod
+            .def.options
+        options.forEach((option: AnyZodSchema, index: number) => {
+            walkZodSchema(option, `${path}[union:${index}]`, issues, toolName)
+        })
+    } else if (schema instanceof z.ZodIntersection) {
+        const left = (schema as unknown as { _zod: { def: { left: AnyZodSchema } } })._zod.def.left
+        const right = (schema as unknown as { _zod: { def: { right: AnyZodSchema } } })._zod.def
+            .right
+        walkZodSchema(left, `${path}[left]`, issues, toolName)
+        walkZodSchema(right, `${path}[right]`, issues, toolName)
+    } else if (schema instanceof z.ZodRecord) {
+        const valueType = (schema as unknown as { _zod: { def: { valueType: AnyZodSchema } } })._zod
+            .def.valueType
+        walkZodSchema(valueType, `${path}[value]`, issues, toolName)
+    } else if (schema instanceof z.ZodTuple) {
+        const items = (schema as unknown as { _zod: { def: { items: AnyZodSchema[] } } })._zod.def
+            .items
+        items.forEach((item: AnyZodSchema, index: number) => {
+            walkZodSchema(item, `${path}[${index}]`, issues, toolName)
+        })
     }
 }
 
 /**
  * Validate a single tool's parameter schema
  */
-// biome-ignore lint/suspicious/noExplicitAny: this is a tooling script
-function validateToolSchema(tool: any): ValidationIssue[] {
+function validateToolSchema(tool: {
+    name?: string
+    parameters?: Record<string, z.ZodTypeAny>
+}): ValidationIssue[] {
     const issues: ValidationIssue[] = []
     const toolName = tool.name || 'unknown'
 
@@ -182,9 +173,7 @@ async function validateAllSchemas(verbose: boolean = false): Promise<ValidationR
             if (tool.parameters) {
                 try {
                     const schema = z.object(tool.parameters)
-                    // biome-ignore lint/suspicious/noExplicitAny: accessing Zod internals
-                    const def = schema._def as any
-                    const shape = typeof def.shape === 'function' ? def.shape() : def.shape
+                    const shape = schema.shape
                     if (shape) {
                         totalParameters += Object.keys(shape).length
                     }
