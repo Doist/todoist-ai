@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.1.0](https://github.com/Doist/todoist-ai/compare/v6.0.0...v6.1.0) (2025-12-18)
+
+
+### Features
+
+* Add support for MCP Apps (task list resource) ([#245](https://github.com/Doist/todoist-ai/issues/245)) ([dcfddd6](https://github.com/Doist/todoist-ai/commit/dcfddd636bfb6f5bfc491c7fc5f58d699887ab73))
+
 ## [6.0.0](https://github.com/Doist/todoist-ai/compare/v5.2.0...v6.0.0) (2025-12-16)
 
 
