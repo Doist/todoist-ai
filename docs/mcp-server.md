@@ -119,3 +119,10 @@ This will expose the service at the URL http://localhost:8080/mcp. You can now c
 
 > [!NOTE]
 > You may also need to change the command, passing the full path to your `npx` binary, depending one how you installed `node`.
+
+## MCP Apps (task-list) build pipeline
+
+-   The task list widget is bundled and inlined **at Vite build time** via a custom plugin (`virtual:todoist-ai-widgets`).
+-   The plugin uses `BUILD_TIMESTAMP` (from `process.env.BUILD_TIMESTAMP` or auto-generated) to cache-bust the widget URI (e.g., `task-list-<timestamp>.html`).
+-   The final HTML is **embedded in the JS bundle**; the runtime MCP server does **not** read from `dist/` to find widget files.
+-   `npm run build` is sufficient

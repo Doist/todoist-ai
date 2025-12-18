@@ -1,0 +1,30 @@
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+}
+
+@keyframes spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.svg {
+    animation-name: spinner;
+    animation-duration: 1.2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+.tint {
+    fill: var(--product-library-display-accent-primary-fill);
+}
+
+.fill {
+    fill: var(--product-library-display-accent-secondary-fill);
+}

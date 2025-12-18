@@ -2,13 +2,16 @@ import { resolve } from 'node:path'
 import dts from 'vite-plugin-dts'
 import { defineConfig } from 'vitest/config'
 
+import { inlineWidgetsVitePlugin } from './scripts/inline-widgets-vite-plugin.js'
+
 export default defineConfig({
     plugins: [
         dts({
             include: ['src/**/*'],
-            exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
+            exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts', 'src/widgets/**/*'],
             entryRoot: 'src',
         }),
+        inlineWidgetsVitePlugin(),
     ],
 
     // Build configuration for library mode

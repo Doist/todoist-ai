@@ -1,0 +1,19 @@
+.emptyContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    background: white;
+    padding: 16px;
+    border-radius: 16px;
+}
+
+.emptyImage {
+    max-width: 220px;
+}
+
+.emtptyText {
+    font-size: 14px;
+    line-height: 21px;
+    color: #202020;
+}

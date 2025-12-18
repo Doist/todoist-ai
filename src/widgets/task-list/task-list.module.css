@@ -1,0 +1,21 @@
+.widgetContainer {
+    padding: 16px;
+}
+
+.widgetTitle {
+    font-size: 26px;
+    line-height: 35px;
+    font-weight: 700;
+    color: #202020;
+    margin-bottom: 16px;
+}
+
+.taskList {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
