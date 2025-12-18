@@ -1,41 +1,3 @@
-export type OpenAiGlobals<
-    ToolInput = UnknownObject,
-    ToolOutput = UnknownObject,
-    ToolResponseMetadata = UnknownObject,
-    WidgetState = UnknownObject,
-> = {
-    // visuals
-    theme: Theme
-
-    userAgent: UserAgent
-    locale: string
-
-    // layout
-    maxHeight: number
-    displayMode: DisplayMode
-    safeArea: SafeArea
-
-    // state
-    toolInput: ToolInput
-    toolOutput: ToolOutput | null
-    toolResponseMetadata: ToolResponseMetadata | null
-    widgetState: WidgetState | null
-    setWidgetState: (state: WidgetState) => Promise<void>
-}
-
-// currently copied from types.ts in chatgpt/web-sandbox.
-// Will eventually use a public package.
-type API = {
-    callTool: CallTool
-    sendFollowUpMessage: (args: { prompt: string }) => Promise<void>
-    openExternal(payload: { href: string }): void
-
-    // Layout controls
-    requestDisplayMode: RequestDisplayMode
-    requestModal: (args: { title?: string; params?: UnknownObject }) => Promise<unknown>
-    requestClose: () => Promise<void>
-}
-
 export type UnknownObject = Record<string, unknown>
 
 export type Theme = 'light' | 'dark'
@@ -49,6 +11,19 @@ export type SafeAreaInsets = {
 
 export type SafeArea = {
     insets: SafeAreaInsets
+}
+
+// currently copied from types.ts in chatgpt/web-sandbox.
+// Will eventually use a public package.
+type API = {
+    callTool: CallTool
+    sendFollowUpMessage: (args: { prompt: string }) => Promise<void>
+    openExternal(payload: { href: string }): void
+
+    // Layout controls
+    requestDisplayMode: RequestDisplayMode
+    requestModal: (args: { title?: string; params?: UnknownObject }) => Promise<unknown>
+    requestClose: () => Promise<void>
 }
 
 export type DeviceType = 'mobile' | 'tablet' | 'desktop' | 'unknown'
@@ -84,6 +59,31 @@ export class SetGlobalsEvent extends CustomEvent<{
     globals: Partial<OpenAiGlobals>
 }> {
     override readonly type = SET_GLOBALS_EVENT_TYPE
+}
+
+export type OpenAiGlobals<
+    ToolInput = UnknownObject,
+    ToolOutput = UnknownObject,
+    ToolResponseMetadata = UnknownObject,
+    WidgetState = UnknownObject,
+> = {
+    // visuals
+    theme: Theme
+
+    userAgent: UserAgent
+    locale: string
+
+    // layout
+    maxHeight: number
+    displayMode: DisplayMode
+    safeArea: SafeArea
+
+    // state
+    toolInput: ToolInput
+    toolOutput: ToolOutput | null
+    toolResponseMetadata: ToolResponseMetadata | null
+    widgetState: WidgetState | null
+    setWidgetState: (state: WidgetState) => Promise<void>
 }
 
 /**
