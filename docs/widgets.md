@@ -8,7 +8,7 @@ We support [ChatGPT Apps](https://openai.com/index/introducing-apps-in-chatgpt/)
 
 ### How It Works
 
-1. A tool (e.g., `find-tasks-by-date`) returns structured data
+1. A tool (e.g. `find-tasks-by-date`) returns structured data
 2. The tool's metadata includes an `openai/outputTemplate` pointing to a widget resource URI
 3. The MCP server registers the widget HTML as a resource at that URI
 4. The AI client fetches the resource and renders it in a sandboxed iframe
