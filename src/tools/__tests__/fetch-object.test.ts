@@ -9,7 +9,7 @@ const mockTodoistApi = {
     getTask: vi.fn(),
     getProject: vi.fn(),
     getComment: vi.fn(),
-    getSections: vi.fn(),
+    getSection: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
 const { FETCH_OBJECT } = ToolNames
@@ -28,14 +28,6 @@ const MOCK_SECTION: Section = {
     isDeleted: false,
     isCollapsed: false,
     url: 'https://todoist.com/sections/section123',
-}
-
-const MOCK_SECTION_2: Section = {
-    ...MOCK_SECTION,
-    id: 'section456',
-    name: 'Other Section',
-    sectionOrder: 2,
-    url: 'https://todoist.com/sections/section456',
 }
 
 function createMockComment(overrides: Partial<Comment> = {}): Comment {
@@ -208,17 +200,14 @@ describe(`${FETCH_OBJECT} tool`, () => {
 
     describe('fetching sections', () => {
         it('should fetch a section by ID', async () => {
-            mockTodoistApi.getSections.mockResolvedValue({
-                results: [MOCK_SECTION, MOCK_SECTION_2],
-                nextCursor: null,
-            })
+            mockTodoistApi.getSection.mockResolvedValue(MOCK_SECTION)
 
             const result = await fetchObject.execute(
                 { type: 'section', id: 'section123' },
                 mockTodoistApi,
             )
 
-            expect(mockTodoistApi.getSections).toHaveBeenCalledWith()
+            expect(mockTodoistApi.getSection).toHaveBeenCalledWith('section123')
             expect(result.textContent).toContain('Found section: My Section')
             expect(result.textContent).toContain('id=section123')
 
@@ -232,22 +221,8 @@ describe(`${FETCH_OBJECT} tool`, () => {
             })
         })
 
-        it('should handle empty sections list', async () => {
-            mockTodoistApi.getSections.mockResolvedValue({
-                results: [],
-                nextCursor: null,
-            })
-
-            await expect(
-                fetchObject.execute({ type: 'section', id: 'section123' }, mockTodoistApi),
-            ).rejects.toThrow('Section section123 not found.')
-        })
-
-        it('should throw error when section not found', async () => {
-            mockTodoistApi.getSections.mockResolvedValue({
-                results: [MOCK_SECTION_2],
-                nextCursor: null,
-            })
+        it('should handle section not found (null response)', async () => {
+            mockTodoistApi.getSection.mockResolvedValue(null as unknown as Section)
 
             await expect(
                 fetchObject.execute({ type: 'section', id: 'section123' }, mockTodoistApi),
@@ -255,7 +230,7 @@ describe(`${FETCH_OBJECT} tool`, () => {
         })
 
         it('should handle API error when fetching sections', async () => {
-            mockTodoistApi.getSections.mockRejectedValue(new Error('API error'))
+            mockTodoistApi.getSection.mockRejectedValue(new Error('API error'))
 
             await expect(
                 fetchObject.execute({ type: 'section', id: 'section123' }, mockTodoistApi),
