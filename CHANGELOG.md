@@ -1,5 +1,18 @@
 # Changelog
 
+## [6.2.0](https://github.com/Doist/todoist-ai/compare/v6.1.0...v6.2.0) (2025-12-19)
+
+
+### Features
+
+* Add fetch-object tool for direct object retrieval by ID ([#253](https://github.com/Doist/todoist-ai/issues/253)) ([b2f7c2e](https://github.com/Doist/todoist-ai/commit/b2f7c2ecd9b9d4dd3e1d646ad8cbc0a2b5944b3e))
+
+
+### Bug Fixes
+
+* add missing fields to find-comments output schema ([#251](https://github.com/Doist/todoist-ai/issues/251)) ([f964360](https://github.com/Doist/todoist-ai/commit/f964360ea10923f2feec98409386ff0cc7c0ccd2))
+* add structured content to fetch tool output ([#254](https://github.com/Doist/todoist-ai/issues/254)) ([f5f3b15](https://github.com/Doist/todoist-ai/commit/f5f3b1551098a17a57d6af1f2aed8607b91b7c45))
+
 ## [6.1.0](https://github.com/Doist/todoist-ai/compare/v6.0.0...v6.1.0) (2025-12-18)
 
 
