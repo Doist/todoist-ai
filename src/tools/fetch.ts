@@ -124,7 +124,10 @@ const fetch = {
             }
         }
 
-        return { textContent: JSON.stringify(result) }
+        return {
+            textContent: JSON.stringify(result),
+            structuredContent: result,
+        }
     },
 } satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
