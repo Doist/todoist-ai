@@ -17,16 +17,6 @@
             "groupSlug": "all"
         },
         {
-            "matchDepTypes": ["devDependencies"],
-            "groupName": "dev dependencies",
-            "groupSlug": "dev"
-        },
-        {
-            "matchDepTypes": ["dependencies"],
-            "groupName": "production dependencies",
-            "groupSlug": "prod"
-        },
-        {
             "matchPackageNames": ["zod"],
             "allowedVersions": "<4.0.0",
             "description": "Pin zod to v3 until the @modelcontextprotocol/sdk supports zod v4"
