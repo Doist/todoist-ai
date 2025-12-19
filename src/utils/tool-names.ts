@@ -39,6 +39,7 @@ export const ToolNames = {
     // General tools
     GET_OVERVIEW: 'get-overview',
     DELETE_OBJECT: 'delete-object',
+    FETCH_OBJECT: 'fetch-object',
     USER_INFO: 'user-info',
 
     // OpenAI MCP tools
