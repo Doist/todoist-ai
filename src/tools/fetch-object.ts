@@ -72,10 +72,7 @@ const fetchObject = {
                     }
                 }
                 case 'section': {
-                    // Sections require fetching all sections in a project and filtering
-                    // projectId is guaranteed to exist due to validation above
-                    const sectionsResponse = await client.getSections()
-                    const section = sectionsResponse.results.find((s) => s.id === id)
+                    const section = await client.getSection(id)
 
                     if (!section) {
                         throw new Error(`Section ${id} not found.`)
