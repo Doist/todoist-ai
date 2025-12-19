@@ -9,6 +9,7 @@ import { addTasks } from './tools/add-tasks.js'
 import { completeTasks } from './tools/complete-tasks.js'
 import { deleteObject } from './tools/delete-object.js'
 import { fetch } from './tools/fetch.js'
+import { fetchObject } from './tools/fetch-object.js'
 import { findActivity } from './tools/find-activity.js'
 import { findComments } from './tools/find-comments.js'
 import { findCompletedTasks } from './tools/find-completed-tasks.js'
@@ -69,6 +70,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 **General Operations:**
 - **delete-object**: Remove projects, sections, tasks, or comments by type and ID
+- **fetch-object**: Fetch a single task, project, comment, or section by its ID
 - **user-info**: Get user details including timezone, goals, and plan information
 
 ### Best Practices:
@@ -169,6 +171,7 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     // General tools
     registerTool(getOverview, server, todoist)
     registerTool(deleteObject, server, todoist)
+    registerTool(fetchObject, server, todoist)
     registerTool(userInfo, server, todoist)
 
     // Assignment and collaboration tools

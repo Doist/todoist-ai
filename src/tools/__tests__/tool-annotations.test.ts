@@ -18,6 +18,7 @@ const TOOL_MUTABILITY_CATEGORIZATION: Record<string, ToolMutability> = {
     'get-overview': 'readonly',
     search: 'readonly',
     fetch: 'readonly',
+    'fetch-object': 'readonly',
     'add-tasks': 'additive',
     'add-projects': 'additive',
     'add-sections': 'additive',
