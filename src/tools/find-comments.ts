@@ -28,6 +28,13 @@ const ArgsSchema = {
 
 const OutputSchema = {
     comments: z.array(CommentOutputSchema).describe('The found comments.'),
+    searchType: z
+        .string()
+        .describe(
+            'The type of search performed: "single" (comment ID), "task" (task ID), or "project" (project ID).',
+        ),
+    searchId: z.string().describe('The ID that was searched for (comment, task, or project ID).'),
+    hasMore: z.boolean().describe('Whether there are more results available.'),
     nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
     totalCount: z.number().describe('The total number of comments in this page.'),
 }
