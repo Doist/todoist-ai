@@ -95,15 +95,41 @@ Update the configuration above as follows
 
 ## Using Streamable HTTP Server Transport
 
-Unfortunately, MCP host applications do not yet support connecting to an MCP server hosted via HTTP. There's a workaround to run them through a bridge that exposes them locally via Standard I/O.
+You can run the MCP server as an HTTP service with configurable session timeouts. This is useful as an alternative to the hosted service at `ai.todoist.net/mcp`, especially if you experience frequent session disconnections ([#239](https://github.com/Doist/todoist-ai/issues/239)).
 
-Start by running the service via a web server. You can do it locally like this:
+### Quick Start with npx
+
+```bash
+# Default: 30 minute session timeout
+TODOIST_API_KEY=your-key npx @doist/todoist-ai-http
+
+# Custom timeout: 1 hour (3600000ms)
+TODOIST_API_KEY=your-key SESSION_TIMEOUT_MS=3600000 npx @doist/todoist-ai-http
+
+# Custom port
+TODOIST_API_KEY=your-key PORT=8080 npx @doist/todoist-ai-http
+```
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `TODOIST_API_KEY` | (required) | Your Todoist API key |
+| `PORT` | `3000` | HTTP server port |
+| `SESSION_TIMEOUT_MS` | `1800000` | Session timeout in milliseconds (30 min default) |
+| `TODOIST_BASE_URL` | (optional) | Custom Todoist API base URL |
+
+### Local Development
 
 ```sh
 PORT=8080 npm run dev:http
 ```
 
-This will expose the service at the URL http://localhost:8080/mcp. You can now configure Claude Desktop:
+This will expose the service at `http://localhost:8080/mcp` with hot-reload.
+
+### Connecting MCP Clients
+
+MCP host applications can connect via the `mcp-remote` bridge:
 
 ```json
 {
@@ -111,14 +137,25 @@ This will expose the service at the URL http://localhost:8080/mcp. You can now c
     "todoist-mcp-http": {
       "type": "stdio",
       "command": "npx",
-      "args": ["mcp-remote", "http://localhost:8080/mcp"]
+      "args": ["mcp-remote", "http://localhost:3000/mcp"]
     }
   }
 }
 ```
 
+### Health Check
+
+The HTTP server exposes a health check endpoint at `/health` that returns:
+- Server status
+- Number of active sessions
+- Configured session timeout
+
+```bash
+curl http://localhost:3000/health
+```
+
 > [!NOTE]
-> You may also need to change the command, passing the full path to your `npx` binary, depending one how you installed `node`.
+> You may also need to change the command, passing the full path to your `npx` binary, depending on how you installed `node`.
 
 ## MCP Apps (task-list) build pipeline
 

@@ -20,6 +20,7 @@ export default defineConfig({
             // Multiple entry points for CLI and library
             entry: {
                 main: resolve(__dirname, 'src/main.ts'),
+                'main-http': resolve(__dirname, 'src/main-http.ts'),
                 index: resolve(__dirname, 'src/index.ts'),
             },
             formats: ['es'], // ESM only (matches package.json "type": "module")
@@ -32,6 +33,7 @@ export default defineConfig({
                 '@doist/todoist-api-typescript',
                 'date-fns',
                 'dotenv',
+                'express',
                 'zod',
                 // Node.js built-ins (both forms)
                 'node:path',
