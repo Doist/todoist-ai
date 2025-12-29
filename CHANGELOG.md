@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.2.1](https://github.com/Doist/todoist-ai/compare/v6.2.0...v6.2.1) (2025-12-29)
+
+
+### Bug Fixes
+
+* **deps:** update all dependencies ([#255](https://github.com/Doist/todoist-ai/issues/255)) ([90772d8](https://github.com/Doist/todoist-ai/commit/90772d8a9bfaaa65cc42bcb5882e9763e7edbeb3))
+
 ## [6.2.0](https://github.com/Doist/todoist-ai/compare/v6.1.0...v6.2.0) (2025-12-19)
 
 
