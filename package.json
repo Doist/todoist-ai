@@ -1,6 +1,6 @@
 {
     "name": "@doist/todoist-ai",
-    "version": "6.2.0",
+    "version": "7.0.0",
     "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -8,14 +8,25 @@
     "bin": {
         "todoist-ai": "dist/main.js"
     },
-    "files": ["dist", "!dist/dev", "scripts", "package.json", "LICENSE.txt", "README.md"],
+    "files": [
+        "dist",
+        "!dist/dev",
+        "scripts",
+        "package.json",
+        "LICENSE.txt",
+        "README.md"
+    ],
     "license": "MIT",
     "description": "A collection of tools for Todoist using AI",
     "repository": {
         "type": "git",
         "url": "https://github.com/Doist/todoist-ai"
     },
-    "keywords": ["todoist", "ai", "tools"],
+    "keywords": [
+        "todoist",
+        "ai",
+        "tools"
+    ],
     "scripts": {
         "test": "vitest run",
         "test:watch": "vitest",
@@ -73,9 +84,17 @@
         "vitest": "3.2.4"
     },
     "lint-staged": {
-        "*": ["biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"],
-        "src/tools/*.ts": ["npm run lint:schemas"],
-        "src/index.ts": ["npm run lint:schemas"],
-        "scripts/validate-schemas.ts": ["npm run lint:schemas"]
+        "*": [
+            "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
+        ],
+        "src/tools/*.ts": [
+            "npm run lint:schemas"
+        ],
+        "src/index.ts": [
+            "npm run lint:schemas"
+        ],
+        "scripts/validate-schemas.ts": [
+            "npm run lint:schemas"
+        ]
     }
 }
