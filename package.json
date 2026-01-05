@@ -8,25 +8,14 @@
     "bin": {
         "todoist-ai": "dist/main.js"
     },
-    "files": [
-        "dist",
-        "!dist/dev",
-        "scripts",
-        "package.json",
-        "LICENSE.txt",
-        "README.md"
-    ],
+    "files": ["dist", "!dist/dev", "scripts", "package.json", "LICENSE.txt", "README.md"],
     "license": "MIT",
     "description": "A collection of tools for Todoist using AI",
     "repository": {
         "type": "git",
         "url": "https://github.com/Doist/todoist-ai"
     },
-    "keywords": [
-        "todoist",
-        "ai",
-        "tools"
-    ],
+    "keywords": ["todoist", "ai", "tools"],
     "scripts": {
         "test": "vitest run",
         "test:watch": "vitest",
@@ -51,11 +40,13 @@
     },
     "dependencies": {
         "@doist/todoist-api-typescript": "6.2.1",
-        "@modelcontextprotocol/sdk": "1.25.1",
         "date-fns": "4.1.0",
         "dompurify": "3.3.1",
         "dotenv": "17.2.3",
         "zod": "4.1.13"
+    },
+    "peerDependencies": {
+        "@modelcontextprotocol/sdk": "^1.25.0"
     },
     "devDependencies": {
         "@biomejs/biome": "2.3.10",
@@ -82,17 +73,9 @@
         "vitest": "3.2.4"
     },
     "lint-staged": {
-        "*": [
-            "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
-        ],
-        "src/tools/*.ts": [
-            "npm run lint:schemas"
-        ],
-        "src/index.ts": [
-            "npm run lint:schemas"
-        ],
-        "scripts/validate-schemas.ts": [
-            "npm run lint:schemas"
-        ]
+        "*": ["biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"],
+        "src/tools/*.ts": ["npm run lint:schemas"],
+        "src/index.ts": ["npm run lint:schemas"],
+        "scripts/validate-schemas.ts": ["npm run lint:schemas"]
     }
 }
