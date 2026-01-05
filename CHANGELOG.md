@@ -1,5 +1,21 @@
 # Changelog
 
+## [7.0.0](https://github.com/Doist/todoist-ai/compare/v6.2.0...v7.0.0) (2026-01-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* Make MCP SDK a peer dependency ([#261](https://github.com/Doist/todoist-ai/issues/261))
+
+### Features
+
+* Make MCP SDK a peer dependency ([#261](https://github.com/Doist/todoist-ai/issues/261)) ([36838dd](https://github.com/Doist/todoist-ai/commit/36838ddfd1408135037f7a22bcf3cc5945dab63b))
+
+
+### Bug Fixes
+
+* **deps:** update all dependencies ([#255](https://github.com/Doist/todoist-ai/issues/255)) ([90772d8](https://github.com/Doist/todoist-ai/commit/90772d8a9bfaaa65cc42bcb5882e9763e7edbeb3))
+
 ## [6.2.0](https://github.com/Doist/todoist-ai/compare/v6.1.0...v6.2.0) (2025-12-19)
 
 
