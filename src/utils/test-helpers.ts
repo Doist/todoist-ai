@@ -1,4 +1,10 @@
-import type { CurrentUser, PersonalProject, Section, Task } from '@doist/todoist-api-typescript'
+import type {
+    CurrentUser,
+    PersonalProject,
+    Section,
+    Task,
+    WorkspaceProject,
+} from '@doist/todoist-api-typescript'
 import { type MappedTask } from '../tool-helpers'
 import { convertPriorityToNumber, type Priority } from './priorities'
 
@@ -98,6 +104,42 @@ export function createMockProject(overrides: Partial<PersonalProject> = {}): Per
 }
 
 /**
+ * Creates a mock WorkspaceProject with all required properties and sensible defaults.
+ * Pass only the properties you want to override for your specific test.
+ */
+export function createMockWorkspaceProject(
+    overrides: Partial<WorkspaceProject> = {},
+): WorkspaceProject {
+    return {
+        id: TEST_IDS.PROJECT_WORKSPACE,
+        name: 'Workspace Project',
+        color: 'blue',
+        isFavorite: false,
+        isShared: true,
+        viewStyle: 'list',
+        url: 'https://todoist.com/projects/workspace-project-id',
+        isDeleted: false,
+        updatedAt: '2025-08-13T22:09:55.841800Z',
+        createdAt: '2025-08-13T22:09:55.841785Z',
+        childOrder: 1,
+        defaultOrder: 0,
+        description: '',
+        isCollapsed: false,
+        canAssignTasks: true,
+        isFrozen: false,
+        isArchived: false,
+        workspaceId: TEST_IDS.WORKSPACE_1,
+        folderId: null,
+        collaboratorRoleDefault: 'member',
+        role: 'admin',
+        status: 'active',
+        isInviteOnly: false,
+        isLinkSharingEnabled: true,
+        ...overrides,
+    }
+}
+
+/**
  * Creates a mock API response object with results and nextCursor.
  */
 export function createMockApiResponse<T>(
@@ -167,9 +209,11 @@ export const TEST_IDS = {
     PROJECT_INBOX: 'inbox-project-id',
     PROJECT_WORK: 'work-project-id',
     PROJECT_TEST: '6cfCcrrCFg2xP94Q',
+    PROJECT_WORKSPACE: 'workspace-project-id',
     SECTION_1: 'section-123',
     SECTION_2: 'section-456',
     USER_ID: '713437',
+    WORKSPACE_1: 'workspace-123',
 } as const
 
 /**

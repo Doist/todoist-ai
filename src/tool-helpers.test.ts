@@ -15,7 +15,13 @@ import {
     mapProject,
     mapTask,
 } from './tool-helpers.js'
-import { createMockApiResponse, createMockProject, createMockTask } from './utils/test-helpers.js'
+import {
+    createMockApiResponse,
+    createMockProject,
+    createMockTask,
+    createMockWorkspaceProject,
+    TEST_IDS,
+} from './utils/test-helpers.js'
 
 describe('shared utilities', () => {
     describe('mapTask', () => {
@@ -158,18 +164,20 @@ End of description.`)
                 parentId: undefined,
                 inboxProject: false,
                 viewStyle: 'list',
+                workspaceId: undefined,
             })
         })
 
         it('should map a workspace project correctly', () => {
-            const mockWorkspaceProject = {
+            const mockWorkspaceProject = createMockWorkspaceProject({
                 id: 'proj-2',
                 name: 'Workspace Project',
                 color: 'red',
                 isFavorite: true,
                 isShared: true,
                 viewStyle: 'board',
-            } as unknown as WorkspaceProject
+                workspaceId: TEST_IDS.WORKSPACE_1,
+            })
 
             expect(mapProject(mockWorkspaceProject)).toEqual({
                 id: 'proj-2',
@@ -180,6 +188,7 @@ End of description.`)
                 parentId: undefined,
                 inboxProject: false,
                 viewStyle: 'board',
+                workspaceId: TEST_IDS.WORKSPACE_1,
             })
         })
     })
@@ -209,7 +218,7 @@ End of description.`)
                 isFavorite: false,
                 isShared: true,
                 viewStyle: 'board',
-                accessLevel: 'admin',
+                workspaceId: TEST_IDS.WORKSPACE_1,
             } as unknown as WorkspaceProject
 
             expect(isWorkspaceProject(workspaceProject)).toBe(true)

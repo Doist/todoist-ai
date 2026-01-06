@@ -253,6 +253,7 @@ describe(`${ADD_PROJECTS} tool`, () => {
                 'parentId',
                 'inboxProject',
                 'viewStyle',
+                'workspaceId',
             ]
             const actualKeys = Object.keys(project)
             expect(actualKeys.sort()).toEqual(allowedKeys.sort())
