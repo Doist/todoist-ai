@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.1.0](https://github.com/Doist/todoist-ai/compare/v7.0.0...v7.1.0) (2026-01-06)
+
+
+### Features
+
+* Include workspaceId in project mapping ([#262](https://github.com/Doist/todoist-ai/issues/262)) ([71c5ffc](https://github.com/Doist/todoist-ai/commit/71c5ffc320b67ec0b0a875b7bcacc6f0050d5686))
+
 ## [7.0.0](https://github.com/Doist/todoist-ai/compare/v6.2.0...v7.0.0) (2026-01-05)
 
 
