@@ -49,6 +49,12 @@ const ProjectSchema = z.object({
     parentId: z.string().optional().describe('The ID of the parent project (for sub-projects).'),
     inboxProject: z.boolean().describe('Whether this is the inbox project.'),
     viewStyle: z.string().describe('The view style of the project (list, board, calendar).'),
+    workspaceId: z
+        .string()
+        .optional()
+        .describe(
+            'The ID of the workspace this project belongs to (undefined for personal projects).',
+        ),
 })
 
 /**

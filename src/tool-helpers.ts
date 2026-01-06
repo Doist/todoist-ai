@@ -30,7 +30,7 @@ export function isPersonalProject(project: Project): project is PersonalProject 
 }
 
 export function isWorkspaceProject(project: Project): project is WorkspaceProject {
-    return 'accessLevel' in project
+    return 'workspaceId' in project
 }
 
 /**
@@ -196,6 +196,7 @@ function mapProject(project: Project) {
         parentId: isPersonalProject(project) ? (project.parentId ?? undefined) : undefined,
         inboxProject: isPersonalProject(project) ? (project.inboxProject ?? false) : false,
         viewStyle: project.viewStyle,
+        workspaceId: isWorkspaceProject(project) ? project.workspaceId : undefined,
     }
 }
 
