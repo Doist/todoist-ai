@@ -111,7 +111,7 @@ export function createMockWorkspaceProject(
     overrides: Partial<WorkspaceProject> = {},
 ): WorkspaceProject {
     return {
-        id: 'workspace-project-id',
+        id: TEST_IDS.PROJECT_WORKSPACE,
         name: 'Workspace Project',
         color: 'blue',
         isFavorite: false,
@@ -209,6 +209,7 @@ export const TEST_IDS = {
     PROJECT_INBOX: 'inbox-project-id',
     PROJECT_WORK: 'work-project-id',
     PROJECT_TEST: '6cfCcrrCFg2xP94Q',
+    PROJECT_WORKSPACE: 'workspace-project-id',
     SECTION_1: 'section-123',
     SECTION_2: 'section-456',
     USER_ID: '713437',
