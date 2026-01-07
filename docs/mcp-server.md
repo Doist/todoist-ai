@@ -101,13 +101,28 @@ You can run the MCP server as an HTTP service with configurable session timeouts
 
 ```bash
 # Default: 30 minute session timeout
-TODOIST_API_KEY=your-key npx @doist/todoist-ai-http
+TODOIST_API_KEY=your-key npx -p @doist/todoist-ai todoist-ai-http
 
 # Custom timeout: 1 hour (3600000ms)
-TODOIST_API_KEY=your-key SESSION_TIMEOUT_MS=3600000 npx @doist/todoist-ai-http
+TODOIST_API_KEY=your-key SESSION_TIMEOUT_MS=3600000 npx -p @doist/todoist-ai todoist-ai-http
 
 # Custom port
-TODOIST_API_KEY=your-key PORT=8080 npx @doist/todoist-ai-http
+TODOIST_API_KEY=your-key PORT=8080 npx -p @doist/todoist-ai todoist-ai-http
+```
+
+### Running from Source
+
+After cloning the repository:
+
+```bash
+# Install dependencies and build
+npm install && npm run build
+
+# Run the HTTP server
+TODOIST_API_KEY=your-key npm run start:http
+
+# Or directly with node
+TODOIST_API_KEY=your-key node dist/main-http.js
 ```
 
 ### Environment Variables
