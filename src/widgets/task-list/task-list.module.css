@@ -19,3 +19,38 @@
     flex-direction: column;
     gap: 12px;
 }
+
+.openInTodoistButton {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 9999px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: #202020;
+    text-decoration: none;
+
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.openInTodoistButton:hover {
+    background-color: var(--product-library-display-accent-primary-fill);
+    color: #fff;
+}
+
+.openInTodoistButton svg {
+    flex-shrink: 0;
+}
