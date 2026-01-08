@@ -3,9 +3,11 @@
     flex-direction: column;
     gap: 16px;
     align-items: center;
+    justify-content: center;
     background: white;
     padding: 16px;
     border-radius: 16px;
+    height: 360px;
 }
 
 .emptyImage {
