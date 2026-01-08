@@ -1,5 +1,17 @@
 # Changelog
 
+## [7.2.0](https://github.com/Doist/todoist-ai/compare/v7.1.0...v7.2.0) (2026-01-08)
+
+
+### Features
+
+* Include backlink to Todoist app ([#266](https://github.com/Doist/todoist-ai/issues/266)) ([e621a84](https://github.com/Doist/todoist-ai/commit/e621a84d570779ad90a936a52d2b4e068ff10df0))
+
+
+### Bug Fixes
+
+* Non-app screens have fixed height to display content ([#264](https://github.com/Doist/todoist-ai/issues/264)) ([711ee65](https://github.com/Doist/todoist-ai/commit/711ee6594e8e4ce3e15b1811e13109e25a8951e0))
+
 ## [7.1.0](https://github.com/Doist/todoist-ai/compare/v7.0.0...v7.1.0) (2026-01-06)
 
 
