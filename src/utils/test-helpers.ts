@@ -163,6 +163,7 @@ export function createMappedTask(overrides: Partial<MappedTask> = {}): MappedTas
         id: TEST_IDS.TASK_1,
         content: 'Test task content',
         description: '',
+        addedAt: '2025-08-13T22:09:56.123456Z',
         dueDate: undefined,
         recurring: false,
         deadlineDate: undefined,

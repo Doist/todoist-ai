@@ -8,6 +8,7 @@ const TaskSchema = z.object({
     id: z.string().describe('The unique ID of the task.'),
     content: z.string().describe('The task title/content.'),
     description: z.string().describe('The task description.'),
+    addedAt: z.string().describe('When the task was created (ISO 8601 format).'),
     dueDate: z.string().optional().describe('The due date of the task (ISO 8601 format).'),
     recurring: z
         .union([z.boolean(), z.string()])
