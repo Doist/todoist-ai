@@ -163,6 +163,7 @@ function mapTask(task: Task) {
         id: task.id,
         content: task.content,
         description: task.description,
+        addedAt: task.addedAt,
         dueDate: task.due?.date,
         recurring: task.due?.isRecurring && task.due.string ? task.due.string : false,
         deadlineDate: task.deadline?.date,
