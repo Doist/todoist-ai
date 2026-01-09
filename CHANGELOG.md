@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.3.0](https://github.com/Doist/todoist-ai/compare/v7.2.0...v7.3.0) (2026-01-09)
+
+
+### Features
+
+* add HTTP server with configurable session timeout ([#258](https://github.com/Doist/todoist-ai/issues/258)) ([0614bef](https://github.com/Doist/todoist-ai/commit/0614befbcf09cae94f17c6db5dff7992079d2fe8))
+
 ## [7.2.0](https://github.com/Doist/todoist-ai/compare/v7.1.0...v7.2.0) (2026-01-08)
 
 
