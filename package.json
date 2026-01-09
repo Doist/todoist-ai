@@ -6,7 +6,8 @@
     "types": "./dist/index.d.ts",
     "mcpName": "net.todoist/mcp",
     "bin": {
-        "todoist-ai": "dist/main.js"
+        "todoist-ai": "dist/main.js",
+        "todoist-ai-http": "dist/main-http.js"
     },
     "files": [
         "dist",
@@ -32,9 +33,11 @@
         "test:watch": "vitest",
         "test:coverage": "vitest run --coverage",
         "build": "vite build",
-        "postbuild": "chmod +x dist/main.js",
+        "postbuild": "chmod +x dist/main.js && chmod +x dist/main-http.js",
         "start": "npm run build && npx @modelcontextprotocol/inspector node dist/main.js",
         "dev": "concurrently \"vite build --watch\" \"npx @modelcontextprotocol/inspector npx nodemon --quiet --watch dist --ext js --exec node dist/main.js\"",
+        "dev:http": "concurrently \"vite build --watch\" \"npx nodemon --quiet --watch dist --ext js --exec node dist/main-http.js\"",
+        "start:http": "npm run build && node dist/main-http.js",
         "dev:widget": "vite build --watch --minify false",
         "setup": "cp .env.example .env && npm install && npm run build",
         "test:executable": "npm run build && node scripts/test-executable.cjs",
@@ -54,6 +57,7 @@
         "date-fns": "4.1.0",
         "dompurify": "3.3.1",
         "dotenv": "17.2.3",
+        "express": "5.2.1",
         "zod": "4.1.13"
     },
     "peerDependencies": {
@@ -68,7 +72,6 @@
         "@types/react": "19.2.7",
         "@types/react-dom": "19.2.3",
         "concurrently": "9.2.1",
-        "express": "5.2.1",
         "husky": "9.1.7",
         "lint-staged": "16.2.7",
         "morgan": "1.10.1",
