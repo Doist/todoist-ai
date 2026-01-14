@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { fetchAllProjects, mapProject } from '../tool-helpers.js'
+import { mapProject, searchAllProjects } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { ProjectSchema as ProjectOutputSchema } from '../utils/output-schemas.js'
 import { formatProjectPreview, summarizeList } from '../utils/response-builders.js'
@@ -52,8 +52,8 @@ const findProjects = {
         let nextCursor = null
 
         if (args.search) {
-            // When searching, fetch ALL projects to ensure we don't miss any matches
-            results = await fetchAllProjects(client)
+            // When searching, fetch ALL matching projects (server-side search)
+            results = await searchAllProjects(client, args.search)
             // When searching, we have all results so no pagination
             nextCursor = null
         } else {
@@ -66,11 +66,7 @@ const findProjects = {
             nextCursor = response.nextCursor
         }
 
-        const searchLower = args.search ? args.search.toLowerCase() : undefined
-        const filtered = searchLower
-            ? results.filter((project) => project.name.toLowerCase().includes(searchLower))
-            : results
-        const projects = filtered.map(mapProject)
+        const projects = results.map(mapProject)
 
         return {
             textContent: generateTextContent({ projects, args, nextCursor }),

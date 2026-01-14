@@ -16,14 +16,6 @@ Preview:
     Work Project • ⭐ • Shared • board • id=work-project-id"
 `;
 
-exports[`find-projects tool > searching projects > should filter projects by search term (case insensitive) and fetch all projects 1`] = `
-"All projects matching "work": 2 (limit 50).
-Filter: search: "work".
-Preview:
-    Work Project • id=work-project-id
-    Hobby Work • id=hobby-project-id"
-`;
-
 exports[`find-projects tool > searching projects > should handle search with 'case insensitive matching' 1`] = `
 "All projects matching "IMPORTANT": 1 (limit 50).
 Filter: search: "IMPORTANT".
@@ -35,4 +27,12 @@ exports[`find-projects tool > searching projects > should handle search with 'no
 "All projects matching "nonexistent": 0 (limit 50).
 Filter: search: "nonexistent".
 No results. Try broader search terms; Check spelling; Remove search to see all projects."
+`;
+
+exports[`find-projects tool > searching projects > should search projects by name (case insensitive) 1`] = `
+"All projects matching "work": 2 (limit 50).
+Filter: search: "work".
+Preview:
+    Work Project • id=work-project-id
+    Hobby Work • id=hobby-project-id"
 `;
