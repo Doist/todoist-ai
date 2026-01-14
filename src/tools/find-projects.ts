@@ -123,7 +123,7 @@ function generateTextContent({
     return summarizeList({
         subject,
         count: projects.length,
-        limit: args.limit,
+        limit: args.search ? undefined : args.limit,
         nextCursor: nextCursor ?? undefined,
         filterHints,
         previewLines: previewWithMore,
