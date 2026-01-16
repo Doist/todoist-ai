@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.3.1](https://github.com/Doist/todoist-ai/compare/v7.3.0...v7.3.1) (2026-01-16)
+
+
+### Performance Improvements
+
+* use SDK search endpoints for projects/sections ([#271](https://github.com/Doist/todoist-ai/issues/271)) ([1a5edc4](https://github.com/Doist/todoist-ai/commit/1a5edc46f5f2263a8d6b4b1a7b899753f70a34a5))
+
 ## [7.3.0](https://github.com/Doist/todoist-ai/compare/v7.2.0...v7.3.0) (2026-01-09)
 
 
