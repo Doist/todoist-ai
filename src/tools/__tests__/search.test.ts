@@ -26,7 +26,7 @@ const mockGetTasksByFilter = getTasksByFilter as MockedFunction<typeof getTasksB
 
 // Mock the Todoist API
 const mockTodoistApi = {
-    getProjects: vi.fn(),
+    searchProjects: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
 describe(`${SEARCH} tool`, () => {
@@ -51,14 +51,10 @@ describe(`${SEARCH} tool`, () => {
                     id: TEST_IDS.PROJECT_WORK,
                     name: 'Important Work Project',
                 }),
-                createMockProject({
-                    id: TEST_IDS.PROJECT_TEST,
-                    name: 'Test Project',
-                }),
             ]
 
             mockGetTasksByFilter.mockResolvedValue({ tasks: mockTasks, nextCursor: null })
-            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse(mockProjects))
+            mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse(mockProjects))
 
             const result = await search.execute({ query: 'important' }, mockTodoistApi)
 
@@ -69,7 +65,8 @@ describe(`${SEARCH} tool`, () => {
                 limit: 100, // TASKS_MAX
                 cursor: undefined,
             })
-            expect(mockTodoistApi.getProjects).toHaveBeenCalledWith({
+            expect(mockTodoistApi.searchProjects).toHaveBeenCalledWith({
+                query: 'important',
                 limit: 200, // PROJECTS_MAX
                 cursor: null,
             })
@@ -106,15 +103,8 @@ describe(`${SEARCH} tool`, () => {
                     content: 'Unique task content',
                 }),
             ]
-            const mockProjects = [
-                createMockProject({
-                    id: TEST_IDS.PROJECT_WORK,
-                    name: 'Work Project',
-                }),
-            ]
-
             mockGetTasksByFilter.mockResolvedValue({ tasks: mockTasks, nextCursor: null })
-            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse(mockProjects))
+            mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse([]))
 
             const result = await search.execute({ query: 'unique' }, mockTodoistApi)
 
@@ -129,14 +119,10 @@ describe(`${SEARCH} tool`, () => {
                     id: TEST_IDS.PROJECT_WORK,
                     name: 'Special Project Name',
                 }),
-                createMockProject({
-                    id: TEST_IDS.PROJECT_TEST,
-                    name: 'Another Project',
-                }),
             ]
 
             mockGetTasksByFilter.mockResolvedValue({ tasks: [], nextCursor: null })
-            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse(mockProjects))
+            mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse(mockProjects))
 
             const result = await search.execute({ query: 'special' }, mockTodoistApi)
 
@@ -151,7 +137,7 @@ describe(`${SEARCH} tool`, () => {
 
         it('should return empty results when nothing matches', async () => {
             mockGetTasksByFilter.mockResolvedValue({ tasks: [], nextCursor: null })
-            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse([]))
+            mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse([]))
 
             const result = await search.execute({ query: 'nonexistent' }, mockTodoistApi)
 
@@ -168,7 +154,7 @@ describe(`${SEARCH} tool`, () => {
             ]
 
             mockGetTasksByFilter.mockResolvedValue({ tasks: [], nextCursor: null })
-            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse(mockProjects))
+            mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse(mockProjects))
 
             const result = await search.execute({ query: 'IMPORTANT' }, mockTodoistApi)
 
@@ -181,11 +167,10 @@ describe(`${SEARCH} tool`, () => {
             const mockProjects = [
                 createMockProject({ id: 'project-1', name: 'Development Tasks' }),
                 createMockProject({ id: 'project-2', name: 'Developer Resources' }),
-                createMockProject({ id: 'project-3', name: 'Marketing' }),
             ]
 
             mockGetTasksByFilter.mockResolvedValue({ tasks: [], nextCursor: null })
-            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse(mockProjects))
+            mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse(mockProjects))
 
             const result = await search.execute({ query: 'develop' }, mockTodoistApi)
 
@@ -199,7 +184,7 @@ describe(`${SEARCH} tool`, () => {
     describe('error handling', () => {
         it('should throw error for task search failure', async () => {
             mockGetTasksByFilter.mockRejectedValue(new Error('Task search failed'))
-            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse([]))
+            mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse([]))
 
             await expect(search.execute({ query: 'test' }, mockTodoistApi)).rejects.toThrow(
                 'Task search failed',
@@ -208,7 +193,7 @@ describe(`${SEARCH} tool`, () => {
 
         it('should throw error for project search failure', async () => {
             mockGetTasksByFilter.mockResolvedValue({ tasks: [], nextCursor: null })
-            mockTodoistApi.getProjects.mockRejectedValue(new Error('Project search failed'))
+            mockTodoistApi.searchProjects.mockRejectedValue(new Error('Project search failed'))
 
             await expect(search.execute({ query: 'test' }, mockTodoistApi)).rejects.toThrow(
                 'Project search failed',
@@ -219,7 +204,7 @@ describe(`${SEARCH} tool`, () => {
     describe('OpenAI MCP spec compliance', () => {
         it('should return valid JSON string in text field', async () => {
             mockGetTasksByFilter.mockResolvedValue({ tasks: [], nextCursor: null })
-            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse([]))
+            mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse([]))
 
             const result = await search.execute({ query: 'test' }, mockTodoistApi)
             expect(() => JSON.parse(result.textContent ?? '{}')).not.toThrow()
@@ -230,7 +215,7 @@ describe(`${SEARCH} tool`, () => {
             const mockProjects = [createMockProject({ id: TEST_IDS.PROJECT_WORK, name: 'Test' })]
 
             mockGetTasksByFilter.mockResolvedValue({ tasks: mockTasks, nextCursor: null })
-            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse(mockProjects))
+            mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse(mockProjects))
 
             const result = await search.execute({ query: 'test' }, mockTodoistApi)
 

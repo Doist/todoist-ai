@@ -12,6 +12,7 @@ import { findSections } from '../find-sections.js'
 // Mock the Todoist API
 const mockTodoistApi = {
     getSections: vi.fn(),
+    searchSections: vi.fn(),
     getUser: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
@@ -113,21 +114,10 @@ describe(`${FIND_SECTIONS} tool`, () => {
         it('should filter sections by search term (case insensitive)', async () => {
             const mockSections: Section[] = [
                 createMockSection({
-                    id: TEST_IDS.SECTION_1,
-                    projectId: TEST_IDS.PROJECT_TEST,
-                    name: 'To Do',
-                }),
-                createMockSection({
                     id: TEST_IDS.SECTION_2,
                     projectId: TEST_IDS.PROJECT_TEST,
                     sectionOrder: 2,
                     name: 'In Progress',
-                }),
-                createMockSection({
-                    id: 'section-789',
-                    projectId: TEST_IDS.PROJECT_TEST,
-                    sectionOrder: 3,
-                    name: 'Done',
                 }),
                 createMockSection({
                     id: 'section-999',
@@ -137,7 +127,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
                 }),
             ]
 
-            mockTodoistApi.getSections.mockResolvedValue({
+            mockTodoistApi.searchSections.mockResolvedValue({
                 results: mockSections,
                 nextCursor: null,
             })
@@ -147,7 +137,8 @@ describe(`${FIND_SECTIONS} tool`, () => {
                 mockTodoistApi,
             )
 
-            expect(mockTodoistApi.getSections).toHaveBeenCalledWith({
+            expect(mockTodoistApi.searchSections).toHaveBeenCalledWith({
+                query: 'progress',
                 projectId: TEST_IDS.PROJECT_TEST,
                 cursor: null,
                 limit: 200, // SECTIONS_MAX
@@ -162,24 +153,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
         })
 
         it('should handle search with no matches', async () => {
-            const mockSections: Section[] = [
-                createMockSection({
-                    id: TEST_IDS.SECTION_1,
-                    projectId: TEST_IDS.PROJECT_TEST,
-                    name: 'To Do',
-                }),
-                createMockSection({
-                    id: TEST_IDS.SECTION_2,
-                    projectId: TEST_IDS.PROJECT_TEST,
-                    sectionOrder: 2,
-                    name: 'In Progress',
-                }),
-            ]
-
-            mockTodoistApi.getSections.mockResolvedValue({
-                results: mockSections,
-                nextCursor: null,
-            })
+            mockTodoistApi.searchSections.mockResolvedValue({ results: [], nextCursor: null })
 
             const result = await findSections.execute(
                 { projectId: TEST_IDS.PROJECT_TEST, search: 'nonexistent' },
@@ -200,15 +174,9 @@ describe(`${FIND_SECTIONS} tool`, () => {
                     projectId: TEST_IDS.PROJECT_TEST,
                     name: 'Important Tasks',
                 }),
-                createMockSection({
-                    id: TEST_IDS.SECTION_2,
-                    projectId: TEST_IDS.PROJECT_TEST,
-                    sectionOrder: 2,
-                    name: 'Regular Work',
-                }),
             ]
 
-            mockTodoistApi.getSections.mockResolvedValue({
+            mockTodoistApi.searchSections.mockResolvedValue({
                 results: mockSections,
                 nextCursor: null,
             })
@@ -238,15 +206,9 @@ describe(`${FIND_SECTIONS} tool`, () => {
                     sectionOrder: 2,
                     name: 'Testing Tasks',
                 }),
-                createMockSection({
-                    id: 'section-789',
-                    projectId: TEST_IDS.PROJECT_TEST,
-                    sectionOrder: 3,
-                    name: 'Deployment',
-                }),
             ]
 
-            mockTodoistApi.getSections.mockResolvedValue({
+            mockTodoistApi.searchSections.mockResolvedValue({
                 results: mockSections,
                 nextCursor: null,
             })
@@ -279,7 +241,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
                 }),
             ]
 
-            mockTodoistApi.getSections.mockResolvedValue({
+            mockTodoistApi.searchSections.mockResolvedValue({
                 results: mockSections,
                 nextCursor: null,
             })

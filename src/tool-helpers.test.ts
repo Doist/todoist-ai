@@ -8,12 +8,12 @@ import { type Mocked, vi } from 'vitest'
 import {
     createMoveTaskArgs,
     fetchAllPages,
-    fetchAllProjects,
-    fetchAllSections,
     isPersonalProject,
     isWorkspaceProject,
     mapProject,
     mapTask,
+    searchAllProjects,
+    searchAllSections,
 } from './tool-helpers.js'
 import {
     createMockApiResponse,
@@ -341,9 +341,9 @@ End of description.`)
         })
     })
 
-    describe('fetchAllProjects', () => {
+    describe('searchAllProjects', () => {
         const mockTodoistApi = {
-            getProjects: vi.fn(),
+            searchProjects: vi.fn(),
         } as unknown as Mocked<TodoistApi>
 
         beforeEach(() => {
@@ -353,11 +353,14 @@ End of description.`)
         it('should delegate to fetchAllPages with correct parameters', async () => {
             const projects = [createMockProject({ id: 'proj-1', name: 'Project 1' })]
 
-            mockTodoistApi.getProjects.mockResolvedValueOnce(createMockApiResponse(projects, null))
+            mockTodoistApi.searchProjects.mockResolvedValueOnce(
+                createMockApiResponse(projects, null),
+            )
 
-            const result = await fetchAllProjects(mockTodoistApi)
+            const result = await searchAllProjects(mockTodoistApi, 'Work')
 
-            expect(mockTodoistApi.getProjects).toHaveBeenCalledWith({
+            expect(mockTodoistApi.searchProjects).toHaveBeenCalledWith({
+                query: 'Work',
                 cursor: null,
                 limit: 200, // PROJECTS_MAX
             })
@@ -366,9 +369,9 @@ End of description.`)
         })
     })
 
-    describe('fetchAllSections', () => {
+    describe('searchAllSections', () => {
         const mockTodoistApi = {
-            getSections: vi.fn(),
+            searchSections: vi.fn(),
         } as unknown as Mocked<TodoistApi>
 
         beforeEach(() => {
@@ -394,14 +397,15 @@ End of description.`)
         it('should delegate to fetchAllPages with correct parameters', async () => {
             const sections = [createMockSection({ id: 'sect-1', name: 'Section 1' })]
 
-            mockTodoistApi.getSections.mockResolvedValueOnce({
+            mockTodoistApi.searchSections.mockResolvedValueOnce({
                 results: sections,
                 nextCursor: null,
             })
 
-            const result = await fetchAllSections(mockTodoistApi, 'project-123')
+            const result = await searchAllSections(mockTodoistApi, 'Work', 'project-123')
 
-            expect(mockTodoistApi.getSections).toHaveBeenCalledWith({
+            expect(mockTodoistApi.searchSections).toHaveBeenCalledWith({
+                query: 'Work',
                 projectId: 'project-123',
                 cursor: null,
                 limit: 200, // SECTIONS_MAX

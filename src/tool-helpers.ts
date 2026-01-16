@@ -84,33 +84,36 @@ export async function fetchAllPages<
 }
 
 /**
- * Fetches all projects from Todoist by looping through paginated results.
- * This is useful when you need to search/filter projects client-side and want
- * to ensure no matches are missed due to pagination boundaries.
+ * Searches projects by name and fetches all matching pages.
  *
  * @param client - The Todoist API client
- * @returns Promise resolving to array of all projects
+ * @param query - The search query string
+ * @returns Promise resolving to array of matching projects
  */
-export async function fetchAllProjects(client: TodoistApi): Promise<Project[]> {
+export async function searchAllProjects(client: TodoistApi, query: string): Promise<Project[]> {
     return fetchAllPages({
-        apiMethod: (args) => client.getProjects(args),
+        apiMethod: client.searchProjects.bind(client),
+        args: { query },
         limit: ApiLimits.PROJECTS_MAX,
     })
 }
 
 /**
- * Fetches all sections for a project from Todoist by looping through paginated results.
- * This is useful when you need to search/filter sections client-side and want
- * to ensure no matches are missed due to pagination boundaries.
+ * Searches sections by name (optionally scoped to a project) and fetches all matching pages.
  *
  * @param client - The Todoist API client
- * @param projectId - The ID of the project to fetch sections from
- * @returns Promise resolving to array of all sections in the project
+ * @param query - The search query string
+ * @param projectId - Optional project ID to scope the search
+ * @returns Promise resolving to array of matching sections
  */
-export async function fetchAllSections(client: TodoistApi, projectId?: string): Promise<Section[]> {
+export async function searchAllSections(
+    client: TodoistApi,
+    query: string,
+    projectId?: string,
+): Promise<Section[]> {
     return fetchAllPages({
-        apiMethod: (args) => client.getSections(args),
-        args: projectId ? { projectId } : {},
+        apiMethod: client.searchSections.bind(client),
+        args: projectId ? { query, projectId } : { query },
         limit: ApiLimits.SECTIONS_MAX,
     })
 }

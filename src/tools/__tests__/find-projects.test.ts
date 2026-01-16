@@ -12,6 +12,7 @@ import { findProjects } from '../find-projects.js'
 // Mock the Todoist API
 const mockTodoistApi = {
     getProjects: vi.fn(),
+    searchProjects: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
 const { FIND_PROJECTS } = ToolNames
@@ -115,26 +116,25 @@ describe(`${FIND_PROJECTS} tool`, () => {
     })
 
     describe('searching projects', () => {
-        it('should filter projects by search term (case insensitive) and fetch all projects', async () => {
-            const mockProjects = [
+        it('should search projects by name (case insensitive)', async () => {
+            const matchingProjects = [
                 createMockProject({
                     id: TEST_IDS.PROJECT_WORK,
                     name: 'Work Project',
                     color: 'blue',
                 }),
-                createMockProject({
-                    id: 'personal-project-id',
-                    name: 'Personal Tasks',
-                    color: 'green',
-                }),
                 createMockProject({ id: 'hobby-project-id', name: 'Hobby Work', color: 'orange' }),
             ]
 
-            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse(mockProjects))
+            mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse(matchingProjects))
             const result = await findProjects.execute({ search: 'work', limit: 50 }, mockTodoistApi)
 
             // When searching, should use maximum limit and ignore user's limit parameter
-            expect(mockTodoistApi.getProjects).toHaveBeenCalledWith({ limit: 200, cursor: null })
+            expect(mockTodoistApi.searchProjects).toHaveBeenCalledWith({
+                query: 'work',
+                limit: 200,
+                cursor: null,
+            })
             expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content with search filter
@@ -150,50 +150,40 @@ describe(`${FIND_PROJECTS} tool`, () => {
             })
         })
 
-        it('should find matching projects across multiple pages', async () => {
-            // Simulate the original problem: matching project is on "page 2"
-            const page1Projects = Array.from({ length: 50 }, (_, i) =>
-                createMockProject({
-                    id: `page1-project-${i}`,
-                    name: `Page 1 Project ${i}`,
-                }),
-            )
+        it('should fetch all pages of search results', async () => {
+            const page1Projects = [createMockProject({ id: 'work-1', name: 'Work Project 1' })]
             const page2Projects = [
                 createMockProject({
-                    id: 'matching-project',
-                    name: 'Important Work Project', // This matches 'work' search
-                }),
-                createMockProject({
-                    id: 'other-project',
-                    name: 'Other Project',
+                    id: 'work-2',
+                    name: 'Important Work Project',
                 }),
             ]
 
             // Set up multiple API calls to simulate pagination
-            mockTodoistApi.getProjects
-                .mockResolvedValueOnce(
-                    createMockApiResponse(page1Projects.slice(0, 200), 'page-2-cursor'),
-                )
+            mockTodoistApi.searchProjects
+                .mockResolvedValueOnce(createMockApiResponse(page1Projects, 'page-2-cursor'))
                 .mockResolvedValueOnce(createMockApiResponse(page2Projects, null))
 
             const result = await findProjects.execute({ search: 'work', limit: 10 }, mockTodoistApi)
 
-            // Should have made 2 API calls to get all projects
-            expect(mockTodoistApi.getProjects).toHaveBeenCalledTimes(2)
-            expect(mockTodoistApi.getProjects).toHaveBeenNthCalledWith(1, {
+            // Should have made 2 API calls to get all matching projects
+            expect(mockTodoistApi.searchProjects).toHaveBeenCalledTimes(2)
+            expect(mockTodoistApi.searchProjects).toHaveBeenNthCalledWith(1, {
+                query: 'work',
                 limit: 200,
                 cursor: null,
             })
-            expect(mockTodoistApi.getProjects).toHaveBeenNthCalledWith(2, {
+            expect(mockTodoistApi.searchProjects).toHaveBeenNthCalledWith(2, {
+                query: 'work',
                 limit: 200,
                 cursor: 'page-2-cursor',
             })
 
-            // Should find the matching project even though it was on "page 2"
+            // Should include results from all pages
             const structuredContent = result.structuredContent
-            expect(structuredContent.projects).toHaveLength(1)
-            expect(structuredContent.projects[0]?.name).toBe('Important Work Project')
-            expect(structuredContent.totalCount).toBe(1)
+            expect(structuredContent.projects).toHaveLength(2)
+            expect(structuredContent.projects[1]?.name).toBe('Important Work Project')
+            expect(structuredContent.totalCount).toBe(2)
             expect(structuredContent.hasMore).toBe(false)
             expect(structuredContent.nextCursor).toBeUndefined()
         })
@@ -201,25 +191,30 @@ describe(`${FIND_PROJECTS} tool`, () => {
         it.each([
             {
                 search: 'nonexistent',
-                projects: ['Project One'],
+                apiProjects: [],
                 expectedCount: 0,
                 description: 'no matches',
             },
             {
                 search: 'IMPORTANT',
-                projects: ['Important Project'],
+                apiProjects: ['Important Project'],
                 expectedCount: 1,
                 description: 'case insensitive matching',
             },
-        ])('should handle search with $description', async ({ search, projects }) => {
-            const mockProjects = projects.map((name) => createMockProject({ name }))
-            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse(mockProjects))
+        ])('should handle search with $description', async ({
+            search,
+            apiProjects,
+            expectedCount,
+        }) => {
+            const mockProjects = apiProjects.map((name) => createMockProject({ name }))
+            mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse(mockProjects))
 
             const result = await findProjects.execute({ search, limit: 50 }, mockTodoistApi)
             expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content
             const structuredContent = result.structuredContent
+            expect(structuredContent.projects).toHaveLength(expectedCount)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     appliedFilters: expect.objectContaining({ search }),

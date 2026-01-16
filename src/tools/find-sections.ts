@@ -1,7 +1,7 @@
 import type { Section } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { fetchAllSections } from '../tool-helpers.js'
+import { searchAllSections } from '../tool-helpers.js'
 import { SectionSchema as SectionOutputSchema } from '../utils/output-schemas.js'
 import { summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -39,7 +39,7 @@ const OutputSchema = {
 const findSections = {
     name: ToolNames.FIND_SECTIONS,
     description:
-        'Search for sections by name or other criteria in a project. When searching, all sections in the project are fetched to ensure complete results.',
+        'Search for sections by name or other criteria in a project. When searching, uses server-side search to avoid fetching all sections.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     mutability: 'readonly' as const,
@@ -51,8 +51,8 @@ const findSections = {
         let results: Section[]
 
         if (args.search) {
-            // When searching, fetch ALL sections to ensure we don't miss any matches
-            results = await fetchAllSections(client, resolvedProjectId)
+            // When searching, fetch ALL matching sections (server-side search)
+            results = await searchAllSections(client, args.search, resolvedProjectId)
         } else {
             // Normal single-page fetch when not searching
             const response = await client.getSections({
@@ -61,12 +61,7 @@ const findSections = {
             results = response.results
         }
 
-        const searchLower = args.search ? args.search.toLowerCase() : undefined
-        const filtered = searchLower
-            ? results.filter((section: Section) => section.name.toLowerCase().includes(searchLower))
-            : results
-
-        const sections = filtered.map(({ id, name }) => ({ id, name }))
+        const sections = results.map(({ id, name }) => ({ id, name }))
 
         const textContent = generateTextContent({
             sections,
