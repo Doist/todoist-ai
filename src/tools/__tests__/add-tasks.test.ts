@@ -820,4 +820,38 @@ describe(`${ADD_TASKS} tool`, () => {
             })
         })
     })
+
+    describe('order parameter', () => {
+        it('should pass order parameter to SDK', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485094000',
+                content: 'Task with order',
+                childOrder: 5,
+            })
+
+            mockTodoistApi.addTask.mockResolvedValueOnce(mockApiResponse)
+
+            await addTasks.execute(
+                {
+                    tasks: [
+                        {
+                            content: 'Task with order',
+                            order: 5,
+                            projectId: '6cfCcrrCFg2xP94Q',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
+                content: 'Task with order',
+                projectId: '6cfCcrrCFg2xP94Q',
+                sectionId: undefined,
+                parentId: undefined,
+                order: 5,
+                labels: undefined,
+            })
+        })
+    })
 })
