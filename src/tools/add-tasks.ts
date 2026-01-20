@@ -47,6 +47,10 @@ const TaskSchema = z.object({
         ),
     sectionId: z.string().optional().describe('The section ID to add this task to.'),
     parentId: z.string().optional().describe('The parent task ID (for subtasks).'),
+    order: z
+        .number()
+        .optional()
+        .describe('Position of the task among sibling tasks under the same parent/section.'),
     responsibleUser: z
         .string()
         .optional()
@@ -103,6 +107,7 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
         projectId,
         sectionId,
         parentId,
+        order,
         responsibleUser,
         priority,
         labels,
@@ -122,6 +127,7 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
         projectId: resolvedProjectId,
         sectionId,
         parentId,
+        order,
         labels,
         deadlineDate,
     }
