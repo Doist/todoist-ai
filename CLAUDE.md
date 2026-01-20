@@ -49,3 +49,21 @@ When adding new tool features:
 2. Update `src/mcp-server.ts` tool usage guidelines
 3. Add tests demonstrating the feature
 4. Include examples in descriptions where helpful
+
+## Running Tools Directly
+
+Use `scripts/run-tool.ts` to execute any tool without the MCP server:
+
+```bash
+npx tsx scripts/run-tool.ts <tool-name> '<json-args>'
+npx tsx scripts/run-tool.ts --list  # list all tools
+```
+
+Examples:
+```bash
+npx tsx scripts/run-tool.ts add-tasks '{"tasks":[{"content":"Test task"}]}'
+npx tsx scripts/run-tool.ts find-tasks '{"query":"meeting"}'
+npx tsx scripts/run-tool.ts get-overview '{}'
+```
+
+Requires `TODOIST_API_KEY` in `.env` (and optionally `TODOIST_BASE_URL`).
