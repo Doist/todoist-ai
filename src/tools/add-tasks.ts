@@ -82,8 +82,10 @@ const addTasks = {
     outputSchema: OutputSchema,
     mutability: 'additive' as const,
     async execute({ tasks }, client) {
-        const addTaskPromises = tasks.map((task) => processTask(task, client))
-        const newTasks = await Promise.all(addTaskPromises)
+        const newTasks: Task[] = []
+        for (const task of tasks) {
+            newTasks.push(await processTask(task, client))
+        }
         const mappedTasks = newTasks.map(mapTask)
 
         const textContent = generateTextContent({
