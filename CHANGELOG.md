@@ -1,5 +1,17 @@
 # Changelog
 
+## [7.4.0](https://github.com/Doist/todoist-ai/compare/v7.3.1...v7.4.0) (2026-01-20)
+
+
+### Features
+
+* **add-tasks:** add order parameter for task positioning ([#274](https://github.com/Doist/todoist-ai/issues/274)) ([6bba6ad](https://github.com/Doist/todoist-ai/commit/6bba6ade8943d5c8f91883109503b4676d46386b))
+
+
+### Bug Fixes
+
+* **add-tasks:** create tasks sequentially to preserve input order ([#277](https://github.com/Doist/todoist-ai/issues/277)) ([4daef92](https://github.com/Doist/todoist-ai/commit/4daef9203ed4d1ef1ccc1b08c3cfc26c634f679c))
+
 ## [7.3.1](https://github.com/Doist/todoist-ai/compare/v7.3.0...v7.3.1) (2026-01-16)
 
 
