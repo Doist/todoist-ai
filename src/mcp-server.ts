@@ -1,7 +1,7 @@
 import { TodoistApi } from '@doist/todoist-api-typescript'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
-import { addMetaToTool, registerResource, registerTool } from './mcp-helpers.js'
+import { addMetaToTool, type Features, registerResource, registerTool } from './mcp-helpers.js'
 import { addComments } from './tools/add-comments.js'
 import { addProjects } from './tools/add-projects.js'
 import { addSections } from './tools/add-sections.js'
@@ -107,9 +107,18 @@ Always provide clear, actionable task titles and descriptions. Use the overview 
  * Create the MCP server.
  * @param todoistApiKey - The API key for the todoist account.
  * @param baseUrl - The base URL for the todoist API.
+ * @param features - Features to enable for the server.
  * @returns the MCP server.
  */
-function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseUrl?: string }) {
+function getMcpServer({
+    todoistApiKey,
+    baseUrl,
+    features = [],
+}: {
+    todoistApiKey: string
+    baseUrl?: string
+    features?: Features
+}) {
     const server = new McpServer(
         { name: 'todoist-mcp-server', version: '0.1.0' },
         {
@@ -142,45 +151,47 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     /**
      * Tools
      */
+    const toolArgs = { server, client: todoist, features }
+
     // Task management tools
-    registerTool(addTasks, server, todoist)
-    registerTool(completeTasks, server, todoist)
-    registerTool(updateTasks, server, todoist)
-    registerTool(findTasks, server, todoist)
-    registerTool(enhancedFindTasksByDateTool, server, todoist)
-    registerTool(findCompletedTasks, server, todoist)
+    registerTool({ tool: addTasks, ...toolArgs })
+    registerTool({ tool: completeTasks, ...toolArgs })
+    registerTool({ tool: updateTasks, ...toolArgs })
+    registerTool({ tool: findTasks, ...toolArgs })
+    registerTool({ tool: enhancedFindTasksByDateTool, ...toolArgs })
+    registerTool({ tool: findCompletedTasks, ...toolArgs })
 
     // Project management tools
-    registerTool(addProjects, server, todoist)
-    registerTool(updateProjects, server, todoist)
-    registerTool(findProjects, server, todoist)
+    registerTool({ tool: addProjects, ...toolArgs })
+    registerTool({ tool: updateProjects, ...toolArgs })
+    registerTool({ tool: findProjects, ...toolArgs })
 
     // Section management tools
-    registerTool(addSections, server, todoist)
-    registerTool(updateSections, server, todoist)
-    registerTool(findSections, server, todoist)
+    registerTool({ tool: addSections, ...toolArgs })
+    registerTool({ tool: updateSections, ...toolArgs })
+    registerTool({ tool: findSections, ...toolArgs })
 
     // Comment management tools
-    registerTool(addComments, server, todoist)
-    registerTool(findComments, server, todoist)
-    registerTool(updateComments, server, todoist)
+    registerTool({ tool: addComments, ...toolArgs })
+    registerTool({ tool: findComments, ...toolArgs })
+    registerTool({ tool: updateComments, ...toolArgs })
 
     // Activity and audit tools
-    registerTool(findActivity, server, todoist)
+    registerTool({ tool: findActivity, ...toolArgs })
 
     // General tools
-    registerTool(getOverview, server, todoist)
-    registerTool(deleteObject, server, todoist)
-    registerTool(fetchObject, server, todoist)
-    registerTool(userInfo, server, todoist)
+    registerTool({ tool: getOverview, ...toolArgs })
+    registerTool({ tool: deleteObject, ...toolArgs })
+    registerTool({ tool: fetchObject, ...toolArgs })
+    registerTool({ tool: userInfo, ...toolArgs })
 
     // Assignment and collaboration tools
-    registerTool(findProjectCollaborators, server, todoist)
-    registerTool(manageAssignments, server, todoist)
+    registerTool({ tool: findProjectCollaborators, ...toolArgs })
+    registerTool({ tool: manageAssignments, ...toolArgs })
 
     // OpenAI MCP tools
-    registerTool(search, server, todoist)
-    registerTool(fetch, server, todoist)
+    registerTool({ tool: search, ...toolArgs })
+    registerTool({ tool: fetch, ...toolArgs })
 
     return server
 }

@@ -4,6 +4,24 @@ import type { TextResourceContents } from '@modelcontextprotocol/sdk/types.js'
 import type { z } from 'zod'
 import type { TodoistTool, ToolMutability } from './todoist-tool.js'
 import { removeNullFields } from './utils/sanitize-data.js'
+import { ToolNames } from './utils/tool-names.js'
+
+/**
+ * A feature that modifies tool behavior.
+ */
+type Feature = {
+    /**
+     * The feature name. Supported features:
+     * - 'strip_emails': Strips email addresses from collaborator tool outputs
+     *   (affects: find-project-collaborators, find-completed-tasks)
+     */
+    name: string
+}
+
+/**
+ * Array of features to enable.
+ */
+type Features = Feature[]
 
 type McpTextResource = {
     name: string
@@ -99,23 +117,93 @@ function addMetaToTool<Params extends z.ZodRawShape, Output extends z.ZodRawShap
 }
 
 /**
- * Register a Todoist tool in an MCP server.
- * @param tool - The tool to register.
- * @param server - The server to register the tool on.
- * @param client - The Todoist API client to use to execute the tool.
+ * Tools that expose user emails in their outputs.
+ * When adding new tools that return user emails, update this list
+ * and the FeatureFlags.stripEmails JSDoc.
  */
-function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape = z.ZodRawShape>(
-    tool: TodoistTool<Params, Output>,
-    server: McpServer,
-    client: TodoistApi,
-) {
+const TOOLS_WITH_USER_EMAILS = [
+    ToolNames.FIND_PROJECT_COLLABORATORS,
+    ToolNames.FIND_COMPLETED_TASKS,
+] as const
+
+/**
+ * Recursively strips email fields from an object structure.
+ * Used to remove sensitive email data from tool outputs for certain clients.
+ */
+function stripEmailsFromObject<T>(obj: T): T {
+    if (obj === null || obj === undefined) {
+        return obj
+    }
+
+    if (Array.isArray(obj)) {
+        return obj.map((item) => stripEmailsFromObject(item)) as T
+    }
+
+    if (typeof obj === 'object') {
+        const result: Record<string, unknown> = {}
+        for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+            if (key === 'email') {
+                // Skip email fields entirely
+                continue
+            }
+            result[key] = stripEmailsFromObject(value)
+        }
+        return result as T
+    }
+
+    return obj
+}
+
+/**
+ * Strips email patterns from text content.
+ * Replaces email addresses with [email hidden] placeholder.
+ */
+function stripEmailsFromText(text: string): string {
+    // Pattern matches common email formats in the tool output
+    // e.g., "• John Doe (john@example.com) - ID: 123" -> "• John Doe - ID: 123"
+    // Also handles standalone email references
+    const emailInParensPattern = /\s*\([^)]*@[^)]+\)/g
+    const emailPattern = /\S+@\S+\.\S+/g
+
+    return text.replace(emailInParensPattern, '').replace(emailPattern, '[email hidden]')
+}
+
+/**
+ * Register a Todoist tool in an MCP server.
+ */
+function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape = z.ZodRawShape>({
+    tool,
+    server,
+    client,
+    features = [],
+}: {
+    tool: TodoistTool<Params, Output>
+    server: McpServer
+    client: TodoistApi
+    features?: Features
+}) {
+    const shouldStripEmails =
+        features.some((f) => f.name === 'strip_emails') &&
+        TOOLS_WITH_USER_EMAILS.includes(tool.name as (typeof TOOLS_WITH_USER_EMAILS)[number])
+
     // @ts-expect-error I give up
     const cb: ToolCallback<Params> = async (args: z.infer<z.ZodObject<Params>>, _context) => {
         try {
-            const { textContent, structuredContent } = await tool.execute(
+            let { textContent, structuredContent } = await tool.execute(
                 args as z.infer<z.ZodObject<Params>>,
                 client,
             )
+
+            // Strip emails from outputs for ChatGPT clients on collaborator-related tools
+            if (shouldStripEmails) {
+                if (textContent) {
+                    textContent = stripEmailsFromText(textContent)
+                }
+                if (structuredContent) {
+                    structuredContent = stripEmailsFromObject(structuredContent)
+                }
+            }
+
             return getToolOutput({ textContent, structuredContent })
         } catch (error) {
             console.error(`Error executing tool ${tool.name}:`, { args, error })
@@ -145,4 +233,12 @@ function registerResource(server: McpServer, resource: McpTextResource) {
     }))
 }
 
-export { addMetaToTool, registerResource, registerTool }
+export {
+    addMetaToTool,
+    registerResource,
+    registerTool,
+    stripEmailsFromObject,
+    stripEmailsFromText,
+    type Feature,
+    type Features,
+}
