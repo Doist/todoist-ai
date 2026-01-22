@@ -7,16 +7,21 @@ import { removeNullFields } from './utils/sanitize-data.js'
 import { ToolNames } from './utils/tool-names.js'
 
 /**
- * Configuration options for the MCP server that affect tool behavior.
+ * A feature that modifies tool behavior.
  */
-type ServerConfig = {
+type Feature = {
     /**
-     * The type of client connecting to the server.
-     * - 'chatgpt': ChatGPT clients - emails are stripped from collaborator tool outputs for privacy.
-     * - 'unknown': Default behavior, no special handling.
+     * The feature name. Supported features:
+     * - 'strip_emails': Strips email addresses from collaborator tool outputs
+     *   (affects: find-project-collaborators, find-completed-tasks)
      */
-    clientType?: 'chatgpt' | 'unknown'
+    name: string
 }
+
+/**
+ * Array of features to enable.
+ */
+type Features = Feature[]
 
 type McpTextResource = {
     name: string
@@ -113,6 +118,8 @@ function addMetaToTool<Params extends z.ZodRawShape, Output extends z.ZodRawShap
 
 /**
  * Tools that expose user emails in their outputs.
+ * When adding new tools that return user emails, update this list
+ * and the FeatureFlags.stripEmails JSDoc.
  */
 const TOOLS_WITH_USER_EMAILS = [
     ToolNames.FIND_PROJECT_COLLABORATORS,
@@ -163,19 +170,20 @@ function stripEmailsFromText(text: string): string {
 
 /**
  * Register a Todoist tool in an MCP server.
- * @param tool - The tool to register.
- * @param server - The server to register the tool on.
- * @param client - The Todoist API client to use to execute the tool.
- * @param config - Server configuration options.
  */
-function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape = z.ZodRawShape>(
-    tool: TodoistTool<Params, Output>,
-    server: McpServer,
-    client: TodoistApi,
-    config: ServerConfig = {},
-) {
+function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape = z.ZodRawShape>({
+    tool,
+    server,
+    client,
+    features = [],
+}: {
+    tool: TodoistTool<Params, Output>
+    server: McpServer
+    client: TodoistApi
+    features?: Features
+}) {
     const shouldStripEmails =
-        config.clientType === 'chatgpt' &&
+        features.some((f) => f.name === 'strip_emails') &&
         TOOLS_WITH_USER_EMAILS.includes(tool.name as (typeof TOOLS_WITH_USER_EMAILS)[number])
 
     // @ts-expect-error I give up
@@ -231,5 +239,6 @@ export {
     registerTool,
     stripEmailsFromObject,
     stripEmailsFromText,
-    type ServerConfig,
+    type Feature,
+    type Features,
 }

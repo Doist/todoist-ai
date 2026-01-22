@@ -54,7 +54,8 @@ describe('Tool annotations', () => {
 
         // Verify each tool has mutability set correctly
         for (const call of registerSpy.mock.calls) {
-            const tool = call[0] // First argument is the tool object
+            const args = call[0] // First argument is the named args object
+            const tool = args.tool
             const toolName = tool.name as keyof typeof TOOL_MUTABILITY_CATEGORIZATION
             const expectedMutability = TOOL_MUTABILITY_CATEGORIZATION[toolName]
 
