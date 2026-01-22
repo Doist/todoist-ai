@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.5.0](https://github.com/Doist/todoist-ai/compare/v7.4.0...v7.5.0) (2026-01-22)
+
+
+### Features
+
+* Add support for 'clientType', do not expose emails to chatgpt ([#278](https://github.com/Doist/todoist-ai/issues/278)) ([2fc6726](https://github.com/Doist/todoist-ai/commit/2fc672665da1408817368195d2322c8ca5c62180))
+
 ## [7.4.0](https://github.com/Doist/todoist-ai/compare/v7.3.1...v7.4.0) (2026-01-20)
 
 
