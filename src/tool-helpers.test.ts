@@ -58,6 +58,7 @@ describe('shared utilities', () => {
                 completedAt: undefined,
                 deadlineDate: undefined,
                 responsibleUid: undefined,
+                order: 1,
             })
         })
 

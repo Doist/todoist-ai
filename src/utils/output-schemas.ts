@@ -35,6 +35,7 @@ const TaskSchema = z.object({
     assignedByUid: z.string().optional().describe('The UID of the user who assigned this task.'),
     checked: z.boolean().describe('Whether the task is checked/completed.'),
     completedAt: z.string().optional().describe('When the task was completed (ISO 8601 format).'),
+    order: z.number().describe('The order/position of the task within its project.'),
 })
 
 /**

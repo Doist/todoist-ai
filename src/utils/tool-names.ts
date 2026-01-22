@@ -12,6 +12,7 @@ export const ToolNames = {
     UPDATE_TASKS: 'update-tasks',
     FIND_TASKS: 'find-tasks',
     FIND_TASKS_BY_DATE: 'find-tasks-by-date',
+    FIND_TASKS_BY_FILTER: 'find-tasks-by-filter',
     FIND_COMPLETED_TASKS: 'find-completed-tasks',
 
     // Project management tools
