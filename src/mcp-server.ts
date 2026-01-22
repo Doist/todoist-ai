@@ -1,7 +1,15 @@
 import { TodoistApi } from '@doist/todoist-api-typescript'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
-import { addMetaToTool, type Features, registerResource, registerTool } from './mcp-helpers.js'
+import {
+    addMetaToTool,
+    FEATURE_NAMES,
+    type Feature,
+    type FeatureName,
+    type Features,
+    registerResource,
+    registerTool,
+} from './mcp-helpers.js'
 import { addComments } from './tools/add-comments.js'
 import { addProjects } from './tools/add-projects.js'
 import { addSections } from './tools/add-sections.js'
@@ -196,4 +204,4 @@ function getMcpServer({
     return server
 }
 
-export { getMcpServer }
+export { getMcpServer, FEATURE_NAMES, type Feature, type FeatureName, type Features }
