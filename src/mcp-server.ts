@@ -19,6 +19,7 @@ import { findSections } from './tools/find-sections.js'
 import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { createFindTasksByDateResource } from './tools/find-tasks-by-date.resource.js'
+import { findTasksByFilter } from './tools/find-tasks-by-filter.js'
 import { getOverview } from './tools/get-overview.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { search } from './tools/search.js'
@@ -53,6 +54,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **complete-tasks**: Mark tasks as done using task IDs
 - **find-tasks**: Search by text, project/section/parent container, responsible user, or labels. Requires at least one search parameter
 - **find-tasks-by-date**: Get tasks by date range (startDate: YYYY-MM-DD or 'today' which includes overdue tasks) or specific day counts
+- **find-tasks-by-filter**: Execute raw Todoist filter queries for advanced searches. Supports "##Project" (project hierarchy including sub-projects), "(today | overdue) & p1" (complex filters), and client-side sorting by priority, due_date, project, or created
 - **find-completed-tasks**: View completed tasks by completion date or original due date (returns all collaborators unless filtered)
 
 **Project & Organization:**
@@ -148,6 +150,7 @@ function getMcpServer({ todoistApiKey, baseUrl }: { todoistApiKey: string; baseU
     registerTool(updateTasks, server, todoist)
     registerTool(findTasks, server, todoist)
     registerTool(enhancedFindTasksByDateTool, server, todoist)
+    registerTool(findTasksByFilter, server, todoist)
     registerTool(findCompletedTasks, server, todoist)
 
     // Project management tools

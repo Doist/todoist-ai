@@ -21,6 +21,7 @@ import { findProjects } from './tools/find-projects.js'
 import { findSections } from './tools/find-sections.js'
 import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
+import { findTasksByFilter } from './tools/find-tasks-by-filter.js'
 import { getOverview } from './tools/get-overview.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { search } from './tools/search.js'
@@ -37,6 +38,7 @@ const tools = {
     updateTasks,
     findTasks,
     findTasksByDate,
+    findTasksByFilter,
     findCompletedTasks,
     // Project management tools
     addProjects,
@@ -73,6 +75,7 @@ export {
     updateTasks,
     findTasks,
     findTasksByDate,
+    findTasksByFilter,
     findCompletedTasks,
     // Project management tools
     addProjects,

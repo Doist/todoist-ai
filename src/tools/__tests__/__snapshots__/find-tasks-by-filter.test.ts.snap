@@ -1,0 +1,59 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`find-tasks-by-filter tool > basic filter queries > should execute a basic project hierarchy filter (##Work) 1`] = `
+"Tasks matching filter "##Work": 2 (limit 10).
+Filter: query: ##Work.
+Preview:
+    Task in Work project • P4 • id=8485093748
+    Task in sub-project • P4 • id=8485093749"
+`;
+
+exports[`find-tasks-by-filter tool > basic filter queries > should execute a complex filter with logical operators 1`] = `
+"Tasks matching filter "(today | overdue) & p1": 1 (limit 50).
+Filter: query: (today | overdue) & p1.
+Preview:
+    High priority overdue task • due 2025-08-10 • P1 • id=8485093748"
+`;
+
+exports[`find-tasks-by-filter tool > basic filter queries > should execute a single project filter (#Inbox) 1`] = `
+"Tasks matching filter "#Inbox": 1 (limit 10).
+Filter: query: #Inbox.
+Preview:
+    Inbox task • P4 • id=8485093748"
+`;
+
+exports[`find-tasks-by-filter tool > combining filter with labels > should combine filter with multiple labels using AND operator 1`] = `
+"Tasks matching filter "##Work": 1 (limit 10).
+Filter: query: ##Work & (@important  &  @urgent); labels: @important & @urgent.
+Preview:
+    Important urgent task • P4 • id=8485093748"
+`;
+
+exports[`find-tasks-by-filter tool > combining filter with labels > should combine filter with single label 1`] = `
+"Tasks matching filter "##Work": 1 (limit 10).
+Filter: query: ##Work & (@urgent); labels: @urgent.
+Preview:
+    Urgent work task • P4 • id=8485093748"
+`;
+
+exports[`find-tasks-by-filter tool > combining filter with responsible user > should combine filter with specific user 1`] = `
+"Tasks matching filter "##Work" assigned to john@example.com: 1 (limit 10).
+Filter: query: ##Work & assigned to: john@example.com; assigned to: john@example.com.
+Preview:
+    Task assigned to John • P4 • id=8485093748"
+`;
+
+exports[`find-tasks-by-filter tool > empty results handling > should handle empty results gracefully 1`] = `
+"Tasks matching filter "##NonExistent": 0 (limit 10).
+Filter: query: ##NonExistent.
+No results. Verify filter syntax is correct; Try a simpler filter to confirm project/label names; Ensure the parent project exists and has sub-projects."
+`;
+
+exports[`find-tasks-by-filter tool > pagination > should handle pagination with cursor 1`] = `
+"Tasks matching filter "##Work": 1 (limit 10), more available.
+Filter: query: ##Work.
+Preview:
+    Page 2 task • P4 • id=8485093748
+Possible suggested next step:
+- Pass cursor 'next-page-cursor' to fetch more results."
+`;

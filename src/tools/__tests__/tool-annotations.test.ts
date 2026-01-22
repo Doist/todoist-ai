@@ -9,6 +9,7 @@ const TOOL_MUTABILITY_CATEGORIZATION: Record<string, ToolMutability> = {
     'find-projects': 'readonly',
     'find-tasks': 'readonly',
     'find-tasks-by-date': 'readonly',
+    'find-tasks-by-filter': 'readonly',
     'find-completed-tasks': 'readonly',
     'find-sections': 'readonly',
     'find-comments': 'readonly',
