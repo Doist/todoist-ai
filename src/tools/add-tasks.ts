@@ -124,6 +124,16 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
         resolvedProjectId = todoistUser.inboxProjectId
     }
 
+    // Validate project is not archived
+    if (resolvedProjectId) {
+        const project = await client.getProject(resolvedProjectId)
+        if (project.isArchived) {
+            throw new Error(
+                `Task "${task.content}": Cannot create task in archived project "${project.name}"`,
+            )
+        }
+    }
+
     let taskArgs: AddTaskArgs = {
         ...otherTaskArgs,
         projectId: resolvedProjectId,
