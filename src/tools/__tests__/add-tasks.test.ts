@@ -1,13 +1,20 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
 import { convertPriorityToNumber } from '../../utils/priorities.js'
-import { createMockTask, createMockUser, TEST_IDS, TODAY } from '../../utils/test-helpers.js'
+import {
+    createMockProject,
+    createMockTask,
+    createMockUser,
+    TEST_IDS,
+    TODAY,
+} from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { addTasks } from '../add-tasks.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
     addTask: vi.fn(),
+    getProject: vi.fn(),
     getUser: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
@@ -16,6 +23,7 @@ const { ADD_TASKS } = ToolNames
 describe(`${ADD_TASKS} tool`, () => {
     beforeEach(() => {
         vi.clearAllMocks()
+        mockTodoistApi.getProject.mockResolvedValue(createMockProject())
     })
 
     describe('adding multiple tasks', () => {
@@ -852,6 +860,90 @@ describe(`${ADD_TASKS} tool`, () => {
                 order: 5,
                 labels: undefined,
             })
+        })
+    })
+
+    describe('archived project validation', () => {
+        it('should throw error when project is archived', async () => {
+            mockTodoistApi.getProject.mockResolvedValue(
+                createMockProject({ isArchived: true, name: 'Archived Project' }),
+            )
+
+            await expect(
+                addTasks.execute(
+                    {
+                        tasks: [
+                            {
+                                content: 'Task in archived project',
+                                projectId: '6cfCcrrCFg2xP94Q',
+                            },
+                        ],
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(
+                'Task "Task in archived project": Cannot create task in archived project "Archived Project"',
+            )
+
+            expect(mockTodoistApi.addTask).not.toHaveBeenCalled()
+        })
+
+        it('should not check project when projectId is omitted', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485094001',
+                content: 'Inbox task',
+            })
+            mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
+
+            await addTasks.execute({ tasks: [{ content: 'Inbox task' }] }, mockTodoistApi)
+
+            expect(mockTodoistApi.getProject).not.toHaveBeenCalled()
+            expect(mockTodoistApi.addTask).toHaveBeenCalled()
+        })
+
+        it('should propagate error when project is deleted (not found)', async () => {
+            mockTodoistApi.getProject.mockRejectedValue(new Error('Project not found'))
+
+            await expect(
+                addTasks.execute(
+                    {
+                        tasks: [
+                            {
+                                content: 'Task in deleted project',
+                                projectId: 'deleted-project-id',
+                            },
+                        ],
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow('Project not found')
+
+            expect(mockTodoistApi.addTask).not.toHaveBeenCalled()
+        })
+
+        it('should allow task creation in active project', async () => {
+            mockTodoistApi.getProject.mockResolvedValue(createMockProject({ isArchived: false }))
+            const mockApiResponse: Task = createMockTask({
+                id: '8485094002',
+                content: 'Task in active project',
+            })
+            mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
+
+            const result = await addTasks.execute(
+                {
+                    tasks: [
+                        {
+                            content: 'Task in active project',
+                            projectId: '6cfCcrrCFg2xP94Q',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.getProject).toHaveBeenCalledWith('6cfCcrrCFg2xP94Q')
+            expect(mockTodoistApi.addTask).toHaveBeenCalled()
+            expect(result.structuredContent.totalCount).toBe(1)
         })
     })
 })
