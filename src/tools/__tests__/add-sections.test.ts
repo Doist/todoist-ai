@@ -1,12 +1,13 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
-import { createMockSection, TEST_IDS } from '../../utils/test-helpers.js'
+import { createMockSection, createMockUser, TEST_IDS } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { addSections } from '../add-sections.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
     addSection: vi.fn(),
+    getUser: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
 const { ADD_SECTIONS } = ToolNames
@@ -14,6 +15,7 @@ const { ADD_SECTIONS } = ToolNames
 describe(`${ADD_SECTIONS} tool`, () => {
     beforeEach(() => {
         vi.clearAllMocks()
+        mockTodoistApi.getUser.mockResolvedValue(createMockUser())
     })
 
     describe('creating a single section', () => {

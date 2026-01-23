@@ -7,7 +7,12 @@ import {
     resolveResponsibleUser,
 } from '../filter-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { getTasksByFilter, type MappedTask, mapTask } from '../tool-helpers.js'
+import {
+    getTasksByFilter,
+    type MappedTask,
+    mapTask,
+    resolveInboxProjectId,
+} from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
@@ -113,8 +118,7 @@ const findTasks = {
             }
 
             if (projectId) {
-                taskParams.projectId =
-                    projectId === 'inbox' ? todoistUser.inboxProjectId : projectId
+                taskParams.projectId = await resolveInboxProjectId({ projectId, user: todoistUser })
             }
             if (sectionId) taskParams.sectionId = sectionId
             if (parentId) taskParams.parentId = parentId

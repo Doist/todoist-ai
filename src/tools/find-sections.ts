@@ -1,7 +1,7 @@
 import type { Section } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { searchAllSections } from '../tool-helpers.js'
+import { resolveInboxProjectId, searchAllSections } from '../tool-helpers.js'
 import { SectionSchema as SectionOutputSchema } from '../utils/output-schemas.js'
 import { summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -45,8 +45,10 @@ const findSections = {
     mutability: 'readonly' as const,
     async execute(args, client) {
         // Resolve "inbox" to actual inbox project ID if needed
-        const resolvedProjectId =
-            args.projectId === 'inbox' ? (await client.getUser()).inboxProjectId : args.projectId
+        const resolvedProjectId = await resolveInboxProjectId({
+            projectId: args.projectId,
+            client,
+        })
 
         let results: Section[]
 

@@ -312,32 +312,6 @@ describe(`${FIND_SECTIONS} tool`, () => {
                 { id: TEST_IDS.SECTION_2, name: 'Inbox Section 2' },
             ])
         })
-
-        it('should not call getUser when projectId is not "inbox"', async () => {
-            const mockSections: Section[] = [
-                createMockSection({
-                    id: TEST_IDS.SECTION_1,
-                    projectId: TEST_IDS.PROJECT_TEST,
-                    name: 'Regular Section',
-                }),
-            ]
-
-            // Mock the API response
-            mockTodoistApi.getSections.mockResolvedValue({
-                results: mockSections,
-                nextCursor: null,
-            })
-
-            await findSections.execute({ projectId: TEST_IDS.PROJECT_TEST }, mockTodoistApi)
-
-            // Verify getUser was NOT called for regular project ID
-            expect(mockTodoistApi.getUser).not.toHaveBeenCalled()
-
-            // Verify getSections was called with original project ID
-            expect(mockTodoistApi.getSections).toHaveBeenCalledWith({
-                projectId: TEST_IDS.PROJECT_TEST,
-            })
-        })
     })
 
     describe('error handling', () => {

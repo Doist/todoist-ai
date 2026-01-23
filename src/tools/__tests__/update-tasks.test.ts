@@ -1,7 +1,7 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
 import { convertPriorityToNumber } from '../../utils/priorities.js'
-import { createMockTask, TEST_IDS } from '../../utils/test-helpers.js'
+import { createMockTask, createMockUser, TEST_IDS } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { updateTasks } from '../update-tasks.js'
 
@@ -9,6 +9,7 @@ import { updateTasks } from '../update-tasks.js'
 const mockTodoistApi = {
     updateTask: vi.fn(),
     moveTask: vi.fn(),
+    getUser: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
 const { UPDATE_TASKS } = ToolNames
@@ -16,6 +17,7 @@ const { UPDATE_TASKS } = ToolNames
 describe(`${UPDATE_TASKS} tool`, () => {
     beforeEach(() => {
         vi.clearAllMocks()
+        mockTodoistApi.getUser.mockResolvedValue(createMockUser())
     })
 
     describe('updating task properties', () => {
