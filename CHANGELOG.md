@@ -1,5 +1,13 @@
 # Changelog
 
+## [7.5.1](https://github.com/Doist/todoist-ai/compare/v7.5.0...v7.5.1) (2026-01-23)
+
+
+### Bug Fixes
+
+* Handle case-insensitive 'inbox' project ID across all tools ([#286](https://github.com/Doist/todoist-ai/issues/286)) ([743a1a9](https://github.com/Doist/todoist-ai/commit/743a1a98fcb5db4990777ab32e5f54ab2fc92801))
+* prevent task creation in archived projects ([#284](https://github.com/Doist/todoist-ai/issues/284)) ([69640cf](https://github.com/Doist/todoist-ai/commit/69640cf3b32466a38345eee625527dc7153de2e5))
+
 ## [7.5.0](https://github.com/Doist/todoist-ai/compare/v7.4.0...v7.5.0) (2026-01-22)
 
 
