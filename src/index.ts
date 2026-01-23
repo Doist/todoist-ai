@@ -1,3 +1,4 @@
+import { FEATURE_NAMES, type Feature, type FeatureName, type Features } from './mcp-helpers.js'
 import { getMcpServer } from './mcp-server.js'
 // Comment management tools
 import { addComments } from './tools/add-comments.js'
@@ -64,7 +65,7 @@ const tools = {
     fetch,
 }
 
-export { tools, getMcpServer }
+export { tools, getMcpServer, FEATURE_NAMES, type Feature, type FeatureName, type Features }
 
 export {
     // Task management tools

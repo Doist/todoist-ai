@@ -7,19 +7,39 @@ import { removeNullFields } from './utils/sanitize-data.js'
 import { ToolNames } from './utils/tool-names.js'
 
 /**
+ * Supported feature names that modify tool behavior.
+ *
+ * Currently supported:
+ * - `'strip_emails'`: Strips email addresses from collaborator tool outputs
+ *   (affects: find-project-collaborators, find-completed-tasks). Useful for
+ *   clients like ChatGPT that should not have access to user emails.
+ */
+const FEATURE_NAMES = {
+    /**
+     * Strips email addresses from tool outputs that expose user data.
+     * Affects: find-project-collaborators, find-completed-tasks
+     */
+    STRIP_EMAILS: 'strip_emails',
+} as const
+
+/**
+ * Valid feature name values.
+ * @see FEATURE_NAMES for available options with documentation.
+ */
+type FeatureName = (typeof FEATURE_NAMES)[keyof typeof FEATURE_NAMES]
+
+/**
  * A feature that modifies tool behavior.
  */
 type Feature = {
     /**
-     * The feature name. Supported features:
-     * - 'strip_emails': Strips email addresses from collaborator tool outputs
-     *   (affects: find-project-collaborators, find-completed-tasks)
+     * The feature name. Use {@link FEATURE_NAMES} for available options with intellisense.
      */
-    name: string
+    name: FeatureName
 }
 
 /**
- * Array of features to enable.
+ * Array of features to enable when creating the MCP server.
  */
 type Features = Feature[]
 
@@ -235,10 +255,12 @@ function registerResource(server: McpServer, resource: McpTextResource) {
 
 export {
     addMetaToTool,
+    FEATURE_NAMES,
     registerResource,
     registerTool,
     stripEmailsFromObject,
     stripEmailsFromText,
     type Feature,
+    type FeatureName,
     type Features,
 }
