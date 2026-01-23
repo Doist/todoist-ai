@@ -1,7 +1,7 @@
 import type { Comment } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { mapComment } from '../tool-helpers.js'
+import { mapComment, resolveInboxProjectId } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { CommentSchema as CommentOutputSchema } from '../utils/output-schemas.js'
 import { formatNextSteps } from '../utils/response-builders.js'
@@ -59,8 +59,10 @@ const findComments = {
         }
 
         // Resolve "inbox" to actual inbox project ID if needed
-        const resolvedProjectId =
-            args.projectId === 'inbox' ? (await client.getUser()).inboxProjectId : args.projectId
+        const resolvedProjectId = await resolveInboxProjectId({
+            projectId: args.projectId,
+            client,
+        })
 
         let hasMore = false
         let nextCursor: string | null = null

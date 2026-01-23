@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { appendToQuery, resolveResponsibleUser } from '../filter-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
-import { mapTask } from '../tool-helpers.js'
+import { mapTask, resolveInboxProjectId } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
@@ -97,7 +97,10 @@ const findCompletedTasks = {
         const userGmtOffset = user.tzInfo?.gmtString || '+00:00'
 
         // Resolve "inbox" to actual inbox project ID if needed
-        const resolvedProjectId = projectId === 'inbox' ? user.inboxProjectId : projectId
+        const resolvedProjectId = await resolveInboxProjectId({
+            projectId,
+            user,
+        })
 
         // Convert user's local date to UTC timestamps
         // This ensures we capture the entire day from the user's perspective

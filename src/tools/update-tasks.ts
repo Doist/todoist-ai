@@ -1,7 +1,7 @@
 import type { Task, UpdateTaskArgs } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { createMoveTaskArgs, mapTask } from '../tool-helpers.js'
+import { createMoveTaskArgs, mapTask, resolveInboxProjectId } from '../tool-helpers.js'
 import { assignmentValidator } from '../utils/assignment-validator.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
 import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
@@ -114,11 +114,10 @@ const updateTasks = {
             } = task
 
             // Resolve "inbox" to actual inbox project ID if needed
-            let resolvedProjectId = projectId
-            if (projectId === 'inbox') {
-                const todoistUser = await client.getUser()
-                resolvedProjectId = todoistUser.inboxProjectId
-            }
+            const resolvedProjectId = await resolveInboxProjectId({
+                projectId,
+                client,
+            })
 
             let updateArgs: UpdateTaskArgs = {
                 ...otherUpdateArgs,

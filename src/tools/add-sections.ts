@@ -1,6 +1,7 @@
 import type { Section } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
+import { isInboxProjectId, resolveInboxProjectId } from '../tool-helpers.js'
 import { SectionSchema as SectionOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -31,17 +32,21 @@ const addSections = {
     mutability: 'additive' as const,
     async execute({ sections }, client) {
         // Check if any section needs inbox resolution
-        const needsInboxResolution = sections.some((section) => section.projectId === 'inbox')
-        const todoistUser = needsInboxResolution ? await client.getUser() : null
+        const needsInboxResolution = sections.some((section) => isInboxProjectId(section.projectId))
+        const todoistUser = needsInboxResolution ? await client.getUser() : undefined
 
         // Resolve inbox project IDs
-        const sectionsWithResolvedProjectIds = sections.map((section) => ({
-            ...section,
-            projectId:
-                section.projectId === 'inbox' && todoistUser
-                    ? todoistUser.inboxProjectId
-                    : section.projectId,
-        }))
+        const sectionsWithResolvedProjectIds = await Promise.all(
+            sections.map(async (section) => ({
+                ...section,
+                projectId:
+                    (await resolveInboxProjectId({
+                        projectId: section.projectId,
+                        user: todoistUser,
+                        client: todoistUser ? undefined : client,
+                    })) ?? section.projectId,
+            })),
+        )
 
         const newSections = await Promise.all(
             sectionsWithResolvedProjectIds.map((section) => client.addSection(section)),

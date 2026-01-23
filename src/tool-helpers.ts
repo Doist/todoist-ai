@@ -1,6 +1,7 @@
 import type {
     ActivityEvent,
     Comment,
+    CurrentUser,
     MoveTaskArgs,
     PersonalProject,
     Section,
@@ -31,6 +32,48 @@ export function isPersonalProject(project: Project): project is PersonalProject 
 
 export function isWorkspaceProject(project: Project): project is WorkspaceProject {
     return 'workspaceId' in project
+}
+
+/**
+ * Checks if a project ID represents the inbox (case-insensitive).
+ *
+ * @param projectId - The project ID to check
+ * @returns true if the project ID is inbox-like
+ */
+export function isInboxProjectId(projectId: string | undefined): boolean {
+    return projectId?.toLowerCase() === 'inbox'
+}
+
+/**
+ * Resolves "inbox" project ID to actual inbox project ID (case-insensitive).
+ * Only makes API calls when necessary (when projectId is inbox-like and user not provided).
+ *
+ * @param args - Configuration object
+ * @param args.projectId - The project ID to resolve (may be "inbox", "Inbox", etc.)
+ * @param args.user - The current user object (if already fetched)
+ * @param args.client - The API client (if user needs to be fetched)
+ * @returns Promise resolving to the resolved project ID
+ */
+export async function resolveInboxProjectId(args: {
+    projectId: string | undefined
+    user?: CurrentUser
+    client?: TodoistApi
+}): Promise<string | undefined> {
+    const { projectId, user, client } = args
+
+    // If not inbox-like, return immediately (no API call needed)
+    if (!isInboxProjectId(projectId)) {
+        return projectId
+    }
+
+    // It's inbox-like, so we need the user
+    const currentUser = user || (client ? await client.getUser() : null)
+
+    if (!currentUser) {
+        throw new Error('Either user or client must be provided when resolving inbox project ID')
+    }
+
+    return currentUser.inboxProjectId
 }
 
 /**

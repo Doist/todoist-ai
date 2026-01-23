@@ -23,6 +23,7 @@ vi.mock('../../tool-helpers', async () => {
         mapTask: actual.mapTask,
         filterTasksByResponsibleUser: actual.filterTasksByResponsibleUser,
         RESPONSIBLE_USER_FILTERING: actual.RESPONSIBLE_USER_FILTERING,
+        resolveInboxProjectId: actual.resolveInboxProjectId,
     }
 })
 

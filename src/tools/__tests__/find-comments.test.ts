@@ -1,5 +1,6 @@
 import type { Comment, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
+import { createMockUser } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { findComments } from '../find-comments.js'
 
@@ -7,6 +8,7 @@ import { findComments } from '../find-comments.js'
 const mockTodoistApi = {
     getComment: vi.fn(),
     getComments: vi.fn(),
+    getUser: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
 const { FIND_COMMENTS } = ToolNames
@@ -30,6 +32,7 @@ function createMockComment(overrides: Partial<Comment> = {}): Comment {
 describe(`${FIND_COMMENTS} tool`, () => {
     beforeEach(() => {
         vi.clearAllMocks()
+        mockTodoistApi.getUser.mockResolvedValue(createMockUser())
     })
 
     describe('finding comments by task', () => {

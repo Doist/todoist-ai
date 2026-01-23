@@ -1,7 +1,7 @@
 import type { AddCommentArgs } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { mapComment } from '../tool-helpers.js'
+import { isInboxProjectId, mapComment, resolveInboxProjectId } from '../tool-helpers.js'
 import { CommentSchema as CommentOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -51,13 +51,16 @@ const addComments = {
         }
 
         // Check if any comment needs inbox resolution
-        const needsInboxResolution = comments.some((comment) => comment.projectId === 'inbox')
-        const todoistUser = needsInboxResolution ? await client.getUser() : null
+        const needsInboxResolution = comments.some((comment) => isInboxProjectId(comment.projectId))
+        const todoistUser = needsInboxResolution ? await client.getUser() : undefined
 
         const addCommentPromises = comments.map(async ({ content, taskId, projectId }) => {
             // Resolve "inbox" to actual inbox project ID if needed
-            const resolvedProjectId =
-                projectId === 'inbox' && todoistUser ? todoistUser.inboxProjectId : projectId
+            const resolvedProjectId = await resolveInboxProjectId({
+                projectId,
+                user: todoistUser,
+                client: todoistUser ? undefined : client,
+            })
 
             return await client.addComment({
                 content,

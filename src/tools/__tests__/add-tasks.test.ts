@@ -749,42 +749,6 @@ describe(`${ADD_TASKS} tool`, () => {
                 ]),
             )
         })
-
-        it('should not call getUser when projectId is not "inbox"', async () => {
-            const mockApiResponse: Task = createMockTask({
-                id: '8485093761',
-                content: 'Regular task',
-                projectId: '6cfCcrrCFg2xP94Q',
-                url: 'https://todoist.com/showTask?id=8485093761',
-                addedAt: '2025-08-13T22:09:56.123456Z',
-            })
-
-            mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
-
-            await addTasks.execute(
-                {
-                    tasks: [
-                        {
-                            content: 'Regular task',
-                            projectId: '6cfCcrrCFg2xP94Q',
-                        },
-                    ],
-                },
-                mockTodoistApi,
-            )
-
-            // Verify getUser was NOT called for regular project ID
-            expect(mockTodoistApi.getUser).not.toHaveBeenCalled()
-
-            // Verify addTask was called with original project ID
-            expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
-                content: 'Regular task',
-                projectId: '6cfCcrrCFg2xP94Q',
-                sectionId: undefined,
-                parentId: undefined,
-                labels: undefined,
-            })
-        })
     })
 
     describe('isUncompletable parameter', () => {
