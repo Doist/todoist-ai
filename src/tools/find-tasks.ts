@@ -73,7 +73,7 @@ const findTasks = {
         'Find tasks by text search, or by project/section/parent container/responsible user. At least one filter must be provided.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    mutability: 'readonly' as const,
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
     async execute(args, client) {
         const {
             searchText,

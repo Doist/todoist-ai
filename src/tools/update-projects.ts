@@ -35,7 +35,7 @@ const updateProjects = {
     description: 'Update multiple existing projects with new values.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    mutability: 'mutating' as const,
+    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
     async execute(args, client) {
         const { projects } = args
         const updateProjectsPromises = projects.map(async (project) => {

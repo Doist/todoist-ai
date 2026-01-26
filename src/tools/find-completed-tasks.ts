@@ -75,7 +75,7 @@ const findCompletedTasks = {
         'Get completed tasks (includes all collaborators by default—use responsibleUser to narrow).',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    mutability: 'readonly' as const,
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
     async execute(args, client) {
         const { getBy, labels, labelsOperator, since, until, responsibleUser, projectId, ...rest } =
             args

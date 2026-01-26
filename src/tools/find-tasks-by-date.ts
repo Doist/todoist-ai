@@ -77,7 +77,7 @@ const findTasksByDate = {
         "Get tasks by date range. Use startDate 'today' to get today's tasks including overdue items, or provide a specific date/date range.",
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    mutability: 'readonly' as const,
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
     async execute(args, client) {
         if (!args.startDate && args.overdueOption !== 'overdue-only') {
             throw new Error(

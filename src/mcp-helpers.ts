@@ -1,8 +1,8 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/mcp.js'
-import type { TextResourceContents } from '@modelcontextprotocol/sdk/types.js'
+import type { TextResourceContents, ToolAnnotations } from '@modelcontextprotocol/sdk/types.js'
 import type { z } from 'zod'
-import type { TodoistTool, ToolMutability } from './todoist-tool.js'
+import type { TodoistTool } from './todoist-tool.js'
 import { removeNullFields } from './utils/sanitize-data.js'
 import { ToolNames } from './utils/tool-names.js'
 
@@ -110,20 +110,26 @@ function getErrorOutput(error: string) {
 }
 
 /**
- * Convert tool mutability level to MCP annotation hints.
+ * Build MCP ToolAnnotations for a tool.
  *
- * @param mutability - The mutability level of the tool.
- * @returns MCP annotations with readOnlyHint and destructiveHint set appropriately.
+ * @param tool - The tool information used for annotation generation.
+ * @returns MCP annotations.
  */
-function getMcpAnnotations(mutability: ToolMutability) {
-    switch (mutability) {
-        case 'readonly':
-            return { readOnlyHint: true, destructiveHint: false }
-        case 'additive':
-            return { readOnlyHint: false, destructiveHint: false }
-        case 'mutating':
-            return { readOnlyHint: false, destructiveHint: true }
+function getMcpAnnotations(tool: { name: string; annotations: ToolAnnotations }): ToolAnnotations {
+    const defaultAnnotations: ToolAnnotations = {
+        title: `Todoist: ${formatToolTitle(tool.name)}`,
+        openWorldHint: false,
     }
+
+    return { ...defaultAnnotations, ...tool.annotations }
+}
+
+function formatToolTitle(toolName: string): string {
+    return toolName
+        .split('-')
+        .filter(Boolean)
+        .map((segment) => `${segment.charAt(0).toUpperCase()}${segment.slice(1)}`)
+        .join(' ')
 }
 
 function addMetaToTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape = z.ZodRawShape>(
@@ -239,7 +245,7 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
             description: tool.description,
             inputSchema: tool.parameters,
             outputSchema: tool.outputSchema as Output,
-            annotations: getMcpAnnotations(tool.mutability),
+            annotations: getMcpAnnotations(tool),
             ...(tool._meta ? { _meta: tool._meta } : {}),
         },
         cb,

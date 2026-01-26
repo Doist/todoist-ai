@@ -80,7 +80,7 @@ const addTasks = {
         'Add one or more tasks to a project, section, or parent. Supports assignment to project collaborators.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    mutability: 'additive' as const,
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
     async execute({ tasks }, client) {
         const newTasks: Task[] = []
         for (const task of tasks) {

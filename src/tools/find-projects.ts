@@ -46,7 +46,7 @@ const findProjects = {
         'List all projects or search for projects by name. When searching, all matching projects are returned (pagination is ignored). When not searching, projects are returned with pagination.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    mutability: 'readonly' as const,
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
     async execute(args, client) {
         let results: Awaited<ReturnType<typeof client.getProjects>>['results']
         let nextCursor = null

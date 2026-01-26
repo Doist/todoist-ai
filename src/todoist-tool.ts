@@ -1,4 +1,5 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
+import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js'
 import type { z } from 'zod'
 
 type ExecuteResult<Output extends z.ZodRawShape> = Promise<{
@@ -6,14 +7,11 @@ type ExecuteResult<Output extends z.ZodRawShape> = Promise<{
     structuredContent?: z.infer<z.ZodObject<Output>>
 }>
 
-/**
- * Categorization of tool behavior for MCP annotation hints.
- *
- * - **readonly**: Tool only reads data, doesn't modify state (e.g., find-*, get-*, search)
- * - **additive**: Tool creates new resources but doesn't modify existing ones (e.g., add-*)
- * - **mutating**: Tool modifies or destroys existing data (e.g., update-*, delete-*, complete-*)
- */
-type ToolMutability = 'readonly' | 'additive' | 'mutating'
+type RequiredToolAnnotations = ToolAnnotations & {
+    readOnlyHint: boolean
+    destructiveHint: boolean
+    idempotentHint: boolean
+}
 
 /**
  * A Todoist tool that can be used in an MCP server or other conversational AI interfaces.
@@ -46,11 +44,9 @@ type TodoistTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape> = {
     outputSchema: Output
 
     /**
-     * The mutability level of this tool.
-     *
-     * This is used to generate appropriate MCP annotation hints (readOnlyHint, destructiveHint).
+     * MCP ToolAnnotations hints for this tool.
      */
-    mutability: ToolMutability
+    annotations: RequiredToolAnnotations
 
     /**
      * The meta data of the tool.
@@ -71,4 +67,4 @@ type TodoistTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape> = {
     execute: (args: z.infer<z.ZodObject<Params>>, client: TodoistApi) => ExecuteResult<Output>
 }
 
-export type { TodoistTool, ToolMutability }
+export type { RequiredToolAnnotations, TodoistTool }
