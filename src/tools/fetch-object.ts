@@ -25,7 +25,7 @@ const fetchObject = {
         'Fetch a single task, project, comment, or section by its ID. Use this when you have a specific object ID and want to retrieve its full details.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    mutability: 'readonly' as const,
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
     async execute(args, client) {
         const { type, id } = args
 

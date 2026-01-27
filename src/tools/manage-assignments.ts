@@ -85,7 +85,7 @@ const manageAssignments = {
         'Bulk assignment operations for multiple tasks. Supports assign, unassign, and reassign operations with atomic rollback on failures.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    mutability: 'mutating' as const,
+    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
     async execute(args, client) {
         const { operation, taskIds, responsibleUser, fromAssigneeUser, dryRun } = args
 

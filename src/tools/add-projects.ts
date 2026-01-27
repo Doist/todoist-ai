@@ -35,7 +35,7 @@ const addProjects = {
     description: 'Add one or more new projects.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    mutability: 'additive' as const,
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
     async execute({ projects }, client) {
         const newProjects = await Promise.all(projects.map((project) => client.addProject(project)))
         const textContent = generateTextContent({ projects: newProjects })

@@ -42,7 +42,7 @@ const findSections = {
         'Search for sections by name or other criteria in a project. When searching, uses server-side search to avoid fetching all sections.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    mutability: 'readonly' as const,
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
     async execute(args, client) {
         // Resolve "inbox" to actual inbox project ID if needed
         const resolvedProjectId = await resolveInboxProjectId({

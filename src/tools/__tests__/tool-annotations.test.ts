@@ -1,68 +1,226 @@
-import { describe, expect, it, vi } from 'vitest'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { getMcpServer } from '../../mcp-server.js'
-import type { ToolMutability } from '../../todoist-tool.js'
 import { ToolNames } from '../../utils/tool-names.js'
 
-// Tool mutability categorization.
-// Update this when adding new tools.
-const TOOL_MUTABILITY_CATEGORIZATION: Record<string, ToolMutability> = {
-    'find-projects': 'readonly',
-    'find-tasks': 'readonly',
-    'find-tasks-by-date': 'readonly',
-    'find-completed-tasks': 'readonly',
-    'find-sections': 'readonly',
-    'find-comments': 'readonly',
-    'find-activity': 'readonly',
-    'find-project-collaborators': 'readonly',
-    'user-info': 'readonly',
-    'get-overview': 'readonly',
-    search: 'readonly',
-    fetch: 'readonly',
-    'fetch-object': 'readonly',
-    'add-tasks': 'additive',
-    'add-projects': 'additive',
-    'add-sections': 'additive',
-    'add-comments': 'additive',
-    'update-tasks': 'mutating',
-    'update-projects': 'mutating',
-    'update-sections': 'mutating',
-    'update-comments': 'mutating',
-    'complete-tasks': 'mutating',
-    'delete-object': 'mutating',
-    'manage-assignments': 'mutating',
-} as const
+type ToolExpectation = {
+    name: string
+    title: string
+    readOnlyHint: boolean
+    destructiveHint: boolean
+    idempotentHint: boolean
+}
+
+const TOOL_EXPECTATIONS: ToolExpectation[] = [
+    {
+        name: ToolNames.ADD_TASKS,
+        title: 'Todoist: Add Tasks',
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+    },
+    {
+        name: ToolNames.COMPLETE_TASKS,
+        title: 'Todoist: Complete Tasks',
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+    },
+    {
+        name: ToolNames.UPDATE_TASKS,
+        title: 'Todoist: Update Tasks',
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+    },
+    {
+        name: ToolNames.FIND_TASKS,
+        title: 'Todoist: Find Tasks',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.FIND_TASKS_BY_DATE,
+        title: 'Todoist: Find Tasks By Date',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.FIND_COMPLETED_TASKS,
+        title: 'Todoist: Find Completed Tasks',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.ADD_PROJECTS,
+        title: 'Todoist: Add Projects',
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+    },
+    {
+        name: ToolNames.UPDATE_PROJECTS,
+        title: 'Todoist: Update Projects',
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+    },
+    {
+        name: ToolNames.FIND_PROJECTS,
+        title: 'Todoist: Find Projects',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.ADD_SECTIONS,
+        title: 'Todoist: Add Sections',
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+    },
+    {
+        name: ToolNames.UPDATE_SECTIONS,
+        title: 'Todoist: Update Sections',
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+    },
+    {
+        name: ToolNames.FIND_SECTIONS,
+        title: 'Todoist: Find Sections',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.ADD_COMMENTS,
+        title: 'Todoist: Add Comments',
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+    },
+    {
+        name: ToolNames.UPDATE_COMMENTS,
+        title: 'Todoist: Update Comments',
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+    },
+    {
+        name: ToolNames.FIND_COMMENTS,
+        title: 'Todoist: Find Comments',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.FIND_PROJECT_COLLABORATORS,
+        title: 'Todoist: Find Project Collaborators',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.MANAGE_ASSIGNMENTS,
+        title: 'Todoist: Manage Assignments',
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+    },
+    {
+        name: ToolNames.FIND_ACTIVITY,
+        title: 'Todoist: Find Activity',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.GET_OVERVIEW,
+        title: 'Todoist: Get Overview',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.DELETE_OBJECT,
+        title: 'Todoist: Delete Object',
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.FETCH_OBJECT,
+        title: 'Todoist: Fetch Object',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.USER_INFO,
+        title: 'Todoist: User Info',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.SEARCH,
+        title: 'Todoist: Search',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.FETCH,
+        title: 'Todoist: Fetch',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+]
 
 describe('Tool annotations', () => {
-    beforeEach(() => {
-        vi.clearAllMocks()
-    })
+    const registered: Map<string, { annotations?: unknown }> = new Map()
 
-    it('should have all tools categorized', () => {
-        // Ensure all tools from ToolNames are categorized
-        expect(Object.values(ToolNames).sort()).toEqual(
-            Object.keys(TOOL_MUTABILITY_CATEGORIZATION).sort(),
-        )
-    })
+    beforeAll(() => {
+        const registerToolSpy = vi.spyOn(McpServer.prototype, 'registerTool')
+        getMcpServer({ todoistApiKey: 'test-token' })
 
-    it('should register tools with correct mutability', async () => {
-        // Spy on registerTool to capture registered tools
-        const mcpHelpersModule = await import('../../mcp-helpers.js')
-        const registerSpy = vi.spyOn(mcpHelpersModule, 'registerTool')
+        const calls = registerToolSpy.mock.calls as unknown as Array<[unknown, unknown]>
+        for (const call of calls) {
+            const name = call[0]
+            const toolSpec = call[1]
+            if (typeof name !== 'string') continue
+            if (!toolSpec || typeof toolSpec !== 'object') continue
 
-        // Initialize MCP server (triggers registerTool for all tools)
-        await getMcpServer({ todoistApiKey: 'test-token' })
-
-        // Verify each tool has mutability set correctly
-        for (const call of registerSpy.mock.calls) {
-            const args = call[0] // First argument is the named args object
-            const tool = args.tool
-            const toolName = tool.name as keyof typeof TOOL_MUTABILITY_CATEGORIZATION
-            const expectedMutability = TOOL_MUTABILITY_CATEGORIZATION[toolName]
-
-            // Verify mutability is set on tool
-            expect(tool.mutability).toBe(expectedMutability)
+            registered.set(name, toolSpec as { annotations?: unknown })
         }
 
-        registerSpy.mockRestore()
+        registerToolSpy.mockRestore()
+    })
+
+    it('should cover all tools', () => {
+        expect(Object.values(ToolNames).sort()).toEqual(TOOL_EXPECTATIONS.map((t) => t.name).sort())
+    })
+
+    describe.each(TOOL_EXPECTATIONS)('$name', (toolExpectation) => {
+        it('should have correct MCP ToolAnnotations', () => {
+            const toolSpec = registered.get(toolExpectation.name)
+            expect(toolSpec).toBeDefined()
+
+            const annotations = toolSpec?.annotations as Record<string, unknown> | undefined
+            expect(annotations).toBeDefined()
+
+            expect(annotations).toMatchObject({
+                title: toolExpectation.title,
+                openWorldHint: false,
+                readOnlyHint: toolExpectation.readOnlyHint,
+                destructiveHint: toolExpectation.destructiveHint,
+                idempotentHint: toolExpectation.idempotentHint,
+            })
+        })
     })
 })

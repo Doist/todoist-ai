@@ -92,7 +92,7 @@ const updateTasks = {
     description: 'Update existing tasks including content, dates, priorities, and assignments.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    mutability: 'mutating' as const,
+    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
     async execute(args, client) {
         const { tasks } = args
         const updateTasksPromises = tasks.map(async (task) => {

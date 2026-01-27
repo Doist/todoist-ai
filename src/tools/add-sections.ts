@@ -29,7 +29,7 @@ const addSections = {
     description: 'Add one or more new sections to projects.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    mutability: 'additive' as const,
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
     async execute({ sections }, client) {
         // Check if any section needs inbox resolution
         const needsInboxResolution = sections.some((section) => isInboxProjectId(section.projectId))
