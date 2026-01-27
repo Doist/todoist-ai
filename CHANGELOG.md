@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.6.0](https://github.com/Doist/todoist-ai/compare/v7.5.1...v7.6.0) (2026-01-27)
+
+
+### Features
+
+* **mcp:** add ToolAnnotations hints ([#289](https://github.com/Doist/todoist-ai/issues/289)) ([b5988c3](https://github.com/Doist/todoist-ai/commit/b5988c3c18a1cac134df215a55a6978e8029c9d7))
+
 ## [7.5.1](https://github.com/Doist/todoist-ai/compare/v7.5.0...v7.5.1) (2026-01-23)
 
 
