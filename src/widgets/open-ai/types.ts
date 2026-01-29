@@ -15,7 +15,7 @@ export type SafeArea = {
 
 // currently copied from types.ts in chatgpt/web-sandbox.
 // Will eventually use a public package.
-type API = {
+export type OpenAiApi = {
     callTool: CallTool
     sendFollowUpMessage: (args: { prompt: string }) => Promise<void>
     openExternal(payload: { href: string }): void
@@ -91,7 +91,7 @@ export type OpenAiGlobals<
  */
 declare global {
     interface Window {
-        openai: API & OpenAiGlobals
+        openai?: OpenAiApi & OpenAiGlobals
     }
 
     interface WindowEventMap {

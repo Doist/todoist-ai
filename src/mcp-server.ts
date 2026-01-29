@@ -26,7 +26,10 @@ import { findProjects } from './tools/find-projects.js'
 import { findSections } from './tools/find-sections.js'
 import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
-import { createFindTasksByDateResource } from './tools/find-tasks-by-date.resource.js'
+import {
+    createFindTasksByDateAppResource,
+    createFindTasksByDateWidgetResource,
+} from './tools/find-tasks-by-date.resource.js'
 import { getOverview } from './tools/get-overview.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { search } from './tools/search.js'
@@ -147,14 +150,26 @@ function getMcpServer({
     // build timestamp into the URI to bust the cache reliably. Ideally, in the
     // future they offer best cache-controls.
     // ref: https://www.epicai.pro/chat-gpt-app-code-walkthrough-kbh1e#rough-edges-for-now
-    const findTasksByDateUri = `ui://widget/${TASK_CARD_FILE_NAME}`
+    const findTasksByDateWidgetUri = `ui://widget/${TASK_CARD_FILE_NAME}`
+    const findTasksByDateAppUri = `ui://app/${TASK_CARD_FILE_NAME}`
     const enhancedFindTasksByDateTool = addMetaToTool(findTasksByDate, {
-        'openai/outputTemplate': findTasksByDateUri,
+        'openai/outputTemplate': findTasksByDateWidgetUri,
         'openai/toolInvocation/invoking': 'Displaying the task list',
         'openai/toolInvocation/invoked': 'Displayed the task list',
+        ui: {
+            resourceUri: findTasksByDateAppUri,
+        },
     })
-    const findTasksByDateResource = createFindTasksByDateResource(findTasksByDateUri, taskCardHtml)
-    registerResource(server, findTasksByDateResource)
+    const findTasksByDateWidgetResource = createFindTasksByDateWidgetResource(
+        findTasksByDateWidgetUri,
+        taskCardHtml,
+    )
+    const findTasksByDateAppResource = createFindTasksByDateAppResource(
+        findTasksByDateAppUri,
+        taskCardHtml,
+    )
+    registerResource(server, findTasksByDateWidgetResource)
+    registerResource(server, findTasksByDateAppResource)
 
     /**
      * Tools

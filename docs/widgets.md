@@ -4,15 +4,17 @@ Widgets are interactive UI components that can be displayed inline within AI cha
 
 ## Overview
 
-We support [ChatGPT Apps](https://openai.com/index/introducing-apps-in-chatgpt/) with a setup that should support [MCP Apps](https://blog.modelcontextprotocol.io/posts/2025-11-21-mcp-apps/) of all kinds once the standard solidifies. Currently, this is used to display a task list widget when users query tasks by date.
+We support both [ChatGPT Apps](https://openai.com/index/introducing-apps-in-chatgpt/) and [MCP Apps](https://blog.modelcontextprotocol.io/posts/2025-11-21-mcp-apps/) with a shared widget bundle and a thin host bridge. Currently, this is used to display a task list widget when users query tasks by date.
 
 ### How It Works
 
 1. A tool (e.g. `find-tasks-by-date`) returns structured data
-2. The tool's metadata includes an `openai/outputTemplate` pointing to a widget resource URI
-3. The MCP server registers the widget HTML as a resource at that URI
+2. The tool metadata includes:
+    - `openai/outputTemplate` for ChatGPT Apps
+    - `ui.resourceUri` for MCP Apps
+3. The MCP server registers the widget HTML as two resources (ChatGPT + MCP MIME types)
 4. The AI client fetches the resource and renders it in a sandboxed iframe
-5. The widget receives tool output via `window.openai.toolOutput` and renders it as React
+5. The widget receives tool output via the host bridge (`window.openai.toolOutput`)
 6. The widget can call tools via `window.openai.callTool`
 
 ## Architecture
@@ -68,8 +70,8 @@ Runtime utility that:
 The MCP server:
 
 -   Loads the widget content at startup
--   Registers it as an MCP resource with a unique URI (includes build timestamp for cache busting)
--   Adds OpenAI-specific metadata to the tool (e.g. `openai/outputTemplate`)
+-   Registers it as MCP resources with distinct URIs for ChatGPT and MCP Apps
+-   Adds metadata for both hosts (`openai/outputTemplate`, `ui.resourceUri`)
 
 ## Local Development
 
