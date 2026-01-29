@@ -5,9 +5,12 @@ import { z } from 'zod'
 import { findTasksByDate } from '../../tools/find-tasks-by-date'
 import { Empty } from '../components/empty'
 import { Loading } from '../components/loading'
+import { initializeOpenAiBridge } from '../open-ai/bridge'
 import { useToolOutput } from '../open-ai/hooks'
 import { TaskList } from './task-list'
 import styles from './task-list.module.css'
+
+initializeOpenAiBridge()
 
 function OpenInTodoistIcon() {
     return (

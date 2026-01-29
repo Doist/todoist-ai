@@ -1,4 +1,9 @@
-function createFindTasksByDateResource(uri: string, rawHtml: string) {
+import { RESOURCE_MIME_TYPE } from '@modelcontextprotocol/ext-apps/server'
+
+const TODOIST_WIDGET_CONNECT_DOMAINS = ['https://*.todoist.com']
+const TODOIST_WIDGET_RESOURCE_DOMAINS = ['https://*.todoist.com']
+
+function createFindTasksByDateWidgetResource(uri: string, rawHtml: string) {
     return {
         name: 'task-list-widget',
         uri,
@@ -21,12 +26,29 @@ function createFindTasksByDateResource(uri: string, rawHtml: string) {
              */
             'openai/widgetCSP': {
                 // Maps to `connect-src` rule in the iframe CSP
-                connect_domains: ['https://*.todoist.com'],
+                connect_domains: TODOIST_WIDGET_CONNECT_DOMAINS,
                 // Maps to style-src, style-src-elem, img-src, font-src, media-src etc. in the iframe CSP
-                resource_domains: ['https://*.todoist.com'],
+                resource_domains: TODOIST_WIDGET_RESOURCE_DOMAINS,
             },
         },
     }
 }
 
-export { createFindTasksByDateResource }
+function createFindTasksByDateAppResource(uri: string, rawHtml: string) {
+    return {
+        name: 'task-list-app',
+        uri,
+        mimeType: RESOURCE_MIME_TYPE,
+        text: rawHtml,
+        _meta: {
+            ui: {
+                csp: {
+                    connectDomains: TODOIST_WIDGET_CONNECT_DOMAINS,
+                    resourceDomains: TODOIST_WIDGET_RESOURCE_DOMAINS,
+                },
+            },
+        },
+    }
+}
+
+export { createFindTasksByDateAppResource, createFindTasksByDateWidgetResource }
