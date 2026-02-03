@@ -2,6 +2,7 @@ import type { CurrentUser, Task, TodoistApi } from '@doist/todoist-api-typescrip
 import { type Mocked, type MockedFunction, vi } from 'vitest'
 import { createMockTask, createMockUser, TEST_IDS } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
+import { userResolver } from '../../utils/user-resolver.js'
 import { findCompletedTasks } from '../find-completed-tasks.js'
 
 // Mock the Todoist API
@@ -9,6 +10,8 @@ const mockTodoistApi = {
     getCompletedTasksByCompletionDate: vi.fn(),
     getCompletedTasksByDueDate: vi.fn(),
     getUser: vi.fn(),
+    getProjects: vi.fn(),
+    getProjectCollaborators: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
 const { FIND_COMPLETED_TASKS } = ToolNames
@@ -16,6 +19,8 @@ const { FIND_COMPLETED_TASKS } = ToolNames
 describe(`${FIND_COMPLETED_TASKS} tool`, () => {
     beforeEach(() => {
         vi.clearAllMocks()
+        // Clear userResolver cache to ensure test isolation
+        userResolver.clearCache()
 
         // Mock default user with UTC timezone
         mockTodoistApi.getUser.mockResolvedValue({
@@ -30,6 +35,12 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                 isDst: 0,
             },
         } as CurrentUser)
+
+        // Mock default projects (no shared projects)
+        mockTodoistApi.getProjects.mockResolvedValue({
+            results: [],
+            nextCursor: null,
+        })
     })
 
     describe('getting completed tasks by completion date (default)', () => {
@@ -513,6 +524,73 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                     limit: 50,
                 }),
             )
+        })
+    })
+
+    describe('responsibleUser resolution with current user', () => {
+        const brennaUser = {
+            id: 'brenna-user-id',
+            fullName: 'Brenna Smith',
+            email: 'brenna@example.com',
+            tzInfo: {
+                timezone: 'UTC',
+                gmtString: '+00:00',
+                hours: 0,
+                minutes: 0,
+                isDst: 0,
+            },
+        } as CurrentUser
+
+        it.each([
+            { name: 'exact full name', responsibleUser: 'Brenna Smith' },
+            { name: 'email', responsibleUser: 'brenna@example.com' },
+            { name: 'partial name', responsibleUser: 'brenna' },
+            { name: 'user ID', responsibleUser: 'brenna-user-id' },
+        ])('should resolve responsibleUser to current user by $name', async ({
+            responsibleUser,
+        }) => {
+            mockTodoistApi.getUser.mockResolvedValue(brennaUser)
+            mockTodoistApi.getCompletedTasksByCompletionDate.mockResolvedValue({
+                items: [],
+                nextCursor: null,
+            })
+
+            await findCompletedTasks.execute(
+                {
+                    getBy: 'completion',
+                    since: '2025-08-15',
+                    until: '2025-08-15',
+                    responsibleUser,
+                    labels: [],
+                    labelsOperator: 'or' as const,
+                    limit: 50,
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.getCompletedTasksByCompletionDate).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    filterQuery: 'assigned to: brenna@example.com',
+                    filterLang: 'en',
+                }),
+            )
+        })
+
+        it('should throw error when responsibleUser does not match current user and no collaborators exist', async () => {
+            await expect(
+                findCompletedTasks.execute(
+                    {
+                        getBy: 'completion',
+                        since: '2025-08-15',
+                        until: '2025-08-15',
+                        responsibleUser: 'nonexistent-user',
+                        labels: [],
+                        labelsOperator: 'or' as const,
+                        limit: 50,
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow('Could not find user: "nonexistent-user"')
         })
     })
 })
