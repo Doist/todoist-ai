@@ -28,6 +28,7 @@ import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { createFindTasksByDateResource } from './tools/find-tasks-by-date.resource.js'
 import { getOverview } from './tools/get-overview.js'
+import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { search } from './tools/search.js'
 import { updateComments } from './tools/update-comments.js'
@@ -67,6 +68,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **add-projects/update-projects/find-projects**: Manage project lifecycle with names, favorites, and view styles (list/board/calendar)
 - **add-sections/update-sections/find-sections**: Organize tasks within projects using sections
 - **get-overview**: Get comprehensive Markdown overview of entire account or specific project with task hierarchies
+- **list-workspaces**: Get all workspaces for the user with details like plan type, role, and settings
 
 **Collaboration & Comments:**
 - **add-comments/update-comments/find-comments**: Manage task and project discussions
@@ -196,6 +198,9 @@ function getMcpServer({
     // Assignment and collaboration tools
     registerTool({ tool: findProjectCollaborators, ...toolArgs })
     registerTool({ tool: manageAssignments, ...toolArgs })
+
+    // Workspace tools
+    registerTool({ tool: listWorkspaces, ...toolArgs })
 
     // OpenAI MCP tools
     registerTool({ tool: search, ...toolArgs })

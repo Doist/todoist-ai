@@ -17,7 +17,6 @@
 import { readFileSync } from 'node:fs'
 import { TodoistApi } from '@doist/todoist-api-typescript'
 import { config } from 'dotenv'
-import type { TodoistTool } from '../src/todoist-tool.js'
 import { addComments } from '../src/tools/add-comments.js'
 import { addProjects } from '../src/tools/add-projects.js'
 import { addSections } from '../src/tools/add-sections.js'
@@ -35,6 +34,7 @@ import { findSections } from '../src/tools/find-sections.js'
 import { findTasks } from '../src/tools/find-tasks.js'
 import { findTasksByDate } from '../src/tools/find-tasks-by-date.js'
 import { getOverview } from '../src/tools/get-overview.js'
+import { listWorkspaces } from '../src/tools/list-workspaces.js'
 import { manageAssignments } from '../src/tools/manage-assignments.js'
 import { search } from '../src/tools/search.js'
 import { updateComments } from '../src/tools/update-comments.js'
@@ -45,8 +45,18 @@ import { userInfo } from '../src/tools/user-info.js'
 
 config()
 
-// biome-ignore lint/suspicious/noExplicitAny: tools have varying schemas
-const tools: Record<string, TodoistTool<any, any>> = {
+// Define a minimal type for tool execution that works with any tool
+type ExecutableTool = {
+    name: string
+    description: string
+    execute: (
+        // biome-ignore lint/suspicious/noExplicitAny: tools have varying parameter schemas
+        args: any,
+        client: TodoistApi,
+    ) => Promise<{ textContent?: string; structuredContent?: unknown }>
+}
+
+const tools: Record<string, ExecutableTool> = {
     'add-tasks': addTasks,
     'add-projects': addProjects,
     'add-sections': addSections,
@@ -64,6 +74,7 @@ const tools: Record<string, TodoistTool<any, any>> = {
     'find-tasks': findTasks,
     'find-tasks-by-date': findTasksByDate,
     'get-overview': getOverview,
+    'list-workspaces': listWorkspaces,
     'manage-assignments': manageAssignments,
     search: search,
     'update-comments': updateComments,
