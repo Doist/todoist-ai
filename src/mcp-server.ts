@@ -68,6 +68,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **add-projects/update-projects/find-projects**: Manage project lifecycle with names, favorites, and view styles (list/board/calendar)
 - **add-sections/update-sections/find-sections**: Organize tasks within projects using sections
 - **get-overview**: Get comprehensive Markdown overview of entire account or specific project with task hierarchies
+- **list-workspaces**: Get all workspaces for the user with details like plan type, role, and settings
 
 **Collaboration & Comments:**
 - **add-comments/update-comments/find-comments**: Manage task and project discussions
@@ -81,7 +82,6 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **delete-object**: Remove projects, sections, tasks, or comments by type and ID
 - **fetch-object**: Fetch a single task, project, comment, or section by its ID
 - **user-info**: Get user details including timezone, goals, and plan information
-- **list-workspaces**: Get all workspaces for the user with details like plan type, role, and settings
 
 ### Best Practices:
 
