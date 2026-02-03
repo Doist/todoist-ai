@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.8.0](https://github.com/Doist/todoist-ai/compare/v7.7.0...v7.8.0) (2026-02-03)
+
+
+### Features
+
+* add list-workspaces tool ([#298](https://github.com/Doist/todoist-ai/issues/298)) ([3d7d89a](https://github.com/Doist/todoist-ai/commit/3d7d89aaa8045e7aed3f02e4018418c4703c8a61))
+
 ## [7.7.0](https://github.com/Doist/todoist-ai/compare/v7.6.0...v7.7.0) (2026-02-03)
 
 
