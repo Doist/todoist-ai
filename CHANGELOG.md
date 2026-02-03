@@ -1,5 +1,17 @@
 # Changelog
 
+## [7.7.0](https://github.com/Doist/todoist-ai/compare/v7.6.0...v7.7.0) (2026-02-03)
+
+
+### Features
+
+* **ci:** [skip ci] add automated cross-repository trigger for todoist-ai-integrations ([#295](https://github.com/Doist/todoist-ai/issues/295)) ([4f8f972](https://github.com/Doist/todoist-ai/commit/4f8f9721f32f18d7e6d51732f132e9a4de00eeea))
+
+
+### Bug Fixes
+
+* include current user in user resolution ([#297](https://github.com/Doist/todoist-ai/issues/297)) ([88faced](https://github.com/Doist/todoist-ai/commit/88faced9c75df63f74021966ad3b10e3afd416af))
+
 ## [7.6.0](https://github.com/Doist/todoist-ai/compare/v7.5.1...v7.6.0) (2026-01-27)
 
 
