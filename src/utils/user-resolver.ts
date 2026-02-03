@@ -65,6 +65,30 @@ export class UserResolver {
             return result
         }
 
+        // Check if input matches the current authenticated user
+        try {
+            const currentUser = await client.getUser()
+            if (currentUser) {
+                const searchTerm = trimmedInput.toLowerCase()
+                if (
+                    currentUser.id === trimmedInput ||
+                    currentUser.email.toLowerCase() === searchTerm ||
+                    currentUser.fullName.toLowerCase() === searchTerm ||
+                    currentUser.fullName.toLowerCase().includes(searchTerm)
+                ) {
+                    const result = {
+                        userId: currentUser.id,
+                        displayName: currentUser.fullName,
+                        email: currentUser.email,
+                    }
+                    userResolutionCache.set(trimmedInput, { result, timestamp: Date.now() })
+                    return result
+                }
+            }
+        } catch (_error) {
+            // Continue to collaborator search if getUser fails
+        }
+
         try {
             // Get all collaborators from shared projects
             const allCollaborators = await this.getAllCollaborators(client)
