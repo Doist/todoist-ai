@@ -42,6 +42,9 @@ export const ToolNames = {
     FETCH_OBJECT: 'fetch-object',
     USER_INFO: 'user-info',
 
+    // Workspace tools
+    LIST_WORKSPACES: 'list-workspaces',
+
     // OpenAI MCP tools
     SEARCH: 'search',
     FETCH: 'fetch',

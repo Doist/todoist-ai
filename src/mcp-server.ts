@@ -28,6 +28,7 @@ import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { createFindTasksByDateResource } from './tools/find-tasks-by-date.resource.js'
 import { getOverview } from './tools/get-overview.js'
+import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { search } from './tools/search.js'
 import { updateComments } from './tools/update-comments.js'
@@ -80,6 +81,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **delete-object**: Remove projects, sections, tasks, or comments by type and ID
 - **fetch-object**: Fetch a single task, project, comment, or section by its ID
 - **user-info**: Get user details including timezone, goals, and plan information
+- **list-workspaces**: Get all workspaces for the user with details like plan type, role, and settings
 
 ### Best Practices:
 
@@ -196,6 +198,9 @@ function getMcpServer({
     // Assignment and collaboration tools
     registerTool({ tool: findProjectCollaborators, ...toolArgs })
     registerTool({ tool: manageAssignments, ...toolArgs })
+
+    // Workspace tools
+    registerTool({ tool: listWorkspaces, ...toolArgs })
 
     // OpenAI MCP tools
     registerTool({ tool: search, ...toolArgs })

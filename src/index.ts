@@ -23,6 +23,7 @@ import { findSections } from './tools/find-sections.js'
 import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { getOverview } from './tools/get-overview.js'
+import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { search } from './tools/search.js'
 import { updateComments } from './tools/update-comments.js'
@@ -60,6 +61,8 @@ const tools = {
     // Assignment and collaboration tools
     findProjectCollaborators,
     manageAssignments,
+    // Workspace tools
+    listWorkspaces,
     // OpenAI MCP tools
     search,
     fetch,
@@ -96,6 +99,8 @@ export {
     // Assignment and collaboration tools
     findProjectCollaborators,
     manageAssignments,
+    // Workspace tools
+    listWorkspaces,
     // OpenAI MCP tools
     search,
     fetch,

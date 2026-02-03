@@ -167,6 +167,13 @@ const TOOL_EXPECTATIONS: ToolExpectation[] = [
         idempotentHint: true,
     },
     {
+        name: ToolNames.LIST_WORKSPACES,
+        title: 'Todoist: List Workspaces',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
         name: ToolNames.SEARCH,
         title: 'Todoist: Search',
         readOnlyHint: true,
