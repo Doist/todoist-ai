@@ -65,44 +65,47 @@ export class UserResolver {
             return result
         }
 
-        // Check if input matches the current authenticated user
-        try {
-            const currentUser = await client.getUser()
-            if (currentUser) {
-                const searchTerm = trimmedInput.toLowerCase()
-                if (
-                    currentUser.id === trimmedInput ||
-                    currentUser.email.toLowerCase() === searchTerm ||
-                    currentUser.fullName.toLowerCase() === searchTerm ||
-                    currentUser.fullName.toLowerCase().includes(searchTerm)
-                ) {
-                    const result = {
-                        userId: currentUser.id,
-                        displayName: currentUser.fullName,
-                        email: currentUser.email,
-                    }
-                    userResolutionCache.set(trimmedInput, { result, timestamp: Date.now() })
-                    return result
-                }
-            }
-        } catch (_error) {
-            // Continue to collaborator search if getUser fails
-        }
-
         try {
             // Get all collaborators from shared projects
-            const allCollaborators = await this.getAllCollaborators(client)
+            let allCollaborators = await this.getAllCollaborators(client)
+
+            // Try to get current user and prepend to collaborators list
+            // This ensures the current user is found even if they have no shared projects
+            try {
+                const currentUser = await client.getUser()
+                if (currentUser) {
+                    const currentUserAsCollaborator: ProjectCollaborator = {
+                        id: currentUser.id,
+                        name: currentUser.fullName,
+                        email: currentUser.email,
+                    }
+                    // Only add if not already in the list
+                    if (!allCollaborators.some((c) => c.id === currentUser.id)) {
+                        allCollaborators = [currentUserAsCollaborator, ...allCollaborators]
+                    }
+                }
+            } catch (_error) {
+                // Continue with collaborators only if getUser fails
+            }
 
             if (allCollaborators.length === 0) {
-                const result = null // No shared projects, can't resolve collaborators
+                const result = null // No users found (no current user, no shared projects)
                 userResolutionCache.set(trimmedInput, { result, timestamp: Date.now() })
                 return result
             }
 
             const searchTerm = nameOrId.toLowerCase().trim()
 
-            // Try exact name match first
-            let match = allCollaborators.find((c) => c.name.toLowerCase() === searchTerm)
+            // Try exact ID match first
+            let match = allCollaborators.find((c) => c.id === trimmedInput)
+            if (match) {
+                const result = { userId: match.id, displayName: match.name, email: match.email }
+                userResolutionCache.set(trimmedInput, { result, timestamp: Date.now() })
+                return result
+            }
+
+            // Try exact name match
+            match = allCollaborators.find((c) => c.name.toLowerCase() === searchTerm)
             if (match) {
                 const result = { userId: match.id, displayName: match.name, email: match.email }
                 userResolutionCache.set(trimmedInput, { result, timestamp: Date.now() })
