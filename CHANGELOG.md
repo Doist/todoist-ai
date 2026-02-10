@@ -1,5 +1,13 @@
 # Changelog
 
+## [7.8.1](https://github.com/Doist/todoist-ai/compare/v7.8.0...v7.8.1) (2026-02-10)
+
+
+### Bug Fixes
+
+* add CI workflow to satisfy required check on release PRs ([#308](https://github.com/Doist/todoist-ai/issues/308)) ([48482c5](https://github.com/Doist/todoist-ai/commit/48482c5811b34b1e99cb17c76b2fb7be2cc7ff94))
+* suppress dotenv@17 stdout logging that breaks stdio MCP transport ([#306](https://github.com/Doist/todoist-ai/issues/306)) ([6f4eb9c](https://github.com/Doist/todoist-ai/commit/6f4eb9cfa723fbf427e9361a8aee4646d747f1d2))
+
 ## [7.8.0](https://github.com/Doist/todoist-ai/compare/v7.7.0...v7.8.0) (2026-02-03)
 
 
