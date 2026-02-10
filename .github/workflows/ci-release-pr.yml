@@ -1,0 +1,13 @@
+name: Release PR CI
+
+on:
+  pull_request_target:
+    branches: [main]
+
+jobs:
+  test:
+    if: startsWith(github.head_ref, 'release-please--')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo "Release PR — version/changelog only, code already tested on main"
