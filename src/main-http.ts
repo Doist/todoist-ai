@@ -20,7 +20,7 @@ import dotenv from 'dotenv'
 import express, { type Request, type Response } from 'express'
 import { getMcpServer } from './mcp-server.js'
 
-dotenv.config()
+dotenv.config({ quiet: true })
 
 const PORT = Number.parseInt(process.env.PORT || '3000', 10)
 const SESSION_TIMEOUT_MS = Number.parseInt(process.env.SESSION_TIMEOUT_MS || '1800000', 10) // 30 minutes default
