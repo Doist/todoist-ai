@@ -301,9 +301,11 @@ async function generateProjectOverview(
     client: TodoistApi,
     projectId: string,
 ): Promise<{ textContent: string; structuredContent: ProjectOverviewStructured }> {
-    const project: Project = await client.getProject(projectId)
-    const sections = await getProjectSections(client, projectId)
-    const allTasks = await getAllTasksForProject(client, projectId)
+    const [project, sections, allTasks] = await Promise.all([
+        client.getProject(projectId) as Promise<Project>,
+        getProjectSections(client, projectId),
+        getAllTasksForProject(client, projectId),
+    ])
 
     // Group tasks by sectionId
     const tasksBySection: Record<string, MappedTask[]> = {}

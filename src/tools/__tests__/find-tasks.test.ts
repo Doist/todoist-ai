@@ -77,7 +77,7 @@ describe(`${FIND_TASKS} tool`, () => {
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: 'search: important meeting',
+                query: 'search: important meeting & !assigned to: others',
                 cursor: undefined,
                 limit: 10,
             })
@@ -112,7 +112,7 @@ describe(`${FIND_TASKS} tool`, () => {
                     searchText: 'project update',
                     limit: 5,
                 },
-                expectedQuery: 'search: project update',
+                expectedQuery: 'search: project update & !assigned to: others',
                 expectedLimit: 5,
                 expectedCursor: undefined,
             },
@@ -123,7 +123,7 @@ describe(`${FIND_TASKS} tool`, () => {
                     limit: 20,
                     cursor: 'cursor-from-first-page',
                 },
-                expectedQuery: 'search: follow up',
+                expectedQuery: 'search: follow up & !assigned to: others',
                 expectedLimit: 20,
                 expectedCursor: 'cursor-from-first-page',
             },
@@ -179,7 +179,7 @@ describe(`${FIND_TASKS} tool`, () => {
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: `search: ${searchText}`,
+                query: `search: ${searchText} & !assigned to: others`,
                 cursor: undefined,
                 limit: 10,
             })
@@ -439,7 +439,7 @@ describe(`${FIND_TASKS} tool`, () => {
                     limit: 10,
                     labels: ['work'],
                 },
-                expectedQuery: 'search: important meeting & (@work)',
+                expectedQuery: 'search: important meeting & (@work) & !assigned to: others',
             },
             {
                 name: 'text search with multiple labels AND operator',
@@ -449,7 +449,8 @@ describe(`${FIND_TASKS} tool`, () => {
                     labels: ['work', 'urgent'],
                     labelsOperator: 'and' as const,
                 },
-                expectedQuery: 'search: project update & (@work  &  @urgent)',
+                expectedQuery:
+                    'search: project update & (@work  &  @urgent) & !assigned to: others',
             },
             {
                 name: 'text search with multiple labels OR operator',
@@ -458,7 +459,8 @@ describe(`${FIND_TASKS} tool`, () => {
                     limit: 20,
                     labels: ['personal', 'shopping'],
                 },
-                expectedQuery: 'search: follow up & (@personal  |  @shopping)',
+                expectedQuery:
+                    'search: follow up & (@personal  |  @shopping) & !assigned to: others',
             },
         ])('should filter tasks by labels in text search: $name', async ({
             params,
@@ -578,7 +580,7 @@ describe(`${FIND_TASKS} tool`, () => {
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: 'search: test',
+                query: 'search: test & !assigned to: others',
                 cursor: undefined,
                 limit: 10,
             })
@@ -647,7 +649,7 @@ describe(`${FIND_TASKS} tool`, () => {
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: '(@work)',
+                query: '(@work) & !assigned to: others',
                 cursor: undefined,
                 limit: 10,
             })
@@ -681,7 +683,7 @@ describe(`${FIND_TASKS} tool`, () => {
             // Should handle both @work (already has @) and personal (needs @ added)
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: '(@work  |  @personal)',
+                query: '(@work  |  @personal) & !assigned to: others',
                 cursor: undefined,
                 limit: 10,
             })
@@ -782,22 +784,17 @@ End of test content.`
 
     describe('responsible user filtering', () => {
         describe('when no responsibleUser is provided', () => {
-            it('should filter text search results to show only unassigned tasks or tasks assigned to current user', async () => {
+            it('should use server-side assignee scoping for text search by default', async () => {
                 const mockTasks = [
                     createMappedTask({
                         id: TEST_IDS.TASK_1,
                         content: 'My task',
-                        responsibleUid: TEST_IDS.USER_ID, // Assigned to current user
+                        responsibleUid: TEST_IDS.USER_ID,
                     }),
                     createMappedTask({
                         id: TEST_IDS.TASK_2,
                         content: 'Unassigned task',
-                        responsibleUid: undefined, // Unassigned
-                    }),
-                    createMappedTask({
-                        id: TEST_IDS.TASK_3,
-                        content: 'Someone else task',
-                        responsibleUid: 'other-user-id', // Assigned to someone else
+                        responsibleUid: undefined,
                     }),
                 ]
 
@@ -809,8 +806,15 @@ End of test content.`
                     mockTodoistApi,
                 )
 
+                // Verify server-side assignee filter is included in query
+                expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                    client: mockTodoistApi,
+                    query: 'search: task & !assigned to: others',
+                    cursor: undefined,
+                    limit: 10,
+                })
+
                 const structuredContent = result.structuredContent
-                // Should only return tasks 1 and 2, not task 3
                 expect(structuredContent.tasks).toHaveLength(2)
                 expect(
                     (structuredContent.tasks as MappedTask[]).map((t: MappedTask) => t.id),
@@ -853,22 +857,12 @@ End of test content.`
         })
 
         describe('when responsibleUser is provided', () => {
-            it('should filter text search results to show only tasks assigned to specified user', async () => {
+            it('should use server-side assignee filter for text search with specified user', async () => {
                 const mockTasks = [
                     createMappedTask({
                         id: TEST_IDS.TASK_1,
                         content: 'Task for John',
-                        responsibleUid: 'specific-user-id', // Assigned to specified user
-                    }),
-                    createMappedTask({
-                        id: TEST_IDS.TASK_2,
-                        content: 'My task',
-                        responsibleUid: TEST_IDS.USER_ID, // Assigned to current user
-                    }),
-                    createMappedTask({
-                        id: TEST_IDS.TASK_3,
-                        content: 'Unassigned task',
-                        responsibleUid: undefined, // Unassigned
+                        responsibleUid: 'specific-user-id',
                     }),
                 ]
 
@@ -886,8 +880,15 @@ End of test content.`
                     mockTodoistApi,
                 )
 
+                // Verify server-side assignee filter is included in query
+                expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                    client: mockTodoistApi,
+                    query: 'search: task & assigned to: john@example.com',
+                    cursor: undefined,
+                    limit: 10,
+                })
+
                 const structuredContent = result.structuredContent
-                // Should only return task 1 (assigned to John)
                 expect(structuredContent.tasks).toHaveLength(1)
                 expect((structuredContent.tasks as MappedTask[])[0]?.id).toBe(TEST_IDS.TASK_1)
             })
