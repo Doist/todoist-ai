@@ -821,6 +821,42 @@ End of test content.`
                 ).toEqual([TEST_IDS.TASK_1, TEST_IDS.TASK_2])
             })
 
+            it('should omit assignee filter from query when responsibleUserFiltering is "all"', async () => {
+                const mockTasks = [createMappedTask({ id: TEST_IDS.TASK_1, content: 'Any task' })]
+                mockGetTasksByFilter.mockResolvedValue({ tasks: mockTasks, nextCursor: null })
+
+                await findTasks.execute(
+                    { searchText: 'task', responsibleUserFiltering: 'all', limit: 10 },
+                    mockTodoistApi,
+                )
+
+                expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                    client: mockTodoistApi,
+                    query: 'search: task',
+                    cursor: undefined,
+                    limit: 10,
+                })
+            })
+
+            it('should use "assigned to: others" filter when responsibleUserFiltering is "assigned"', async () => {
+                const mockTasks = [
+                    createMappedTask({ id: TEST_IDS.TASK_1, content: 'Other user task' }),
+                ]
+                mockGetTasksByFilter.mockResolvedValue({ tasks: mockTasks, nextCursor: null })
+
+                await findTasks.execute(
+                    { searchText: 'task', responsibleUserFiltering: 'assigned', limit: 10 },
+                    mockTodoistApi,
+                )
+
+                expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                    client: mockTodoistApi,
+                    query: 'search: task & assigned to: others',
+                    cursor: undefined,
+                    limit: 10,
+                })
+            })
+
             it('should filter container-based results to show only unassigned tasks or tasks assigned to current user', async () => {
                 const mockTasks = [
                     createMockTask({
