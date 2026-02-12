@@ -857,6 +857,41 @@ End of test content.`
                 })
             })
 
+            it('should filter container-based results to only others tasks when responsibleUserFiltering is "assigned"', async () => {
+                const mockTasks = [
+                    createMockTask({
+                        id: TEST_IDS.TASK_1,
+                        content: 'My task',
+                        responsibleUid: TEST_IDS.USER_ID,
+                    }),
+                    createMockTask({
+                        id: TEST_IDS.TASK_2,
+                        content: 'Unassigned task',
+                        responsibleUid: null,
+                    }),
+                    createMockTask({
+                        id: TEST_IDS.TASK_3,
+                        content: 'Other user task',
+                        responsibleUid: 'other-user-id',
+                    }),
+                ]
+
+                mockTodoistApi.getTasks.mockResolvedValue(createMockApiResponse(mockTasks))
+
+                const result = await findTasks.execute(
+                    {
+                        projectId: TEST_IDS.PROJECT_WORK,
+                        responsibleUserFiltering: 'assigned',
+                        limit: 10,
+                    },
+                    mockTodoistApi,
+                )
+
+                const structuredContent = result.structuredContent
+                expect(structuredContent.tasks).toHaveLength(1)
+                expect((structuredContent.tasks as MappedTask[])[0]?.id).toBe(TEST_IDS.TASK_3)
+            })
+
             it('should filter container-based results to show only unassigned tasks or tasks assigned to current user', async () => {
                 const mockTasks = [
                     createMockTask({
