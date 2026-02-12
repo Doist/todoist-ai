@@ -302,7 +302,7 @@ async function generateProjectOverview(
     projectId: string,
 ): Promise<{ textContent: string; structuredContent: ProjectOverviewStructured }> {
     const [project, sections, allTasks] = await Promise.all([
-        client.getProject(projectId) as Promise<Project>,
+        client.getProject(projectId),
         getProjectSections(client, projectId),
         getAllTasksForProject(client, projectId),
     ])
