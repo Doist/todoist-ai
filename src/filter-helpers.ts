@@ -104,10 +104,11 @@ export function filterTasksByResponsibleUser<T extends { responsibleUid?: string
     if (resolvedAssigneeId) {
         // If responsibleUser provided, only return tasks assigned to that user
         return tasks.filter((task) => task.responsibleUid === resolvedAssigneeId)
+    } else if (responsibleUserFiltering === 'unassignedOrMe') {
+        return tasks.filter((task) => !task.responsibleUid || task.responsibleUid === currentUserId)
+    } else if (responsibleUserFiltering === 'assigned') {
+        return tasks.filter((task) => task.responsibleUid && task.responsibleUid !== currentUserId)
     } else {
-        // If no responsibleUser, only return unassigned tasks or tasks assigned to current user
-        return responsibleUserFiltering === 'unassignedOrMe'
-            ? tasks.filter((task) => !task.responsibleUid || task.responsibleUid === currentUserId)
-            : tasks
+        return tasks
     }
 }

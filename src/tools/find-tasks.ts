@@ -2,6 +2,7 @@ import { GetTasksArgs } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import {
     appendToQuery,
+    buildResponsibleUserQueryFilter,
     filterTasksByResponsibleUser,
     RESPONSIBLE_USER_FILTERING,
     resolveResponsibleUser,
@@ -206,7 +207,7 @@ const findTasks = {
             }
         }
 
-        // Handle search text and/or labels using filter query (responsibleUid filtering done client-side)
+        // Handle search text and/or labels using filter query
         let query = ''
 
         // Add search text component
@@ -218,19 +219,20 @@ const findTasks = {
         const labelsFilter = generateLabelsFilter(labels, labelsOperator)
         query = appendToQuery(query, labelsFilter)
 
+        // Add responsible user filtering to the query (server-side)
+        const responsibleUserFilter = buildResponsibleUserQueryFilter({
+            resolvedAssigneeId,
+            assigneeEmail,
+            responsibleUserFiltering,
+        })
+        query = appendToQuery(query, responsibleUserFilter)
+
         // Execute filter query
-        const { tasks, nextCursor } = await getTasksByFilter({
+        const { tasks: filteredTasks, nextCursor } = await getTasksByFilter({
             client,
             query,
             cursor: args.cursor,
             limit: args.limit,
-        })
-
-        const filteredTasks = filterTasksByResponsibleUser({
-            tasks,
-            resolvedAssigneeId,
-            currentUserId: todoistUser.id,
-            responsibleUserFiltering,
         })
 
         const textContent = generateTextContent({
@@ -246,7 +248,7 @@ const findTasks = {
             structuredContent: {
                 tasks: filteredTasks,
                 nextCursor: nextCursor ?? undefined,
-                totalCount: tasks.length,
+                totalCount: filteredTasks.length,
                 hasMore: Boolean(nextCursor),
                 appliedFilters: args,
             },
