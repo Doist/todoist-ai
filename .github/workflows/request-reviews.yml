@@ -1,0 +1,20 @@
+name: Automatically request reviews
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+jobs:
+  request-reviews-frontend-product:
+    runs-on: ubuntu-latest
+    if: |
+      !github.event.pull_request.draft &&
+      github.actor != 'dependabot[bot]' &&
+      github.actor != 'renovate[bot]'
+    steps:
+      - name: Automatically request reviews from Frontend Product
+        uses: doist/auto-request-reviews-action@v1
+        with:
+          reviewers: 1
+          team: 'Doist/frontend-product'
+          token: ${{ secrets.GH_PROJECTS_TOKEN }}
