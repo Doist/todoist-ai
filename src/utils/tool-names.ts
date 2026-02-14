@@ -18,6 +18,7 @@ export const ToolNames = {
     ADD_PROJECTS: 'add-projects',
     UPDATE_PROJECTS: 'update-projects',
     FIND_PROJECTS: 'find-projects',
+    PROJECT_MANAGEMENT: 'project-management',
 
     // Section management tools
     ADD_SECTIONS: 'add-sections',

@@ -30,6 +30,7 @@ import { createFindTasksByDateResource } from './tools/find-tasks-by-date.resour
 import { getOverview } from './tools/get-overview.js'
 import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
+import { projectManagement } from './tools/project-management.js'
 import { search } from './tools/search.js'
 import { updateComments } from './tools/update-comments.js'
 import { updateProjects } from './tools/update-projects.js'
@@ -66,6 +67,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 **Project & Organization:**
 - **add-projects/update-projects/find-projects**: Manage project lifecycle with names, favorites, and view styles (list/board/calendar)
+- **project-management**: Archive or unarchive projects by ID
 - **add-sections/update-sections/find-sections**: Organize tasks within projects using sections
 - **get-overview**: Get comprehensive Markdown overview of entire account or specific project with task hierarchies
 - **list-workspaces**: Get all workspaces for the user with details like plan type, role, and settings
@@ -175,6 +177,7 @@ function getMcpServer({
     registerTool({ tool: addProjects, ...toolArgs })
     registerTool({ tool: updateProjects, ...toolArgs })
     registerTool({ tool: findProjects, ...toolArgs })
+    registerTool({ tool: projectManagement, ...toolArgs })
 
     // Section management tools
     registerTool({ tool: addSections, ...toolArgs })
