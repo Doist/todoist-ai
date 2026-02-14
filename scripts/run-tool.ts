@@ -36,6 +36,8 @@ import { findTasksByDate } from '../src/tools/find-tasks-by-date.js'
 import { getOverview } from '../src/tools/get-overview.js'
 import { listWorkspaces } from '../src/tools/list-workspaces.js'
 import { manageAssignments } from '../src/tools/manage-assignments.js'
+import { projectManagement } from '../src/tools/project-management.js'
+import { projectMove } from '../src/tools/project-move.js'
 import { search } from '../src/tools/search.js'
 import { updateComments } from '../src/tools/update-comments.js'
 import { updateProjects } from '../src/tools/update-projects.js'
@@ -76,6 +78,8 @@ const tools: Record<string, ExecutableTool> = {
     'get-overview': getOverview,
     'list-workspaces': listWorkspaces,
     'manage-assignments': manageAssignments,
+    'project-management': projectManagement,
+    'project-move': projectMove,
     search: search,
     'update-comments': updateComments,
     'update-projects': updateProjects,
