@@ -1,0 +1,5 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`project-management tool > archiving projects > should archive a project by ID 1`] = `"Archived project: My Project (id=6cfCcrrCFg2xP94Q)"`;
+
+exports[`project-management tool > unarchiving projects > should unarchive a project by ID 1`] = `"Unarchived project: Archived Project (id=proj-archived)"`;
