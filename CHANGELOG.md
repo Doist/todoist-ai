@@ -1,5 +1,17 @@
 # Changelog
 
+## [7.9.0](https://github.com/Doist/todoist-ai/compare/v7.8.1...v7.9.0) (2026-02-14)
+
+
+### Features
+
+* add project-management tool for archive/unarchive ([#314](https://github.com/Doist/todoist-ai/issues/314)) ([29226af](https://github.com/Doist/todoist-ai/commit/29226af86bce8aed685534221083beb195703003))
+
+
+### Performance Improvements
+
+* server-side assignee scoping in find-tasks and parallel fetching in get-overview ([#310](https://github.com/Doist/todoist-ai/issues/310)) ([e6db532](https://github.com/Doist/todoist-ai/commit/e6db5324db992102888ad3d51ed072dd60e4c7cf))
+
 ## [7.8.1](https://github.com/Doist/todoist-ai/compare/v7.8.0...v7.8.1) (2026-02-10)
 
 
