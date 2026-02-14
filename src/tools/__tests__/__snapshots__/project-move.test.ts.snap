@@ -1,0 +1,5 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`project-move tool > move to personal > should move a project to personal 1`] = `"Moved to personal: My Project (id=6cfCcrrCFg2xP94Q)"`;
+
+exports[`project-move tool > move to workspace > should move a project to a workspace with projectId and workspaceId only 1`] = `"Moved to workspace: My Project (id=6cfCcrrCFg2xP94Q)"`;
