@@ -1,5 +1,18 @@
 # Changelog
 
+## [7.10.0](https://github.com/Doist/todoist-ai/compare/v7.9.0...v7.10.0) (2026-02-18)
+
+
+### Features
+
+* add project-move tool for moving projects between personal and workspace ([#315](https://github.com/Doist/todoist-ai/issues/315)) ([4fa7253](https://github.com/Doist/todoist-ai/commit/4fa72534e4fdcd3ec5b7fdacf4b9ac914a674060))
+* switch HTTP server to stateless MCP mode ([#319](https://github.com/Doist/todoist-ai/issues/319)) ([fa97e5e](https://github.com/Doist/todoist-ai/commit/fa97e5e673b8408ff171d1023e549f713901b6d7))
+
+
+### Bug Fixes
+
+* **deps:** update all dependencies ([#316](https://github.com/Doist/todoist-ai/issues/316)) ([bd9746c](https://github.com/Doist/todoist-ai/commit/bd9746cefe6b8aeda8b548e6e2cae82b37331a7e))
+
 ## [7.9.0](https://github.com/Doist/todoist-ai/compare/v7.8.1...v7.9.0) (2026-02-14)
 
 
