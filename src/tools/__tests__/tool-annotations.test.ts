@@ -83,6 +83,13 @@ const TOOL_EXPECTATIONS: ToolExpectation[] = [
         idempotentHint: true,
     },
     {
+        name: ToolNames.PROJECT_MOVE,
+        title: 'Todoist: Project Move',
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
         name: ToolNames.ADD_SECTIONS,
         title: 'Todoist: Add Sections',
         readOnlyHint: false,
