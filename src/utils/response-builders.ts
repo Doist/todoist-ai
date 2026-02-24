@@ -6,8 +6,10 @@ import { ToolNames } from './tool-names.js'
  * Helper function to get date string in YYYY-MM-DD format
  */
 export function getDateString(date: Date = new Date()): string {
-    const parts = date.toISOString().split('T')
-    return parts[0] ?? ''
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
 }
 
 const { FIND_TASKS_BY_DATE, ADD_TASKS, UPDATE_TASKS, COMPLETE_TASKS, GET_OVERVIEW } = ToolNames

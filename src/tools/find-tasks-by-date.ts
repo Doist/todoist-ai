@@ -14,6 +14,13 @@ import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
 import { getDateString, previewTasks, summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
+/**
+ * Parse a YYYY-MM-DD string as local midnight (not UTC)
+ */
+function parseLocalDate(dateStr: string): Date {
+    return new Date(`${dateStr}T00:00:00`)
+}
+
 const ArgsSchema = {
     startDate: z
         .string()
@@ -95,13 +102,26 @@ const findTasksByDate = {
         if (args.overdueOption === 'overdue-only') {
             query = 'overdue'
         } else if (args.startDate === 'today') {
-            // For 'today', include overdue unless explicitly excluded
-            // Use parentheses to ensure correct operator precedence when combining with other filters
-            query = args.overdueOption === 'exclude-overdue' ? 'today' : '(today | overdue)'
+            if (args.daysCount > 1) {
+                // For multi-day ranges starting from today, build a date range query
+                const today = new Date()
+                const todayStr = getDateString(today)
+                const endDate = addDays(today, args.daysCount)
+                const endDateStr = formatISO(endDate, { representation: 'date' })
+                const dateRangeQuery = `(due after: ${todayStr} | due: ${todayStr}) & due before: ${endDateStr}`
+                query =
+                    args.overdueOption === 'exclude-overdue'
+                        ? dateRangeQuery
+                        : `(${dateRangeQuery} | overdue)`
+            } else {
+                // For 'today' with daysCount === 1, use the simple query
+                // Use parentheses to ensure correct operator precedence when combining with other filters
+                query = args.overdueOption === 'exclude-overdue' ? 'today' : '(today | overdue)'
+            }
         } else if (args.startDate) {
             // For specific dates, never include overdue tasks
             const startDate = args.startDate
-            const endDate = addDays(startDate, args.daysCount)
+            const endDate = addDays(parseLocalDate(startDate), args.daysCount)
             const endDateStr = formatISO(endDate, { representation: 'date' })
             query = `(due after: ${startDate} | due: ${startDate}) & due before: ${endDateStr}`
         }
@@ -169,7 +189,7 @@ function generateTextContent({
     } else if (args.startDate) {
         const dateRange =
             args.daysCount > 1
-                ? ` to ${getDateString(addDays(args.startDate, args.daysCount))}`
+                ? ` to ${getDateString(addDays(parseLocalDate(args.startDate), args.daysCount))}`
                 : ''
         filterHints.push(`${args.startDate}${dateRange}`)
     }

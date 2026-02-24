@@ -39,9 +39,10 @@ const mockTodoistApi = {
 const mockTodoistUser = createMockUser()
 
 // Mock date-fns functions to make tests deterministic
+// Use local date parsing/formatting to match the production code's timezone-aware behavior
 vi.mock('date-fns', () => ({
     addDays: vi.fn((date: string | Date, amount: number) => {
-        const d = new Date(date)
+        const d = typeof date === 'string' ? new Date(`${date}T00:00:00`) : new Date(date)
         d.setDate(d.getDate() + amount)
         return d
     }),
@@ -50,7 +51,10 @@ vi.mock('date-fns', () => ({
             return date // Return string dates as-is
         }
         if (options?.representation === 'date') {
-            return date.toISOString().split('T')[0]
+            const year = date.getFullYear()
+            const month = String(date.getMonth() + 1).padStart(2, '0')
+            const day = String(date.getDate()).padStart(2, '0')
+            return `${year}-${month}-${day}`
         }
         return date.toISOString()
     }),
@@ -96,13 +100,13 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
             expect(textContent).toMatchSnapshot()
         })
 
-        it('should get tasks for today when startDate is "today" (includes overdue)', async () => {
+        it('should get tasks for today when startDate is "today" with daysCount=1 (includes overdue)', async () => {
             const mockTasks = [createMappedTask({ content: 'Today task', dueDate: '2025-08-15' })]
             const mockResponse = { tasks: mockTasks, nextCursor: null }
             mockGetTasksByFilter.mockResolvedValue(mockResponse)
 
             const result = await findTasksByDate.execute(
-                { startDate: 'today', limit: 50, daysCount: 7 },
+                { startDate: 'today', limit: 50, daysCount: 1 },
                 mockTodoistApi,
             )
 
@@ -113,6 +117,55 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 limit: 50,
             })
             // Verify result is a concise summary
+            expect(result.textContent).toMatchSnapshot()
+        })
+
+        it('should get tasks for today + multi-day range when daysCount > 1 (includes overdue)', async () => {
+            const mockTasks = [createMappedTask({ content: 'Today task', dueDate: '2025-08-15' })]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasksByDate.execute(
+                { startDate: 'today', limit: 50, daysCount: 7 },
+                mockTodoistApi,
+            )
+
+            // With daysCount > 1, should build a date-range query instead of simple '(today | overdue)'
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: expect.stringContaining('due before:'),
+                cursor: undefined,
+                limit: 50,
+            })
+
+            // Verify it includes overdue by default
+            const call = mockGetTasksByFilter.mock.calls[0]?.[0]
+            expect(call?.query).toContain('overdue')
+
+            // Verify result is a concise summary
+            expect(result.textContent).toMatchSnapshot()
+        })
+
+        it('should exclude overdue for today + multi-day range when exclude-overdue', async () => {
+            const mockTasks = [createMappedTask({ content: 'Today task', dueDate: '2025-08-15' })]
+            const mockResponse = { tasks: mockTasks, nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            const result = await findTasksByDate.execute(
+                {
+                    startDate: 'today',
+                    limit: 50,
+                    daysCount: 7,
+                    overdueOption: 'exclude-overdue',
+                },
+                mockTodoistApi,
+            )
+
+            // With exclude-overdue, should not include overdue in query
+            const call = mockGetTasksByFilter.mock.calls[0]?.[0]
+            expect(call?.query).toContain('due before:')
+            expect(call?.query).not.toContain('overdue')
+
             expect(result.textContent).toMatchSnapshot()
         })
 
@@ -169,7 +222,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
                 params: {
                     startDate: 'today',
                     limit: 25,
-                    daysCount: 7,
+                    daysCount: 1,
                     cursor: 'pagination-cursor',
                 },
                 expectedCursor: 'pagination-cursor',
@@ -198,7 +251,7 @@ describe(`${FIND_TASKS_BY_DATE} tool`, () => {
 
     describe('edge cases', () => {
         it.each([
-            { name: 'empty results', daysCount: 7, shouldReturnResult: true },
+            { name: 'empty results', daysCount: 1, shouldReturnResult: true },
             { name: 'maximum daysCount', daysCount: 30, shouldReturnResult: false },
             { name: 'minimum daysCount', daysCount: 1, shouldReturnResult: false },
         ])('should handle $name', async ({ daysCount, shouldReturnResult }) => {
