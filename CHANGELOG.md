@@ -1,5 +1,13 @@
 # Changelog
 
+## [7.10.1](https://github.com/Doist/todoist-ai/compare/v7.10.0...v7.10.1) (2026-02-24)
+
+
+### Bug Fixes
+
+* **deps:** update all dependencies ([#320](https://github.com/Doist/todoist-ai/issues/320)) ([ed93e00](https://github.com/Doist/todoist-ai/commit/ed93e00fe078a010d29cad67eeb4b86867276fc9))
+* resolve timezone bugs in find-tasks-by-date ([#324](https://github.com/Doist/todoist-ai/issues/324)) ([7139dd3](https://github.com/Doist/todoist-ai/commit/7139dd3576d7f6e01b83e386c05371e5c56cb44c))
+
 ## [7.10.0](https://github.com/Doist/todoist-ai/compare/v7.9.0...v7.10.0) (2026-02-18)
 
 
