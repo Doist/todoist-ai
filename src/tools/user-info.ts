@@ -1,6 +1,7 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
+import { getDateString } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const ArgsSchema = {}
@@ -81,10 +82,6 @@ function getDayName(dayNumber: number): string {
     return days[index] ?? 'Unknown'
 }
 
-function formatDate(date: Date): string {
-    return date.toISOString().split('T')[0] ?? ''
-}
-
 function isValidTimezone(timezone: string): boolean {
     try {
         // Test if the timezone is valid by attempting to format a date with it
@@ -153,8 +150,8 @@ async function generateUserInfo(
         '## Week Settings',
         `**Week Start Day:** ${startDayName} (${startDay})`,
         `**Current Week:** Week ${weekNumber}`,
-        `**Week Start Date:** ${formatDate(weekStart)}`,
-        `**Week End Date:** ${formatDate(weekEnd)}`,
+        `**Week Start Date:** ${getDateString(weekStart)}`,
+        `**Week End Date:** ${getDateString(weekEnd)}`,
         '',
         '## Daily Progress',
         `**Completed Today:** ${user.completedToday}`,
@@ -176,8 +173,8 @@ async function generateUserInfo(
         currentLocalTime: localTime,
         startDay: startDay,
         startDayName: startDayName,
-        weekStartDate: formatDate(weekStart),
-        weekEndDate: formatDate(weekEnd),
+        weekStartDate: getDateString(weekStart),
+        weekEndDate: getDateString(weekEnd),
         currentWeekNumber: weekNumber,
         completedToday: user.completedToday,
         dailyGoal: user.dailyGoal,
