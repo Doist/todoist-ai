@@ -2,6 +2,7 @@ import type { PersonalProject, WorkspaceProject } from '@doist/todoist-api-types
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapProject } from '../tool-helpers.js'
+import { ColorSchema } from '../utils/colors.js'
 import { ProjectSchema as ProjectOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -19,6 +20,7 @@ const ProjectSchema = z.object({
         .enum(['list', 'board', 'calendar'])
         .optional()
         .describe('The project view style. Defaults to "list".'),
+    color: ColorSchema,
 })
 
 const ArgsSchema = {

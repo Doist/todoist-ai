@@ -1,5 +1,6 @@
 import type { PersonalProject, TodoistApi, WorkspaceProject } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
+import { z } from 'zod'
 import { ProjectSchema } from '../../utils/output-schemas.js'
 import { createMockProject } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
@@ -129,6 +130,92 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
         })
     })
 
+    describe('color handling', () => {
+        it('should pass a valid color key through to the API', async () => {
+            const mockApiResponse = createMockProject({
+                id: 'project-color-1',
+                name: 'Grape Project',
+                color: 'grape',
+            })
+            mockTodoistApi.updateProject.mockResolvedValue(mockApiResponse)
+
+            await updateProjects.execute(
+                { projects: [{ id: 'project-color-1', color: 'grape' }] },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateProject).toHaveBeenCalledWith(
+                'project-color-1',
+                expect.objectContaining({ color: 'grape' }),
+            )
+        })
+
+        it('should normalize a display name to the canonical color key', async () => {
+            const mockApiResponse = createMockProject({
+                id: 'project-color-2',
+                name: 'Grape Project',
+                color: 'grape',
+            })
+            mockTodoistApi.updateProject.mockResolvedValue(mockApiResponse)
+
+            // Parse through schema to trigger normalization, then call execute
+            const parsed = z.object(updateProjects.parameters).parse({
+                projects: [{ id: 'project-color-2', color: 'Grape' }],
+            })
+            await updateProjects.execute(parsed, mockTodoistApi)
+
+            expect(mockTodoistApi.updateProject).toHaveBeenCalledWith(
+                'project-color-2',
+                expect.objectContaining({ color: 'grape' }),
+            )
+        })
+
+        it('should skip a project whose only field is an unrecognized color', async () => {
+            // Parse through schema — unrecognized color normalizes to undefined
+            // getSkipReason returns 'no-valid-values', so the project is skipped
+            const parsed = z.object(updateProjects.parameters).parse({
+                projects: [{ id: 'project-color-3', color: 'hotpink' }],
+            })
+            const result = await updateProjects.execute(parsed, mockTodoistApi)
+
+            expect(mockTodoistApi.updateProject).not.toHaveBeenCalled()
+            expect(result.textContent).toContain('skipped - no valid field values')
+            expect(result.structuredContent.appliedOperations).toEqual({
+                updateCount: 0,
+                skippedCount: 1,
+            })
+        })
+
+        it('should report no-valid-values and no-changes skips separately', async () => {
+            const mockApiResponse = createMockProject({
+                id: 'project-color-4',
+                name: 'Named Project',
+                color: 'grape',
+            })
+            mockTodoistApi.updateProject.mockResolvedValue(mockApiResponse)
+
+            // project-A: unrecognized color only → 'no-valid-values'
+            // project-B: no fields at all → 'no-fields'
+            // project-C: valid update → actually updated
+            const parsed = z.object(updateProjects.parameters).parse({
+                projects: [
+                    { id: 'project-A', color: 'hotpink' },
+                    { id: 'project-B' },
+                    { id: 'project-C', color: 'grape' },
+                ],
+            })
+            const result = await updateProjects.execute(parsed, mockTodoistApi)
+
+            expect(mockTodoistApi.updateProject).toHaveBeenCalledTimes(1)
+            expect(result.textContent).toContain('1 skipped - no changes')
+            expect(result.textContent).toContain('1 skipped - no valid field values')
+            expect(result.structuredContent.appliedOperations).toEqual({
+                updateCount: 1,
+                skippedCount: 2,
+            })
+        })
+    })
+
     describe('updating multiple projects', () => {
         it('should update multiple projects and return mapped results', async () => {
             type Project = PersonalProject | WorkspaceProject
@@ -222,7 +309,7 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
 
             const textContent = result.textContent
             expect(textContent).toMatchSnapshot()
-            expect(textContent).toContain('Updated 1 project (1 skipped - no changes):')
+            expect(textContent).toContain('Updated 1 project (1 skipped - no changes):\n')
             expect(textContent).toContain('Updated Project (id=project-1)')
 
             // Verify structured content reflects skipped count

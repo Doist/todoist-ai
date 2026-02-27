@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ColorKeySchema } from './colors.js'
 import { PrioritySchema } from './priorities.js'
 
 /**
@@ -43,7 +44,7 @@ const TaskSchema = z.object({
 const ProjectSchema = z.object({
     id: z.string().describe('The unique ID of the project.'),
     name: z.string().describe('The name of the project.'),
-    color: z.string().describe('The color of the project.'),
+    color: ColorKeySchema,
     isFavorite: z.boolean().describe('Whether the project is marked as favorite.'),
     isShared: z.boolean().describe('Whether the project is shared.'),
     parentId: z.string().optional().describe('The ID of the parent project (for sub-projects).'),

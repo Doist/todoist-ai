@@ -1,5 +1,6 @@
 import type { PersonalProject, TodoistApi, WorkspaceProject } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
+import { z } from 'zod'
 import { ProjectSchema } from '../../utils/output-schemas.js'
 import { createMockProject, TEST_IDS } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
@@ -145,6 +146,63 @@ describe(`${ADD_PROJECTS} tool`, () => {
             expect(textContent).toContain('Added 1 project:')
             expect(textContent).toContain('Child Project')
             expect(textContent).toContain('id=project-child')
+        })
+    })
+
+    describe('color handling', () => {
+        it('should pass a valid color key through to the API', async () => {
+            const mockApiResponse = createMockProject({
+                id: 'project-color-1',
+                name: 'Berry Project',
+                color: 'berry_red',
+            })
+            mockTodoistApi.addProject.mockResolvedValue(mockApiResponse)
+
+            await addProjects.execute(
+                { projects: [{ name: 'Berry Project', color: 'berry_red' }] },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addProject).toHaveBeenCalledWith(
+                expect.objectContaining({ name: 'Berry Project', color: 'berry_red' }),
+            )
+        })
+
+        it('should normalize a display name to the canonical color key', async () => {
+            const mockApiResponse = createMockProject({
+                id: 'project-color-2',
+                name: 'Berry Project',
+                color: 'berry_red',
+            })
+            mockTodoistApi.addProject.mockResolvedValue(mockApiResponse)
+
+            // Parse through schema to trigger normalization, then call execute
+            const parsed = z.object(addProjects.parameters).parse({
+                projects: [{ name: 'Berry Project', color: 'Berry Red' }],
+            })
+            await addProjects.execute(parsed, mockTodoistApi)
+
+            expect(mockTodoistApi.addProject).toHaveBeenCalledWith(
+                expect.objectContaining({ name: 'Berry Project', color: 'berry_red' }),
+            )
+        })
+
+        it('should omit an unrecognized color and not pass it to the API', async () => {
+            const mockApiResponse = createMockProject({
+                id: 'project-color-3',
+                name: 'Colorless Project',
+            })
+            mockTodoistApi.addProject.mockResolvedValue(mockApiResponse)
+
+            // Parse through schema — unrecognized color normalizes to undefined
+            const parsed = z.object(addProjects.parameters).parse({
+                projects: [{ name: 'Colorless Project', color: 'hotpink' }],
+            })
+            await addProjects.execute(parsed, mockTodoistApi)
+
+            const call = mockTodoistApi.addProject.mock.calls[0]?.[0]
+            expect(call).toBeDefined()
+            expect(call?.color).toBeUndefined()
         })
     })
 
