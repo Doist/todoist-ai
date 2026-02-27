@@ -1,5 +1,17 @@
 # Changelog
 
+## [7.11.0](https://github.com/Doist/todoist-ai/compare/v7.10.1...v7.11.0) (2026-02-27)
+
+
+### Features
+
+* typed color support for add-projects and update-projects ([#328](https://github.com/Doist/todoist-ai/issues/328)) ([83b98fb](https://github.com/Doist/todoist-ai/commit/83b98fbd63ecadc55eefe6d3348a88e3ac2b10f0))
+
+
+### Bug Fixes
+
+* use PAT for release-please to trigger CI on its PRs ([#325](https://github.com/Doist/todoist-ai/issues/325)) ([3248b8a](https://github.com/Doist/todoist-ai/commit/3248b8a619ccd2189d8bd676137005da1d0c372e))
+
 ## [7.10.1](https://github.com/Doist/todoist-ai/compare/v7.10.0...v7.10.1) (2026-02-24)
 
 
