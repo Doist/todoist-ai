@@ -1,5 +1,6 @@
 import type {
     ActivityEvent,
+    ColorKey,
     Comment,
     CurrentUser,
     MoveTaskArgs,
@@ -236,7 +237,7 @@ function mapProject(project: Project) {
     return {
         id: project.id,
         name: project.name,
-        color: project.color,
+        color: project.color as ColorKey,
         isFavorite: project.isFavorite,
         isShared: project.isShared,
         parentId: isPersonalProject(project) ? (project.parentId ?? undefined) : undefined,

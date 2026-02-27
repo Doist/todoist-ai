@@ -1,7 +1,8 @@
+import type { ColorKey } from '@doist/todoist-api-typescript'
 import { colors } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 
-const colorKeys = colors.map((c) => c.key) as [string, ...string[]]
+const colorKeys = colors.map((c) => c.key) as [ColorKey, ...ColorKey[]]
 
 function normalizeColor(val: unknown): string | undefined {
     if (typeof val !== 'string') return undefined
