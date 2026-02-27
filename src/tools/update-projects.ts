@@ -2,6 +2,7 @@ import type { PersonalProject, WorkspaceProject } from '@doist/todoist-api-types
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapProject } from '../tool-helpers.js'
+import { ColorSchema } from '../utils/colors.js'
 import { ProjectSchema as ProjectOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -10,9 +11,11 @@ const ProjectUpdateSchema = z.object({
     name: z.string().min(1).optional().describe('The new name of the project.'),
     isFavorite: z.boolean().optional().describe('Whether the project is a favorite.'),
     viewStyle: z.enum(['list', 'board', 'calendar']).optional().describe('The project view style.'),
+    color: ColorSchema,
 })
 
 type ProjectUpdate = z.infer<typeof ProjectUpdateSchema>
+type SkipReason = 'no-fields' | 'no-valid-values'
 
 const ArgsSchema = {
     projects: z.array(ProjectUpdateSchema).min(1).describe('The projects to update.'),
@@ -38,24 +41,43 @@ const updateProjects = {
     annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
     async execute(args, client) {
         const { projects } = args
-        const updateProjectsPromises = projects.map(async (project) => {
-            if (!hasUpdatesToMake(project)) {
-                return undefined
-            }
 
-            const { id, ...updateArgs } = project
-            return await client.updateProject(id, updateArgs)
-        })
+        type Result =
+            | { kind: 'updated'; project: PersonalProject | WorkspaceProject }
+            | { kind: 'skipped'; reason: SkipReason }
 
-        const updatedProjects = (await Promise.all(updateProjectsPromises))
+        const results: Result[] = await Promise.all(
+            projects.map(async (project): Promise<Result> => {
+                const skipReason = getSkipReason(project)
+                if (skipReason !== null) return { kind: 'skipped', reason: skipReason }
+
+                const { id, ...updateArgs } = project
+                const updated = await client.updateProject(id, updateArgs)
+                return { kind: 'updated', project: updated }
+            }),
+        )
+
+        const updatedProjects = results
             .filter(
-                (project): project is PersonalProject | WorkspaceProject => project !== undefined,
+                (r): r is { kind: 'updated'; project: PersonalProject | WorkspaceProject } =>
+                    r.kind === 'updated',
             )
-            .map(mapProject)
+            .map((r) => mapProject(r.project))
+
+        const skippedNoFields = results.filter(
+            (r): r is { kind: 'skipped'; reason: SkipReason } =>
+                r.kind === 'skipped' && r.reason === 'no-fields',
+        ).length
+
+        const skippedNoValidValues = results.filter(
+            (r): r is { kind: 'skipped'; reason: SkipReason } =>
+                r.kind === 'skipped' && r.reason === 'no-valid-values',
+        ).length
 
         const textContent = generateTextContent({
             projects: updatedProjects,
-            args,
+            skippedNoFields,
+            skippedNoValidValues,
         })
 
         return {
@@ -66,7 +88,7 @@ const updateProjects = {
                 updatedProjectIds: updatedProjects.map((project) => project.id),
                 appliedOperations: {
                     updateCount: updatedProjects.length,
-                    skippedCount: projects.length - updatedProjects.length,
+                    skippedCount: skippedNoFields + skippedNoValidValues,
                 },
             },
         }
@@ -75,21 +97,28 @@ const updateProjects = {
 
 function generateTextContent({
     projects,
-    args,
+    skippedNoFields,
+    skippedNoValidValues,
 }: {
     projects: Array<{ id: string; name: string }>
-    args: z.infer<z.ZodObject<typeof ArgsSchema>>
+    skippedNoFields: number
+    skippedNoValidValues: number
 }) {
-    const totalRequested = args.projects.length
-    const actuallyUpdated = projects.length
-    const skipped = totalRequested - actuallyUpdated
-
     const count = projects.length
     const projectList = projects.map((project) => `• ${project.name} (id=${project.id})`).join('\n')
 
     let summary = `Updated ${count} project${count === 1 ? '' : 's'}`
-    if (skipped > 0) {
-        summary += ` (${skipped} skipped - no changes)`
+
+    const skipParts: string[] = []
+    if (skippedNoFields > 0) {
+        skipParts.push(`${skippedNoFields} skipped - no changes`)
+    }
+    if (skippedNoValidValues > 0) {
+        skipParts.push(`${skippedNoValidValues} skipped - no valid field values`)
+    }
+
+    if (skipParts.length > 0) {
+        summary += ` (${skipParts.join(', ')})`
     }
 
     if (count > 0) {
@@ -99,8 +128,11 @@ function generateTextContent({
     return summary
 }
 
-function hasUpdatesToMake({ id, ...otherUpdateArgs }: ProjectUpdate) {
-    return Object.keys(otherUpdateArgs).length > 0
+function getSkipReason({ id, ...otherUpdateArgs }: ProjectUpdate): SkipReason | null {
+    const values = Object.values(otherUpdateArgs)
+    if (values.length === 0) return 'no-fields'
+    if (values.every((v) => v === undefined)) return 'no-valid-values'
+    return null
 }
 
 export { updateProjects }
