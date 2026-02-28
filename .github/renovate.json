@@ -18,7 +18,7 @@
         },
         {
             "matchPackageNames": ["@types/node"],
-            "allowedVersions": "< 23"        
+            "allowedVersions": "< 23"
         }
     ],
     "vulnerabilityAlerts": {
