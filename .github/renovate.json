@@ -15,6 +15,10 @@
             "matchPackageNames": ["*"],
             "groupName": "all dependencies",
             "groupSlug": "all"
+        },
+        {
+            "matchPackageNames": ["@types/node"],
+            "allowedVersions": "< 23"
         }
     ],
     "vulnerabilityAlerts": {
