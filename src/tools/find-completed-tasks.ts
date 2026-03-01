@@ -40,7 +40,7 @@ const ArgsSchema = {
         .string()
         .optional()
         .describe(
-            'Find tasks assigned to this user. Can be a user ID, name, or email address. Defaults to all collaborators when omitted.',
+            'Filter completed tasks assigned to this user. User ID, name, or email. For personal queries (summaries, plans, reports), set to current user from user-info to exclude collaborators. Defaults to all collaborators.',
         ),
 
     limit: z
@@ -72,7 +72,7 @@ const OutputSchema = {
 const findCompletedTasks = {
     name: ToolNames.FIND_COMPLETED_TASKS,
     description:
-        'Get completed tasks (includes all collaborators by default—use responsibleUser to narrow).',
+        'Get completed tasks. Includes all collaborators by default. Person-specific queries (summaries, plans, reports) require responsibleUser.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
