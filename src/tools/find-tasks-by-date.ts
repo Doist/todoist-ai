@@ -58,12 +58,14 @@ const ArgsSchema = {
     responsibleUser: z
         .string()
         .optional()
-        .describe('Find tasks assigned to this user. Can be a user ID, name, or email address.'),
+        .describe(
+            'Filter tasks assigned to this user. User ID, name, or email. For personal queries (summaries, plans, reports), set to current user from user-info to exclude collaborators.',
+        ),
     responsibleUserFiltering: z
         .enum(RESPONSIBLE_USER_FILTERING)
         .optional()
         .describe(
-            'How to filter by responsible user when responsibleUser is not provided. "assigned" = only tasks assigned to others; "unassignedOrMe" = only unassigned tasks or tasks assigned to me; "all" = all tasks regardless of assignment. Default is "unassignedOrMe".',
+            "Filter when responsibleUser is omitted. 'assigned'=assigned to others; 'unassignedOrMe'=unassigned+mine; 'all'=everyone. Default: 'unassignedOrMe'.",
         ),
     ...LabelsSchema,
 }
@@ -81,7 +83,7 @@ const OutputSchema = {
 const findTasksByDate = {
     name: ToolNames.FIND_TASKS_BY_DATE,
     description:
-        "Get tasks by date range. Use startDate 'today' to get today's tasks including overdue items, or provide a specific date/date range.",
+        "Get tasks by date range. startDate='today' includes overdue items. Default responsibleUserFiltering='unassignedOrMe' excludes others' tasks. Person-specific queries (summaries, plans, reports) require responsibleUser.",
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
