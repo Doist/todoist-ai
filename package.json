@@ -64,7 +64,7 @@
         "@modelcontextprotocol/sdk": "^1.25.0"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.4.2",
+        "@biomejs/biome": "2.4.4",
         "@types/dompurify": "3.2.0",
         "@types/express": "5.0.6",
         "@types/morgan": "1.9.10",
@@ -75,7 +75,7 @@
         "husky": "9.1.7",
         "lint-staged": "16.2.7",
         "morgan": "1.10.1",
-        "nodemon": "3.1.11",
+        "nodemon": "3.1.14",
         "react": "19.2.4",
         "react-dom": "19.2.4",
         "rimraf": "6.1.3",
