@@ -1,5 +1,7 @@
-import type { TodoistApi } from '@doist/todoist-api-typescript'
+import type { ColorKey, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
+import { ColorOutputSchema } from '../../utils/colors.js'
+import { ProjectSchema } from '../../utils/output-schemas.js'
 import {
     createMockApiResponse,
     createMockProject,
@@ -220,6 +222,131 @@ describe(`${FIND_PROJECTS} tool`, () => {
                     appliedFilters: expect.objectContaining({ search }),
                 }),
             )
+        })
+    })
+
+    describe('unrecognised color values (issue #343)', () => {
+        // Todoist's API returns color values such as "grey" that are not present in the
+        // 20-key ColorKeySchema enum.  Before this fix both failure modes below would occur:
+        //   1. Full list  → loud MCP output-validation error (-32602) when the MCP SDK
+        //      validates structuredContent against the outputSchema
+        //   2. Name search → silent empty result set (swallowed validation error)
+        //
+        // The unit tests below call tool.execute() directly, so they do not go through the
+        // MCP SDK output-validation layer.  Instead they verify:
+        //   a. ColorOutputSchema itself tolerates unrecognised values (schema-level tests)
+        //   b. The tool returns projects successfully when a project has an unrecognised color
+        //      (end-to-end execution tests)
+
+        describe('ColorOutputSchema tolerance', () => {
+            it('should coerce an unrecognised color value to undefined', () => {
+                expect(ColorOutputSchema.parse('grey')).toBeUndefined()
+                expect(ColorOutputSchema.parse('unknown-color')).toBeUndefined()
+            })
+
+            it('should pass through recognised color values unchanged', () => {
+                expect(ColorOutputSchema.parse('gray')).toBe('gray')
+                expect(ColorOutputSchema.parse('blue')).toBe('blue')
+                expect(ColorOutputSchema.parse('charcoal')).toBe('charcoal')
+            })
+
+            it('should coerce unrecognised colors to undefined in ProjectSchema', () => {
+                const project = {
+                    id: 'proj-1',
+                    name: 'Inbox',
+                    color: 'grey', // unrecognised
+                    isFavorite: false,
+                    isShared: false,
+                    inboxProject: true,
+                    viewStyle: 'list',
+                }
+                // Should parse without throwing
+                const parsed = ProjectSchema.parse(project)
+                // Unrecognised color coerces to undefined
+                expect(parsed.color).toBeUndefined()
+            })
+
+            it('should not throw for ProjectSchema when color is unrecognised', () => {
+                // Replicates the MCP SDK validation that caused the -32602 error
+                const project = {
+                    id: 'proj-1',
+                    name: 'Inbox',
+                    color: 'grey',
+                    isFavorite: false,
+                    isShared: false,
+                    inboxProject: true,
+                    viewStyle: 'list',
+                }
+                expect(() => ProjectSchema.parse(project)).not.toThrow()
+            })
+        })
+
+        it('should succeed for a full list when a project has an unrecognised color', async () => {
+            // "grey" is returned by the Todoist API but is not in the 20-key color enum.
+            // Before the fix, the MCP SDK's output validation would throw -32602 here.
+            const mockProjects = [
+                createMockProject({
+                    id: TEST_IDS.PROJECT_INBOX,
+                    name: 'Inbox',
+                    color: 'grey' as unknown as ColorKey,
+                    inboxProject: true,
+                }),
+                createMockProject({ id: TEST_IDS.PROJECT_WORK, name: 'Work', color: 'blue' }),
+            ]
+
+            mockTodoistApi.getProjects.mockResolvedValue(createMockApiResponse(mockProjects))
+
+            // Should not throw (before the fix, MCP SDK output validation would throw -32602)
+            const result = await findProjects.execute({ limit: 50 }, mockTodoistApi)
+
+            // Should return all projects
+            expect(result.structuredContent.projects).toHaveLength(2)
+            expect(result.structuredContent.totalCount).toBe(2)
+        })
+
+        it('should return matching projects when the matching project has an unrecognised color', async () => {
+            // Before the fix, the search path would silently swallow the validation error
+            // and return { projects: [], totalCount: 0 } — indistinguishable from no match.
+            const matchingProject = createMockProject({
+                id: TEST_IDS.PROJECT_INBOX,
+                name: 'Inbox',
+                color: 'grey' as unknown as ColorKey,
+                inboxProject: true,
+            })
+
+            mockTodoistApi.searchProjects.mockResolvedValue(
+                createMockApiResponse([matchingProject]),
+            )
+
+            const result = await findProjects.execute(
+                { search: 'inbox', limit: 50 },
+                mockTodoistApi,
+            )
+
+            // Should find the project, not silently return an empty result set
+            expect(result.structuredContent.projects).toHaveLength(1)
+            expect(result.structuredContent.totalCount).toBe(1)
+            expect(result.structuredContent.projects[0]?.name).toBe('Inbox')
+        })
+
+        it('should return correct results when a non-matching project has an unrecognised color', async () => {
+            // Server-side search filters out non-matching projects before returning.
+            // Confirms that a recognized-color match is returned correctly even when
+            // other projects in the account have unrecognised colors.
+            const matchingProject = createMockProject({
+                id: TEST_IDS.PROJECT_WORK,
+                name: 'Work Project',
+                color: 'blue',
+            })
+
+            mockTodoistApi.searchProjects.mockResolvedValue(
+                createMockApiResponse([matchingProject]),
+            )
+
+            const result = await findProjects.execute({ search: 'work', limit: 50 }, mockTodoistApi)
+
+            expect(result.structuredContent.projects).toHaveLength(1)
+            expect(result.structuredContent.projects[0]?.name).toBe('Work Project')
         })
     })
 
