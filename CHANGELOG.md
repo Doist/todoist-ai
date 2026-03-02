@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.11.1](https://github.com/Doist/todoist-ai/compare/v7.11.0...v7.11.1) (2026-03-02)
+
+
+### Bug Fixes
+
+* **find-projects:** tolerate unrecognised color values in project output schema ([#344](https://github.com/Doist/todoist-ai/issues/344)) ([10fe731](https://github.com/Doist/todoist-ai/commit/10fe731aa08fe8cefd850a443bde60e063f02962)), closes [#343](https://github.com/Doist/todoist-ai/issues/343)
+
 ## [7.11.0](https://github.com/Doist/todoist-ai/compare/v7.10.1...v7.11.0) (2026-02-27)
 
 
