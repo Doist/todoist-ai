@@ -234,6 +234,24 @@ function extractFieldHints(responseData: Record<string, unknown> | undefined): s
     return Array.from(hints).slice(0, 3)
 }
 
+function hasKnownApiErrorKeys(responseData: Record<string, unknown> | undefined): boolean {
+    if (!responseData) {
+        return false
+    }
+
+    return (
+        responseData.error !== undefined ||
+        responseData.errorCode !== undefined ||
+        responseData.errorTag !== undefined ||
+        responseData.errors !== undefined ||
+        responseData.errorDetails !== undefined ||
+        responseData.field !== undefined ||
+        responseData.parameter !== undefined ||
+        responseData.param !== undefined ||
+        responseData.path !== undefined
+    )
+}
+
 function getNextStepHint(statusCode: number | undefined, hasFieldHints: boolean): string {
     if (statusCode === 401 || statusCode === 403) {
         return 'Verify your API token and access permissions, then retry.'
@@ -329,7 +347,7 @@ function extractApiErrorInfo(error: unknown): ApiErrorInfo | null {
 
     const hasApiSignals =
         statusCode !== undefined ||
-        responseData !== undefined ||
+        hasKnownApiErrorKeys(responseData) ||
         tag !== undefined ||
         code !== undefined ||
         (message ? isGenericHttpMessage(message) : false)

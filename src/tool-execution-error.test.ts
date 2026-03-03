@@ -82,4 +82,12 @@ describe('formatToolExecutionError', () => {
     it('returns non-API errors as plain messages', () => {
         expect(formatToolExecutionError(new Error('Simple failure'))).toBe('Simple failure')
     })
+
+    it('does not mislabel generic errors with data payloads as API errors', () => {
+        const error = Object.assign(new Error('Unexpected tool failure'), {
+            data: { foo: 'bar' },
+        })
+
+        expect(formatToolExecutionError(error)).toBe('Unexpected tool failure')
+    })
 })
