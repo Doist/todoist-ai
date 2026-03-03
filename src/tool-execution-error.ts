@@ -234,22 +234,24 @@ function extractFieldHints(responseData: Record<string, unknown> | undefined): s
     return Array.from(hints).slice(0, 3)
 }
 
+const KNOWN_API_ERROR_KEYS = [
+    'error',
+    'errorCode',
+    'errorTag',
+    'errors',
+    'errorDetails',
+    'field',
+    'parameter',
+    'param',
+    'path',
+] as const
+
 function hasKnownApiErrorKeys(responseData: Record<string, unknown> | undefined): boolean {
     if (!responseData) {
         return false
     }
 
-    return (
-        responseData.error !== undefined ||
-        responseData.errorCode !== undefined ||
-        responseData.errorTag !== undefined ||
-        responseData.errors !== undefined ||
-        responseData.errorDetails !== undefined ||
-        responseData.field !== undefined ||
-        responseData.parameter !== undefined ||
-        responseData.param !== undefined ||
-        responseData.path !== undefined
-    )
+    return KNOWN_API_ERROR_KEYS.some((key) => responseData[key] !== undefined)
 }
 
 function getNextStepHint(statusCode: number | undefined, hasFieldHints: boolean): string {
