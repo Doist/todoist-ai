@@ -1,4 +1,4 @@
-import { stripEmailsFromObject, stripEmailsFromText } from './mcp-helpers.js'
+import { registerTool, stripEmailsFromObject, stripEmailsFromText } from './mcp-helpers.js'
 
 describe('stripEmailsFromObject', () => {
     it.each([
@@ -48,5 +48,55 @@ describe('stripEmailsFromText', () => {
         ['', ''],
     ])('transforms %j to %j', (input, expected) => {
         expect(stripEmailsFromText(input)).toBe(expected)
+    })
+})
+
+describe('registerTool error path', () => {
+    it('applies centralized API formatting in MCP callback errors', async () => {
+        const registerToolMock = vi.fn()
+
+        registerTool({
+            tool: {
+                name: 'test-tool',
+                description: 'Test tool',
+                parameters: {},
+                outputSchema: {},
+                annotations: {
+                    readOnlyHint: true,
+                    destructiveHint: false,
+                    idempotentHint: true,
+                },
+                execute: async () => {
+                    throw {
+                        httpStatusCode: 500,
+                        responseData: {
+                            error: 'Internal API failure',
+                        },
+                    }
+                },
+            },
+            server: {
+                registerTool: registerToolMock,
+            } as unknown as Parameters<typeof registerTool>[0]['server'],
+            client: {} as Parameters<typeof registerTool>[0]['client'],
+        })
+
+        expect(registerToolMock).toHaveBeenCalledTimes(1)
+
+        const callback = registerToolMock.mock.calls[0]?.[2] as (
+            args: Record<string, unknown>,
+            context: unknown,
+        ) => Promise<{
+            content: Array<{ text: string }>
+            isError: boolean
+        }>
+
+        const output = await callback({}, {})
+
+        expect(output.isError).toBe(true)
+        expect(output.content[0]?.text).toContain('Todoist API request failed (HTTP 500).')
+        expect(output.content[0]?.text).toContain(
+            'Try next: Todoist API may be temporarily unavailable. Retry shortly.',
+        )
     })
 })

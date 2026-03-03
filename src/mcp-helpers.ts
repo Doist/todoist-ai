@@ -3,6 +3,7 @@ import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/m
 import type { TextResourceContents, ToolAnnotations } from '@modelcontextprotocol/sdk/types.js'
 import type { z } from 'zod'
 import type { TodoistTool } from './todoist-tool.js'
+import { formatToolExecutionError } from './tool-execution-error.js'
 import { removeNullFields } from './utils/sanitize-data.js'
 import { ToolNames } from './utils/tool-names.js'
 
@@ -233,8 +234,7 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
             return getToolOutput({ textContent, structuredContent })
         } catch (error) {
             console.error(`Error executing tool ${tool.name}:`, { args, error })
-            const message = error instanceof Error ? error.message : 'An unknown error occurred'
-            return getErrorOutput(message)
+            return getErrorOutput(formatToolExecutionError(error))
         }
     }
 
