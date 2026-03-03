@@ -152,7 +152,7 @@ See [docs/mcp-server.md](docs/mcp-server.md) for full instructions on setting up
 
 ## Local Development Setup
 
-See [docs/dev-setup.md](docs/dev-setup.md) for full instructions on setting up this repository locally for development and contributing.
+See [docs/dev-setup.md](docs/dev-setup.md) for full setup instructions and [CONTRIBUTING.md](CONTRIBUTING.md) for contributor workflows and quality checks.
 
 ### Widgets
 
@@ -166,6 +166,25 @@ After cloning and setting up the repository:
 
 - `npm start` - Build and run the MCP inspector for testing
 - `npm run dev` - Development mode with auto-rebuild and restart
+- `npm run tool:list` - List available tools for direct execution
+- `npm run tool -- <tool-name> '<json-args>'` - Run a tool directly without MCP
+
+When using `npm run tool`, include `--` before tool arguments so npm forwards them to `scripts/run-tool.ts`.
+
+Example check before write operations:
+`npm run tool -- user-info '{}'`
+This confirms which Todoist account the current `TODOIST_API_KEY` is connected to.
+
+`run-tool` uses `TODOIST_API_KEY` from your `.env` file (created from `.env.example` by `npm run setup`). Use a test account or a temporary project when running write operations to avoid modifying real data.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for:
+
+- Development workflow
+- Running tools directly with `scripts/run-tool.ts`
+- Testing and quality checks
+- Commit conventions
 
 ## Releasing
 
