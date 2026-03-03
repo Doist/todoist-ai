@@ -5,7 +5,11 @@ import { mapTask, resolveInboxProjectId } from '../tool-helpers.js'
 import { assignmentValidator } from '../utils/assignment-validator.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
 import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
-import { convertPriorityToNumber, PrioritySchema } from '../utils/priorities.js'
+import {
+    convertPriorityToNumber,
+    PRIORITY_INPUT_DESCRIPTION,
+    PrioritySchema,
+} from '../utils/priorities.js'
 import { summarizeTaskOperation } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -22,9 +26,7 @@ const TaskSchema = z.object({
         .describe(
             'Additional details, notes, or context for the task. Use this for longer content rather than putting it in the task name. Supports Markdown.',
         ),
-    priority: PrioritySchema.optional().describe(
-        'The priority of the task: p1 (highest), p2 (high), p3 (medium), p4 (lowest/default).',
-    ),
+    priority: PrioritySchema.optional().describe(PRIORITY_INPUT_DESCRIPTION),
     dueString: z.string().optional().describe('The due date for the task, in natural language.'),
     deadlineDate: z
         .string()
