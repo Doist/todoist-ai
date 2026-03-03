@@ -35,20 +35,26 @@ const TasksUpdateSchema = z.object({
     priority: PrioritySchema.optional().describe(
         'The new priority of the task: p1 (highest), p2 (high), p3 (medium), p4 (lowest/default).',
     ),
-    dueString: z
-        .string()
-        .nullable()
-        .optional()
-        .describe(
-            'The new due date for the task in natural language (e.g., "tomorrow at 5pm"). Use "remove" to clear the due date.',
-        ),
-    deadlineDate: z
-        .string()
-        .nullable()
-        .optional()
-        .describe(
-            'The new deadline date for the task in ISO 8601 format (YYYY-MM-DD, e.g., "2025-12-31"). Deadlines are immovable constraints shown with a different indicator than due dates. Use "remove" to clear the deadline.',
-        ),
+    dueString: z.preprocess(
+        // Keep accepting legacy null while exposing a Gemini-compatible string schema.
+        (value) => (value === null ? 'remove' : value),
+        z
+            .string()
+            .optional()
+            .describe(
+                'The new due date for the task in natural language (e.g., "tomorrow at 5pm"). Use "remove" to clear the due date.',
+            ),
+    ),
+    deadlineDate: z.preprocess(
+        // Keep accepting legacy null while exposing a Gemini-compatible string schema.
+        (value) => (value === null ? 'remove' : value),
+        z
+            .string()
+            .optional()
+            .describe(
+                'The new deadline date for the task in ISO 8601 format (YYYY-MM-DD, e.g., "2025-12-31"). Deadlines are immovable constraints shown with a different indicator than due dates. Use "remove" to clear the deadline.',
+            ),
+    ),
     duration: z
         .string()
         .optional()
@@ -271,7 +277,7 @@ function hasUpdatesToMake({ id, ...otherUpdateArgs }: TaskUpdate) {
 }
 
 function normalizeNullEquivalentValue(
-    value: string | null | undefined,
+    value: string | undefined,
     nullEquivalentValues: readonly string[],
 ) {
     if (value == null) {

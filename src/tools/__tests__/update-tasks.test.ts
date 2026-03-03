@@ -598,7 +598,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                     tasks: [
                         {
                             id: '8485093763',
-                            dueString: null,
+                            dueString: null as unknown as string,
                         },
                     ],
                 },
