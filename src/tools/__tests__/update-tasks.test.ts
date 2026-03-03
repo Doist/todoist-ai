@@ -510,6 +510,133 @@ describe(`${UPDATE_TASKS} tool`, () => {
             const { structuredContent } = result
             expect(structuredContent.tasks).toHaveLength(1)
         })
+
+        it('should remove task deadline with "no date" string', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093765',
+                content: 'Task without deadline',
+                deadline: null,
+                url: 'https://todoist.com/showTask?id=8485093765',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+
+            await updateTasks.execute(
+                {
+                    tasks: [
+                        {
+                            id: '8485093765',
+                            deadlineDate: 'no date',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093765', {
+                deadlineDate: null,
+            })
+        })
+    })
+
+    describe('updating due dates', () => {
+        it('should remove task due date with "remove" string', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093762',
+                content: 'Task without due date',
+                due: null,
+                url: 'https://todoist.com/showTask?id=8485093762',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+
+            const result = await updateTasks.execute(
+                {
+                    tasks: [
+                        {
+                            id: '8485093762',
+                            dueString: 'remove',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093762', {
+                dueString: null,
+            })
+
+            expect(result.textContent).toContain('Updated 1 task')
+            const { structuredContent } = result
+            expect(structuredContent.tasks).toHaveLength(1)
+            expect(structuredContent.tasks).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        id: '8485093762',
+                        dueDate: undefined,
+                        recurring: false,
+                    }),
+                ]),
+            )
+        })
+
+        it('should remove task due date with null for backward compatibility', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093763',
+                content: 'Task without due date',
+                due: null,
+                url: 'https://todoist.com/showTask?id=8485093763',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+
+            await updateTasks.execute(
+                {
+                    tasks: [
+                        {
+                            id: '8485093763',
+                            dueString: null,
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093763', {
+                dueString: null,
+            })
+        })
+
+        it('should remove task due date with "no date" string', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485093764',
+                content: 'Task without due date',
+                due: null,
+                url: 'https://todoist.com/showTask?id=8485093764',
+                addedAt: '2025-08-13T22:09:56.123456Z',
+            })
+
+            mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
+
+            await updateTasks.execute(
+                {
+                    tasks: [
+                        {
+                            id: '8485093764',
+                            dueString: 'no date',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093764', {
+                dueString: null,
+            })
+        })
     })
 
     describe('updating labels', () => {

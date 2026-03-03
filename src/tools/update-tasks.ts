@@ -37,10 +37,14 @@ const TasksUpdateSchema = z.object({
     ),
     dueString: z
         .string()
+        .nullable()
         .optional()
-        .describe("The new due date for the task, in natural language (e.g., 'tomorrow at 5pm')."),
+        .describe(
+            'The new due date for the task in natural language (e.g., "tomorrow at 5pm"). Use "remove" to clear the due date.',
+        ),
     deadlineDate: z
         .string()
+        .nullable()
         .optional()
         .describe(
             'The new deadline date for the task in ISO 8601 format (YYYY-MM-DD, e.g., "2025-12-31"). Deadlines are immovable constraints shown with a different indicator than due dates. Use "remove" to clear the deadline.',
@@ -70,6 +74,9 @@ const TasksUpdateSchema = z.object({
 })
 
 type TaskUpdate = z.infer<typeof TasksUpdateSchema>
+
+const DUE_DATE_REMOVAL_ALIASES = ['remove', 'no date'] as const
+const DEADLINE_REMOVAL_ALIASES = ['remove', 'no date', 'no deadline'] as const
 
 const ArgsSchema = {
     tasks: z.array(TasksUpdateSchema).min(1).describe('The tasks to update.'),
@@ -105,6 +112,7 @@ const updateTasks = {
                 projectId,
                 sectionId,
                 parentId,
+                dueString,
                 duration: durationStr,
                 responsibleUser,
                 priority,
@@ -129,15 +137,28 @@ const updateTasks = {
                 updateArgs.priority = convertPriorityToNumber(priority)
             }
 
-            // Handle deadline changes if provided
-            if (deadlineDate !== undefined) {
-                if (deadlineDate === null || deadlineDate === 'remove') {
-                    // Remove deadline - support both legacy null and new "remove" string
-                    updateArgs = { ...updateArgs, deadlineDate: null }
-                } else {
-                    // Set new deadline
-                    updateArgs = { ...updateArgs, deadlineDate }
+            // Handle due date changes if provided
+            const dueStringUpdate = normalizeNullEquivalentValue(
+                dueString,
+                DUE_DATE_REMOVAL_ALIASES,
+            )
+            if (dueStringUpdate === null) {
+                // SDK typings may lag API support for null dueString. Cast keeps runtime null payload.
+                updateArgs = {
+                    ...updateArgs,
+                    dueString: null as unknown as UpdateTaskArgs['dueString'],
                 }
+            } else if (dueStringUpdate !== undefined) {
+                updateArgs = { ...updateArgs, dueString: dueStringUpdate }
+            }
+
+            // Handle deadline changes if provided
+            const deadlineDateUpdate = normalizeNullEquivalentValue(
+                deadlineDate,
+                DEADLINE_REMOVAL_ALIASES,
+            )
+            if (deadlineDateUpdate !== undefined) {
+                updateArgs = { ...updateArgs, deadlineDate: deadlineDateUpdate }
             }
 
             // Parse duration if provided
@@ -247,6 +268,22 @@ function generateTextContent({
 
 function hasUpdatesToMake({ id, ...otherUpdateArgs }: TaskUpdate) {
     return Object.keys(otherUpdateArgs).length > 0
+}
+
+function normalizeNullEquivalentValue(
+    value: string | null | undefined,
+    nullEquivalentValues: readonly string[],
+) {
+    if (value == null) {
+        return value
+    }
+
+    const normalizedValue = value.trim().toLowerCase()
+    if (nullEquivalentValues.includes(normalizedValue)) {
+        return null
+    }
+
+    return value
 }
 
 export { updateTasks }
