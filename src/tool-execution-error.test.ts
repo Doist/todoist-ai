@@ -22,6 +22,30 @@ describe('formatToolExecutionError', () => {
         expect(output).toContain('Try next: Fix the field hints above and retry.')
     })
 
+    it('supports canonical Todoist snake_case error payloads', () => {
+        const output = formatToolExecutionError({
+            responseData: {
+                error: 'Invalid temporary id',
+                error_code: 58,
+                error_tag: 'INVALID_TEMP_ID',
+                http_code: 400,
+                error_extra: {
+                    argument: 'temp_id_mapping',
+                    explanation: 'At least one temporary id was not found.',
+                },
+            },
+        })
+
+        expect(output).toContain(
+            'Todoist API request failed (HTTP 400, code 58, tag INVALID_TEMP_ID).',
+        )
+        expect(output).toContain('Message: Invalid temporary id')
+        expect(output).toContain(
+            'Details: argument: temp_id_mapping; explanation: At least one temporary id was not found.',
+        )
+        expect(output).toContain('Field hints: temp_id_mapping')
+    })
+
     it('formats nested response errors consistently', () => {
         const output = formatToolExecutionError({
             message: 'Request failed with status code 404',

@@ -175,13 +175,19 @@ function extractFieldHints(responseData: Record<string, unknown> | undefined): s
     )
     addHint(singleFieldHint)
 
-    const detailsRecord = firstRecord(responseData.details, responseData.errorDetails)
+    const detailsRecord = firstRecord(
+        responseData.details,
+        responseData.errorDetails,
+        responseData.errorExtra,
+        responseData.error_extra,
+    )
     if (detailsRecord) {
         const detailFieldHint = firstDefined(
             toStringValue(detailsRecord.field),
             toStringValue(detailsRecord.parameter),
             toStringValue(detailsRecord.param),
             toStringValue(detailsRecord.path),
+            toStringValue(detailsRecord.argument),
         )
         addHint(detailFieldHint)
     }
@@ -235,16 +241,24 @@ function extractFieldHints(responseData: Record<string, unknown> | undefined): s
     return Array.from(hints).slice(0, 3)
 }
 
-const KNOWN_API_ERROR_KEYS = [
+/**
+ * Canonical Todoist API error keys from docs:
+ * - error, error_code, error_tag, http_code, error_extra
+ *
+ * Compatibility keys support SDK/client normalization to camelCase.
+ * We read both formats because this module can receive either raw API payloads
+ * (snake_case) or transformed payloads (camelCase), depending on the caller.
+ */
+const KNOWN_TODOIST_API_ERROR_KEYS = [
     'error',
+    'error_code',
+    'error_tag',
+    'http_code',
+    'error_extra',
     'errorCode',
     'errorTag',
-    'errors',
-    'errorDetails',
-    'field',
-    'parameter',
-    'param',
-    'path',
+    'httpCode',
+    'errorExtra',
 ] as const
 
 function hasKnownApiErrorKeys(responseData: Record<string, unknown> | undefined): boolean {
@@ -252,7 +266,7 @@ function hasKnownApiErrorKeys(responseData: Record<string, unknown> | undefined)
         return false
     }
 
-    return KNOWN_API_ERROR_KEYS.some((key) => responseData[key] !== undefined)
+    return KNOWN_TODOIST_API_ERROR_KEYS.some((key) => responseData[key] !== undefined)
 }
 
 function getNextStepHint(statusCode: number | undefined, hasFieldHints: boolean): string {
@@ -307,6 +321,8 @@ function extractApiErrorInfo(error: unknown): ApiErrorInfo | null {
         toNumber(responseData?.httpStatusCode),
         toNumber(responseData?.statusCode),
         toNumber(responseData?.status),
+        toNumber(responseData?.httpCode),
+        toNumber(responseData?.http_code),
         extractStatusCodeFromText(toStringValue(errorRecord?.message)),
         extractStatusCodeFromText(toStringValue(errorCauseRecord?.message)),
         extractStatusCodeFromText(typeof error === 'string' ? error : undefined),
@@ -314,15 +330,19 @@ function extractApiErrorInfo(error: unknown): ApiErrorInfo | null {
 
     const code = firstDefined(
         coerceErrorCode(responseData?.errorCode),
+        coerceErrorCode(responseData?.error_code),
         coerceErrorCode(responseData?.code),
         coerceErrorCode(errorRecord?.errorCode),
+        coerceErrorCode(errorRecord?.error_code),
         coerceErrorCode(errorRecord?.code),
     )
 
     const tag = firstDefined(
         toStringValue(responseData?.errorTag),
+        toStringValue(responseData?.error_tag),
         toStringValue(responseData?.tag),
         toStringValue(errorRecord?.errorTag),
+        toStringValue(errorRecord?.error_tag),
         toStringValue(errorRecord?.tag),
     )
 
@@ -340,6 +360,8 @@ function extractApiErrorInfo(error: unknown): ApiErrorInfo | null {
         rawMessageCandidates[0]
 
     const details = firstDefined(
+        summarizeDetails(responseData?.errorExtra),
+        summarizeDetails(responseData?.error_extra),
         summarizeDetails(responseData?.details),
         summarizeDetails(responseData?.errorDetails),
         summarizeDetails(responseData?.errors),
