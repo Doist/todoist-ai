@@ -565,7 +565,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
             )
 
             expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093762', {
-                dueString: null,
+                dueString: 'no date',
             })
 
             expect(result.textContent).toContain('Updated 1 task')
@@ -606,7 +606,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
             )
 
             expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093763', {
-                dueString: null,
+                dueString: 'no date',
             })
         })
 
@@ -634,7 +634,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
             )
 
             expect(mockTodoistApi.updateTask).toHaveBeenCalledWith('8485093764', {
-                dueString: null,
+                dueString: 'no date',
             })
         })
     })

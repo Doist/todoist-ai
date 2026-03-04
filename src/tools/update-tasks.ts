@@ -83,6 +83,7 @@ type TaskUpdate = z.infer<typeof TasksUpdateSchema>
 
 const DUE_DATE_REMOVAL_ALIASES = ['remove', 'no date'] as const
 const DEADLINE_REMOVAL_ALIASES = ['remove', 'no date', 'no deadline'] as const
+const DUE_DATE_REMOVAL_VALUE = 'no date' as const
 
 const ArgsSchema = {
     tasks: z.array(TasksUpdateSchema).min(1).describe('The tasks to update.'),
@@ -144,24 +145,20 @@ const updateTasks = {
             }
 
             // Handle due date changes if provided
-            const dueStringUpdate = normalizeNullEquivalentValue(
+            const dueStringUpdate = normalizeAliasValue(
                 dueString,
                 DUE_DATE_REMOVAL_ALIASES,
+                DUE_DATE_REMOVAL_VALUE,
             )
-            if (dueStringUpdate === null) {
-                // SDK typings may lag API support for null dueString. Cast keeps runtime null payload.
-                updateArgs = {
-                    ...updateArgs,
-                    dueString: null as unknown as UpdateTaskArgs['dueString'],
-                }
-            } else if (dueStringUpdate !== undefined) {
+            if (dueStringUpdate !== undefined) {
                 updateArgs = { ...updateArgs, dueString: dueStringUpdate }
             }
 
             // Handle deadline changes if provided
-            const deadlineDateUpdate = normalizeNullEquivalentValue(
+            const deadlineDateUpdate = normalizeAliasValue(
                 deadlineDate,
                 DEADLINE_REMOVAL_ALIASES,
+                null,
             )
             if (deadlineDateUpdate !== undefined) {
                 updateArgs = { ...updateArgs, deadlineDate: deadlineDateUpdate }
@@ -276,17 +273,22 @@ function hasUpdatesToMake({ id, ...otherUpdateArgs }: TaskUpdate) {
     return Object.keys(otherUpdateArgs).length > 0
 }
 
-function normalizeNullEquivalentValue(
-    value: string | undefined,
-    nullEquivalentValues: readonly string[],
+function normalizeAliasValue<TReplacement extends string | null>(
+    value: string | null | undefined,
+    aliases: readonly string[],
+    replacement: TReplacement,
 ) {
-    if (value == null) {
+    if (value === undefined) {
         return value
     }
 
+    if (value === null) {
+        return replacement
+    }
+
     const normalizedValue = value.trim().toLowerCase()
-    if (nullEquivalentValues.includes(normalizedValue)) {
-        return null
+    if (aliases.includes(normalizedValue)) {
+        return replacement
     }
 
     return value
