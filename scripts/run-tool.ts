@@ -9,7 +9,7 @@
  *
  * Examples:
  *   npx tsx scripts/run-tool.ts add-tasks '{"tasks":[{"content":"Test task","order":1}]}'
- *   npx tsx scripts/run-tool.ts find-tasks '{"query":"meeting"}'
+ *   npx tsx scripts/run-tool.ts find-tasks '{"searchText":"meeting"}'
  *   npx tsx scripts/run-tool.ts get-overview '{}'
  *
  * Requires TODOIST_API_KEY in .env file (and optionally TODOIST_BASE_URL).
