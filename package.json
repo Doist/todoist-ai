@@ -14,7 +14,7 @@
         "!dist/dev",
         "scripts",
         "package.json",
-        "LICENSE.txt",
+        "LICENSE",
         "README.md"
     ],
     "license": "MIT",
@@ -40,6 +40,8 @@
         "start:http": "npm run build && node dist/main-http.js",
         "dev:widget": "vite build --watch --minify false",
         "setup": "cp .env.example .env && npm install && npm run build",
+        "tool": "tsx scripts/run-tool.ts",
+        "tool:list": "tsx scripts/run-tool.ts --list",
         "test:executable": "npm run build && node scripts/test-executable.cjs",
         "type-check": "npx tsc --noEmit",
         "biome:sort-imports": "biome check --formatter-enabled=false --linter-enabled=false --organize-imports-enabled=true --write .",
