@@ -46,11 +46,12 @@ function toStringValue(value: unknown): string | undefined {
     return undefined
 }
 
-function toCode(value: unknown): string | number | undefined {
+function coerceErrorCode(value: unknown): string | number | undefined {
     const numeric = toNumber(value)
     if (numeric !== undefined) {
         return numeric
     }
+
     return toStringValue(value)
 }
 
@@ -312,10 +313,10 @@ function extractApiErrorInfo(error: unknown): ApiErrorInfo | null {
     )
 
     const code = firstDefined(
-        toCode(responseData?.errorCode),
-        toCode(responseData?.code),
-        toCode(errorRecord?.errorCode),
-        toCode(errorRecord?.code),
+        coerceErrorCode(responseData?.errorCode),
+        coerceErrorCode(responseData?.code),
+        coerceErrorCode(errorRecord?.errorCode),
+        coerceErrorCode(errorRecord?.code),
     )
 
     const tag = firstDefined(
