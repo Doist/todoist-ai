@@ -121,6 +121,15 @@ const findCompletedTasks = {
         const { getBy, labels, labelsOperator, since, until, responsibleUser, projectId, ...rest } =
             args
 
+        // Cursor pagination must keep the exact same date window as page 1.
+        // If since/until are omitted, they are recomputed from "today" and can drift
+        // after midnight between requests, causing inconsistent pagination.
+        if (args.cursor && (!since || !until)) {
+            throw new Error(
+                'Cursor pagination requires explicit since and until. Reuse structuredContent.appliedFilters.since and structuredContent.appliedFilters.until from the previous page.',
+            )
+        }
+
         // Resolve assignee name to user ID if provided
         const resolved = await resolveResponsibleUser(client, responsibleUser)
         const assigneeEmail = resolved?.email

@@ -210,6 +210,51 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                 vi.useRealTimers()
             }
         })
+
+        it('should require explicit since/until for cursor pagination to prevent date-window drift across midnight', async () => {
+            vi.useFakeTimers()
+            vi.setSystemTime(new Date('2026-03-03T12:00:00Z'))
+
+            try {
+                mockTodoistApi.getCompletedTasksByCompletionDate.mockResolvedValueOnce({
+                    items: [],
+                    nextCursor: 'cursor-page-2',
+                })
+
+                const firstPage = await findCompletedTasks.execute(
+                    {
+                        getBy: 'completion',
+                        limit: 50,
+                        labels: [],
+                        labelsOperator: 'or' as const,
+                    },
+                    mockTodoistApi,
+                )
+
+                expect(firstPage.structuredContent.nextCursor).toBe('cursor-page-2')
+
+                // Simulate next-page fetch that happens after midnight.
+                // Without explicit since/until, defaults could shift to a different window.
+                vi.setSystemTime(new Date('2026-03-04T12:00:00Z'))
+
+                await expect(
+                    findCompletedTasks.execute(
+                        {
+                            getBy: 'completion',
+                            limit: 50,
+                            cursor: 'cursor-page-2',
+                            labels: [],
+                            labelsOperator: 'or' as const,
+                        },
+                        mockTodoistApi,
+                    ),
+                ).rejects.toThrow(
+                    'Cursor pagination requires explicit since and until. Reuse structuredContent.appliedFilters.since and structuredContent.appliedFilters.until from the previous page.',
+                )
+            } finally {
+                vi.useRealTimers()
+            }
+        })
     })
 
     describe('getting completed tasks by due date', () => {
