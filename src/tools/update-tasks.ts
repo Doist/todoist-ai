@@ -5,7 +5,11 @@ import { createMoveTaskArgs, mapTask, resolveInboxProjectId } from '../tool-help
 import { assignmentValidator } from '../utils/assignment-validator.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
 import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
-import { convertPriorityToNumber, PrioritySchema } from '../utils/priorities.js'
+import {
+    convertPriorityToNumber,
+    PRIORITY_INPUT_DESCRIPTION,
+    PrioritySchema,
+} from '../utils/priorities.js'
 import { summarizeTaskOperation } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -32,9 +36,7 @@ const TasksUpdateSchema = z.object({
     sectionId: z.string().optional().describe('The new section ID for the task.'),
     parentId: z.string().optional().describe('The new parent task ID (for subtasks).'),
     order: z.number().optional().describe('The new order of the task within its parent/section.'),
-    priority: PrioritySchema.optional().describe(
-        'The new priority of the task: p1 (highest), p2 (high), p3 (medium), p4 (lowest/default).',
-    ),
+    priority: PrioritySchema.optional().describe(PRIORITY_INPUT_DESCRIPTION),
     dueString: z
         .string()
         .optional()
