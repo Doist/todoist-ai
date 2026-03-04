@@ -62,7 +62,7 @@ npx tsx scripts/run-tool.ts --list  # list all tools
 Examples:
 ```bash
 npx tsx scripts/run-tool.ts add-tasks '{"tasks":[{"content":"Test task"}]}'
-npx tsx scripts/run-tool.ts find-tasks '{"query":"meeting"}'
+npx tsx scripts/run-tool.ts find-tasks '{"searchText":"meeting"}'
 npx tsx scripts/run-tool.ts get-overview '{}'
 ```
 

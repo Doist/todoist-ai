@@ -24,7 +24,7 @@ Examples:
 
 ```sh
 npm run tool -- add-tasks '{"tasks":[{"content":"Test task"}]}'
-npm run tool -- find-tasks '{"query":"meeting"}'
+npm run tool -- find-tasks '{"searchText":"meeting"}'
 npm run tool -- get-overview '{}'
 ```
 
