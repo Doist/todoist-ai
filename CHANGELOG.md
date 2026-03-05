@@ -1,5 +1,14 @@
 # Changelog
 
+## [7.11.2](https://github.com/Doist/todoist-ai/compare/v7.11.1...v7.11.2) (2026-03-05)
+
+
+### Bug Fixes
+
+* clarify priority input format in task tools ([#352](https://github.com/Doist/todoist-ai/issues/352)) ([d9e9d19](https://github.com/Doist/todoist-ai/commit/d9e9d1937c459d375641d381a363039c4135c982))
+* default find-completed-tasks date window ([#350](https://github.com/Doist/todoist-ai/issues/350)) ([e935b94](https://github.com/Doist/todoist-ai/commit/e935b949acb3cfce61606c96ce14537516693bdc))
+* improve actionable API error messages ([#349](https://github.com/Doist/todoist-ai/issues/349)) ([3100be9](https://github.com/Doist/todoist-ai/commit/3100be99497b47fd4ee9140c224b09a926817d49))
+
 ## [7.11.1](https://github.com/Doist/todoist-ai/compare/v7.11.0...v7.11.1) (2026-03-02)
 
 
