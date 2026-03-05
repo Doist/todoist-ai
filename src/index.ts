@@ -2,6 +2,8 @@ import { FEATURE_NAMES, type Feature, type FeatureName, type Features } from './
 import { getMcpServer } from './mcp-server.js'
 // Comment management tools
 import { addComments } from './tools/add-comments.js'
+// Filter management tools
+import { addFilters } from './tools/add-filters.js'
 // Project management tools
 import { addProjects } from './tools/add-projects.js'
 // Section management tools
@@ -9,6 +11,7 @@ import { addSections } from './tools/add-sections.js'
 // Task management tools
 import { addTasks } from './tools/add-tasks.js'
 import { completeTasks } from './tools/complete-tasks.js'
+import { deleteFilter } from './tools/delete-filter.js'
 // General tools
 import { deleteObject } from './tools/delete-object.js'
 import { fetch } from './tools/fetch.js'
@@ -16,6 +19,7 @@ import { fetch } from './tools/fetch.js'
 import { findActivity } from './tools/find-activity.js'
 import { findComments } from './tools/find-comments.js'
 import { findCompletedTasks } from './tools/find-completed-tasks.js'
+import { findFilters } from './tools/find-filters.js'
 // Assignment and collaboration tools
 import { findProjectCollaborators } from './tools/find-project-collaborators.js'
 import { findProjects } from './tools/find-projects.js'
@@ -27,6 +31,7 @@ import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { search } from './tools/search.js'
 import { updateComments } from './tools/update-comments.js'
+import { updateFilters } from './tools/update-filters.js'
 import { updateProjects } from './tools/update-projects.js'
 import { updateSections } from './tools/update-sections.js'
 import { updateTasks } from './tools/update-tasks.js'
@@ -52,6 +57,11 @@ const tools = {
     addComments,
     updateComments,
     findComments,
+    // Filter management tools
+    findFilters,
+    addFilters,
+    updateFilters,
+    deleteFilter,
     // Activity and audit tools
     findActivity,
     // General tools
@@ -90,6 +100,11 @@ export {
     addComments,
     updateComments,
     findComments,
+    // Filter management tools
+    findFilters,
+    addFilters,
+    updateFilters,
+    deleteFilter,
     // Activity and audit tools
     findActivity,
     // General tools

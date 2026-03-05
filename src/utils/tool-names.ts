@@ -44,6 +44,12 @@ export const ToolNames = {
     FETCH_OBJECT: 'fetch-object',
     USER_INFO: 'user-info',
 
+    // Filter management tools
+    FIND_FILTERS: 'find-filters',
+    ADD_FILTERS: 'add-filters',
+    UPDATE_FILTERS: 'update-filters',
+    DELETE_FILTER: 'delete-filter',
+
     // Workspace tools
     LIST_WORKSPACES: 'list-workspaces',
 

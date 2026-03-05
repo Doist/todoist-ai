@@ -11,16 +11,19 @@ import {
     registerTool,
 } from './mcp-helpers.js'
 import { addComments } from './tools/add-comments.js'
+import { addFilters } from './tools/add-filters.js'
 import { addProjects } from './tools/add-projects.js'
 import { addSections } from './tools/add-sections.js'
 import { addTasks } from './tools/add-tasks.js'
 import { completeTasks } from './tools/complete-tasks.js'
+import { deleteFilter } from './tools/delete-filter.js'
 import { deleteObject } from './tools/delete-object.js'
 import { fetch } from './tools/fetch.js'
 import { fetchObject } from './tools/fetch-object.js'
 import { findActivity } from './tools/find-activity.js'
 import { findComments } from './tools/find-comments.js'
 import { findCompletedTasks } from './tools/find-completed-tasks.js'
+import { findFilters } from './tools/find-filters.js'
 import { findProjectCollaborators } from './tools/find-project-collaborators.js'
 import { findProjects } from './tools/find-projects.js'
 import { findSections } from './tools/find-sections.js'
@@ -34,6 +37,7 @@ import { projectManagement } from './tools/project-management.js'
 import { projectMove } from './tools/project-move.js'
 import { search } from './tools/search.js'
 import { updateComments } from './tools/update-comments.js'
+import { updateFilters } from './tools/update-filters.js'
 import { updateProjects } from './tools/update-projects.js'
 import { updateSections } from './tools/update-sections.js'
 import { updateTasks } from './tools/update-tasks.js'
@@ -78,6 +82,12 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **add-comments/update-comments/find-comments**: Manage task and project discussions
 - **find-project-collaborators**: Find team members by name or email for assignments
 - **manage-assignments**: Bulk assign/unassign/reassign up to 50 tasks with atomic operations and dry-run validation
+
+**Filters:**
+- **find-filters**: List all personal filters or search by name; filters are saved task views using query syntax
+- **add-filters**: Create personal filters with name, query (e.g. "today & p1"), color, and favorite flag
+- **update-filters**: Modify existing filters' name, query, color, or favorite status
+- **delete-filter**: Remove a personal filter by ID
 
 **Activity & Audit:**
 - **find-activity**: Retrieve recent activity logs to monitor and audit changes. Shows events from all users by default; use initiatorId to filter by specific user. Filter by object type (task/project/comment), event type (added/updated/deleted/completed/uncompleted/archived/unarchived/shared/left), and specific objects (objectId, projectId, taskId). Useful for tracking who did what and when. Note: Date-based filtering is not supported.
@@ -191,6 +201,12 @@ function getMcpServer({
     registerTool({ tool: addComments, ...toolArgs })
     registerTool({ tool: findComments, ...toolArgs })
     registerTool({ tool: updateComments, ...toolArgs })
+
+    // Filter management tools
+    registerTool({ tool: findFilters, ...toolArgs })
+    registerTool({ tool: addFilters, ...toolArgs })
+    registerTool({ tool: updateFilters, ...toolArgs })
+    registerTool({ tool: deleteFilter, ...toolArgs })
 
     // Activity and audit tools
     registerTool({ tool: findActivity, ...toolArgs })

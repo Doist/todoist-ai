@@ -18,16 +18,19 @@ import { readFileSync } from 'node:fs'
 import { TodoistApi } from '@doist/todoist-api-typescript'
 import { config } from 'dotenv'
 import { addComments } from '../src/tools/add-comments.js'
+import { addFilters } from '../src/tools/add-filters.js'
 import { addProjects } from '../src/tools/add-projects.js'
 import { addSections } from '../src/tools/add-sections.js'
 import { addTasks } from '../src/tools/add-tasks.js'
 import { completeTasks } from '../src/tools/complete-tasks.js'
+import { deleteFilter } from '../src/tools/delete-filter.js'
 import { deleteObject } from '../src/tools/delete-object.js'
 import { fetch } from '../src/tools/fetch.js'
 import { fetchObject } from '../src/tools/fetch-object.js'
 import { findActivity } from '../src/tools/find-activity.js'
 import { findComments } from '../src/tools/find-comments.js'
 import { findCompletedTasks } from '../src/tools/find-completed-tasks.js'
+import { findFilters } from '../src/tools/find-filters.js'
 import { findProjectCollaborators } from '../src/tools/find-project-collaborators.js'
 import { findProjects } from '../src/tools/find-projects.js'
 import { findSections } from '../src/tools/find-sections.js'
@@ -40,6 +43,7 @@ import { projectManagement } from '../src/tools/project-management.js'
 import { projectMove } from '../src/tools/project-move.js'
 import { search } from '../src/tools/search.js'
 import { updateComments } from '../src/tools/update-comments.js'
+import { updateFilters } from '../src/tools/update-filters.js'
 import { updateProjects } from '../src/tools/update-projects.js'
 import { updateSections } from '../src/tools/update-sections.js'
 import { updateTasks } from '../src/tools/update-tasks.js'
@@ -61,14 +65,17 @@ type ExecutableTool = {
 const tools: Record<string, ExecutableTool> = {
     'add-tasks': addTasks,
     'add-projects': addProjects,
+    'add-filters': addFilters,
     'add-sections': addSections,
     'add-comments': addComments,
     'complete-tasks': completeTasks,
+    'delete-filter': deleteFilter,
     'delete-object': deleteObject,
     fetch: fetch,
     'fetch-object': fetchObject,
     'find-activity': findActivity,
     'find-comments': findComments,
+    'find-filters': findFilters,
     'find-completed-tasks': findCompletedTasks,
     'find-project-collaborators': findProjectCollaborators,
     'find-projects': findProjects,
@@ -82,6 +89,7 @@ const tools: Record<string, ExecutableTool> = {
     'project-move': projectMove,
     search: search,
     'update-comments': updateComments,
+    'update-filters': updateFilters,
     'update-projects': updateProjects,
     'update-sections': updateSections,
     'update-tasks': updateTasks,
