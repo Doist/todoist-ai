@@ -50,6 +50,12 @@ export const ToolNames = {
     ADD_LABELS: 'add-labels',
     FIND_LABELS: 'find-labels',
 
+    // Filter management tools
+    FIND_FILTERS: 'find-filters',
+    ADD_FILTERS: 'add-filters',
+    UPDATE_FILTERS: 'update-filters',
+    DELETE_FILTER: 'delete-filter',
+
     // Workspace tools
     LIST_WORKSPACES: 'list-workspaces',
 

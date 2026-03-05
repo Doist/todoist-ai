@@ -18,17 +18,20 @@ import { readFileSync } from 'node:fs'
 import { TodoistApi } from '@doist/todoist-api-typescript'
 import { config } from 'dotenv'
 import { addComments } from '../src/tools/add-comments.js'
+import { addFilters } from '../src/tools/add-filters.js'
 import { addLabels } from '../src/tools/add-labels.js'
 import { addProjects } from '../src/tools/add-projects.js'
 import { addSections } from '../src/tools/add-sections.js'
 import { addTasks } from '../src/tools/add-tasks.js'
 import { completeTasks } from '../src/tools/complete-tasks.js'
+import { deleteFilter } from '../src/tools/delete-filter.js'
 import { deleteObject } from '../src/tools/delete-object.js'
 import { fetch } from '../src/tools/fetch.js'
 import { fetchObject } from '../src/tools/fetch-object.js'
 import { findActivity } from '../src/tools/find-activity.js'
 import { findComments } from '../src/tools/find-comments.js'
 import { findCompletedTasks } from '../src/tools/find-completed-tasks.js'
+import { findFilters } from '../src/tools/find-filters.js'
 import { findLabels } from '../src/tools/find-labels.js'
 import { findProjectCollaborators } from '../src/tools/find-project-collaborators.js'
 import { findProjects } from '../src/tools/find-projects.js'
@@ -44,6 +47,7 @@ import { rescheduleTasks } from '../src/tools/reschedule-tasks.js'
 import { search } from '../src/tools/search.js'
 import { uncompleteTasks } from '../src/tools/uncomplete-tasks.js'
 import { updateComments } from '../src/tools/update-comments.js'
+import { updateFilters } from '../src/tools/update-filters.js'
 import { updateProjects } from '../src/tools/update-projects.js'
 import { updateSections } from '../src/tools/update-sections.js'
 import { updateTasks } from '../src/tools/update-tasks.js'
@@ -65,16 +69,19 @@ type ExecutableTool = {
 const tools: Record<string, ExecutableTool> = {
     'add-tasks': addTasks,
     'add-projects': addProjects,
+    'add-filters': addFilters,
     'add-sections': addSections,
     'add-comments': addComments,
     'add-labels': addLabels,
     'complete-tasks': completeTasks,
     'uncomplete-tasks': uncompleteTasks,
+    'delete-filter': deleteFilter,
     'delete-object': deleteObject,
     fetch: fetch,
     'fetch-object': fetchObject,
     'find-activity': findActivity,
     'find-comments': findComments,
+    'find-filters': findFilters,
     'find-completed-tasks': findCompletedTasks,
     'find-labels': findLabels,
     'find-project-collaborators': findProjectCollaborators,
@@ -90,6 +97,7 @@ const tools: Record<string, ExecutableTool> = {
     'reschedule-tasks': rescheduleTasks,
     search: search,
     'update-comments': updateComments,
+    'update-filters': updateFilters,
     'update-projects': updateProjects,
     'update-sections': updateSections,
     'update-tasks': updateTasks,
