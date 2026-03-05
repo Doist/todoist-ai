@@ -1,5 +1,6 @@
 import type { CurrentUser, Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, type MockedFunction, vi } from 'vitest'
+import { z } from 'zod'
 import { createMockTask, createMockUser, TEST_IDS } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { userResolver } from '../../utils/user-resolver.js'
@@ -120,6 +121,139 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
             })
 
             expect(result.textContent).toMatchSnapshot()
+        })
+
+        it('should allow missing since/until and default to the last 7 days', async () => {
+            vi.useFakeTimers()
+            vi.setSystemTime(new Date('2026-03-03T12:00:00Z'))
+
+            try {
+                mockTodoistApi.getCompletedTasksByCompletionDate.mockResolvedValue({
+                    items: [],
+                    nextCursor: null,
+                })
+
+                expect(() =>
+                    z.object(findCompletedTasks.parameters).parse({
+                        getBy: 'completion',
+                        limit: 50,
+                        labels: [],
+                        labelsOperator: 'or',
+                    }),
+                ).not.toThrow()
+
+                const result = await findCompletedTasks.execute(
+                    {
+                        getBy: 'completion',
+                        limit: 50,
+                        labels: [],
+                        labelsOperator: 'or' as const,
+                    },
+                    mockTodoistApi,
+                )
+
+                expect(mockTodoistApi.getCompletedTasksByCompletionDate).toHaveBeenCalledWith({
+                    since: '2026-02-25T00:00:00.000Z',
+                    until: '2026-03-03T23:59:59.000Z',
+                    limit: 50,
+                })
+
+                expect(result.textContent).toContain('completed date: 2026-02-25 to 2026-03-03')
+                expect(result.structuredContent.appliedFilters).toMatchObject({
+                    since: '2026-02-25',
+                    until: '2026-03-03',
+                })
+            } finally {
+                vi.useRealTimers()
+            }
+        })
+
+        it('should use user timezone when defaulting missing since/until', async () => {
+            vi.useFakeTimers()
+            vi.setSystemTime(new Date('2025-10-11T23:30:00Z'))
+
+            try {
+                mockTodoistApi.getUser.mockResolvedValue({
+                    id: 'test-user-id',
+                    fullName: 'Test User',
+                    email: 'test@example.com',
+                    tzInfo: {
+                        timezone: 'Europe/Madrid',
+                        gmtString: '+02:00',
+                        hours: 2,
+                        minutes: 0,
+                        isDst: 0,
+                    },
+                } as CurrentUser)
+
+                mockTodoistApi.getCompletedTasksByCompletionDate.mockResolvedValue({
+                    items: [],
+                    nextCursor: null,
+                })
+
+                await findCompletedTasks.execute(
+                    {
+                        getBy: 'completion',
+                        limit: 50,
+                        labels: [],
+                        labelsOperator: 'or' as const,
+                    },
+                    mockTodoistApi,
+                )
+
+                expect(mockTodoistApi.getCompletedTasksByCompletionDate).toHaveBeenCalledWith({
+                    since: '2025-10-05T22:00:00.000Z',
+                    until: '2025-10-12T21:59:59.000Z',
+                    limit: 50,
+                })
+            } finally {
+                vi.useRealTimers()
+            }
+        })
+
+        it('should require explicit since/until for cursor pagination to prevent date-window drift across midnight', async () => {
+            vi.useFakeTimers()
+            vi.setSystemTime(new Date('2026-03-03T12:00:00Z'))
+
+            try {
+                mockTodoistApi.getCompletedTasksByCompletionDate.mockResolvedValueOnce({
+                    items: [],
+                    nextCursor: 'cursor-page-2',
+                })
+
+                const firstPage = await findCompletedTasks.execute(
+                    {
+                        getBy: 'completion',
+                        limit: 50,
+                        labels: [],
+                        labelsOperator: 'or' as const,
+                    },
+                    mockTodoistApi,
+                )
+
+                expect(firstPage.structuredContent.nextCursor).toBe('cursor-page-2')
+
+                // Simulate next-page fetch that happens after midnight.
+                // Without explicit since/until, defaults could shift to a different window.
+                vi.setSystemTime(new Date('2026-03-04T12:00:00Z'))
+
+                await expect(
+                    findCompletedTasks.execute(
+                        {
+                            getBy: 'completion',
+                            limit: 50,
+                            cursor: 'cursor-page-2',
+                            labels: [],
+                            labelsOperator: 'or' as const,
+                        },
+                        mockTodoistApi,
+                    ),
+                ).rejects.toThrow(
+                    'Cursor pagination requires explicit since and until. Reuse structuredContent.appliedFilters.since and structuredContent.appliedFilters.until from the previous page.',
+                )
+            } finally {
+                vi.useRealTimers()
+            }
         })
     })
 

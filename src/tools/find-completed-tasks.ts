@@ -3,12 +3,47 @@ import { appendToQuery, resolveResponsibleUser } from '../filter-helpers.js'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapTask, resolveInboxProjectId } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
+import { getDateInOffset, parseGmtOffsetToMinutes, shiftDateStringByDays } from '../utils/date.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 // No ToolNames constants needed - we only use cursor-based pagination
+const DEFAULT_DATE_WINDOW_DAYS = 7
+
+/**
+ * Resolve the effective local-date window for completed-task queries.
+ *
+ * Why this exists:
+ * - The API call still needs concrete `since`/`until` values when the user omits them.
+ * - "Last 7 days" must be based on the user's local day boundaries, not server UTC day boundaries.
+ * - We use the user's GMT offset so defaults remain deterministic and aligned with how users
+ *   think about dates in Todoist.
+ */
+function resolveEffectiveDateRange({
+    since,
+    until,
+    userGmtOffset,
+    now = new Date(),
+}: {
+    since?: string
+    until?: string
+    userGmtOffset: string
+    now?: Date
+}): { since: string; until: string } {
+    const offsetMinutes = parseGmtOffsetToMinutes(userGmtOffset)
+    const today = getDateInOffset(now, offsetMinutes)
+    const daysOffset = DEFAULT_DATE_WINDOW_DAYS - 1
+
+    const effectiveUntil = until ?? (since ? shiftDateStringByDays(since, daysOffset) : today)
+    const effectiveSince = since ?? shiftDateStringByDays(effectiveUntil, -daysOffset)
+
+    return {
+        since: effectiveSince,
+        until: effectiveUntil,
+    }
+}
 
 const ArgsSchema = {
     getBy: z
@@ -21,12 +56,18 @@ const ArgsSchema = {
         .string()
         .date()
         .regex(/^\d{4}-\d{2}-\d{2}$/)
-        .describe('The start date to get the tasks for. Format: YYYY-MM-DD.'),
+        .optional()
+        .describe(
+            'Optional start date for completed tasks. Format: YYYY-MM-DD. Defaults to 6 days before until (or today if until is omitted), resulting in a 7-day window.',
+        ),
     until: z
         .string()
         .date()
         .regex(/^\d{4}-\d{2}-\d{2}$/)
-        .describe('The start date to get the tasks for. Format: YYYY-MM-DD.'),
+        .optional()
+        .describe(
+            'Optional end date for completed tasks. Format: YYYY-MM-DD. Defaults to 6 days after since (or today if since is omitted), resulting in a 7-day window.',
+        ),
     workspaceId: z.string().optional().describe('The ID of the workspace to get the tasks for.'),
     projectId: z
         .string()
@@ -72,13 +113,22 @@ const OutputSchema = {
 const findCompletedTasks = {
     name: ToolNames.FIND_COMPLETED_TASKS,
     description:
-        'Get completed tasks. Includes all collaborators by default. Person-specific queries (summaries, plans, reports) require responsibleUser.',
+        'Get completed tasks. since/until are optional and default to a 7-day window when omitted. Includes all collaborators by default. Person-specific queries (summaries, plans, reports) require responsibleUser.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
     async execute(args, client) {
         const { getBy, labels, labelsOperator, since, until, responsibleUser, projectId, ...rest } =
             args
+
+        // Cursor pagination must keep the exact same date window as page 1.
+        // If since/until are omitted, they are recomputed from "today" and can drift
+        // after midnight between requests, causing inconsistent pagination.
+        if (args.cursor && (!since || !until)) {
+            throw new Error(
+                'Cursor pagination requires explicit since and until. Reuse structuredContent.appliedFilters.since and structuredContent.appliedFilters.until from the previous page.',
+            )
+        }
 
         // Resolve assignee name to user ID if provided
         const resolved = await resolveResponsibleUser(client, responsibleUser)
@@ -104,12 +154,23 @@ const findCompletedTasks = {
 
         // Convert user's local date to UTC timestamps
         // This ensures we capture the entire day from the user's perspective
-        const sinceWithOffset = `${since}T00:00:00${userGmtOffset}`
-        const untilWithOffset = `${until}T23:59:59${userGmtOffset}`
+        const effectiveDateRange = resolveEffectiveDateRange({
+            since,
+            until,
+            userGmtOffset,
+        })
+
+        const sinceWithOffset = `${effectiveDateRange.since}T00:00:00${userGmtOffset}`
+        const untilWithOffset = `${effectiveDateRange.until}T23:59:59${userGmtOffset}`
 
         // Parse and convert to UTC
         const sinceDateTime = new Date(sinceWithOffset).toISOString()
         const untilDateTime = new Date(untilWithOffset).toISOString()
+        const effectiveArgs = {
+            ...args,
+            since: effectiveDateRange.since,
+            until: effectiveDateRange.until,
+        }
 
         const { items, nextCursor } =
             getBy === 'completion'
@@ -131,7 +192,7 @@ const findCompletedTasks = {
 
         const textContent = generateTextContent({
             tasks: mappedTasks,
-            args,
+            args: effectiveArgs,
             nextCursor,
             assigneeEmail,
         })
@@ -143,11 +204,14 @@ const findCompletedTasks = {
                 nextCursor: nextCursor ?? undefined,
                 totalCount: mappedTasks.length,
                 hasMore: Boolean(nextCursor),
-                appliedFilters: args,
+                appliedFilters: effectiveArgs,
             },
         }
     },
 } satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
+
+type FindCompletedTasksArgs = z.infer<z.ZodObject<typeof ArgsSchema>>
+type ResolvedFindCompletedTasksArgs = FindCompletedTasksArgs & { since: string; until: string }
 
 function generateTextContent({
     tasks,
@@ -156,7 +220,7 @@ function generateTextContent({
     assigneeEmail,
 }: {
     tasks: ReturnType<typeof mapTask>[]
-    args: z.infer<z.ZodObject<typeof ArgsSchema>>
+    args: ResolvedFindCompletedTasksArgs
     nextCursor: string | null
     assigneeEmail?: string
 }) {

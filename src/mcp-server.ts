@@ -64,7 +64,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **complete-tasks**: Mark tasks as done using task IDs
 - **find-tasks**: Search by text, project/section/parent container, responsible user, or labels. Requires at least one search parameter
 - **find-tasks-by-date**: Get tasks by date range (startDate: YYYY-MM-DD or 'today' which includes overdue tasks) or specific day counts
-- **find-completed-tasks**: View completed tasks by completion date or original due date (returns all collaborators unless filtered)
+- **find-completed-tasks**: View completed tasks by completion date or original due date; if since/until are omitted, defaults to the last 7 days (returns all collaborators unless filtered)
 
 **Project & Organization:**
 - **add-projects/update-projects/find-projects**: Manage project lifecycle with names, favorites, and view styles (list/board/calendar)
@@ -111,7 +111,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **Team Assignment**: find-project-collaborators → add-tasks with responsibleUser → manage-assignments for bulk changes
 - **Task Search**: find-tasks with multiple filters → update-tasks or complete-tasks based on results
 - **Project Organization**: add-projects → add-sections → add-tasks with projectId and sectionId
-- **Progress Reviews**: find-completed-tasks with date ranges → get-overview for project summaries
+- **Progress Reviews**: find-completed-tasks (defaults to last 7 days; optionally use explicit date ranges) → get-overview for project summaries
 - **Activity Auditing**: find-activity with event/object filters to track changes, monitor team activity, or investigate specific actions
 
 Always provide clear, actionable task titles and descriptions. Use the overview tools to give users context about their workload and project status.
