@@ -37,16 +37,26 @@ const TasksUpdateSchema = z.object({
     parentId: z.string().optional().describe('The new parent task ID (for subtasks).'),
     order: z.number().optional().describe('The new order of the task within its parent/section.'),
     priority: PrioritySchema.optional().describe(PRIORITY_INPUT_DESCRIPTION),
-    dueString: z
-        .string()
-        .optional()
-        .describe("The new due date for the task, in natural language (e.g., 'tomorrow at 5pm')."),
-    deadlineDate: z
-        .string()
-        .optional()
-        .describe(
-            'The new deadline date for the task in ISO 8601 format (YYYY-MM-DD, e.g., "2025-12-31"). Deadlines are immovable constraints shown with a different indicator than due dates. Use "remove" to clear the deadline.',
-        ),
+    dueString: z.preprocess(
+        // Keep accepting legacy null while exposing a Gemini-compatible string schema.
+        (value) => (value === null ? 'remove' : value),
+        z
+            .string()
+            .optional()
+            .describe(
+                'The new due date for the task in natural language (e.g., "tomorrow at 5pm"). Use "remove" to clear the due date.',
+            ),
+    ),
+    deadlineDate: z.preprocess(
+        // Keep accepting legacy null while exposing a Gemini-compatible string schema.
+        (value) => (value === null ? 'remove' : value),
+        z
+            .string()
+            .optional()
+            .describe(
+                'The new deadline date for the task in ISO 8601 format (YYYY-MM-DD, e.g., "2025-12-31"). Deadlines are immovable constraints shown with a different indicator than due dates. Use "remove" to clear the deadline.',
+            ),
+    ),
     duration: z
         .string()
         .optional()
@@ -72,6 +82,10 @@ const TasksUpdateSchema = z.object({
 })
 
 type TaskUpdate = z.infer<typeof TasksUpdateSchema>
+
+const DUE_DATE_REMOVAL_ALIASES = ['remove', 'no date'] as const
+const DEADLINE_REMOVAL_ALIASES = ['remove', 'no date', 'no deadline'] as const
+const DUE_DATE_REMOVAL_VALUE = 'no date' as const
 
 const ArgsSchema = {
     tasks: z.array(TasksUpdateSchema).min(1).describe('The tasks to update.'),
@@ -107,6 +121,7 @@ const updateTasks = {
                 projectId,
                 sectionId,
                 parentId,
+                dueString,
                 duration: durationStr,
                 responsibleUser,
                 priority,
@@ -131,15 +146,24 @@ const updateTasks = {
                 updateArgs.priority = convertPriorityToNumber(priority)
             }
 
+            // Handle due date changes if provided
+            const dueStringUpdate = normalizeAliasValue(
+                dueString,
+                DUE_DATE_REMOVAL_ALIASES,
+                DUE_DATE_REMOVAL_VALUE,
+            )
+            if (dueStringUpdate !== undefined) {
+                updateArgs = { ...updateArgs, dueString: dueStringUpdate }
+            }
+
             // Handle deadline changes if provided
-            if (deadlineDate !== undefined) {
-                if (deadlineDate === null || deadlineDate === 'remove') {
-                    // Remove deadline - support both legacy null and new "remove" string
-                    updateArgs = { ...updateArgs, deadlineDate: null }
-                } else {
-                    // Set new deadline
-                    updateArgs = { ...updateArgs, deadlineDate }
-                }
+            const deadlineDateUpdate = normalizeAliasValue(
+                deadlineDate,
+                DEADLINE_REMOVAL_ALIASES,
+                null,
+            )
+            if (deadlineDateUpdate !== undefined) {
+                updateArgs = { ...updateArgs, deadlineDate: deadlineDateUpdate }
             }
 
             // Parse duration if provided
@@ -249,6 +273,27 @@ function generateTextContent({
 
 function hasUpdatesToMake({ id, ...otherUpdateArgs }: TaskUpdate) {
     return Object.keys(otherUpdateArgs).length > 0
+}
+
+function normalizeAliasValue<TReplacement extends string | null>(
+    value: string | null | undefined,
+    aliases: readonly string[],
+    replacement: TReplacement,
+) {
+    if (value === undefined) {
+        return value
+    }
+
+    if (value === null) {
+        return replacement
+    }
+
+    const normalizedValue = value.trim().toLowerCase()
+    if (aliases.includes(normalizedValue)) {
+        return replacement
+    }
+
+    return value
 }
 
 export { updateTasks }
