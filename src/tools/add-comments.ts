@@ -14,6 +14,12 @@ const CommentSchema = z.object({
             'The ID of the project to comment on. Project ID should be an ID string, or the text "inbox", for inbox tasks.',
         ),
     content: z.string().min(1).describe('The content of the comment.'),
+    filePath: z
+        .string()
+        .optional()
+        .describe(
+            'Absolute path to a file to attach to the comment. The file will be uploaded to Todoist and attached to the comment.',
+        ),
 })
 
 const ArgsSchema = {
@@ -54,19 +60,37 @@ const addComments = {
         const needsInboxResolution = comments.some((comment) => isInboxProjectId(comment.projectId))
         const todoistUser = needsInboxResolution ? await client.getUser() : undefined
 
-        const addCommentPromises = comments.map(async ({ content, taskId, projectId }) => {
-            // Resolve "inbox" to actual inbox project ID if needed
-            const resolvedProjectId = await resolveInboxProjectId({
-                projectId,
-                user: todoistUser,
-                client: todoistUser ? undefined : client,
-            })
+        const addCommentPromises = comments.map(
+            async ({ content, taskId, projectId, filePath }) => {
+                // Resolve "inbox" to actual inbox project ID if needed
+                const resolvedProjectId = await resolveInboxProjectId({
+                    projectId,
+                    user: todoistUser,
+                    client: todoistUser ? undefined : client,
+                })
 
-            return await client.addComment({
-                content,
-                ...(taskId ? { taskId } : { projectId: resolvedProjectId }),
-            } as AddCommentArgs)
-        })
+                // Upload file and create attachment if filePath is provided
+                let attachment: AddCommentArgs['attachment'] | undefined
+                if (filePath) {
+                    const upload = await client.uploadFile({ file: filePath })
+                    if (!upload.fileUrl) {
+                        throw new Error(`File upload failed for: ${filePath}`)
+                    }
+                    attachment = {
+                        fileUrl: upload.fileUrl,
+                        fileName: upload.fileName ?? undefined,
+                        fileType: upload.fileType ?? undefined,
+                        resourceType: upload.resourceType,
+                    }
+                }
+
+                return await client.addComment({
+                    content,
+                    ...(taskId ? { taskId } : { projectId: resolvedProjectId }),
+                    ...(attachment ? { attachment } : {}),
+                } as AddCommentArgs)
+            },
+        )
 
         const newComments = await Promise.all(addCommentPromises)
         const mappedComments = newComments.map(mapComment)

@@ -8,6 +8,7 @@ import { addComments } from '../add-comments.js'
 const mockTodoistApi = {
     addComment: vi.fn(),
     getUser: vi.fn(),
+    uploadFile: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
 const { ADD_COMMENTS } = ToolNames
@@ -292,6 +293,73 @@ describe(`${ADD_COMMENTS} tool`, () => {
                     addedCommentIds: ['55555', '66666'],
                 }),
             )
+        })
+    })
+
+    describe('file attachments', () => {
+        it('should upload file and attach to comment when filePath is provided', async () => {
+            const mockUpload = {
+                fileUrl: 'https://cdn.todoist.com/uploads/test.pdf',
+                fileName: 'invoice.pdf',
+                fileType: 'application/pdf',
+                resourceType: 'file',
+            }
+
+            mockTodoistApi.uploadFile.mockResolvedValue(mockUpload)
+
+            const mockComment = createMockComment({
+                id: '77777',
+                content: 'See attached invoice',
+                taskId: 'task123',
+            })
+            mockTodoistApi.addComment.mockResolvedValue(mockComment)
+
+            await addComments.execute(
+                {
+                    comments: [
+                        {
+                            taskId: 'task123',
+                            content: 'See attached invoice',
+                            filePath: '/path/to/invoice.pdf',
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.uploadFile).toHaveBeenCalledWith({
+                file: '/path/to/invoice.pdf',
+            })
+            expect(mockTodoistApi.addComment).toHaveBeenCalledWith({
+                content: 'See attached invoice',
+                taskId: 'task123',
+                attachment: {
+                    fileUrl: 'https://cdn.todoist.com/uploads/test.pdf',
+                    fileName: 'invoice.pdf',
+                    fileType: 'application/pdf',
+                    resourceType: 'file',
+                },
+            })
+        })
+
+        it('should not upload file when filePath is not provided', async () => {
+            const mockComment = createMockComment({
+                id: '88888',
+                content: 'No attachment',
+                taskId: 'task456',
+            })
+            mockTodoistApi.addComment.mockResolvedValue(mockComment)
+
+            await addComments.execute(
+                { comments: [{ taskId: 'task456', content: 'No attachment' }] },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.uploadFile).not.toHaveBeenCalled()
+            expect(mockTodoistApi.addComment).toHaveBeenCalledWith({
+                content: 'No attachment',
+                taskId: 'task456',
+            })
         })
     })
 
