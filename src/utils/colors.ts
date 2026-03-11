@@ -27,8 +27,7 @@ export const ColorSchema = z
 export const ColorKeySchema = z.enum(colorKeys).describe('The color key of the entity.')
 
 // For OUTPUT (tolerant): accepts valid color keys and silently coerces unrecognised values
-// (e.g. "grey" returned by the Todoist API instead of the expected "gray") to undefined
-// instead of raising a validation error.  Fixes both failure modes described in issue #343:
+// to undefined instead of raising a validation error.  Fixes both failure modes described in issue #343:
 //   1. Full list — loud MCP output-validation error (-32602)
 //   2. Name search — silent empty result set due to swallowed validation error
 // This is the output-side counterpart to ColorSchema, which uses .preprocess()/.catch() for

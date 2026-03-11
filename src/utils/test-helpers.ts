@@ -31,8 +31,6 @@ export function createMockTask({
         sectionId: null,
         parentId: null,
         url: 'https://todoist.com/showTask?id=8485093748',
-        // Use correct property names from Task schema
-        noteCount: 0,
         addedByUid: '713437',
         addedAt: '2025-08-13T22:09:56.123456Z',
         deadline: null,

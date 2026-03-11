@@ -31,7 +31,7 @@ describe(`${GET_OVERVIEW} tool`, () => {
                 createMockProject({
                     id: TEST_IDS.PROJECT_INBOX,
                     name: 'Inbox',
-                    color: 'gray',
+                    color: 'grey',
                     inboxProject: true,
                     childOrder: 0,
                 }),

@@ -30,7 +30,7 @@ describe(`${FIND_PROJECTS} tool`, () => {
                 createMockProject({
                     id: TEST_IDS.PROJECT_INBOX,
                     name: 'Inbox',
-                    color: 'gray',
+                    color: 'grey',
                     inboxProject: true,
                     childOrder: 0,
                 }),
@@ -226,8 +226,8 @@ describe(`${FIND_PROJECTS} tool`, () => {
     })
 
     describe('unrecognised color values (issue #343)', () => {
-        // Todoist's API returns color values such as "grey" that are not present in the
-        // 20-key ColorKeySchema enum.  Before this fix both failure modes below would occur:
+        // The Todoist API may return color values not present in the ColorKeySchema enum.
+        // Before this fix both failure modes below would occur:
         //   1. Full list  → loud MCP output-validation error (-32602) when the MCP SDK
         //      validates structuredContent against the outputSchema
         //   2. Name search → silent empty result set (swallowed validation error)
@@ -240,12 +240,12 @@ describe(`${FIND_PROJECTS} tool`, () => {
 
         describe('ColorOutputSchema tolerance', () => {
             it('should coerce an unrecognised color value to undefined', () => {
-                expect(ColorOutputSchema.parse('grey')).toBeUndefined()
+                expect(ColorOutputSchema.parse('gray')).toBeUndefined()
                 expect(ColorOutputSchema.parse('unknown-color')).toBeUndefined()
             })
 
             it('should pass through recognised color values unchanged', () => {
-                expect(ColorOutputSchema.parse('gray')).toBe('gray')
+                expect(ColorOutputSchema.parse('grey')).toBe('grey')
                 expect(ColorOutputSchema.parse('blue')).toBe('blue')
                 expect(ColorOutputSchema.parse('charcoal')).toBe('charcoal')
             })
@@ -254,7 +254,7 @@ describe(`${FIND_PROJECTS} tool`, () => {
                 const project = {
                     id: 'proj-1',
                     name: 'Inbox',
-                    color: 'grey', // unrecognised
+                    color: 'gray', // unrecognised
                     isFavorite: false,
                     isShared: false,
                     inboxProject: true,
@@ -271,7 +271,7 @@ describe(`${FIND_PROJECTS} tool`, () => {
                 const project = {
                     id: 'proj-1',
                     name: 'Inbox',
-                    color: 'grey',
+                    color: 'gray',
                     isFavorite: false,
                     isShared: false,
                     inboxProject: true,
@@ -282,13 +282,12 @@ describe(`${FIND_PROJECTS} tool`, () => {
         })
 
         it('should succeed for a full list when a project has an unrecognised color', async () => {
-            // "grey" is returned by the Todoist API but is not in the 20-key color enum.
-            // Before the fix, the MCP SDK's output validation would throw -32602 here.
+            // An unrecognised color value should not cause output-validation to throw -32602.
             const mockProjects = [
                 createMockProject({
                     id: TEST_IDS.PROJECT_INBOX,
                     name: 'Inbox',
-                    color: 'grey' as unknown as ColorKey,
+                    color: 'gray' as unknown as ColorKey,
                     inboxProject: true,
                 }),
                 createMockProject({ id: TEST_IDS.PROJECT_WORK, name: 'Work', color: 'blue' }),
@@ -310,7 +309,7 @@ describe(`${FIND_PROJECTS} tool`, () => {
             const matchingProject = createMockProject({
                 id: TEST_IDS.PROJECT_INBOX,
                 name: 'Inbox',
-                color: 'grey' as unknown as ColorKey,
+                color: 'gray' as unknown as ColorKey,
                 inboxProject: true,
             })
 
