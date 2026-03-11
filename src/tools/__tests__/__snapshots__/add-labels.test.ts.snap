@@ -1,0 +1,12 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`add-labels tool > adding labels > should add a single label and return text + structured output 1`] = `
+"Added 1 label:
+• Work (id=label-1)"
+`;
+
+exports[`add-labels tool > adding labels > should add multiple labels 1`] = `
+"Added 2 labels:
+• Work (id=label-1)
+• Personal (id=label-2)"
+`;

@@ -18,6 +18,7 @@ import { readFileSync } from 'node:fs'
 import { TodoistApi } from '@doist/todoist-api-typescript'
 import { config } from 'dotenv'
 import { addComments } from '../src/tools/add-comments.js'
+import { addLabels } from '../src/tools/add-labels.js'
 import { addProjects } from '../src/tools/add-projects.js'
 import { addSections } from '../src/tools/add-sections.js'
 import { addTasks } from '../src/tools/add-tasks.js'
@@ -28,6 +29,7 @@ import { fetchObject } from '../src/tools/fetch-object.js'
 import { findActivity } from '../src/tools/find-activity.js'
 import { findComments } from '../src/tools/find-comments.js'
 import { findCompletedTasks } from '../src/tools/find-completed-tasks.js'
+import { findLabels } from '../src/tools/find-labels.js'
 import { findProjectCollaborators } from '../src/tools/find-project-collaborators.js'
 import { findProjects } from '../src/tools/find-projects.js'
 import { findSections } from '../src/tools/find-sections.js'
@@ -63,6 +65,7 @@ const tools: Record<string, ExecutableTool> = {
     'add-projects': addProjects,
     'add-sections': addSections,
     'add-comments': addComments,
+    'add-labels': addLabels,
     'complete-tasks': completeTasks,
     'delete-object': deleteObject,
     fetch: fetch,
@@ -70,6 +73,7 @@ const tools: Record<string, ExecutableTool> = {
     'find-activity': findActivity,
     'find-comments': findComments,
     'find-completed-tasks': findCompletedTasks,
+    'find-labels': findLabels,
     'find-project-collaborators': findProjectCollaborators,
     'find-projects': findProjects,
     'find-sections': findSections,

@@ -124,6 +124,23 @@ function formatTaskPreview(task: TaskLike): string {
     return `    ${content}${due}${priority}${project}${id}`
 }
 
+type LabelLike = {
+    id: string
+    name: string
+    color?: string
+    isFavorite: boolean
+}
+
+/**
+ * Formats a single label-like object into a readable preview line
+ */
+export function formatLabelPreview(label: LabelLike): string {
+    const color = label.color ? ` (${label.color})` : ''
+    const isFavorite = label.isFavorite ? ' • ⭐' : ''
+    const id = ` • id=${label.id}`
+    return `    ${label.name}${color}${isFavorite}${id}`
+}
+
 /**
  * Formats a single project-like object into a readable preview line
  */

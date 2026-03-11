@@ -2,6 +2,8 @@ import { FEATURE_NAMES, type Feature, type FeatureName, type Features } from './
 import { getMcpServer } from './mcp-server.js'
 // Comment management tools
 import { addComments } from './tools/add-comments.js'
+// Label management tools
+import { addLabels } from './tools/add-labels.js'
 // Project management tools
 import { addProjects } from './tools/add-projects.js'
 // Section management tools
@@ -16,6 +18,7 @@ import { fetch } from './tools/fetch.js'
 import { findActivity } from './tools/find-activity.js'
 import { findComments } from './tools/find-comments.js'
 import { findCompletedTasks } from './tools/find-completed-tasks.js'
+import { findLabels } from './tools/find-labels.js'
 // Assignment and collaboration tools
 import { findProjectCollaborators } from './tools/find-project-collaborators.js'
 import { findProjects } from './tools/find-projects.js'
@@ -52,6 +55,9 @@ const tools = {
     addComments,
     updateComments,
     findComments,
+    // Label management tools
+    addLabels,
+    findLabels,
     // Activity and audit tools
     findActivity,
     // General tools
@@ -90,6 +96,9 @@ export {
     addComments,
     updateComments,
     findComments,
+    // Label management tools
+    addLabels,
+    findLabels,
     // Activity and audit tools
     findActivity,
     // General tools

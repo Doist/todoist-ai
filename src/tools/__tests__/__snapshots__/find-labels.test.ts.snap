@@ -1,0 +1,52 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`find-labels tool > listing all labels > should handle pagination with limit and cursor 1`] = `
+"Labels: 1 (limit 10), more available.
+Preview:
+    Work (blue) • id=label-1
+Possible suggested next step:
+- Pass cursor 'next-page-cursor' to fetch more results."
+`;
+
+exports[`find-labels tool > listing all labels > should list all labels when no search parameter is provided 1`] = `
+"Labels: 3 (limit 50).
+Preview:
+    Work (blue) • id=label-1
+    Personal (green) • ⭐ • id=label-2
+    Errands (orange) • id=label-3"
+`;
+
+exports[`find-labels tool > listing all labels > should return empty list when no labels exist 1`] = `
+"Labels: 0 (limit 50).
+No results. No personal labels created yet."
+`;
+
+exports[`find-labels tool > listing all labels > should truncate preview to 10 labels and show count for the rest 1`] = `
+"Labels: 13 (limit 50).
+Preview:
+    Label 0 (red) • id=label-0
+    Label 1 (red) • id=label-1
+    Label 2 (red) • id=label-2
+    Label 3 (red) • id=label-3
+    Label 4 (red) • id=label-4
+    Label 5 (red) • id=label-5
+    Label 6 (red) • id=label-6
+    Label 7 (red) • id=label-7
+    Label 8 (red) • id=label-8
+    Label 9 (red) • id=label-9
+    …and 3 more"
+`;
+
+exports[`find-labels tool > searching labels > should return empty list when no labels match exact search 1`] = `
+"All labels matching "nonexistent": 0.
+Filter: search: "nonexistent".
+No results. Search requires the exact label name; Check spelling; Remove search to see all labels."
+`;
+
+exports[`find-labels tool > searching labels > should search labels by name 1`] = `
+"All labels matching "work": 2.
+Filter: search: "work".
+Preview:
+    Work (blue) • id=label-1
+    Work Home (green) • id=label-2"
+`;

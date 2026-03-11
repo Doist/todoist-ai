@@ -130,6 +130,17 @@ const CollaboratorSchema = z.object({
 })
 
 /**
+ * Schema for a label object returned by tools
+ */
+const LabelSchema = z.object({
+    id: z.string().describe('The unique ID of the label.'),
+    name: z.string().describe('The name of the label.'),
+    color: ColorOutputSchema,
+    order: z.number().optional().describe('The display order of the label.'),
+    isFavorite: z.boolean().describe('Whether the label is marked as favorite.'),
+})
+
+/**
  * Schema for batch operation failure
  */
 const FailureSchema = z.object({
@@ -143,6 +154,7 @@ export {
     CollaboratorSchema,
     CommentSchema,
     FailureSchema,
+    LabelSchema,
     ProjectSchema,
     SectionSchema,
     TaskSchema,

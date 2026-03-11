@@ -3,6 +3,7 @@ import type {
     ColorKey,
     Comment,
     CurrentUser,
+    Label,
     MoveTaskArgs,
     PersonalProject,
     Section,
@@ -11,6 +12,7 @@ import type {
     WorkspaceProject,
 } from '@doist/todoist-api-typescript'
 import z from 'zod'
+import { ColorOutputSchema } from './utils/colors.js'
 import { ApiLimits } from './utils/constants.js'
 import { formatDuration } from './utils/duration-parser.js'
 import { convertNumberToPriority } from './utils/priorities.js'
@@ -139,6 +141,21 @@ export async function searchAllProjects(client: TodoistApi, query: string): Prom
         apiMethod: client.searchProjects.bind(client),
         args: { query },
         limit: ApiLimits.PROJECTS_MAX,
+    })
+}
+
+/**
+ * Searches labels by name and fetches all matching pages.
+ *
+ * @param client - The Todoist API client
+ * @param query - The search query string
+ * @returns Promise resolving to array of matching labels
+ */
+export async function searchAllLabels(client: TodoistApi, query: string): Promise<Label[]> {
+    return fetchAllPages({
+        apiMethod: client.searchLabels.bind(client),
+        args: { query },
+        limit: ApiLimits.LABELS_MAX,
     })
 }
 
@@ -337,5 +354,15 @@ async function getTasksByFilter({
     }
 }
 
-export { getTasksByFilter, mapActivityEvent, mapComment, mapProject, mapTask }
+function mapLabel(label: Label) {
+    return {
+        id: label.id,
+        name: label.name,
+        color: ColorOutputSchema.parse(label.color),
+        order: label.order ?? undefined,
+        isFavorite: label.isFavorite,
+    }
+}
+
+export { getTasksByFilter, mapActivityEvent, mapComment, mapLabel, mapProject, mapTask }
 export type { MappedTask }

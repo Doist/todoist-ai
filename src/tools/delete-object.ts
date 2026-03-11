@@ -4,7 +4,7 @@ import { ToolNames } from '../utils/tool-names.js'
 
 const ArgsSchema = {
     type: z
-        .enum(['project', 'section', 'task', 'comment'])
+        .enum(['project', 'section', 'task', 'comment', 'label'])
         .describe('The type of entity to delete.'),
     id: z.string().min(1).describe('The ID of the entity to delete.'),
 }
@@ -13,7 +13,7 @@ const OutputSchema = {
     deletedEntity: z
         .object({
             type: z
-                .enum(['project', 'section', 'task', 'comment'])
+                .enum(['project', 'section', 'task', 'comment', 'label'])
                 .describe('The type of deleted entity.'),
             id: z.string().describe('The ID of the deleted entity.'),
         })
@@ -23,7 +23,7 @@ const OutputSchema = {
 
 const deleteObject = {
     name: ToolNames.DELETE_OBJECT,
-    description: 'Delete a project, section, task, or comment by its ID.',
+    description: 'Delete a project, section, task, comment, or label by its ID.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
@@ -40,6 +40,9 @@ const deleteObject = {
                 break
             case 'comment':
                 await client.deleteComment(args.id)
+                break
+            case 'label':
+                await client.deleteLabel(args.id)
                 break
         }
 

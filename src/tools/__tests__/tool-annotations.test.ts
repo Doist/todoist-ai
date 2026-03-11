@@ -132,6 +132,20 @@ const TOOL_EXPECTATIONS: ToolExpectation[] = [
         idempotentHint: true,
     },
     {
+        name: ToolNames.ADD_LABELS,
+        title: 'Todoist: Add Labels',
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+    },
+    {
+        name: ToolNames.FIND_LABELS,
+        title: 'Todoist: Find Labels',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
         name: ToolNames.FIND_PROJECT_COLLABORATORS,
         title: 'Todoist: Find Project Collaborators',
         readOnlyHint: true,

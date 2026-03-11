@@ -44,6 +44,10 @@ export const ToolNames = {
     FETCH_OBJECT: 'fetch-object',
     USER_INFO: 'user-info',
 
+    // Label management tools
+    ADD_LABELS: 'add-labels',
+    FIND_LABELS: 'find-labels',
+
     // Workspace tools
     LIST_WORKSPACES: 'list-workspaces',
 

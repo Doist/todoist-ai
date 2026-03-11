@@ -31,6 +31,10 @@ export const ApiLimits = {
     ACTIVITY_DEFAULT: 20,
     /** Maximum limit for activity log search and list operations */
     ACTIVITY_MAX: 100,
+    /** Default limit for label listings */
+    LABELS_DEFAULT: 50,
+    /** Maximum limit for label listings */
+    LABELS_MAX: 200,
 } as const
 
 // UI Display Limits
