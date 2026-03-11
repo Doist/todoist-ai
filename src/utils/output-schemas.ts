@@ -136,7 +136,7 @@ const LabelSchema = z.object({
     id: z.string().describe('The unique ID of the label.'),
     name: z.string().describe('The name of the label.'),
     color: ColorOutputSchema,
-    order: z.number().optional().describe('The display order of the label.'),
+    order: z.number().optional().catch(undefined).describe('The display order of the label.'),
     isFavorite: z.boolean().describe('Whether the label is marked as favorite.'),
 })
 

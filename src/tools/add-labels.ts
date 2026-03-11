@@ -1,7 +1,6 @@
 import type { Label } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { mapLabel } from '../tool-helpers.js'
 import { ColorSchema } from '../utils/colors.js'
 import { LabelSchema as LabelOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -34,13 +33,12 @@ const addLabels = {
     async execute({ labels }, client) {
         const newLabels = await Promise.all(labels.map((label) => client.addLabel(label)))
         const textContent = generateTextContent({ labels: newLabels })
-        const mappedLabels = newLabels.map(mapLabel)
 
         return {
             textContent,
             structuredContent: {
-                labels: mappedLabels,
-                totalCount: mappedLabels.length,
+                labels: newLabels.map((l) => LabelOutputSchema.parse(l)),
+                totalCount: newLabels.length,
             },
         }
     },

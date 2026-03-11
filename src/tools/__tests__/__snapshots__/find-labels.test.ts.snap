@@ -5,7 +5,8 @@ exports[`find-labels tool > listing all labels > should handle pagination with l
 Preview:
     Work (blue) • id=label-1
 Possible suggested next step:
-- Pass cursor 'next-page-cursor' to fetch more results."
+- Pass cursor 'next-page-cursor' to fetch more results.
+No shared labels."
 `;
 
 exports[`find-labels tool > listing all labels > should list all labels when no search parameter is provided 1`] = `
@@ -13,12 +14,14 @@ exports[`find-labels tool > listing all labels > should list all labels when no 
 Preview:
     Work (blue) • id=label-1
     Personal (green) • ⭐ • id=label-2
-    Errands (orange) • id=label-3"
+    Errands (orange) • id=label-3
+No shared labels."
 `;
 
 exports[`find-labels tool > listing all labels > should return empty list when no labels exist 1`] = `
 "Labels: 0 (limit 50).
-No results. No personal labels created yet."
+No results. No personal labels created yet.
+No shared labels."
 `;
 
 exports[`find-labels tool > listing all labels > should truncate preview to 10 labels and show count for the rest 1`] = `
@@ -34,13 +37,15 @@ Preview:
     Label 7 (red) • id=label-7
     Label 8 (red) • id=label-8
     Label 9 (red) • id=label-9
-    …and 3 more"
+    …and 3 more
+No shared labels."
 `;
 
 exports[`find-labels tool > searching labels > should return empty list when no labels match exact search 1`] = `
 "All labels matching "nonexistent": 0.
 Filter: search: "nonexistent".
-No results. Search requires the exact label name; Check spelling; Remove search to see all labels."
+No results. Search requires the exact label name; Check spelling; Remove search to see all labels.
+No shared labels."
 `;
 
 exports[`find-labels tool > searching labels > should search labels by name 1`] = `
@@ -48,5 +53,6 @@ exports[`find-labels tool > searching labels > should search labels by name 1`] 
 Filter: search: "work".
 Preview:
     Work (blue) • id=label-1
-    Work Home (green) • id=label-2"
+    Work Home (green) • id=label-2
+No shared labels."
 `;

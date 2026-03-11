@@ -13,6 +13,7 @@ import { findLabels } from '../find-labels.js'
 // Mock the Todoist API
 const mockTodoistApi = {
     getLabels: vi.fn(),
+    getSharedLabels: vi.fn(),
     searchLabels: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
@@ -21,6 +22,8 @@ const { FIND_LABELS } = ToolNames
 describe(`${FIND_LABELS} tool`, () => {
     beforeEach(() => {
         vi.clearAllMocks()
+        // Default: no shared labels
+        mockTodoistApi.getSharedLabels.mockResolvedValue({ results: [], nextCursor: null })
     })
 
     describe('listing all labels', () => {
@@ -52,7 +55,6 @@ describe(`${FIND_LABELS} tool`, () => {
             expect(structuredContent.hasMore).toBe(false)
             expect(structuredContent.nextCursor).toBeUndefined()
             expect(structuredContent.appliedFilters).toEqual({
-                search: undefined,
                 limit: 50,
                 cursor: undefined,
             })
@@ -114,7 +116,7 @@ describe(`${FIND_LABELS} tool`, () => {
             })
         })
 
-        it('should handle label with order: null', async () => {
+        it('should coerce order: null to undefined in structured output', async () => {
             const mockLabel = createMockLabel({ id: 'label-1', name: 'Work', order: null })
             mockTodoistApi.getLabels.mockResolvedValue(createMockApiResponse([mockLabel]))
 
@@ -137,6 +139,56 @@ describe(`${FIND_LABELS} tool`, () => {
         })
     })
 
+    describe('shared labels', () => {
+        it('should include shared labels in structured content and text', async () => {
+            mockTodoistApi.getLabels.mockResolvedValue(createMockApiResponse([]))
+            mockTodoistApi.getSharedLabels.mockResolvedValue({
+                results: ['team-project', 'urgent'],
+                nextCursor: null,
+            })
+
+            const result = await findLabels.execute({ limit: 50 }, mockTodoistApi)
+
+            expect(result.structuredContent.sharedLabels).toEqual(['team-project', 'urgent'])
+            expect(result.textContent).toContain('Shared labels (2): team-project, urgent')
+        })
+
+        it('should fetch all pages of shared labels', async () => {
+            mockTodoistApi.getLabels.mockResolvedValue(createMockApiResponse([]))
+            mockTodoistApi.getSharedLabels
+                .mockResolvedValueOnce({ results: ['label-a'], nextCursor: 'page-2' })
+                .mockResolvedValueOnce({ results: ['label-b'], nextCursor: null })
+
+            const result = await findLabels.execute({ limit: 50 }, mockTodoistApi)
+
+            expect(mockTodoistApi.getSharedLabels).toHaveBeenCalledTimes(2)
+            expect(result.structuredContent.sharedLabels).toEqual(['label-a', 'label-b'])
+        })
+
+        it('should show "No shared labels." when none exist', async () => {
+            mockTodoistApi.getLabels.mockResolvedValue(createMockApiResponse([]))
+
+            const result = await findLabels.execute({ limit: 50 }, mockTodoistApi)
+
+            expect(result.structuredContent.sharedLabels).toEqual([])
+            expect(result.textContent).toContain('No shared labels.')
+        })
+
+        it('should fetch shared labels in parallel with personal labels', async () => {
+            const mockLabel = createMockLabel({ name: 'Work' })
+            mockTodoistApi.getLabels.mockResolvedValue(createMockApiResponse([mockLabel]))
+            mockTodoistApi.getSharedLabels.mockResolvedValue({
+                results: ['shared-work'],
+                nextCursor: null,
+            })
+
+            const result = await findLabels.execute({ limit: 50 }, mockTodoistApi)
+
+            expect(result.structuredContent.labels).toHaveLength(1)
+            expect(result.structuredContent.sharedLabels).toEqual(['shared-work'])
+        })
+    })
+
     describe('unrecognised color values', () => {
         it('LabelSchema should coerce an unrecognised color to undefined', () => {
             const label = {
@@ -148,6 +200,17 @@ describe(`${FIND_LABELS} tool`, () => {
             }
             const parsed = LabelSchema.parse(label)
             expect(parsed.color).toBeUndefined()
+        })
+
+        it('LabelSchema should coerce order: null to undefined', () => {
+            const label = {
+                id: 'label-1',
+                name: 'Test',
+                color: 'red',
+                order: null,
+                isFavorite: false,
+            }
+            expect(LabelSchema.parse(label).order).toBeUndefined()
         })
 
         it('LabelSchema should pass through recognised color values unchanged', () => {
@@ -202,9 +265,7 @@ describe(`${FIND_LABELS} tool`, () => {
             expect(structuredContent.totalCount).toBe(2)
             expect(structuredContent.hasMore).toBe(false)
             expect(structuredContent.nextCursor).toBeUndefined()
-            expect(structuredContent.appliedFilters).toEqual(
-                expect.objectContaining({ search: 'work' }),
-            )
+            expect(structuredContent.appliedFilters).toEqual({ search: 'work' })
             expect(result.textContent).toMatchSnapshot()
         })
 

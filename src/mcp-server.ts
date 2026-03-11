@@ -101,7 +101,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 5. **Date Handling**: All dates respect user timezone settings. Use 'today' keyword for dynamic date filtering (includes overdue tasks).
 
-6. **Labels**: Use label filtering with AND/OR operators for advanced task organization. Most search tools support labels parameter. Use **find-labels** to discover and search personal labels (returns IDs for use with other tools). Use **add-labels** to create new personal labels, and **delete-object** with type "label" to remove them.
+6. **Labels**: Use label filtering with AND/OR operators for advanced task organization. Most search tools support labels parameter. Use **find-labels** to discover personal and shared labels — use label **names** (not IDs) when filtering tasks, and use label **IDs** only with **delete-object**. Use **add-labels** to create new personal labels.
 
 7. **Pagination**: Large result sets use cursor-based pagination. Use limit parameter to control result size (default varies by tool).
 

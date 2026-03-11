@@ -12,7 +12,6 @@ import type {
     WorkspaceProject,
 } from '@doist/todoist-api-typescript'
 import z from 'zod'
-import { ColorOutputSchema } from './utils/colors.js'
 import { ApiLimits } from './utils/constants.js'
 import { formatDuration } from './utils/duration-parser.js'
 import { convertNumberToPriority } from './utils/priorities.js'
@@ -155,6 +154,14 @@ export async function searchAllLabels(client: TodoistApi, query: string): Promis
     return fetchAllPages({
         apiMethod: client.searchLabels.bind(client),
         args: { query },
+        limit: ApiLimits.LABELS_MAX,
+    })
+}
+
+export async function fetchAllSharedLabels(client: TodoistApi): Promise<string[]> {
+    return fetchAllPages({
+        apiMethod: client.getSharedLabels.bind(client),
+        args: {},
         limit: ApiLimits.LABELS_MAX,
     })
 }
@@ -354,15 +361,5 @@ async function getTasksByFilter({
     }
 }
 
-function mapLabel(label: Label) {
-    return {
-        id: label.id,
-        name: label.name,
-        color: ColorOutputSchema.parse(label.color),
-        order: label.order ?? undefined,
-        isFavorite: label.isFavorite,
-    }
-}
-
-export { getTasksByFilter, mapActivityEvent, mapComment, mapLabel, mapProject, mapTask }
+export { getTasksByFilter, mapActivityEvent, mapComment, mapProject, mapTask }
 export type { MappedTask }

@@ -1,6 +1,7 @@
+import type { Label } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { mapLabel, searchAllLabels } from '../tool-helpers.js'
+import { fetchAllSharedLabels, searchAllLabels } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { LabelSchema as LabelOutputSchema } from '../utils/output-schemas.js'
 import { formatLabelPreview, summarizeList } from '../utils/response-builders.js'
@@ -27,10 +28,15 @@ const ArgsSchema = {
 }
 
 const OutputSchema = {
-    labels: z.array(LabelOutputSchema).describe('The found labels.'),
+    labels: z.array(LabelOutputSchema).describe('The found personal labels.'),
     nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
     totalCount: z.number().describe('The total number of labels in this page.'),
     hasMore: z.boolean().describe('Whether there are more results available.'),
+    sharedLabels: z
+        .array(z.string())
+        .describe(
+            'Names of all shared labels visible to you. These have no IDs or metadata — use their names directly when filtering tasks.',
+        ),
     appliedFilters: z
         .record(z.string(), z.unknown())
         .describe('The filters that were applied to the search.'),
@@ -39,35 +45,36 @@ const OutputSchema = {
 const findLabels = {
     name: ToolNames.FIND_LABELS,
     description:
-        'List all personal labels or search for a label by exact name. When searching, all matching labels are fetched across all pages and returned as a single result set (limit and cursor are ignored). When not searching, labels are returned with pagination.',
+        'List personal labels and shared labels. Personal labels have full metadata (id, name, color, order, isFavorite) and support pagination and exact-name search. Shared labels are labels used on tasks shared with you — they are returned as names only (no IDs or metadata). When searching, all matching personal labels are fetched across all pages and returned as a single result set (limit and cursor are ignored). When not searching, personal labels are returned with pagination.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
     async execute(args, client) {
-        let results: Awaited<ReturnType<typeof client.getLabels>>['results']
-        let nextCursor = null
+        const [personalResult, sharedLabels] = await Promise.all([
+            args.search
+                ? searchAllLabels(client, args.search).then((results) => ({
+                      results,
+                      nextCursor: null,
+                  }))
+                : client.getLabels({ limit: args.limit, cursor: args.cursor ?? null }),
+            fetchAllSharedLabels(client),
+        ])
 
-        if (args.search) {
-            results = await searchAllLabels(client, args.search)
-        } else {
-            const response = await client.getLabels({
-                limit: args.limit,
-                cursor: args.cursor ?? null,
-            })
-            results = response.results
-            nextCursor = response.nextCursor
-        }
+        const { results, nextCursor } = personalResult
 
-        const labels = results.map(mapLabel)
+        const appliedFilters = args.search
+            ? { search: args.search }
+            : { limit: args.limit, cursor: args.cursor }
 
         return {
-            textContent: generateTextContent({ labels, args, nextCursor }),
+            textContent: generateTextContent({ labels: results, args, nextCursor, sharedLabels }),
             structuredContent: {
-                labels,
+                labels: results.map((l) => LabelOutputSchema.parse(l)),
                 nextCursor: nextCursor ?? undefined,
-                totalCount: labels.length,
+                totalCount: results.length,
                 hasMore: Boolean(nextCursor),
-                appliedFilters: args,
+                sharedLabels,
+                appliedFilters,
             },
         }
     },
@@ -77,10 +84,12 @@ function generateTextContent({
     labels,
     args,
     nextCursor,
+    sharedLabels,
 }: {
-    labels: ReturnType<typeof mapLabel>[]
+    labels: Label[]
     args: z.infer<z.ZodObject<typeof ArgsSchema>>
     nextCursor: string | null
+    sharedLabels: string[]
 }) {
     const subject = args.search ? `All labels matching "${args.search}"` : 'Labels'
 
@@ -107,15 +116,22 @@ function generateTextContent({
         }
     }
 
-    return summarizeList({
-        subject,
-        count: labels.length,
-        limit: args.search ? undefined : args.limit,
-        nextCursor: nextCursor ?? undefined,
-        filterHints,
-        previewLines: previewWithMore,
-        zeroReasonHints,
-    })
+    const sharedSection =
+        sharedLabels.length > 0
+            ? `\nShared labels (${sharedLabels.length}): ${sharedLabels.join(', ')}`
+            : '\nNo shared labels.'
+
+    return (
+        summarizeList({
+            subject,
+            count: labels.length,
+            limit: args.search ? undefined : args.limit,
+            nextCursor: nextCursor ?? undefined,
+            filterHints,
+            previewLines: previewWithMore,
+            zeroReasonHints,
+        }) + sharedSection
+    )
 }
 
 export { findLabels }
