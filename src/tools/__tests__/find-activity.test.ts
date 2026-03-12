@@ -126,7 +126,7 @@ describe(`${FIND_ACTIVITY} tool`, () => {
             )
 
             expect(mockTodoistApi.getActivityLogs).toHaveBeenCalledWith({
-                objectType,
+                objectEventTypes: `${objectType}:`,
                 limit: 20,
                 cursor: null,
             })
@@ -170,7 +170,7 @@ describe(`${FIND_ACTIVITY} tool`, () => {
             )
 
             expect(mockTodoistApi.getActivityLogs).toHaveBeenCalledWith({
-                eventType,
+                objectEventTypes: `:${eventType}`,
                 limit: 20,
                 cursor: null,
             })
@@ -233,8 +233,7 @@ describe(`${FIND_ACTIVITY} tool`, () => {
             )
 
             expect(mockTodoistApi.getActivityLogs).toHaveBeenCalledWith({
-                objectType: 'task',
-                eventType: 'completed',
+                objectEventTypes: 'task:completed',
                 parentProjectId: 'project-work',
                 initiatorId: 'user-bob',
                 limit: 50,

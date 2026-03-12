@@ -80,9 +80,10 @@ const findActivity = {
         }
 
         // Add optional filters
-        if (objectType) apiArgs.objectType = objectType
+        if (objectType && eventType) apiArgs.objectEventTypes = `${objectType}:${eventType}`
+        else if (objectType) apiArgs.objectEventTypes = `${objectType}:`
+        else if (eventType) apiArgs.objectEventTypes = `:${eventType}`
         if (objectId && objectId !== 'remove') apiArgs.objectId = objectId
-        if (eventType) apiArgs.eventType = eventType
         if (projectId) apiArgs.parentProjectId = projectId
         if (taskId) apiArgs.parentItemId = taskId
         if (initiatorId) apiArgs.initiatorId = initiatorId
