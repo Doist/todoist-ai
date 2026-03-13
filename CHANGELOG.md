@@ -1,5 +1,18 @@
 # Changelog
 
+## [7.13.0](https://github.com/Doist/todoist-ai/compare/v7.12.0...v7.13.0) (2026-03-13)
+
+
+### Features
+
+* add filter parameter to find-tasks tool ([#370](https://github.com/Doist/todoist-ai/issues/370)) ([473f087](https://github.com/Doist/todoist-ai/commit/473f087528d7846e74bf427c0d9ae5bf090ca746))
+* add uncomplete-tasks tool to reopen completed tasks ([#368](https://github.com/Doist/todoist-ai/issues/368)) ([2156d2b](https://github.com/Doist/todoist-ai/commit/2156d2be4664d016c29386b4cceb21998c6ef006))
+
+
+### Bug Fixes
+
+* make due/deadline clearing explicit in update-tasks ([#351](https://github.com/Doist/todoist-ai/issues/351)) ([f05bd11](https://github.com/Doist/todoist-ai/commit/f05bd11a6cd816d03683e0dd56b7aefaef850215))
+
 ## [7.12.0](https://github.com/Doist/todoist-ai/compare/v7.11.2...v7.12.0) (2026-03-13)
 
 
