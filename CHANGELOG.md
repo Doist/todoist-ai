@@ -1,5 +1,18 @@
 # Changelog
 
+## [7.12.0](https://github.com/Doist/todoist-ai/compare/v7.11.2...v7.12.0) (2026-03-13)
+
+
+### Features
+
+* add find-labels, add-labels, and label deletion support ([#363](https://github.com/Doist/todoist-ai/issues/363)) ([cf65918](https://github.com/Doist/todoist-ai/commit/cf6591802a1f42978225d66f95621288ff3b6143))
+
+
+### Bug Fixes
+
+* **deps:** update all dependencies ([#360](https://github.com/Doist/todoist-ai/issues/360)) ([46d7122](https://github.com/Doist/todoist-ai/commit/46d7122f09336cf3ef8c6b5ef62efafe62737363))
+* skip auto-review-request workflow for fork PRs ([#364](https://github.com/Doist/todoist-ai/issues/364)) ([fc3420a](https://github.com/Doist/todoist-ai/commit/fc3420a370ad4fe954621d408f4050b4a5dbe363))
+
 ## [7.11.2](https://github.com/Doist/todoist-ai/compare/v7.11.1...v7.11.2) (2026-03-05)
 
 
