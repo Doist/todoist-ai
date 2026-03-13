@@ -29,6 +29,7 @@ import { getOverview } from './tools/get-overview.js'
 import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { search } from './tools/search.js'
+import { uncompleteTasks } from './tools/uncomplete-tasks.js'
 import { updateComments } from './tools/update-comments.js'
 import { updateProjects } from './tools/update-projects.js'
 import { updateSections } from './tools/update-sections.js'
@@ -39,6 +40,7 @@ const tools = {
     // Task management tools
     addTasks,
     completeTasks,
+    uncompleteTasks,
     updateTasks,
     findTasks,
     findTasksByDate,
@@ -80,6 +82,7 @@ export {
     // Task management tools
     addTasks,
     completeTasks,
+    uncompleteTasks,
     updateTasks,
     findTasks,
     findTasksByDate,

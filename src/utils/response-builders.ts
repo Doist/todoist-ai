@@ -45,6 +45,7 @@ type BatchOperationParams = {
     success: number
     total: number
     successItems?: string[]
+    successLabel?: string
     failures?: Array<{
         item: string
         error: string
@@ -86,7 +87,7 @@ export function summarizeTaskOperation(
  * Creates batch operation summaries with success/failure breakdown
  */
 export function summarizeBatch(params: BatchOperationParams): string {
-    const { action, success, total, successItems, failures } = params
+    const { action, success, total, successItems, successLabel = 'Completed', failures } = params
     const bits: string[] = []
 
     // Main result summary
@@ -95,7 +96,7 @@ export function summarizeBatch(params: BatchOperationParams): string {
 
     // Success items (if provided and reasonable count)
     if (successItems?.length && successItems.length <= 5) {
-        bits.push(`Completed:\n${successItems.map((item) => `    ${item}`).join('\n')}.`)
+        bits.push(`${successLabel}:\n${successItems.map((item) => `    ${item}`).join('\n')}.`)
     }
 
     // Failure details (if any)

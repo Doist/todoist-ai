@@ -35,6 +35,7 @@ import { manageAssignments } from './tools/manage-assignments.js'
 import { projectManagement } from './tools/project-management.js'
 import { projectMove } from './tools/project-move.js'
 import { search } from './tools/search.js'
+import { uncompleteTasks } from './tools/uncomplete-tasks.js'
 import { updateComments } from './tools/update-comments.js'
 import { updateProjects } from './tools/update-projects.js'
 import { updateSections } from './tools/update-sections.js'
@@ -64,6 +65,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **add-tasks**: Create tasks with content, description, priority (\`p1\`, \`p2\`, \`p3\`, \`p4\` strings only; \`p1\` highest and \`p4\` lowest/default; integers are not accepted), dueString (natural language like "tomorrow", "next Friday", "2024-12-25"), deadlineDate (ISO 8601 format like "2025-12-31" for immovable constraints), duration (formats like "2h", "90m", "2h30m"), and assignments to project collaborators
 - **update-tasks**: Modify existing tasks - get task IDs from search results first, only include fields that need changes. Supports priority updates using \`p1\`/\`p2\`/\`p3\`/\`p4\` string values (\`p1\` highest, \`p4\` lowest/default; integers are not accepted), plus deadlineDate (ISO 8601 format like "2025-12-31") updates and removals (use "remove" to clear)
 - **complete-tasks**: Mark tasks as done using task IDs
+- **uncomplete-tasks**: Reopen completed tasks using task IDs
 - **find-tasks**: Search by text, project/section/parent container, responsible user, or labels. Requires at least one search parameter
 - **find-tasks-by-date**: Get tasks by date range (startDate: YYYY-MM-DD or 'today' which includes overdue tasks) or specific day counts
 - **find-completed-tasks**: View completed tasks by completion date or original due date; if since/until are omitted, defaults to the last 7 days (returns all collaborators unless filtered)
@@ -172,6 +174,7 @@ function getMcpServer({
     // Task management tools
     registerTool({ tool: addTasks, ...toolArgs })
     registerTool({ tool: completeTasks, ...toolArgs })
+    registerTool({ tool: uncompleteTasks, ...toolArgs })
     registerTool({ tool: updateTasks, ...toolArgs })
     registerTool({ tool: findTasks, ...toolArgs })
     registerTool({ tool: enhancedFindTasksByDateTool, ...toolArgs })

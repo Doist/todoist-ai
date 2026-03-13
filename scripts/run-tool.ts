@@ -41,6 +41,7 @@ import { manageAssignments } from '../src/tools/manage-assignments.js'
 import { projectManagement } from '../src/tools/project-management.js'
 import { projectMove } from '../src/tools/project-move.js'
 import { search } from '../src/tools/search.js'
+import { uncompleteTasks } from '../src/tools/uncomplete-tasks.js'
 import { updateComments } from '../src/tools/update-comments.js'
 import { updateProjects } from '../src/tools/update-projects.js'
 import { updateSections } from '../src/tools/update-sections.js'
@@ -67,6 +68,7 @@ const tools: Record<string, ExecutableTool> = {
     'add-comments': addComments,
     'add-labels': addLabels,
     'complete-tasks': completeTasks,
+    'uncomplete-tasks': uncompleteTasks,
     'delete-object': deleteObject,
     fetch: fetch,
     'fetch-object': fetchObject,

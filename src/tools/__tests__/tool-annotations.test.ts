@@ -27,6 +27,13 @@ const TOOL_EXPECTATIONS: ToolExpectation[] = [
         idempotentHint: false,
     },
     {
+        name: ToolNames.UNCOMPLETE_TASKS,
+        title: 'Todoist: Uncomplete Tasks',
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+    },
+    {
         name: ToolNames.UPDATE_TASKS,
         title: 'Todoist: Update Tasks',
         readOnlyHint: false,
