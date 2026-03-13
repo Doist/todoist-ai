@@ -124,8 +124,10 @@ const fetch = {
             }
         }
 
+        const textContent = `Fetched ${type}: ${result.title} • id=${result.id} • url=${result.url}`
+
         return {
-            textContent: JSON.stringify(result),
+            textContent,
             structuredContent: result,
         }
     },

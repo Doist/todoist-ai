@@ -78,8 +78,20 @@ const search = {
             })
         }
 
+        const taskCount = tasksResult.tasks.length
+        const projectCount = projects.length
+        const textContent =
+            results.length === 0
+                ? `No results found for "${query}".`
+                : `Found ${results.length} result${results.length === 1 ? '' : 's'} for "${query}": ${taskCount} task${taskCount === 1 ? '' : 's'}, ${projectCount} project${projectCount === 1 ? '' : 's'}.\nResults:\n${results
+                      .slice(0, 5)
+                      .map((r) => `    ${r.title} • ${r.id}`)
+                      .join(
+                          '\n',
+                      )}${results.length > 5 ? `\n    ... and ${results.length - 5} more` : ''}`
+
         return {
-            textContent: JSON.stringify({ results }),
+            textContent,
             structuredContent: { results, totalCount: results.length },
         }
     },

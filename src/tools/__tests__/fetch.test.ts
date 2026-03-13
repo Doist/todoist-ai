@@ -44,9 +44,8 @@ describe(`${FETCH} tool`, () => {
             // Verify API was called correctly
             expect(mockTodoistApi.getTask).toHaveBeenCalledWith(TEST_IDS.TASK_1)
 
-            // Parse the JSON response
-            const jsonResponse = JSON.parse(result.textContent ?? '{}')
-            expect(jsonResponse).toEqual({
+            // Verify structured content
+            expect(result.structuredContent).toMatchObject({
                 id: `task:${TEST_IDS.TASK_1}`,
                 title: 'Important meeting with team',
                 text: 'Important meeting with team\n\nDescription: Discuss project roadmap and timeline\nDue: 2025-10-15\nLabels: work, urgent',
@@ -59,6 +58,11 @@ describe(`${FETCH} tool`, () => {
                     checked: false,
                 },
             })
+
+            // Verify human-readable text
+            expect(result.textContent).toBe(
+                `Fetched task: Important meeting with team • id=task:${TEST_IDS.TASK_1} • url=https://app.todoist.com/app/task/${TEST_IDS.TASK_1}`,
+            )
         })
 
         it('should fetch a task without optional fields', async () => {
@@ -74,10 +78,9 @@ describe(`${FETCH} tool`, () => {
 
             const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_2}` }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.textContent ?? '{}')
-            expect(jsonResponse.title).toBe('Simple task')
-            expect(jsonResponse.text).toBe('Simple task')
-            expect(jsonResponse.metadata).toEqual({
+            expect(result.structuredContent?.title).toBe('Simple task')
+            expect(result.structuredContent?.text).toBe('Simple task')
+            expect(result.structuredContent?.metadata).toMatchObject({
                 priority: 'p4',
                 projectId: TEST_IDS.PROJECT_TEST,
                 recurring: false,
@@ -103,8 +106,7 @@ describe(`${FETCH} tool`, () => {
 
             const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_3}` }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.textContent ?? '{}')
-            expect(jsonResponse.metadata.recurring).toBe('every monday')
+            expect(result.structuredContent?.metadata?.recurring).toBe('every monday')
         })
 
         it('should handle tasks with duration', async () => {
@@ -121,8 +123,7 @@ describe(`${FETCH} tool`, () => {
 
             const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.textContent ?? '{}')
-            expect(jsonResponse.metadata.duration).toBe('1h30m')
+            expect(result.structuredContent?.metadata?.duration).toBe('1h30m')
         })
 
         it('should handle tasks with assignments', async () => {
@@ -137,9 +138,8 @@ describe(`${FETCH} tool`, () => {
 
             const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.textContent ?? '{}')
-            expect(jsonResponse.metadata.responsibleUid).toBe('user-123')
-            expect(jsonResponse.metadata.assignedByUid).toBe('user-456')
+            expect(result.structuredContent?.metadata?.responsibleUid).toBe('user-123')
+            expect(result.structuredContent?.metadata?.assignedByUid).toBe('user-456')
         })
     })
 
@@ -166,9 +166,8 @@ describe(`${FETCH} tool`, () => {
             // Verify API was called correctly
             expect(mockTodoistApi.getProject).toHaveBeenCalledWith(TEST_IDS.PROJECT_WORK)
 
-            // Parse the JSON response
-            const jsonResponse = JSON.parse(result.textContent ?? '{}')
-            expect(jsonResponse).toEqual({
+            // Verify structured content
+            expect(result.structuredContent).toMatchObject({
                 id: `project:${TEST_IDS.PROJECT_WORK}`,
                 title: 'Work Project',
                 text: 'Work Project\n\nShared project\nFavorite: Yes',
@@ -181,6 +180,11 @@ describe(`${FETCH} tool`, () => {
                     viewStyle: 'board',
                 },
             })
+
+            // Verify human-readable text
+            expect(result.textContent).toBe(
+                `Fetched project: Work Project • id=project:${TEST_IDS.PROJECT_WORK} • url=https://app.todoist.com/app/project/${TEST_IDS.PROJECT_WORK}`,
+            )
         })
 
         it('should fetch a project without optional flags', async () => {
@@ -198,11 +202,10 @@ describe(`${FETCH} tool`, () => {
                 mockTodoistApi,
             )
 
-            const jsonResponse = JSON.parse(result.textContent ?? '{}')
-            expect(jsonResponse.title).toBe('Simple Project')
-            expect(jsonResponse.text).toBe('Simple Project')
-            expect(jsonResponse.metadata.isFavorite).toBe(false)
-            expect(jsonResponse.metadata.isShared).toBe(false)
+            expect(result.structuredContent?.title).toBe('Simple Project')
+            expect(result.structuredContent?.text).toBe('Simple Project')
+            expect(result.structuredContent?.metadata?.isFavorite).toBe(false)
+            expect(result.structuredContent?.metadata?.isShared).toBe(false)
         })
 
         it('should fetch inbox project', async () => {
@@ -219,8 +222,7 @@ describe(`${FETCH} tool`, () => {
                 mockTodoistApi,
             )
 
-            const jsonResponse = JSON.parse(result.textContent ?? '{}')
-            expect(jsonResponse.metadata.inboxProject).toBe(true)
+            expect(result.structuredContent?.metadata?.inboxProject).toBe(true)
         })
 
         it('should fetch project with parent ID', async () => {
@@ -234,8 +236,7 @@ describe(`${FETCH} tool`, () => {
 
             const result = await fetch.execute({ id: 'project:sub-project-id' }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.textContent ?? '{}')
-            expect(jsonResponse.metadata.parentId).toBe(TEST_IDS.PROJECT_WORK)
+            expect(result.structuredContent?.metadata?.parentId).toBe(TEST_IDS.PROJECT_WORK)
         })
     })
 
@@ -281,42 +282,61 @@ describe(`${FETCH} tool`, () => {
         })
     })
 
-    describe('OpenAI MCP spec compliance', () => {
-        it('should return valid JSON string in text field', async () => {
-            const mockTask = createMockTask({ id: TEST_IDS.TASK_1, content: 'Test' })
+    describe('human-readable text content', () => {
+        it('should return human-readable text for a task', async () => {
+            const mockTask = createMockTask({ id: TEST_IDS.TASK_1, content: 'Test Task' })
             mockTodoistApi.getTask.mockResolvedValue(mockTask)
 
             const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi)
 
-            expect(() => JSON.parse(result.textContent ?? '{}')).not.toThrow()
+            expect(result.textContent).toContain('Fetched task:')
+            expect(result.textContent).toContain('Test Task')
+            expect(result.textContent).toContain(`id=task:${TEST_IDS.TASK_1}`)
+            expect(result.textContent).toContain('url=')
         })
 
-        it('should include all required fields (id, title, text, url)', async () => {
-            const mockTask = createMockTask({ id: TEST_IDS.TASK_1, content: 'Test' })
-            mockTodoistApi.getTask.mockResolvedValue(mockTask)
+        it('should return human-readable text for a project', async () => {
+            const mockProject = createMockProject({
+                id: TEST_IDS.PROJECT_WORK,
+                name: 'Test Project',
+            })
+            mockTodoistApi.getProject.mockResolvedValue(mockProject)
 
-            const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi)
+            const result = await fetch.execute(
+                { id: `project:${TEST_IDS.PROJECT_WORK}` },
+                mockTodoistApi,
+            )
 
-            const jsonResponse = JSON.parse(result.textContent ?? '{}')
-            expect(jsonResponse).toHaveProperty('id')
-            expect(jsonResponse).toHaveProperty('title')
-            expect(jsonResponse).toHaveProperty('text')
-            expect(jsonResponse).toHaveProperty('url')
-            expect(typeof jsonResponse.id).toBe('string')
-            expect(typeof jsonResponse.title).toBe('string')
-            expect(typeof jsonResponse.text).toBe('string')
-            expect(typeof jsonResponse.url).toBe('string')
+            expect(result.textContent).toContain('Fetched project:')
+            expect(result.textContent).toContain('Test Project')
+            expect(result.textContent).toContain(`id=project:${TEST_IDS.PROJECT_WORK}`)
+            expect(result.textContent).toContain('url=')
         })
 
-        it('should include optional metadata field', async () => {
+        it('should include all required fields (id, title, text, url) in structuredContent', async () => {
             const mockTask = createMockTask({ id: TEST_IDS.TASK_1, content: 'Test' })
             mockTodoistApi.getTask.mockResolvedValue(mockTask)
 
             const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi)
 
-            const jsonResponse = JSON.parse(result.textContent ?? '{}')
-            expect(jsonResponse).toHaveProperty('metadata')
-            expect(typeof jsonResponse.metadata).toBe('object')
+            expect(result.structuredContent).toHaveProperty('id')
+            expect(result.structuredContent).toHaveProperty('title')
+            expect(result.structuredContent).toHaveProperty('text')
+            expect(result.structuredContent).toHaveProperty('url')
+            expect(typeof result.structuredContent?.id).toBe('string')
+            expect(typeof result.structuredContent?.title).toBe('string')
+            expect(typeof result.structuredContent?.text).toBe('string')
+            expect(typeof result.structuredContent?.url).toBe('string')
+        })
+
+        it('should include optional metadata field in structuredContent', async () => {
+            const mockTask = createMockTask({ id: TEST_IDS.TASK_1, content: 'Test' })
+            mockTodoistApi.getTask.mockResolvedValue(mockTask)
+
+            const result = await fetch.execute({ id: `task:${TEST_IDS.TASK_1}` }, mockTodoistApi)
+
+            expect(result.structuredContent).toHaveProperty('metadata')
+            expect(typeof result.structuredContent?.metadata).toBe('object')
         })
     })
 })
