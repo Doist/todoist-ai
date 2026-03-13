@@ -9,6 +9,7 @@ export const ToolNames = {
     // Task management tools
     ADD_TASKS: 'add-tasks',
     COMPLETE_TASKS: 'complete-tasks',
+    UNCOMPLETE_TASKS: 'uncomplete-tasks',
     UPDATE_TASKS: 'update-tasks',
     FIND_TASKS: 'find-tasks',
     FIND_TASKS_BY_DATE: 'find-tasks-by-date',

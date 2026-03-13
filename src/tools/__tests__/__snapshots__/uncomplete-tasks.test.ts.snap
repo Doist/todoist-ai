@@ -1,0 +1,113 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`uncomplete-tasks tool > edge cases > should handle minimum one task required by schema 1`] = `
+"Uncompleted tasks: 1/1 successful.
+Completed:
+    single-task."
+`;
+
+exports[`uncomplete-tasks tool > edge cases > should handle tasks with special ID formats 1`] = `
+"Uncompleted tasks: 3/3 successful.
+Completed:
+    proj_123_task_456
+    task-with-dashes
+    1234567890."
+`;
+
+exports[`uncomplete-tasks tool > error message truncation > should not show truncation message for exactly 3 errors 1`] = `
+"Uncompleted tasks: 0/3 successful.
+Failed (3):
+    task-1 (Error: Error 1)
+    task-2 (Error: Error 2)
+    task-3 (Error: Error 3)."
+`;
+
+exports[`uncomplete-tasks tool > error message truncation > should truncate failure messages after 3 errors 1`] = `
+"Uncompleted tasks: 0/5 successful.
+Failed (5):
+    task-1 (Error: Error 1)
+    task-2 (Error: Error 2)
+    task-3 (Error: Error 3), +2 more."
+`;
+
+exports[`uncomplete-tasks tool > mixed success and failure scenarios > should handle realistic mixed scenario 1`] = `
+"Uncompleted tasks: 3/5 successful.
+Completed:
+    8485093748
+    8485093749
+    8485093751.
+Failed (2):
+    8485093750 (Error: Task already active)
+    8485093752 (Error: Task not found)."
+`;
+
+exports[`uncomplete-tasks tool > next steps logic validation > should suggest checking IDs when all tasks fail 1`] = `
+"Uncompleted tasks: 0/2 successful.
+Failed (2):
+    bad-id-1 (Error: Task not found)
+    bad-id-2 (Error: Task not found)."
+`;
+
+exports[`uncomplete-tasks tool > next steps logic validation > should suggest next steps when all tasks uncomplete successfully 1`] = `
+"Uncompleted tasks: 2/2 successful.
+Completed:
+    task-1
+    task-2."
+`;
+
+exports[`uncomplete-tasks tool > next steps logic validation > should suggest reviewing failures when mixed results 1`] = `
+"Uncompleted tasks: 1/2 successful.
+Completed:
+    task-1.
+Failed (1):
+    task-2 (Error: Task not found)."
+`;
+
+exports[`uncomplete-tasks tool > uncompleting multiple tasks > should continue processing remaining tasks after failures 1`] = `
+"Uncompleted tasks: 2/5 successful.
+Completed:
+    task-3
+    task-5.
+Failed (3):
+    task-1 (Error: Task already active)
+    task-2 (Error: Task not found)
+    task-4 (Error: Permission denied)."
+`;
+
+exports[`uncomplete-tasks tool > uncompleting multiple tasks > should handle all tasks failing 1`] = `
+"Uncompleted tasks: 0/2 successful.
+Failed (2):
+    task-1 (Error: API Error: Network timeout)
+    task-2 (Error: API Error: Network timeout)."
+`;
+
+exports[`uncomplete-tasks tool > uncompleting multiple tasks > should handle different types of API errors 1`] = `
+"Uncompleted tasks: 0/4 successful.
+Failed (4):
+    not-found (Error: Task not found)
+    already-active (Error: Task already active)
+    no-permission (Error: Permission denied), +1 more."
+`;
+
+exports[`uncomplete-tasks tool > uncompleting multiple tasks > should handle partial failures gracefully 1`] = `
+"Uncompleted tasks: 2/3 successful.
+Completed:
+    task-1
+    task-3.
+Failed (1):
+    task-2 (Error: Task not found)."
+`;
+
+exports[`uncomplete-tasks tool > uncompleting multiple tasks > should uncomplete all tasks successfully 1`] = `
+"Uncompleted tasks: 3/3 successful.
+Completed:
+    task-1
+    task-2
+    task-3."
+`;
+
+exports[`uncomplete-tasks tool > uncompleting multiple tasks > should uncomplete single task 1`] = `
+"Uncompleted tasks: 1/1 successful.
+Completed:
+    8485093748."
+`;

@@ -5,29 +5,29 @@ import { summarizeBatch } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const ArgsSchema = {
-    ids: z.array(z.string().min(1)).min(1).describe('The IDs of the tasks to complete.'),
+    ids: z.array(z.string().min(1)).min(1).describe('The IDs of the tasks to uncomplete.'),
 }
 
 const OutputSchema = {
-    completed: z.array(z.string()).describe('The IDs of successfully completed tasks.'),
-    failures: z.array(FailureSchema).describe('Failed task completions with error details.'),
-    totalRequested: z.number().describe('The total number of tasks requested to complete.'),
-    successCount: z.number().describe('The number of successfully completed tasks.'),
-    failureCount: z.number().describe('The number of failed task completions.'),
+    uncompleted: z.array(z.string()).describe('The IDs of successfully uncompleted tasks.'),
+    failures: z.array(FailureSchema).describe('Failed task uncompletion with error details.'),
+    totalRequested: z.number().describe('The total number of tasks requested to uncomplete.'),
+    successCount: z.number().describe('The number of successfully uncompleted tasks.'),
+    failureCount: z.number().describe('The number of failed task uncompletions.'),
 }
 
-const completeTasks = {
-    name: ToolNames.COMPLETE_TASKS,
-    description: 'Complete one or more tasks by their IDs.',
+const uncompleteTasks = {
+    name: ToolNames.UNCOMPLETE_TASKS,
+    description: 'Uncomplete (reopen) one or more completed tasks by their IDs.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
     async execute(args, client) {
         const results = await Promise.allSettled(
-            args.ids.map((id) => client.closeTask(id).then(() => id)),
+            args.ids.map((id) => client.reopenTask(id).then(() => id)),
         )
 
-        const completed: string[] = []
+        const uncompleted: string[] = []
         const failures: Array<{ item: string; error: string; code?: string }> = []
 
         for (let i = 0; i < results.length; i++) {
@@ -36,7 +36,7 @@ const completeTasks = {
             if (!result || !id) continue
 
             if (result.status === 'fulfilled') {
-                completed.push(result.value)
+                uncompleted.push(result.value)
             } else {
                 const errorMessage =
                     result.reason instanceof Error ? result.reason.message : 'Unknown error'
@@ -45,7 +45,7 @@ const completeTasks = {
         }
 
         const textContent = generateTextContent({
-            completed,
+            uncompleted,
             failures,
             args,
         })
@@ -53,10 +53,10 @@ const completeTasks = {
         return {
             textContent,
             structuredContent: {
-                completed,
+                uncompleted,
                 failures,
                 totalRequested: args.ids.length,
-                successCount: completed.length,
+                successCount: uncompleted.length,
                 failureCount: failures.length,
             },
         }
@@ -64,21 +64,21 @@ const completeTasks = {
 } satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent({
-    completed,
+    uncompleted,
     failures,
     args,
 }: {
-    completed: string[]
+    uncompleted: string[]
     failures: Array<{ item: string; error: string; code?: string }>
     args: z.infer<z.ZodObject<typeof ArgsSchema>>
 }) {
     return summarizeBatch({
-        action: 'Completed tasks',
-        success: completed.length,
+        action: 'Uncompleted tasks',
+        success: uncompleted.length,
         total: args.ids.length,
-        successItems: completed,
+        successItems: uncompleted,
         failures,
     })
 }
 
-export { completeTasks }
+export { uncompleteTasks }
