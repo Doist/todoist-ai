@@ -2,13 +2,13 @@
 
 exports[`uncomplete-tasks tool > edge cases > should handle minimum one task required by schema 1`] = `
 "Uncompleted tasks: 1/1 successful.
-Completed:
+Reopened:
     single-task."
 `;
 
 exports[`uncomplete-tasks tool > edge cases > should handle tasks with special ID formats 1`] = `
 "Uncompleted tasks: 3/3 successful.
-Completed:
+Reopened:
     proj_123_task_456
     task-with-dashes
     1234567890."
@@ -32,7 +32,7 @@ Failed (5):
 
 exports[`uncomplete-tasks tool > mixed success and failure scenarios > should handle realistic mixed scenario 1`] = `
 "Uncompleted tasks: 3/5 successful.
-Completed:
+Reopened:
     8485093748
     8485093749
     8485093751.
@@ -50,14 +50,14 @@ Failed (2):
 
 exports[`uncomplete-tasks tool > next steps logic validation > should suggest next steps when all tasks uncomplete successfully 1`] = `
 "Uncompleted tasks: 2/2 successful.
-Completed:
+Reopened:
     task-1
     task-2."
 `;
 
 exports[`uncomplete-tasks tool > next steps logic validation > should suggest reviewing failures when mixed results 1`] = `
 "Uncompleted tasks: 1/2 successful.
-Completed:
+Reopened:
     task-1.
 Failed (1):
     task-2 (Error: Task not found)."
@@ -65,7 +65,7 @@ Failed (1):
 
 exports[`uncomplete-tasks tool > uncompleting multiple tasks > should continue processing remaining tasks after failures 1`] = `
 "Uncompleted tasks: 2/5 successful.
-Completed:
+Reopened:
     task-3
     task-5.
 Failed (3):
@@ -91,7 +91,7 @@ Failed (4):
 
 exports[`uncomplete-tasks tool > uncompleting multiple tasks > should handle partial failures gracefully 1`] = `
 "Uncompleted tasks: 2/3 successful.
-Completed:
+Reopened:
     task-1
     task-3.
 Failed (1):
@@ -100,7 +100,7 @@ Failed (1):
 
 exports[`uncomplete-tasks tool > uncompleting multiple tasks > should uncomplete all tasks successfully 1`] = `
 "Uncompleted tasks: 3/3 successful.
-Completed:
+Reopened:
     task-1
     task-2
     task-3."
@@ -108,6 +108,6 @@ Completed:
 
 exports[`uncomplete-tasks tool > uncompleting multiple tasks > should uncomplete single task 1`] = `
 "Uncompleted tasks: 1/1 successful.
-Completed:
+Reopened:
     8485093748."
 `;

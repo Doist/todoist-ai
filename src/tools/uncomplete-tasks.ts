@@ -23,24 +23,19 @@ const uncompleteTasks = {
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
     async execute(args, client) {
-        const results = await Promise.allSettled(
-            args.ids.map((id) => client.reopenTask(id).then(() => id)),
-        )
-
         const uncompleted: string[] = []
         const failures: Array<{ item: string; error: string; code?: string }> = []
 
-        for (let i = 0; i < results.length; i++) {
-            const result = results[i]
-            const id = args.ids[i]
-            if (!result || !id) continue
-
-            if (result.status === 'fulfilled') {
-                uncompleted.push(result.value)
-            } else {
-                const errorMessage =
-                    result.reason instanceof Error ? result.reason.message : 'Unknown error'
-                failures.push({ item: id, error: errorMessage })
+        for (const id of args.ids) {
+            try {
+                await client.reopenTask(id)
+                uncompleted.push(id)
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+                failures.push({
+                    item: id,
+                    error: errorMessage,
+                })
             }
         }
 
@@ -77,6 +72,7 @@ function generateTextContent({
         success: uncompleted.length,
         total: args.ids.length,
         successItems: uncompleted,
+        successLabel: 'Reopened',
         failures,
     })
 }
