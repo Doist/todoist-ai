@@ -78,7 +78,7 @@ const OutputSchema = {
 const findTasks = {
     name: ToolNames.FIND_TASKS,
     description:
-        'Find tasks by text search, or by project/section/parent container/responsible user. At least one filter must be provided.',
+        'Find tasks by text search, project/section/parent container, responsible user, labels, or a raw Todoist filter string. At least one filter must be provided.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
@@ -223,7 +223,7 @@ const findTasks = {
         }
 
         // Handle search text and/or labels using filter query
-        let query = filter ?? ''
+        let query = filter ? `(${filter})` : ''
 
         // Add search text component
         if (searchText) {

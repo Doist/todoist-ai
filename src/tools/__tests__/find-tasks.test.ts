@@ -1022,7 +1022,7 @@ End of test content.`
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: 'today | overdue & !assigned to: others',
+                query: '(today | overdue) & !assigned to: others',
                 cursor: undefined,
                 limit: 10,
             })
@@ -1039,7 +1039,7 @@ End of test content.`
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: 'p1 & search: meeting & !assigned to: others',
+                query: '(p1) & search: meeting & !assigned to: others',
                 cursor: undefined,
                 limit: 10,
             })
@@ -1056,7 +1056,7 @@ End of test content.`
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: 'today & (@work) & !assigned to: others',
+                query: '(today) & (@work) & !assigned to: others',
                 cursor: undefined,
                 limit: 10,
             })
@@ -1078,7 +1078,7 @@ End of test content.`
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: '##Work & assigned to: jane@example.com',
+                query: '(##Work) & assigned to: jane@example.com',
                 cursor: undefined,
                 limit: 10,
             })
@@ -1117,7 +1117,7 @@ End of test content.`
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: 'today',
+                query: '(today)',
                 cursor: undefined,
                 limit: 10,
             })
