@@ -55,6 +55,13 @@ const ArgsSchema = {
         .describe(
             'The cursor to get the next page of tasks (cursor is obtained from the previous call to this tool, with the same parameters).',
         ),
+    filter: z
+        .string()
+        .optional()
+        .describe(
+            'A raw Todoist filter query string (e.g. "today", "p1", "##Work", "(today | overdue) & p1"). ' +
+                'Combined with other filters using AND. Cannot be used with projectId, sectionId, or parentId.',
+        ),
     ...LabelsSchema,
 }
 
@@ -87,6 +94,7 @@ const findTasks = {
             cursor,
             labels,
             labelsOperator,
+            filter,
         } = args
 
         const todoistUser = await client.getUser()
@@ -99,10 +107,17 @@ const findTasks = {
             !sectionId &&
             !parentId &&
             !responsibleUser &&
-            !hasLabels
+            !hasLabels &&
+            !filter
         ) {
             throw new Error(
-                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, or labels',
+                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, labels, or filter',
+            )
+        }
+
+        if (filter && (projectId || sectionId || parentId)) {
+            throw new Error(
+                'The `filter` parameter cannot be combined with projectId, sectionId, or parentId. Use filter syntax instead (e.g. "##ProjectName").',
             )
         }
 
@@ -176,8 +191,8 @@ const findTasks = {
             }
         }
 
-        // If only responsibleUid is provided (without containers), use assignee filter
-        if (resolvedAssigneeId && !searchText && !hasLabels) {
+        // If only responsibleUid is provided (without containers or raw filter), use assignee filter
+        if (resolvedAssigneeId && !searchText && !hasLabels && !filter) {
             const { results: tasks, nextCursor } = await client.getTasksByFilter({
                 query: `assigned to: ${assigneeEmail}`,
                 lang: 'en',
@@ -208,11 +223,11 @@ const findTasks = {
         }
 
         // Handle search text and/or labels using filter query
-        let query = ''
+        let query = filter ?? ''
 
         // Add search text component
         if (searchText) {
-            query = `search: ${searchText}`
+            query = appendToQuery(query, `search: ${searchText}`)
         }
 
         // Add labels component
@@ -350,6 +365,9 @@ function generateTextContent({
 
         // Build subject based on filters
         const subjectParts = []
+        if (args.filter) {
+            subjectParts.push(`filter: ${args.filter}`)
+        }
         if (args.searchText) {
             subjectParts.push(`"${args.searchText}"`)
         }
@@ -363,16 +381,22 @@ function generateTextContent({
             subjectParts.push(`with labels: ${labelText}`)
         }
 
-        if (args.searchText) {
+        if (args.filter && !args.searchText && !args.responsibleUser && !args.labels?.length) {
+            subject = `Tasks matching filter: ${args.filter}`
+            filterHints.push(`filter: ${args.filter}`)
+        } else if (args.searchText) {
             subject = `Search results for ${subjectParts.join(' ')}`
             filterHints.push(`matching "${args.searchText}"`)
+            if (args.filter) filterHints.push(`filter: ${args.filter}`)
         } else if (args.responsibleUser && (!args.labels || args.labels.length === 0)) {
             subject = `Tasks assigned to ${email}`
+            if (args.filter) filterHints.push(`filter: ${args.filter}`)
         } else if (args.labels && args.labels.length > 0 && !args.responsibleUser) {
             const labelText = args.labels
                 .map((label) => `@${label}`)
                 .join(args.labelsOperator === 'and' ? ' & ' : ' | ')
             subject = `Tasks with labels: ${labelText}`
+            if (args.filter) filterHints.push(`filter: ${args.filter}`)
         } else {
             subject = `Tasks ${subjectParts.join(' ')}`
         }

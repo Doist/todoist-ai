@@ -203,7 +203,7 @@ describe(`${FIND_TASKS} tool`, () => {
     describe('validation', () => {
         it('should require at least one filter parameter', async () => {
             await expect(findTasks.execute({ limit: 10 }, mockTodoistApi)).rejects.toThrow(
-                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, or labels',
+                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, labels, or filter',
             )
         })
     })
@@ -1004,10 +1004,130 @@ End of test content.`
         })
     })
 
+    describe('filter parameter', () => {
+        it('should satisfy the at-least-one-filter requirement on its own', async () => {
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            await expect(
+                findTasks.execute({ filter: 'today', limit: 10 }, mockTodoistApi),
+            ).resolves.toBeDefined()
+        })
+
+        it('should pass the raw filter as the query (with default user filter appended)', async () => {
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            await findTasks.execute({ filter: 'today | overdue', limit: 10 }, mockTodoistApi)
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: 'today | overdue & !assigned to: others',
+                cursor: undefined,
+                limit: 10,
+            })
+        })
+
+        it('should combine filter with searchText using AND', async () => {
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            await findTasks.execute(
+                { filter: 'p1', searchText: 'meeting', limit: 10 },
+                mockTodoistApi,
+            )
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: 'p1 & search: meeting & !assigned to: others',
+                cursor: undefined,
+                limit: 10,
+            })
+        })
+
+        it('should combine filter with labels', async () => {
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            await findTasks.execute(
+                { filter: 'today', labels: ['work'], limit: 10 },
+                mockTodoistApi,
+            )
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: 'today & (@work) & !assigned to: others',
+                cursor: undefined,
+                limit: 10,
+            })
+        })
+
+        it('should combine filter with responsibleUser', async () => {
+            mockResolveUserNameToId.mockResolvedValue({
+                userId: 'specific-user-id',
+                displayName: 'Jane Doe',
+                email: 'jane@example.com',
+            })
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            await findTasks.execute(
+                { filter: '##Work', responsibleUser: 'Jane Doe', limit: 10 },
+                mockTodoistApi,
+            )
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: '##Work & assigned to: jane@example.com',
+                cursor: undefined,
+                limit: 10,
+            })
+        })
+
+        it('should throw an error when filter is combined with projectId', async () => {
+            await expect(
+                findTasks.execute(
+                    { filter: 'today', projectId: TEST_IDS.PROJECT_TEST, limit: 10 },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(
+                'The `filter` parameter cannot be combined with projectId, sectionId, or parentId.',
+            )
+        })
+
+        it('should throw an error when filter is combined with sectionId', async () => {
+            await expect(
+                findTasks.execute(
+                    { filter: 'p1', sectionId: TEST_IDS.SECTION_1, limit: 10 },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(
+                'The `filter` parameter cannot be combined with projectId, sectionId, or parentId.',
+            )
+        })
+
+        it('should pass filter through without appending user filter when responsibleUserFiltering is "all"', async () => {
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            await findTasks.execute(
+                { filter: 'today', responsibleUserFiltering: 'all', limit: 10 },
+                mockTodoistApi,
+            )
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: 'today',
+                cursor: undefined,
+                limit: 10,
+            })
+        })
+    })
+
     describe('error handling', () => {
         it.each([
             {
-                error: 'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, or labels',
+                error: 'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, labels, or filter',
                 params: { limit: 10 },
                 expectValidation: true,
             },
