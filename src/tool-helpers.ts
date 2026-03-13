@@ -3,6 +3,7 @@ import type {
     ColorKey,
     Comment,
     CurrentUser,
+    Label,
     MoveTaskArgs,
     PersonalProject,
     Section,
@@ -139,6 +140,29 @@ export async function searchAllProjects(client: TodoistApi, query: string): Prom
         apiMethod: client.searchProjects.bind(client),
         args: { query },
         limit: ApiLimits.PROJECTS_MAX,
+    })
+}
+
+/**
+ * Searches labels by name and fetches all matching pages.
+ *
+ * @param client - The Todoist API client
+ * @param query - The search query string
+ * @returns Promise resolving to array of matching labels
+ */
+export async function searchAllLabels(client: TodoistApi, query: string): Promise<Label[]> {
+    return fetchAllPages({
+        apiMethod: client.searchLabels.bind(client),
+        args: { query },
+        limit: ApiLimits.LABELS_MAX,
+    })
+}
+
+export async function fetchAllSharedLabels(client: TodoistApi): Promise<string[]> {
+    return fetchAllPages({
+        apiMethod: client.getSharedLabels.bind(client),
+        args: {},
+        limit: ApiLimits.LABELS_MAX,
     })
 }
 

@@ -1,0 +1,137 @@
+import type { Label } from '@doist/todoist-api-typescript'
+import { z } from 'zod'
+import type { TodoistTool } from '../todoist-tool.js'
+import { fetchAllSharedLabels, searchAllLabels } from '../tool-helpers.js'
+import { ApiLimits } from '../utils/constants.js'
+import { LabelSchema as LabelOutputSchema } from '../utils/output-schemas.js'
+import { formatLabelPreview, summarizeList } from '../utils/response-builders.js'
+import { ToolNames } from '../utils/tool-names.js'
+
+const ArgsSchema = {
+    search: z
+        .string()
+        .optional()
+        .describe('Search for a label by exact name. If omitted, all labels are returned.'),
+    limit: z
+        .number()
+        .int()
+        .min(1)
+        .max(ApiLimits.LABELS_MAX)
+        .default(ApiLimits.LABELS_DEFAULT)
+        .describe('The maximum number of labels to return.'),
+    cursor: z
+        .string()
+        .optional()
+        .describe(
+            'The cursor to get the next page of labels (cursor is obtained from the previous call to this tool, with the same parameters). Ignored when search is provided.',
+        ),
+}
+
+const OutputSchema = {
+    labels: z.array(LabelOutputSchema).describe('The found personal labels.'),
+    nextCursor: z.string().optional().describe('Cursor for the next page of results.'),
+    totalCount: z.number().describe('The total number of labels in this page.'),
+    hasMore: z.boolean().describe('Whether there are more results available.'),
+    sharedLabels: z
+        .array(z.string())
+        .describe(
+            'Names of all shared labels visible to you. These have no IDs or metadata — use their names directly when filtering tasks.',
+        ),
+    appliedFilters: z
+        .record(z.string(), z.unknown())
+        .describe('The filters that were applied to the search.'),
+}
+
+const findLabels = {
+    name: ToolNames.FIND_LABELS,
+    description:
+        'List personal labels and shared labels. Personal labels have full metadata (id, name, color, order, isFavorite) and support pagination and exact-name search. Shared labels are labels used on tasks shared with you — they are returned as names only (no IDs or metadata). When searching, all matching personal labels are fetched across all pages and returned as a single result set (limit and cursor are ignored). When not searching, personal labels are returned with pagination.',
+    parameters: ArgsSchema,
+    outputSchema: OutputSchema,
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+    async execute(args, client) {
+        const [personalResult, sharedLabels] = await Promise.all([
+            args.search
+                ? searchAllLabels(client, args.search).then((results) => ({
+                      results,
+                      nextCursor: null,
+                  }))
+                : client.getLabels({ limit: args.limit, cursor: args.cursor ?? null }),
+            fetchAllSharedLabels(client),
+        ])
+
+        const { results, nextCursor } = personalResult
+
+        const appliedFilters = args.search
+            ? { search: args.search }
+            : { limit: args.limit, cursor: args.cursor }
+
+        return {
+            textContent: generateTextContent({ labels: results, args, nextCursor, sharedLabels }),
+            structuredContent: {
+                labels: results.map((l) => LabelOutputSchema.parse(l)),
+                nextCursor: nextCursor ?? undefined,
+                totalCount: results.length,
+                hasMore: Boolean(nextCursor),
+                sharedLabels,
+                appliedFilters,
+            },
+        }
+    },
+} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
+
+function generateTextContent({
+    labels,
+    args,
+    nextCursor,
+    sharedLabels,
+}: {
+    labels: Label[]
+    args: z.infer<z.ZodObject<typeof ArgsSchema>>
+    nextCursor: string | null
+    sharedLabels: string[]
+}) {
+    const subject = args.search ? `All labels matching "${args.search}"` : 'Labels'
+
+    const filterHints: string[] = []
+    if (args.search) {
+        filterHints.push(`search: "${args.search}"`)
+    }
+
+    const previewLimit = 10
+    const previewLabels = labels.slice(0, previewLimit)
+    const previewLines = previewLabels.map(formatLabelPreview).join('\n')
+    const remainingCount = labels.length - previewLimit
+    const previewWithMore =
+        remainingCount > 0 ? `${previewLines}\n    …and ${remainingCount} more` : previewLines
+
+    const zeroReasonHints: string[] = []
+    if (labels.length === 0) {
+        if (args.search) {
+            zeroReasonHints.push('Search requires the exact label name')
+            zeroReasonHints.push('Check spelling')
+            zeroReasonHints.push('Remove search to see all labels')
+        } else {
+            zeroReasonHints.push('No personal labels created yet')
+        }
+    }
+
+    const sharedSection =
+        sharedLabels.length > 0
+            ? `\nShared labels (${sharedLabels.length}): ${sharedLabels.join(', ')}`
+            : '\nNo shared labels.'
+
+    return (
+        summarizeList({
+            subject,
+            count: labels.length,
+            limit: args.search ? undefined : args.limit,
+            nextCursor: nextCursor ?? undefined,
+            filterHints,
+            previewLines: previewWithMore,
+            zeroReasonHints,
+        }) + sharedSection
+    )
+}
+
+export { findLabels }

@@ -1,5 +1,5 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
-import { type Mocked, vi } from 'vitest'
+import { beforeEach, describe, expect, it, type Mocked, vi } from 'vitest'
 import { ToolNames } from '../../utils/tool-names.js'
 import { deleteObject } from '../delete-object.js'
 
@@ -8,6 +8,8 @@ const mockTodoistApi = {
     deleteProject: vi.fn(),
     deleteSection: vi.fn(),
     deleteTask: vi.fn(),
+    deleteComment: vi.fn(),
+    deleteLabel: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
 const { DELETE_OBJECT } = ToolNames
@@ -128,28 +130,101 @@ describe(`${DELETE_OBJECT} tool`, () => {
         })
     })
 
+    describe('deleting comments', () => {
+        it('should delete a comment by ID', async () => {
+            mockTodoistApi.deleteComment.mockResolvedValue(true)
+
+            const result = await deleteObject.execute(
+                { type: 'comment', id: 'comment-456' },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.deleteComment).toHaveBeenCalledWith('comment-456')
+            expect(mockTodoistApi.deleteProject).not.toHaveBeenCalled()
+            expect(mockTodoistApi.deleteTask).not.toHaveBeenCalled()
+
+            const textContent = result.textContent
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Deleted comment: id=comment-456')
+            expect(result.structuredContent).toEqual({
+                deletedEntity: { type: 'comment', id: 'comment-456' },
+                success: true,
+            })
+        })
+
+        it('should propagate comment deletion errors', async () => {
+            mockTodoistApi.deleteComment.mockRejectedValue(
+                new Error('API Error: Comment not found'),
+            )
+
+            await expect(
+                deleteObject.execute(
+                    { type: 'comment', id: 'non-existent-comment' },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow('API Error: Comment not found')
+        })
+    })
+
+    describe('deleting labels', () => {
+        it('should delete a label by ID', async () => {
+            mockTodoistApi.deleteLabel.mockResolvedValue(true)
+
+            const result = await deleteObject.execute(
+                { type: 'label', id: 'label-123' },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.deleteLabel).toHaveBeenCalledWith('label-123')
+            expect(mockTodoistApi.deleteProject).not.toHaveBeenCalled()
+            expect(mockTodoistApi.deleteTask).not.toHaveBeenCalled()
+
+            const textContent = result.textContent
+            expect(textContent).toMatchSnapshot()
+            expect(textContent).toContain('Deleted label: id=label-123')
+            expect(result.structuredContent).toEqual({
+                deletedEntity: { type: 'label', id: 'label-123' },
+                success: true,
+            })
+        })
+
+        it('should propagate label deletion errors', async () => {
+            mockTodoistApi.deleteLabel.mockRejectedValue(new Error('API Error: Label not found'))
+
+            await expect(
+                deleteObject.execute({ type: 'label', id: 'non-existent-label' }, mockTodoistApi),
+            ).rejects.toThrow('API Error: Label not found')
+        })
+    })
+
     describe('type validation', () => {
         it('should handle all supported entity types', async () => {
             mockTodoistApi.deleteProject.mockResolvedValue(true)
             mockTodoistApi.deleteSection.mockResolvedValue(true)
             mockTodoistApi.deleteTask.mockResolvedValue(true)
+            mockTodoistApi.deleteComment.mockResolvedValue(true)
+            mockTodoistApi.deleteLabel.mockResolvedValue(true)
 
-            // Delete project
             await deleteObject.execute({ type: 'project', id: 'proj-1' }, mockTodoistApi)
             expect(mockTodoistApi.deleteProject).toHaveBeenCalledWith('proj-1')
 
-            // Delete section
             await deleteObject.execute({ type: 'section', id: 'sect-1' }, mockTodoistApi)
             expect(mockTodoistApi.deleteSection).toHaveBeenCalledWith('sect-1')
 
-            // Delete task
             await deleteObject.execute({ type: 'task', id: 'task-1' }, mockTodoistApi)
             expect(mockTodoistApi.deleteTask).toHaveBeenCalledWith('task-1')
 
-            // Verify each API method was called exactly once
+            await deleteObject.execute({ type: 'comment', id: 'comment-1' }, mockTodoistApi)
+            expect(mockTodoistApi.deleteComment).toHaveBeenCalledWith('comment-1')
+
+            await deleteObject.execute({ type: 'label', id: 'label-1' }, mockTodoistApi)
+            expect(mockTodoistApi.deleteLabel).toHaveBeenCalledWith('label-1')
+
             expect(mockTodoistApi.deleteProject).toHaveBeenCalledTimes(1)
             expect(mockTodoistApi.deleteSection).toHaveBeenCalledTimes(1)
             expect(mockTodoistApi.deleteTask).toHaveBeenCalledTimes(1)
+            expect(mockTodoistApi.deleteComment).toHaveBeenCalledTimes(1)
+            expect(mockTodoistApi.deleteLabel).toHaveBeenCalledTimes(1)
         })
     })
 })

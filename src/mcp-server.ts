@@ -11,6 +11,7 @@ import {
     registerTool,
 } from './mcp-helpers.js'
 import { addComments } from './tools/add-comments.js'
+import { addLabels } from './tools/add-labels.js'
 import { addProjects } from './tools/add-projects.js'
 import { addSections } from './tools/add-sections.js'
 import { addTasks } from './tools/add-tasks.js'
@@ -21,6 +22,7 @@ import { fetchObject } from './tools/fetch-object.js'
 import { findActivity } from './tools/find-activity.js'
 import { findComments } from './tools/find-comments.js'
 import { findCompletedTasks } from './tools/find-completed-tasks.js'
+import { findLabels } from './tools/find-labels.js'
 import { findProjectCollaborators } from './tools/find-project-collaborators.js'
 import { findProjects } from './tools/find-projects.js'
 import { findSections } from './tools/find-sections.js'
@@ -83,7 +85,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **find-activity**: Retrieve recent activity logs to monitor and audit changes. Shows events from all users by default; use initiatorId to filter by specific user. Filter by object type (task/project/comment), event type (added/updated/deleted/completed/uncompleted/archived/unarchived/shared/left), and specific objects (objectId, projectId, taskId). Useful for tracking who did what and when. Note: Date-based filtering is not supported.
 
 **General Operations:**
-- **delete-object**: Remove projects, sections, tasks, or comments by type and ID
+- **delete-object**: Remove projects, sections, tasks, comments, or labels by type and ID
 - **fetch-object**: Fetch a single task, project, comment, or section by its ID
 - **user-info**: Get user details including timezone, goals, and plan information
 
@@ -99,7 +101,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 5. **Date Handling**: All dates respect user timezone settings. Use 'today' keyword for dynamic date filtering (includes overdue tasks).
 
-6. **Labels**: Use label filtering with AND/OR operators for advanced task organization. Most search tools support labels parameter.
+6. **Labels**: Use label filtering with AND/OR operators for advanced task organization. Most search tools support labels parameter. Use **find-labels** to discover personal and shared labels — use label **names** (not IDs) when filtering tasks, and use label **IDs** only with **delete-object**. Use **add-labels** to create new personal labels.
 
 7. **Pagination**: Large result sets use cursor-based pagination. Use limit parameter to control result size (default varies by tool).
 
@@ -191,6 +193,10 @@ function getMcpServer({
     registerTool({ tool: addComments, ...toolArgs })
     registerTool({ tool: findComments, ...toolArgs })
     registerTool({ tool: updateComments, ...toolArgs })
+
+    // Label management tools
+    registerTool({ tool: addLabels, ...toolArgs })
+    registerTool({ tool: findLabels, ...toolArgs })
 
     // Activity and audit tools
     registerTool({ tool: findActivity, ...toolArgs })

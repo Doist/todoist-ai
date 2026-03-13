@@ -1,3 +1,4 @@
+import type { Label } from '@doist/todoist-api-typescript'
 import { DisplayLimits } from './constants.js'
 import { type Priority } from './priorities.js'
 import { ToolNames } from './tool-names.js'
@@ -122,6 +123,16 @@ function formatTaskPreview(task: TaskLike): string {
     const project = task.projectName ? ` • ${task.projectName}` : ''
     const id = task.id ? ` • id=${task.id}` : ''
     return `    ${content}${due}${priority}${project}${id}`
+}
+
+/**
+ * Formats a single label into a readable preview line
+ */
+export function formatLabelPreview(label: Label): string {
+    const color = ` (${label.color})`
+    const isFavorite = label.isFavorite ? ' • ⭐' : ''
+    const id = ` • id=${label.id}`
+    return `    ${label.name}${color}${isFavorite}${id}`
 }
 
 /**

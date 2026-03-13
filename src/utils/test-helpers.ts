@@ -1,5 +1,6 @@
 import type {
     CurrentUser,
+    Label,
     PersonalProject,
     Section,
     Task,
@@ -133,6 +134,21 @@ export function createMockWorkspaceProject(
         status: 'active',
         isInviteOnly: false,
         isLinkSharingEnabled: true,
+        ...overrides,
+    }
+}
+
+/**
+ * Creates a mock Label with all required properties and sensible defaults.
+ * Pass only the properties you want to override for your specific test.
+ */
+export function createMockLabel(overrides: Partial<Label> = {}): Label {
+    return {
+        id: 'label-123',
+        name: 'Test Label',
+        color: 'red',
+        order: 1,
+        isFavorite: false,
         ...overrides,
     }
 }
