@@ -196,6 +196,34 @@ End of description.`)
                 childOrder: 1,
             })
         })
+
+        it('should map a workspace project with non-null folderId', () => {
+            const mockWorkspaceProject = createMockWorkspaceProject({
+                id: 'proj-3',
+                name: 'Folder Project',
+                color: 'green',
+                isFavorite: false,
+                isShared: true,
+                viewStyle: 'list',
+                workspaceId: TEST_IDS.WORKSPACE_1,
+                folderId: 'folder-42',
+                childOrder: 5,
+            })
+
+            expect(mapProject(mockWorkspaceProject)).toEqual({
+                id: 'proj-3',
+                name: 'Folder Project',
+                color: 'green',
+                isFavorite: false,
+                isShared: true,
+                parentId: undefined,
+                inboxProject: false,
+                viewStyle: 'list',
+                workspaceId: TEST_IDS.WORKSPACE_1,
+                folderId: 'folder-42',
+                childOrder: 5,
+            })
+        })
     })
 
     describe('type guards', () => {

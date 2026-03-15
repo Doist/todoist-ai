@@ -15,6 +15,37 @@ const ArgsSchema = {
         ),
 }
 
+const ProjectStructureSchema: z.ZodType<{
+    id: string
+    name: string
+    parentId: string | null
+    folderId: string | null
+    childOrder: number
+    sections: { id: string; name: string }[]
+    children: unknown[]
+}> = z.lazy(() =>
+    z.object({
+        id: z.string().describe('The project ID.'),
+        name: z.string().describe('The project name.'),
+        parentId: z
+            .string()
+            .nullable()
+            .describe('The parent project ID (for sub-projects, personal projects only).'),
+        folderId: z
+            .string()
+            .nullable()
+            .describe('The folder ID this project belongs to (workspace projects only).'),
+        childOrder: z.number().describe('The ordering index among siblings.'),
+        sections: z.array(
+            z.object({
+                id: z.string(),
+                name: z.string(),
+            }),
+        ),
+        children: z.array(ProjectStructureSchema).describe('Nested child projects.'),
+    }),
+)
+
 const OutputSchema = {
     type: z
         .enum(['account_overview', 'project_overview'])
@@ -46,12 +77,53 @@ const OutputSchema = {
         .boolean()
         .optional()
         .describe('Whether account has nested projects (account overview only).'),
-    inbox: z.any().optional().describe('Inbox information (account overview only).'),
-    projects: z.array(z.any()).optional().describe('List of projects (account overview only).'),
-    project: z.any().optional().describe('Project details (project overview only).'),
-    sections: z.array(z.any()).optional().describe('List of sections (project overview only).'),
+    inbox: z
+        .object({
+            id: z.string().describe('The inbox project ID.'),
+            name: z.string().describe('The inbox project name.'),
+            sections: z
+                .array(
+                    z.object({
+                        id: z.string(),
+                        name: z.string(),
+                    }),
+                )
+                .describe('Sections in the inbox project.'),
+        })
+        .nullable()
+        .optional()
+        .describe('Inbox information (account overview only).'),
+    projects: z
+        .array(z.lazy(() => ProjectStructureSchema))
+        .optional()
+        .describe(
+            'List of projects with hierarchy, folders, and ordering (account overview only).',
+        ),
+    project: z
+        .object({
+            id: z.string().describe('The project ID.'),
+            name: z.string().describe('The project name.'),
+        })
+        .optional()
+        .describe('Project details (project overview only).'),
+    sections: z
+        .array(
+            z.object({
+                id: z.string(),
+                name: z.string(),
+            }),
+        )
+        .optional()
+        .describe('List of sections (project overview only).'),
     tasks: z.array(z.any()).optional().describe('List of tasks (project overview only).'),
-    stats: z.any().optional().describe('Statistics object (project overview only).'),
+    stats: z
+        .object({
+            totalTasks: z.number(),
+            totalSections: z.number(),
+            tasksWithoutSection: z.number(),
+        })
+        .optional()
+        .describe('Statistics object (project overview only).'),
 }
 
 // Types and helpers from account-overview
