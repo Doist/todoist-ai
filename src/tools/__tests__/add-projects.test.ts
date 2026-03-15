@@ -1,14 +1,25 @@
-import type { PersonalProject, TodoistApi, WorkspaceProject } from '@doist/todoist-api-typescript'
+import type {
+    PersonalProject,
+    TodoistApi,
+    Workspace,
+    WorkspaceProject,
+} from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
 import { z } from 'zod'
 import { ProjectSchema } from '../../utils/output-schemas.js'
-import { createMockProject, TEST_IDS } from '../../utils/test-helpers.js'
+import {
+    createMockProject,
+    createMockWorkspaceProject,
+    TEST_IDS,
+} from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
+import { workspaceResolver } from '../../utils/workspace-resolver.js'
 import { addProjects } from '../add-projects.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
     addProject: vi.fn(),
+    getWorkspaces: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
 const { ADD_PROJECTS } = ToolNames
@@ -374,6 +385,162 @@ describe(`${ADD_PROJECTS} tool`, () => {
                     console.error('Schema validation failed:', parseResult.error.format())
                 }
             }
+        })
+    })
+
+    describe('workspace support', () => {
+        beforeEach(() => {
+            workspaceResolver.clearCache()
+        })
+
+        function createMockWorkspace(overrides: Partial<Workspace> = {}): Workspace {
+            return {
+                id: '100123',
+                name: 'Test Workspace',
+                plan: 'BUSINESS',
+                role: 'ADMIN',
+                inviteCode: 'abc123',
+                isLinkSharingEnabled: true,
+                isGuestAllowed: true,
+                limits: { current: null, next: null },
+                createdAt: '2024-01-15T10:00:00Z',
+                creatorId: 'user-456',
+                properties: {},
+                ...overrides,
+            }
+        }
+
+        it('should pass workspaceId when workspace is specified by ID', async () => {
+            const mockWorkspaces = [createMockWorkspace({ id: '111', name: 'Engineering' })]
+            mockTodoistApi.getWorkspaces.mockResolvedValue(mockWorkspaces)
+
+            const mockProject = createMockWorkspaceProject({
+                id: 'ws-project-1',
+                name: 'WS Project',
+                workspaceId: '111',
+            })
+            mockTodoistApi.addProject.mockResolvedValue(mockProject)
+
+            await addProjects.execute(
+                { projects: [{ name: 'WS Project', workspace: '111' }] },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addProject).toHaveBeenCalledWith({
+                name: 'WS Project',
+                workspaceId: '111',
+            })
+        })
+
+        it('should resolve workspace by name and pass workspaceId', async () => {
+            const mockWorkspaces = [createMockWorkspace({ id: '222', name: 'Marketing Team' })]
+            mockTodoistApi.getWorkspaces.mockResolvedValue(mockWorkspaces)
+
+            const mockProject = createMockWorkspaceProject({
+                id: 'ws-project-2',
+                name: 'Marketing Project',
+                workspaceId: '222',
+            })
+            mockTodoistApi.addProject.mockResolvedValue(mockProject)
+
+            await addProjects.execute(
+                { projects: [{ name: 'Marketing Project', workspace: 'Marketing Team' }] },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addProject).toHaveBeenCalledWith({
+                name: 'Marketing Project',
+                workspaceId: '222',
+            })
+        })
+
+        it('should handle mixed projects with and without workspace', async () => {
+            const mockWorkspaces = [createMockWorkspace({ id: '333', name: 'Engineering' })]
+            mockTodoistApi.getWorkspaces.mockResolvedValue(mockWorkspaces)
+
+            const personalProject = createMockProject({ id: 'p-1', name: 'Personal' })
+            const wsProject = createMockWorkspaceProject({
+                id: 'ws-1',
+                name: 'Work',
+                workspaceId: '333',
+            })
+
+            mockTodoistApi.addProject
+                .mockResolvedValueOnce(personalProject)
+                .mockResolvedValueOnce(wsProject)
+
+            await addProjects.execute(
+                {
+                    projects: [{ name: 'Personal' }, { name: 'Work', workspace: 'Engineering' }],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addProject).toHaveBeenNthCalledWith(1, { name: 'Personal' })
+            expect(mockTodoistApi.addProject).toHaveBeenNthCalledWith(2, {
+                name: 'Work',
+                workspaceId: '333',
+            })
+        })
+
+        it('should resolve the same workspace name only once for multiple projects', async () => {
+            const mockWorkspaces = [createMockWorkspace({ id: '444', name: 'Engineering' })]
+            mockTodoistApi.getWorkspaces.mockResolvedValue(mockWorkspaces)
+
+            const project1 = createMockWorkspaceProject({
+                id: 'ws-1',
+                name: 'Project A',
+                workspaceId: '444',
+            })
+            const project2 = createMockWorkspaceProject({
+                id: 'ws-2',
+                name: 'Project B',
+                workspaceId: '444',
+            })
+            mockTodoistApi.addProject
+                .mockResolvedValueOnce(project1)
+                .mockResolvedValueOnce(project2)
+
+            await addProjects.execute(
+                {
+                    projects: [
+                        { name: 'Project A', workspace: 'Engineering' },
+                        { name: 'Project B', workspace: 'Engineering' },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // getWorkspaces should only be called once (cached)
+            expect(mockTodoistApi.getWorkspaces).toHaveBeenCalledTimes(1)
+        })
+
+        it('should throw when workspace name is ambiguous', async () => {
+            const mockWorkspaces = [
+                createMockWorkspace({ id: '555', name: 'Engineering Team' }),
+                createMockWorkspace({ id: '666', name: 'Marketing Team' }),
+            ]
+            mockTodoistApi.getWorkspaces.mockResolvedValue(mockWorkspaces)
+
+            await expect(
+                addProjects.execute(
+                    { projects: [{ name: 'Project', workspace: 'Team' }] },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(/Ambiguous workspace reference/)
+        })
+
+        it('should throw when workspace name is not found', async () => {
+            mockTodoistApi.getWorkspaces.mockResolvedValue([
+                createMockWorkspace({ id: '777', name: 'Engineering' }),
+            ])
+
+            await expect(
+                addProjects.execute(
+                    { projects: [{ name: 'Project', workspace: 'Nonexistent' }] },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(/Workspace "Nonexistent" not found/)
         })
     })
 

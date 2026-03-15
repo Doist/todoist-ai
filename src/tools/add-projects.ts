@@ -5,6 +5,7 @@ import { mapProject } from '../tool-helpers.js'
 import { ColorSchema } from '../utils/colors.js'
 import { ProjectSchema as ProjectOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
+import { workspaceResolver } from '../utils/workspace-resolver.js'
 
 const ProjectSchema = z.object({
     name: z.string().min(1).describe('The name of the project.'),
@@ -21,6 +22,15 @@ const ProjectSchema = z.object({
         .optional()
         .describe('The project view style. Defaults to "list".'),
     color: ColorSchema,
+    workspace: z
+        .string()
+        .trim()
+        .min(1)
+        .optional()
+        .describe(
+            'The workspace to create the project in. Accepts a workspace name or workspace ID. ' +
+                'If not provided, creates a personal project. Use list-workspaces to see available workspaces.',
+        ),
 })
 
 const ArgsSchema = {
@@ -39,7 +49,23 @@ const addProjects = {
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
     async execute({ projects }, client) {
-        const newProjects = await Promise.all(projects.map((project) => client.addProject(project)))
+        // Collect unique workspace references and resolve each once
+        const uniqueWorkspaceRefs = [
+            ...new Set(projects.map((p) => p.workspace).filter(Boolean)),
+        ] as string[]
+
+        const resolvedWorkspaces = new Map<string, string>()
+        for (const ref of uniqueWorkspaceRefs) {
+            const resolved = await workspaceResolver.resolveWorkspace(client, ref)
+            resolvedWorkspaces.set(ref, resolved.workspaceId)
+        }
+
+        const newProjects = await Promise.all(
+            projects.map(({ workspace, ...rest }) => {
+                const workspaceId = workspace ? resolvedWorkspaces.get(workspace) : undefined
+                return client.addProject({ ...rest, ...(workspaceId ? { workspaceId } : {}) })
+            }),
+        )
         const textContent = generateTextContent({ projects: newProjects })
         const mappedProjects = newProjects.map(mapProject)
 

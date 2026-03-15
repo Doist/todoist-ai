@@ -71,7 +71,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **find-completed-tasks**: View completed tasks by completion date or original due date; if since/until are omitted, defaults to the last 7 days (returns all collaborators unless filtered)
 
 **Project & Organization:**
-- **add-projects/update-projects/find-projects**: Manage project lifecycle with names, favorites, and view styles (list/board/calendar)
+- **add-projects/update-projects/find-projects**: Manage project lifecycle with names, favorites, view styles (list/board/calendar), and workspace assignment for new projects (by name or ID)
 - **project-management**: Archive or unarchive projects by ID
 - **project-move**: Move projects between personal and workspace contexts
 - **add-sections/update-sections/find-sections**: Organize tasks within projects using sections
