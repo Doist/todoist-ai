@@ -66,7 +66,7 @@ describe(`${SEARCH} tool`, () => {
                 cursor: undefined,
             })
             expect(mockTodoistApi.searchProjects).toHaveBeenCalledWith({
-                query: 'important',
+                query: '*important*',
                 limit: 200, // PROJECTS_MAX
                 cursor: null,
             })

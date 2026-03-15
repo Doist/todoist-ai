@@ -138,7 +138,7 @@ export async function fetchAllPages<
 export async function searchAllProjects(client: TodoistApi, query: string): Promise<Project[]> {
     return fetchAllPages({
         apiMethod: client.searchProjects.bind(client),
-        args: { query },
+        args: { query: `*${query}*` },
         limit: ApiLimits.PROJECTS_MAX,
     })
 }
@@ -153,7 +153,7 @@ export async function searchAllProjects(client: TodoistApi, query: string): Prom
 export async function searchAllLabels(client: TodoistApi, query: string): Promise<Label[]> {
     return fetchAllPages({
         apiMethod: client.searchLabels.bind(client),
-        args: { query },
+        args: { query: `*${query}*` },
         limit: ApiLimits.LABELS_MAX,
     })
 }

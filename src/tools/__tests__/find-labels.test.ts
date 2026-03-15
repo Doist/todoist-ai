@@ -254,7 +254,7 @@ describe(`${FIND_LABELS} tool`, () => {
             const result = await findLabels.execute({ search: 'work', limit: 50 }, mockTodoistApi)
 
             expect(mockTodoistApi.searchLabels).toHaveBeenCalledWith({
-                query: 'work',
+                query: '*work*',
                 limit: 200,
                 cursor: null,
             })
@@ -281,12 +281,12 @@ describe(`${FIND_LABELS} tool`, () => {
 
             expect(mockTodoistApi.searchLabels).toHaveBeenCalledTimes(2)
             expect(mockTodoistApi.searchLabels).toHaveBeenNthCalledWith(1, {
-                query: 'work',
+                query: '*work*',
                 limit: 200,
                 cursor: null,
             })
             expect(mockTodoistApi.searchLabels).toHaveBeenNthCalledWith(2, {
-                query: 'work',
+                query: '*work*',
                 limit: 200,
                 cursor: 'page-2-cursor',
             })

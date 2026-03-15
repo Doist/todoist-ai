@@ -360,7 +360,7 @@ End of description.`)
             const result = await searchAllProjects(mockTodoistApi, 'Work')
 
             expect(mockTodoistApi.searchProjects).toHaveBeenCalledWith({
-                query: 'Work',
+                query: '*Work*',
                 cursor: null,
                 limit: 200, // PROJECTS_MAX
             })
