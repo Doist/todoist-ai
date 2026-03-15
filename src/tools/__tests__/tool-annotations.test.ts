@@ -41,6 +41,13 @@ const TOOL_EXPECTATIONS: ToolExpectation[] = [
         idempotentHint: false,
     },
     {
+        name: ToolNames.RESCHEDULE_TASKS,
+        title: 'Todoist: Reschedule Tasks',
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+    },
+    {
         name: ToolNames.FIND_TASKS,
         title: 'Todoist: Find Tasks',
         readOnlyHint: true,
