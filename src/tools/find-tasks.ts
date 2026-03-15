@@ -15,6 +15,7 @@ import {
     resolveInboxProjectId,
 } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
+import { filterResolver } from '../utils/filter-resolver.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
@@ -60,13 +61,13 @@ const ArgsSchema = {
         .optional()
         .describe(
             'A raw Todoist filter query string (e.g. "today", "p1", "##Work", "(today | overdue) & p1"). ' +
-                'Combined with other filters using AND. Cannot be used with projectId, sectionId, parentId, or filterId.',
+                'Combined with other filters using AND. Cannot be used with projectId, sectionId, parentId, or filterIdOrName.',
         ),
-    filterId: z
+    filterIdOrName: z
         .string()
         .optional()
         .describe(
-            "The ID of a saved Todoist filter. The filter's query will be fetched and used to find tasks. " +
+            "The ID or name of a saved Todoist filter. The filter's query will be fetched and used to find tasks. " +
                 'Cannot be used with the `filter` parameter, projectId, sectionId, or parentId.',
         ),
     ...LabelsSchema,
@@ -102,7 +103,7 @@ const findTasks = {
             labels,
             labelsOperator,
             filter,
-            filterId,
+            filterIdOrName,
         } = args
 
         const todoistUser = await client.getUser()
@@ -117,37 +118,30 @@ const findTasks = {
             !responsibleUser &&
             !hasLabels &&
             !filter &&
-            !filterId
+            !filterIdOrName
         ) {
             throw new Error(
-                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, labels, filter, or filterId',
+                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, labels, filter, or filterIdOrName',
             )
         }
 
-        if (filter && filterId) {
+        if (filter && filterIdOrName) {
             throw new Error(
-                'The `filter` and `filterId` parameters cannot be used together. Provide only one.',
+                'The `filter` and `filterIdOrName` parameters cannot be used together. Provide only one.',
             )
         }
 
-        if ((filter || filterId) && (projectId || sectionId || parentId)) {
+        if ((filter || filterIdOrName) && (projectId || sectionId || parentId)) {
             throw new Error(
-                'The `filter`/`filterId` parameter cannot be combined with projectId, sectionId, or parentId. Use filter syntax instead (e.g. "##ProjectName").',
+                'The `filter`/`filterIdOrName` parameter cannot be combined with projectId, sectionId, or parentId. Use filter syntax instead (e.g. "##ProjectName").',
             )
         }
 
-        // Resolve filterId to a filter query string
+        // Resolve filterIdOrName to a filter query string
         let resolvedFilter = filter
-        if (filterId) {
-            const syncResponse = await client.sync({
-                resourceTypes: ['filters'],
-                syncToken: '*',
-            })
-            const matchedFilter = syncResponse.filters?.find((f) => f.id === filterId)
-            if (!matchedFilter) {
-                throw new Error(`Filter with ID "${filterId}" not found.`)
-            }
-            resolvedFilter = matchedFilter.query
+        if (filterIdOrName) {
+            const resolved = await filterResolver.resolveFilter(client, filterIdOrName)
+            resolvedFilter = resolved.filterQuery
         }
 
         // Resolve assignee name to user ID if provided
