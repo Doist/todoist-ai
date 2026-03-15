@@ -40,6 +40,7 @@ import { listWorkspaces } from '../src/tools/list-workspaces.js'
 import { manageAssignments } from '../src/tools/manage-assignments.js'
 import { projectManagement } from '../src/tools/project-management.js'
 import { projectMove } from '../src/tools/project-move.js'
+import { rescheduleTasks } from '../src/tools/reschedule-tasks.js'
 import { search } from '../src/tools/search.js'
 import { uncompleteTasks } from '../src/tools/uncomplete-tasks.js'
 import { updateComments } from '../src/tools/update-comments.js'
@@ -86,6 +87,7 @@ const tools: Record<string, ExecutableTool> = {
     'manage-assignments': manageAssignments,
     'project-management': projectManagement,
     'project-move': projectMove,
+    'reschedule-tasks': rescheduleTasks,
     search: search,
     'update-comments': updateComments,
     'update-projects': updateProjects,

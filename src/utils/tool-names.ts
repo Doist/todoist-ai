@@ -14,6 +14,7 @@ export const ToolNames = {
     FIND_TASKS: 'find-tasks',
     FIND_TASKS_BY_DATE: 'find-tasks-by-date',
     FIND_COMPLETED_TASKS: 'find-completed-tasks',
+    RESCHEDULE_TASKS: 'reschedule-tasks',
 
     // Project management tools
     ADD_PROJECTS: 'add-projects',
