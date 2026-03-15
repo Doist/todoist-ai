@@ -133,7 +133,7 @@ describe(`${FIND_PROJECTS} tool`, () => {
 
             // When searching, should use maximum limit and ignore user's limit parameter
             expect(mockTodoistApi.searchProjects).toHaveBeenCalledWith({
-                query: 'work',
+                query: '*work*',
                 limit: 200,
                 cursor: null,
             })
@@ -171,12 +171,12 @@ describe(`${FIND_PROJECTS} tool`, () => {
             // Should have made 2 API calls to get all matching projects
             expect(mockTodoistApi.searchProjects).toHaveBeenCalledTimes(2)
             expect(mockTodoistApi.searchProjects).toHaveBeenNthCalledWith(1, {
-                query: 'work',
+                query: '*work*',
                 limit: 200,
                 cursor: null,
             })
             expect(mockTodoistApi.searchProjects).toHaveBeenNthCalledWith(2, {
-                query: 'work',
+                query: '*work*',
                 limit: 200,
                 cursor: 'page-2-cursor',
             })

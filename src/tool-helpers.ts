@@ -129,6 +129,15 @@ export async function fetchAllPages<
 }
 
 /**
+ * Wraps a search query with wildcards for substring matching.
+ * Escapes any literal backslashes and asterisks in the query first.
+ */
+export function toWildcardQuery(query: string): string {
+    const escaped = query.replaceAll('\\', '\\\\').replaceAll('*', '\\*')
+    return `*${escaped}*`
+}
+
+/**
  * Searches projects by name and fetches all matching pages.
  *
  * @param client - The Todoist API client
@@ -138,7 +147,7 @@ export async function fetchAllPages<
 export async function searchAllProjects(client: TodoistApi, query: string): Promise<Project[]> {
     return fetchAllPages({
         apiMethod: client.searchProjects.bind(client),
-        args: { query },
+        args: { query: toWildcardQuery(query) },
         limit: ApiLimits.PROJECTS_MAX,
     })
 }
@@ -153,7 +162,7 @@ export async function searchAllProjects(client: TodoistApi, query: string): Prom
 export async function searchAllLabels(client: TodoistApi, query: string): Promise<Label[]> {
     return fetchAllPages({
         apiMethod: client.searchLabels.bind(client),
-        args: { query },
+        args: { query: toWildcardQuery(query) },
         limit: ApiLimits.LABELS_MAX,
     })
 }
@@ -179,9 +188,10 @@ export async function searchAllSections(
     query: string,
     projectId?: string,
 ): Promise<Section[]> {
+    const wildcardQuery = toWildcardQuery(query)
     return fetchAllPages({
         apiMethod: client.searchSections.bind(client),
-        args: projectId ? { query, projectId } : { query },
+        args: projectId ? { query: wildcardQuery, projectId } : { query: wildcardQuery },
         limit: ApiLimits.SECTIONS_MAX,
     })
 }
