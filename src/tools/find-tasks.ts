@@ -15,6 +15,7 @@ import {
     resolveInboxProjectId,
 } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
+import { filterResolver } from '../utils/filter-resolver.js'
 import { generateLabelsFilter, LabelsSchema } from '../utils/labels.js'
 import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
 import { previewTasks, summarizeList } from '../utils/response-builders.js'
@@ -60,7 +61,14 @@ const ArgsSchema = {
         .optional()
         .describe(
             'A raw Todoist filter query string (e.g. "today", "p1", "##Work", "(today | overdue) & p1"). ' +
-                'Combined with other filters using AND. Cannot be used with projectId, sectionId, or parentId.',
+                'Combined with other filters using AND. Cannot be used with projectId, sectionId, parentId, or filterIdOrName.',
+        ),
+    filterIdOrName: z
+        .string()
+        .optional()
+        .describe(
+            "The ID or name of a saved Todoist filter. The filter's query will be fetched and used to find tasks. " +
+                'Cannot be used with the `filter` parameter, projectId, sectionId, or parentId.',
         ),
     ...LabelsSchema,
 }
@@ -78,7 +86,7 @@ const OutputSchema = {
 const findTasks = {
     name: ToolNames.FIND_TASKS,
     description:
-        'Find tasks by text search, project/section/parent container, responsible user, labels, or a raw Todoist filter string. At least one filter must be provided.',
+        'Find tasks by text search, project/section/parent container, responsible user, labels, a raw Todoist filter string, or a saved filter by ID or name (filterIdOrName). At least one filter must be provided.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
@@ -95,6 +103,7 @@ const findTasks = {
             labels,
             labelsOperator,
             filter,
+            filterIdOrName,
         } = args
 
         const todoistUser = await client.getUser()
@@ -108,17 +117,31 @@ const findTasks = {
             !parentId &&
             !responsibleUser &&
             !hasLabels &&
-            !filter
+            !filter &&
+            !filterIdOrName
         ) {
             throw new Error(
-                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, labels, or filter',
+                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, labels, filter, or filterIdOrName',
             )
         }
 
-        if (filter && (projectId || sectionId || parentId)) {
+        if (filter && filterIdOrName) {
             throw new Error(
-                'The `filter` parameter cannot be combined with projectId, sectionId, or parentId. Use filter syntax instead (e.g. "##ProjectName").',
+                'The `filter` and `filterIdOrName` parameters cannot be used together. Provide only one.',
             )
+        }
+
+        if ((filter || filterIdOrName) && (projectId || sectionId || parentId)) {
+            throw new Error(
+                'The `filter`/`filterIdOrName` parameter cannot be combined with projectId, sectionId, or parentId. Use filter syntax instead (e.g. "##ProjectName").',
+            )
+        }
+
+        // Resolve filterIdOrName to a filter query string
+        let resolvedFilter = filter
+        if (filterIdOrName) {
+            const resolved = await filterResolver.resolveFilter(client, filterIdOrName)
+            resolvedFilter = resolved.filterQuery
         }
 
         // Resolve assignee name to user ID if provided
@@ -192,7 +215,7 @@ const findTasks = {
         }
 
         // If only responsibleUid is provided (without containers or raw filter), use assignee filter
-        if (resolvedAssigneeId && !searchText && !hasLabels && !filter) {
+        if (resolvedAssigneeId && !searchText && !hasLabels && !resolvedFilter) {
             const { results: tasks, nextCursor } = await client.getTasksByFilter({
                 query: `assigned to: ${assigneeEmail}`,
                 lang: 'en',
@@ -223,7 +246,7 @@ const findTasks = {
         }
 
         // Handle search text and/or labels using filter query
-        let query = filter ? `(${filter})` : ''
+        let query = resolvedFilter ? `(${resolvedFilter})` : ''
 
         // Add search text component
         if (searchText) {
@@ -235,12 +258,19 @@ const findTasks = {
         query = appendToQuery(query, labelsFilter)
 
         // Add responsible user filtering to the query (server-side)
-        const responsibleUserFilter = buildResponsibleUserQueryFilter({
-            resolvedAssigneeId,
-            assigneeEmail,
-            responsibleUserFiltering,
-        })
-        query = appendToQuery(query, responsibleUserFilter)
+        // When using a saved filter (filterIdOrName), skip the default assignee filtering
+        // unless the caller explicitly provided responsibleUser or responsibleUserFiltering,
+        // since the saved filter may already include its own assignment logic.
+        const skipDefaultAssigneeFilter =
+            filterIdOrName && !responsibleUser && !responsibleUserFiltering
+        if (!skipDefaultAssigneeFilter) {
+            const responsibleUserFilter = buildResponsibleUserQueryFilter({
+                resolvedAssigneeId,
+                assigneeEmail,
+                responsibleUserFiltering,
+            })
+            query = appendToQuery(query, responsibleUserFilter)
+        }
 
         // Execute filter query
         const { tasks: filteredTasks, nextCursor } = await getTasksByFilter({
