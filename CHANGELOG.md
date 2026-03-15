@@ -1,5 +1,17 @@
 # Changelog
 
+## [7.16.0](https://github.com/Doist/todoist-ai/compare/v7.15.0...v7.16.0) (2026-03-15)
+
+
+### Features
+
+* add filterIdOrName parameter to find-tasks tool ([#378](https://github.com/Doist/todoist-ai/issues/378)) ([0ec0032](https://github.com/Doist/todoist-ai/commit/0ec0032caa4564cf30c821b1617adbaad1548ecc))
+
+
+### Bug Fixes
+
+* get-overview account-level fails due to null stripping ([#380](https://github.com/Doist/todoist-ai/issues/380)) ([0f2791f](https://github.com/Doist/todoist-ai/commit/0f2791f33f8a490c0327f2973cd07f112ea5e078))
+
 ## [7.15.0](https://github.com/Doist/todoist-ai/compare/v7.14.0...v7.15.0) (2026-03-15)
 
 
