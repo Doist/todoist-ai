@@ -1,7 +1,7 @@
 import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { isPersonalProject, mapTask, type Project } from '../tool-helpers.js'
+import { isPersonalProject, isWorkspaceProject, mapTask, type Project } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -172,6 +172,8 @@ type ProjectStructure = {
     id: string
     name: string
     parentId: string | null
+    folderId: string | null
+    childOrder: number
     sections: Section[]
     children: ProjectStructure[]
 }
@@ -212,6 +214,8 @@ function buildProjectStructure(
         id: project.id,
         name: project.name,
         parentId: isPersonalProject(project) ? (project.parentId ?? null) : null,
+        folderId: isWorkspaceProject(project) ? (project.folderId ?? null) : null,
+        childOrder: project.childOrder,
         sections: sectionsByProject[project.id] || [],
         children: project.children.map((child) => buildProjectStructure(child, sectionsByProject)),
     }

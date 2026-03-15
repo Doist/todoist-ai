@@ -323,13 +323,14 @@ describe(`${ADD_PROJECTS} tool`, () => {
                 'inboxProject',
                 'viewStyle',
                 'workspaceId',
+                'folderId',
+                'childOrder',
             ]
             const actualKeys = Object.keys(project)
             expect(actualKeys.sort()).toEqual(allowedKeys.sort())
 
             // Verify NO extra API properties leaked through
             const disallowedKeys = [
-                'childOrder',
                 'createdAt',
                 'updatedAt',
                 'defaultOrder',

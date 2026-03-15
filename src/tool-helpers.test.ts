@@ -153,6 +153,7 @@ End of description.`)
                 parentId: null,
                 inboxProject: false,
                 viewStyle: 'list',
+                childOrder: 1,
             } as unknown as PersonalProject
 
             expect(mapProject(mockPersonalProject)).toEqual({
@@ -165,6 +166,8 @@ End of description.`)
                 inboxProject: false,
                 viewStyle: 'list',
                 workspaceId: undefined,
+                folderId: undefined,
+                childOrder: 1,
             })
         })
 
@@ -189,6 +192,8 @@ End of description.`)
                 inboxProject: false,
                 viewStyle: 'board',
                 workspaceId: TEST_IDS.WORKSPACE_1,
+                folderId: undefined,
+                childOrder: 1,
             })
         })
     })

@@ -56,6 +56,11 @@ const ProjectSchema = z.object({
         .describe(
             'The ID of the workspace this project belongs to (undefined for personal projects).',
         ),
+    folderId: z
+        .string()
+        .optional()
+        .describe('The ID of the folder this project belongs to (workspace projects only).'),
+    childOrder: z.number().describe('The ordering index of the project among its siblings.'),
 })
 
 /**
