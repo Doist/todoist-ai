@@ -203,7 +203,7 @@ describe(`${FIND_TASKS} tool`, () => {
     describe('validation', () => {
         it('should require at least one filter parameter', async () => {
             await expect(findTasks.execute({ limit: 10 }, mockTodoistApi)).rejects.toThrow(
-                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, labels, or filter',
+                'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, labels, filter, or filterId',
             )
         })
     })
@@ -1091,7 +1091,7 @@ End of test content.`
                     mockTodoistApi,
                 ),
             ).rejects.toThrow(
-                'The `filter` parameter cannot be combined with projectId, sectionId, or parentId.',
+                'The `filter`/`filterId` parameter cannot be combined with projectId, sectionId, or parentId.',
             )
         })
 
@@ -1102,7 +1102,7 @@ End of test content.`
                     mockTodoistApi,
                 ),
             ).rejects.toThrow(
-                'The `filter` parameter cannot be combined with projectId, sectionId, or parentId.',
+                'The `filter`/`filterId` parameter cannot be combined with projectId, sectionId, or parentId.',
             )
         })
 
@@ -1124,10 +1124,96 @@ End of test content.`
         })
     })
 
+    describe('filterId parameter', () => {
+        it('should fetch filter by ID and use its query', async () => {
+            mockTodoistApi.sync = vi.fn().mockResolvedValue({
+                filters: [
+                    { id: 'filter-1', name: 'My Filter', query: 'today & p1' },
+                    { id: 'filter-2', name: 'Other Filter', query: 'overdue' },
+                ],
+            })
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            await findTasks.execute({ filterId: 'filter-1', limit: 10 }, mockTodoistApi)
+
+            expect(mockTodoistApi.sync).toHaveBeenCalledWith({
+                resourceTypes: ['filters'],
+                syncToken: '*',
+            })
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: '(today & p1) & !assigned to: others',
+                cursor: undefined,
+                limit: 10,
+            })
+        })
+
+        it('should throw an error when both filter and filterId are provided', async () => {
+            await expect(
+                findTasks.execute(
+                    { filter: 'today', filterId: 'filter-1', limit: 10 },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(
+                'The `filter` and `filterId` parameters cannot be used together. Provide only one.',
+            )
+        })
+
+        it('should throw an error when filterId is not found', async () => {
+            mockTodoistApi.sync = vi.fn().mockResolvedValue({
+                filters: [{ id: 'filter-1', name: 'My Filter', query: 'today' }],
+            })
+
+            await expect(
+                findTasks.execute({ filterId: 'nonexistent-id', limit: 10 }, mockTodoistApi),
+            ).rejects.toThrow('Filter with ID "nonexistent-id" not found.')
+        })
+
+        it('should throw an error when filterId is combined with projectId', async () => {
+            await expect(
+                findTasks.execute(
+                    { filterId: 'filter-1', projectId: TEST_IDS.PROJECT_TEST, limit: 10 },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow(
+                'The `filter`/`filterId` parameter cannot be combined with projectId, sectionId, or parentId.',
+            )
+        })
+
+        it('should combine filterId query with searchText', async () => {
+            mockTodoistApi.sync = vi.fn().mockResolvedValue({
+                filters: [{ id: 'filter-1', name: 'My Filter', query: 'p1' }],
+            })
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            await findTasks.execute(
+                { filterId: 'filter-1', searchText: 'meeting', limit: 10 },
+                mockTodoistApi,
+            )
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: '(p1) & search: meeting & !assigned to: others',
+                cursor: undefined,
+                limit: 10,
+            })
+        })
+
+        it('should throw when sync returns no filters array', async () => {
+            mockTodoistApi.sync = vi.fn().mockResolvedValue({})
+
+            await expect(
+                findTasks.execute({ filterId: 'filter-1', limit: 10 }, mockTodoistApi),
+            ).rejects.toThrow('Filter with ID "filter-1" not found.')
+        })
+    })
+
     describe('error handling', () => {
         it.each([
             {
-                error: 'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, labels, or filter',
+                error: 'At least one filter must be provided: searchText, projectId, sectionId, parentId, responsibleUser, labels, filter, or filterId',
                 params: { limit: 10 },
                 expectValidation: true,
             },

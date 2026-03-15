@@ -66,7 +66,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **update-tasks**: Modify existing tasks - get task IDs from search results first, only include fields that need changes. Supports priority updates using \`p1\`/\`p2\`/\`p3\`/\`p4\` string values (\`p1\` highest, \`p4\` lowest/default; integers are not accepted), due date updates via dueString and due date removal via "dueString: remove", plus deadlineDate (ISO 8601 format like "2025-12-31") updates and removals via "deadlineDate: remove"
 - **complete-tasks**: Mark tasks as done using task IDs
 - **uncomplete-tasks**: Reopen completed tasks using task IDs
-- **find-tasks**: Search by text, project/section/parent container, responsible user, labels, or a raw Todoist \`filter\` string (e.g. "today", "p1", "##Work", "(today | overdue) & p1"). Requires at least one search parameter. \`filter\` cannot be combined with projectId/sectionId/parentId.
+- **find-tasks**: Search by text, project/section/parent container, responsible user, labels, a raw Todoist \`filter\` string (e.g. "today", "p1", "##Work", "(today | overdue) & p1"), or a saved filter ID (\`filterId\`). Requires at least one search parameter. \`filter\`/\`filterId\` cannot be combined with projectId/sectionId/parentId, and \`filter\` and \`filterId\` are mutually exclusive.
 - **find-tasks-by-date**: Get tasks by date range (startDate: YYYY-MM-DD or 'today' which includes overdue tasks) or specific day counts
 - **find-completed-tasks**: View completed tasks by completion date or original due date; if since/until are omitted, defaults to the last 7 days (returns all collaborators unless filtered)
 
