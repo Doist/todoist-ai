@@ -31,11 +31,12 @@ export class WorkspaceResolver {
      * Resolve a workspace name or ID to a workspace ID and name.
      *
      * Resolution order:
-     * 1. If input looks like an ID (numeric), try ID match first. If not found, pass through as-is.
-     * 2. Exact case-insensitive name match
-     * 3. Unique partial case-insensitive name match
-     * 4. Multiple partial matches → throw ambiguous error
-     * 5. No match → throw not-found error
+     * 1. Exact ID match (always tried first for any input)
+     * 2. If input looks like an ID (numeric) but wasn't found, pass through as-is (API validates)
+     * 3. Exact case-insensitive name match
+     * 4. Unique partial case-insensitive name match
+     * 5. Multiple partial matches → throw ambiguous error
+     * 6. No match → throw not-found error
      */
     async resolveWorkspace(client: TodoistApi, nameOrId: string): Promise<ResolvedWorkspace> {
         const trimmed = nameOrId.trim()
@@ -45,13 +46,14 @@ export class WorkspaceResolver {
 
         const workspaces = await this.getWorkspaces(client)
 
-        // If it looks like an ID, try ID match first
+        // Try exact ID match first (for any input)
+        const byId = workspaces.find((w) => w.id === trimmed)
+        if (byId) {
+            return { workspaceId: byId.id, workspaceName: byId.name }
+        }
+
+        // If it looks like an ID but wasn't found, pass through as-is (API will validate)
         if (looksLikeWorkspaceId(trimmed)) {
-            const byId = workspaces.find((w) => w.id === trimmed)
-            if (byId) {
-                return { workspaceId: byId.id, workspaceName: byId.name }
-            }
-            // Not found by ID — pass through as-is (API will validate)
             return { workspaceId: trimmed, workspaceName: trimmed }
         }
 

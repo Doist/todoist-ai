@@ -24,6 +24,8 @@ const ProjectSchema = z.object({
     color: ColorSchema,
     workspace: z
         .string()
+        .trim()
+        .min(1)
         .optional()
         .describe(
             'The workspace to create the project in. Accepts a workspace name or workspace ID. ' +

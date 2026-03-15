@@ -8,7 +8,7 @@ const mockTodoistApi = {
 
 function createMockWorkspace(overrides: Partial<Workspace> = {}): Workspace {
     return {
-        id: 'workspace-123',
+        id: '100123',
         name: 'Test Workspace',
         plan: 'BUSINESS',
         role: 'ADMIN',
