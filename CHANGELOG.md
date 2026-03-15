@@ -1,5 +1,18 @@
 # Changelog
 
+## [7.15.0](https://github.com/Doist/todoist-ai/compare/v7.14.0...v7.15.0) (2026-03-15)
+
+
+### Features
+
+* add folderId and childOrder to project responses ([#377](https://github.com/Doist/todoist-ai/issues/377)) ([34d0446](https://github.com/Doist/todoist-ai/commit/34d04469e717a9a85b2756dcab5e1ee4839f811f))
+
+
+### Bug Fixes
+
+* **deps:** update all dependencies ([#374](https://github.com/Doist/todoist-ai/issues/374)) ([8486c37](https://github.com/Doist/todoist-ai/commit/8486c37d5d0eb5af8e4acc22b8a8e444a4136dd9))
+* use wildcard queries for substring matching in search ([#376](https://github.com/Doist/todoist-ai/issues/376)) ([6cc33b2](https://github.com/Doist/todoist-ai/commit/6cc33b2d86fa969f4584ee345b57fa492d4d51c5))
+
 ## [7.14.0](https://github.com/Doist/todoist-ai/compare/v7.13.0...v7.14.0) (2026-03-15)
 
 
