@@ -259,6 +259,7 @@ describe(`${FIND_PROJECTS} tool`, () => {
                     isShared: false,
                     inboxProject: true,
                     viewStyle: 'list',
+                    childOrder: 0,
                 }
                 // Should parse without throwing
                 const parsed = ProjectSchema.parse(project)
@@ -276,6 +277,7 @@ describe(`${FIND_PROJECTS} tool`, () => {
                     isShared: false,
                     inboxProject: true,
                     viewStyle: 'list',
+                    childOrder: 0,
                 }
                 expect(() => ProjectSchema.parse(project)).not.toThrow()
             })

@@ -278,6 +278,8 @@ function mapProject(project: Project) {
         inboxProject: isPersonalProject(project) ? (project.inboxProject ?? false) : false,
         viewStyle: project.viewStyle,
         workspaceId: isWorkspaceProject(project) ? project.workspaceId : undefined,
+        folderId: isWorkspaceProject(project) ? (project.folderId ?? undefined) : undefined,
+        childOrder: project.childOrder,
     }
 }
 
