@@ -64,8 +64,8 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 **Task Management:**
 - **add-tasks**: Create tasks with content, description, priority (\`p1\`, \`p2\`, \`p3\`, \`p4\` strings only; \`p1\` highest and \`p4\` lowest/default; integers are not accepted), dueString (natural language like "tomorrow", "next Friday", "2024-12-25"), deadlineDate (ISO 8601 format like "2025-12-31" for immovable constraints), duration (formats like "2h", "90m", "2h30m"), and assignments to project collaborators
-- **update-tasks**: Modify existing tasks - get task IDs from search results first, only include fields that need changes. Supports priority updates using \`p1\`/\`p2\`/\`p3\`/\`p4\` string values (\`p1\` highest, \`p4\` lowest/default; integers are not accepted), due date updates via dueString and due date removal via "dueString: remove", plus deadlineDate (ISO 8601 format like "2025-12-31") updates and removals via "deadlineDate: remove"
-- **reschedule-tasks**: Move task due dates while preserving recurring schedules. Unlike update-tasks (which replaces the entire due string and can wipe recurrence), this tool changes only the date, keeping recurrence patterns intact. Accepts YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS. Use this when moving recurring tasks to a different date.
+- **update-tasks**: Modify existing tasks - get task IDs from search results first, only include fields that need changes. Supports priority updates using \`p1\`/\`p2\`/\`p3\`/\`p4\` string values (\`p1\` highest, \`p4\` lowest/default; integers are not accepted), due date updates via dueString and due date removal via "dueString: remove", plus deadlineDate (ISO 8601 format like "2025-12-31") updates and removals via "deadlineDate: remove". **IMPORTANT: Do NOT use update-tasks to reschedule/move task dates — use reschedule-tasks instead.** update-tasks replaces the entire due string which destroys recurrence patterns on recurring tasks.
+- **reschedule-tasks**: **Always use this tool when moving/rescheduling task due dates to a different date.** This tool preserves recurring schedules and existing time-of-day. Accepts YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS. Works for both recurring and non-recurring tasks. Do NOT use update-tasks for rescheduling.
 - **complete-tasks**: Mark tasks as done using task IDs
 - **uncomplete-tasks**: Reopen completed tasks using task IDs
 - **find-tasks**: Search by text, project/section/parent container, responsible user, labels, a raw Todoist \`filter\` string (e.g. "today", "p1", "##Work", "(today | overdue) & p1"), or a saved filter by ID or name (\`filterIdOrName\`). Requires at least one search parameter. \`filter\`/\`filterIdOrName\` cannot be combined with projectId/sectionId/parentId, and \`filter\` and \`filterIdOrName\` are mutually exclusive.
@@ -103,7 +103,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 4. **Bulk Operations**: When working with multiple items, prefer bulk tools (complete-tasks, manage-assignments) over individual operations for better performance.
 
-5. **Date Handling**: All dates respect user timezone settings. Use 'today' keyword for dynamic date filtering (includes overdue tasks).
+5. **Date Handling**: All dates respect user timezone settings. Use 'today' keyword for dynamic date filtering (includes overdue tasks). **When rescheduling/moving tasks to a different date, always use reschedule-tasks** — never update-tasks with dueString, as that destroys recurrence on recurring tasks.
 
 6. **Labels**: Use label filtering with AND/OR operators for advanced task organization. Most search tools support labels parameter. Use **find-labels** to discover personal and shared labels — use label **names** (not IDs) when filtering tasks, and use label **IDs** only with **delete-object**. Use **add-labels** to create new personal labels.
 
