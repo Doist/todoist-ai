@@ -44,7 +44,7 @@ No shared labels."
 exports[`find-labels tool > searching labels > should return empty list when no labels match exact search 1`] = `
 "All labels matching "nonexistent": 0.
 Filter: search: "nonexistent".
-No results. Search requires the exact label name; Check spelling; Remove search to see all labels.
+No results. Try broader search terms; Check spelling; Remove search to see all labels.
 No shared labels."
 `;
 

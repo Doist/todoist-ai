@@ -11,7 +11,9 @@ const ArgsSchema = {
     search: z
         .string()
         .optional()
-        .describe('Search for a label by exact name. If omitted, all labels are returned.'),
+        .describe(
+            'Search for a label by name (partial and case insensitive match). If omitted, all labels are returned.',
+        ),
     limit: z
         .number()
         .int()
@@ -45,7 +47,7 @@ const OutputSchema = {
 const findLabels = {
     name: ToolNames.FIND_LABELS,
     description:
-        'List personal labels and shared labels. Personal labels have full metadata (id, name, color, order, isFavorite) and support pagination and exact-name search. Shared labels are labels used on tasks shared with you — they are returned as names only (no IDs or metadata). When searching, all matching personal labels are fetched across all pages and returned as a single result set (limit and cursor are ignored). When not searching, personal labels are returned with pagination.',
+        'List personal labels and shared labels. Personal labels have full metadata (id, name, color, order, isFavorite) and support pagination and name search (partial, case insensitive). Shared labels are labels used on tasks shared with you — they are returned as names only (no IDs or metadata). When searching, all matching personal labels are fetched across all pages and returned as a single result set (limit and cursor are ignored). When not searching, personal labels are returned with pagination.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
@@ -108,7 +110,7 @@ function generateTextContent({
     const zeroReasonHints: string[] = []
     if (labels.length === 0) {
         if (args.search) {
-            zeroReasonHints.push('Search requires the exact label name')
+            zeroReasonHints.push('Try broader search terms')
             zeroReasonHints.push('Check spelling')
             zeroReasonHints.push('Remove search to see all labels')
         } else {
