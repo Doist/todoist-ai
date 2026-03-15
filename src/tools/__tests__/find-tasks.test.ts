@@ -1151,7 +1151,7 @@ End of test content.`
             expect(mockResolveFilter).toHaveBeenCalledWith(mockTodoistApi, 'My Filter')
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: '(today & p1) & !assigned to: others',
+                query: '(today & p1)',
                 cursor: undefined,
                 limit: 10,
             })
@@ -1207,7 +1207,33 @@ End of test content.`
 
             expect(mockGetTasksByFilter).toHaveBeenCalledWith({
                 client: mockTodoistApi,
-                query: '(p1) & search: meeting & !assigned to: others',
+                query: '(p1) & search: meeting',
+                cursor: undefined,
+                limit: 10,
+            })
+        })
+
+        it('should apply assignee filtering when responsibleUserFiltering is explicitly set', async () => {
+            mockResolveFilter.mockResolvedValue({
+                filterId: 'filter-1',
+                filterName: 'My Filter',
+                filterQuery: 'today',
+            })
+            const mockResponse = { tasks: [], nextCursor: null }
+            mockGetTasksByFilter.mockResolvedValue(mockResponse)
+
+            await findTasks.execute(
+                {
+                    filterIdOrName: 'filter-1',
+                    responsibleUserFiltering: 'unassignedOrMe',
+                    limit: 10,
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockGetTasksByFilter).toHaveBeenCalledWith({
+                client: mockTodoistApi,
+                query: '(today) & !assigned to: others',
                 cursor: undefined,
                 limit: 10,
             })

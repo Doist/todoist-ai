@@ -86,7 +86,7 @@ const OutputSchema = {
 const findTasks = {
     name: ToolNames.FIND_TASKS,
     description:
-        'Find tasks by text search, project/section/parent container, responsible user, labels, or a raw Todoist filter string. At least one filter must be provided.',
+        'Find tasks by text search, project/section/parent container, responsible user, labels, a raw Todoist filter string, or a saved filter by ID or name (filterIdOrName). At least one filter must be provided.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
@@ -258,12 +258,19 @@ const findTasks = {
         query = appendToQuery(query, labelsFilter)
 
         // Add responsible user filtering to the query (server-side)
-        const responsibleUserFilter = buildResponsibleUserQueryFilter({
-            resolvedAssigneeId,
-            assigneeEmail,
-            responsibleUserFiltering,
-        })
-        query = appendToQuery(query, responsibleUserFilter)
+        // When using a saved filter (filterIdOrName), skip the default assignee filtering
+        // unless the caller explicitly provided responsibleUser or responsibleUserFiltering,
+        // since the saved filter may already include its own assignment logic.
+        const skipDefaultAssigneeFilter =
+            filterIdOrName && !responsibleUser && !responsibleUserFiltering
+        if (!skipDefaultAssigneeFilter) {
+            const responsibleUserFilter = buildResponsibleUserQueryFilter({
+                resolvedAssigneeId,
+                assigneeEmail,
+                responsibleUserFiltering,
+            })
+            query = appendToQuery(query, responsibleUserFilter)
+        }
 
         // Execute filter query
         const { tasks: filteredTasks, nextCursor } = await getTasksByFilter({
