@@ -18,8 +18,8 @@ const ArgsSchema = {
 const ProjectStructureSchema: z.ZodType<{
     id: string
     name: string
-    parentId: string | null
-    folderId: string | null
+    parentId?: string
+    folderId?: string
     childOrder: number
     sections: { id: string; name: string }[]
     children: unknown[]
@@ -29,11 +29,11 @@ const ProjectStructureSchema: z.ZodType<{
         name: z.string().describe('The project name.'),
         parentId: z
             .string()
-            .nullable()
+            .optional()
             .describe('The parent project ID (for sub-projects, personal projects only).'),
         folderId: z
             .string()
-            .nullable()
+            .optional()
             .describe('The folder ID this project belongs to (workspace projects only).'),
         childOrder: z.number().describe('The ordering index among siblings.'),
         sections: z.array(
@@ -243,8 +243,8 @@ function renderTaskTreeMarkdown(tasks: TaskTreeNode[], indent = ''): string[] {
 type ProjectStructure = {
     id: string
     name: string
-    parentId: string | null
-    folderId: string | null
+    parentId?: string
+    folderId?: string
     childOrder: number
     sections: Section[]
     children: ProjectStructure[]
@@ -285,8 +285,8 @@ function buildProjectStructure(
     return {
         id: project.id,
         name: project.name,
-        parentId: isPersonalProject(project) ? (project.parentId ?? null) : null,
-        folderId: isWorkspaceProject(project) ? (project.folderId ?? null) : null,
+        parentId: isPersonalProject(project) ? (project.parentId ?? undefined) : undefined,
+        folderId: isWorkspaceProject(project) ? (project.folderId ?? undefined) : undefined,
         childOrder: project.childOrder,
         sections: sectionsByProject[project.id] || [],
         children: project.children.map((child) => buildProjectStructure(child, sectionsByProject)),
