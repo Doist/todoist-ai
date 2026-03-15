@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.14.0](https://github.com/Doist/todoist-ai/compare/v7.13.0...v7.14.0) (2026-03-15)
+
+
+### Features
+
+* add workspace support to add-projects tool ([#372](https://github.com/Doist/todoist-ai/issues/372)) ([0c9d9c7](https://github.com/Doist/todoist-ai/commit/0c9d9c76baecabad944b9692e49d7b5fc25c09b0))
+
 ## [7.13.0](https://github.com/Doist/todoist-ai/compare/v7.12.0...v7.13.0) (2026-03-13)
 
 
