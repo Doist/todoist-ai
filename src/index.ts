@@ -28,6 +28,7 @@ import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { getOverview } from './tools/get-overview.js'
 import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
+import { rescheduleTasks } from './tools/reschedule-tasks.js'
 import { search } from './tools/search.js'
 import { uncompleteTasks } from './tools/uncomplete-tasks.js'
 import { updateComments } from './tools/update-comments.js'
@@ -45,6 +46,7 @@ const tools = {
     findTasks,
     findTasksByDate,
     findCompletedTasks,
+    rescheduleTasks,
     // Project management tools
     addProjects,
     updateProjects,
@@ -87,6 +89,7 @@ export {
     findTasks,
     findTasksByDate,
     findCompletedTasks,
+    rescheduleTasks,
     // Project management tools
     addProjects,
     updateProjects,

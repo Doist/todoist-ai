@@ -201,7 +201,7 @@ describe(`${RESCHEDULE_TASKS} tool`, () => {
             ).rejects.toThrow('has no due date')
         })
 
-        it('should throw when sync reports errors', async () => {
+        it('should throw when sync fails', async () => {
             const task = createMockTask({
                 id: 'task-1',
                 due: {
@@ -211,24 +211,14 @@ describe(`${RESCHEDULE_TASKS} tool`, () => {
                 },
             })
             mockTodoistApi.getTask.mockResolvedValue(task)
-            mockTodoistApi.sync.mockResolvedValue({
-                syncStatus: {
-                    'some-uuid': {
-                        error: 'Something went wrong',
-                        errorCode: 42,
-                        errorExtra: {},
-                        errorTag: 'UNKNOWN',
-                        httpCode: 400,
-                    },
-                },
-            })
+            mockTodoistApi.sync.mockRejectedValue(new Error('Sync API error'))
 
             await expect(
                 rescheduleTasks.execute(
                     { tasks: [{ id: 'task-1', date: '2026-03-20' }] },
                     mockTodoistApi,
                 ),
-            ).rejects.toThrow('Reschedule failed')
+            ).rejects.toThrow('Reschedule failed: Sync API error')
         })
     })
 

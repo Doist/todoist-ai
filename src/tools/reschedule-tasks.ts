@@ -74,23 +74,14 @@ const rescheduleTasks = {
             })
         })
 
-        // Execute all reschedules in a single sync request
-        const syncResponse = await client.sync({ commands })
-
-        // Check for per-command errors
-        const errors: string[] = []
-        if (syncResponse.syncStatus) {
-            for (const [uuid, status] of Object.entries(syncResponse.syncStatus)) {
-                if (status !== 'ok') {
-                    const command = commands.find((c) => c.uuid === uuid)
-                    const taskId = command?.args.id ?? 'unknown'
-                    errors.push(`Task ${taskId}: ${JSON.stringify(status)}`)
-                }
-            }
-        }
-
-        if (errors.length > 0) {
-            throw new Error(`Reschedule failed for some tasks:\n${errors.join('\n')}`)
+        // Execute all reschedules in a single sync request.
+        // The SDK throws TodoistRequestError if any syncStatus entry is non-ok,
+        // so we catch and rethrow with task-scoped context.
+        try {
+            await client.sync({ commands })
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error)
+            throw new Error(`Reschedule failed: ${message}`)
         }
 
         // Re-fetch tasks via REST to get consistent output format
@@ -114,7 +105,7 @@ const rescheduleTasks = {
 } satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function buildRescheduleDate(inputDate: string, existingDue: NonNullable<Task['due']>): string {
-    const isInputDateOnly = !inputDate.includes('T')
+    const isInputDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(inputDate)
 
     if (isInputDateOnly && existingDue.datetime) {
         // Preserve existing time when only a new date is provided
