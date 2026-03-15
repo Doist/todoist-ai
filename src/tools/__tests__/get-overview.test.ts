@@ -1,9 +1,11 @@
 import type { PersonalProject, Section, Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
+import { removeNullFields } from '../../utils/sanitize-data.js'
 import {
     createMockProject,
     createMockSection,
     createMockTask,
+    createMockWorkspaceProject,
     TEST_ERRORS,
     TEST_IDS,
 } from '../../utils/test-helpers.js'
@@ -87,6 +89,56 @@ describe(`${GET_OVERVIEW} tool`, () => {
                 }),
             )
             expect(structuredContent.projects).toHaveLength(1) // Only non-inbox projects
+        })
+
+        it('should produce structured content that survives removeNullFields sanitization', async () => {
+            const mockProjects = [
+                createMockProject({
+                    id: TEST_IDS.PROJECT_INBOX,
+                    name: 'Inbox',
+                    inboxProject: true,
+                    parentId: null,
+                    childOrder: 0,
+                }),
+                createMockProject({
+                    id: TEST_IDS.PROJECT_TEST,
+                    name: 'Top-level project',
+                    parentId: null,
+                    childOrder: 1,
+                }),
+                createMockWorkspaceProject({
+                    id: TEST_IDS.PROJECT_WORKSPACE,
+                    name: 'Workspace project',
+                    folderId: null,
+                    childOrder: 2,
+                }),
+            ]
+
+            mockTodoistApi.getProjects.mockResolvedValue({
+                results: mockProjects,
+                nextCursor: null,
+            })
+            mockTodoistApi.getSections.mockResolvedValue({
+                results: [],
+                nextCursor: null,
+            })
+
+            const result = await getOverview.execute({}, mockTodoistApi)
+            const sanitized = removeNullFields(result.structuredContent)
+
+            // After sanitization, projects should still have valid structure
+            // This verifies the fix for #379 where removeNullFields stripped
+            // nullable parentId/folderId, causing schema validation failures
+            expect(sanitized.projects).toHaveLength(2) // Non-inbox projects
+            for (const project of sanitized.projects as Array<Record<string, unknown>>) {
+                expect(project).toHaveProperty('id')
+                expect(project).toHaveProperty('name')
+                expect(project).toHaveProperty('childOrder')
+                // parentId and folderId must never be null — removeNullFields
+                // would strip them, breaking the output schema validation
+                expect(project.parentId).not.toBeNull()
+                expect(project.folderId).not.toBeNull()
+            }
         })
 
         it('should handle empty projects list', async () => {
