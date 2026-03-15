@@ -138,7 +138,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             )
 
             expect(mockTodoistApi.searchSections).toHaveBeenCalledWith({
-                query: 'progress',
+                query: '*progress*',
                 projectId: TEST_IDS.PROJECT_TEST,
                 cursor: null,
                 limit: 200, // SECTIONS_MAX

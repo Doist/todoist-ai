@@ -14,6 +14,7 @@ import {
     mapTask,
     searchAllProjects,
     searchAllSections,
+    toWildcardQuery,
 } from './tool-helpers.js'
 import {
     createMockApiResponse,
@@ -341,6 +342,24 @@ End of description.`)
         })
     })
 
+    describe('toWildcardQuery', () => {
+        it('should wrap a plain query with wildcards', () => {
+            expect(toWildcardQuery('work')).toBe('*work*')
+        })
+
+        it('should escape literal asterisks', () => {
+            expect(toWildcardQuery('my * project')).toBe('*my \\* project*')
+        })
+
+        it('should escape literal backslashes', () => {
+            expect(toWildcardQuery('back\\slash')).toBe('*back\\\\slash*')
+        })
+
+        it('should escape backslashes before asterisks', () => {
+            expect(toWildcardQuery('a\\*b')).toBe('*a\\\\\\*b*')
+        })
+    })
+
     describe('searchAllProjects', () => {
         const mockTodoistApi = {
             searchProjects: vi.fn(),
@@ -405,7 +424,7 @@ End of description.`)
             const result = await searchAllSections(mockTodoistApi, 'Work', 'project-123')
 
             expect(mockTodoistApi.searchSections).toHaveBeenCalledWith({
-                query: 'Work',
+                query: '*Work*',
                 projectId: 'project-123',
                 cursor: null,
                 limit: 200, // SECTIONS_MAX
