@@ -136,8 +136,8 @@ describe(`${GET_OVERVIEW} tool`, () => {
                 expect(project).toHaveProperty('childOrder')
                 // parentId and folderId must never be null — removeNullFields
                 // would strip them, breaking the output schema validation
-                expect(project.parentId).not.toBeNull()
-                expect(project.folderId).not.toBeNull()
+                expect(project.parentId).toBeUndefined()
+                expect(project.folderId).toBeUndefined()
             }
         })
 
