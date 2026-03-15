@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.17.0](https://github.com/Doist/todoist-ai/compare/v7.16.0...v7.17.0) (2026-03-15)
+
+
+### Features
+
+* add reschedule-tasks tool to preserve recurrence patterns ([#382](https://github.com/Doist/todoist-ai/issues/382)) ([9c3025c](https://github.com/Doist/todoist-ai/commit/9c3025c3839fa9595a4b74f4686ba0a8f67f6a6f))
+
 ## [7.16.0](https://github.com/Doist/todoist-ai/compare/v7.15.0...v7.16.0) (2026-03-15)
 
 
