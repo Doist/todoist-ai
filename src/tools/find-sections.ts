@@ -15,7 +15,7 @@ const ArgsSchema = {
         .describe(
             'The ID of the project to search sections in. Project ID should be an ID string, or the text "inbox", for inbox tasks.',
         ),
-    search: z
+    searchText: z
         .string()
         .optional()
         .describe(
@@ -52,9 +52,9 @@ const findSections = {
 
         let results: Section[]
 
-        if (args.search) {
+        if (args.searchText) {
             // When searching, fetch ALL matching sections (server-side search)
-            results = await searchAllSections(client, args.search, resolvedProjectId)
+            results = await searchAllSections(client, args.searchText, resolvedProjectId)
         } else {
             // Normal single-page fetch when not searching
             const response = await client.getSections({
@@ -68,7 +68,7 @@ const findSections = {
         const textContent = generateTextContent({
             sections,
             projectId: args.projectId,
-            search: args.search,
+            searchText: args.searchText,
         })
 
         return {
@@ -85,26 +85,26 @@ const findSections = {
 function generateTextContent({
     sections,
     projectId,
-    search,
+    searchText,
 }: {
     sections: SectionSummary[]
     projectId: string
-    search?: string
+    searchText?: string
 }): string {
     const zeroReasonHints: string[] = []
 
-    if (search) {
+    if (searchText) {
         zeroReasonHints.push('Try broader search terms')
         zeroReasonHints.push('Check spelling')
-        zeroReasonHints.push('Remove search to see all sections')
+        zeroReasonHints.push('Remove searchText to see all sections')
     } else {
         zeroReasonHints.push('Project has no sections yet')
         zeroReasonHints.push(`Use ${ADD_SECTIONS} to create sections`)
     }
 
     // Data-driven next steps based on results
-    const subject = search
-        ? `Sections in project ${projectId} matching "${search}"`
+    const subject = searchText
+        ? `Sections in project ${projectId} matching "${searchText}"`
         : `Sections in project ${projectId}`
 
     const previewLines =

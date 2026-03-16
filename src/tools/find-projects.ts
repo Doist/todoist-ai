@@ -9,7 +9,7 @@ import { ToolNames } from '../utils/tool-names.js'
 const { ADD_PROJECTS } = ToolNames
 
 const ArgsSchema = {
-    search: z
+    searchText: z
         .string()
         .optional()
         .describe(
@@ -51,9 +51,9 @@ const findProjects = {
         let results: Awaited<ReturnType<typeof client.getProjects>>['results']
         let nextCursor = null
 
-        if (args.search) {
+        if (args.searchText) {
             // When searching, fetch ALL matching projects (server-side search)
-            results = await searchAllProjects(client, args.search)
+            results = await searchAllProjects(client, args.searchText)
             // When searching, we have all results so no pagination
             nextCursor = null
         } else {
@@ -91,12 +91,12 @@ function generateTextContent({
     nextCursor: string | null
 }) {
     // Generate subject description
-    const subject = args.search ? `All projects matching "${args.search}"` : 'Projects'
+    const subject = args.searchText ? `All projects matching "${args.searchText}"` : 'Projects'
 
     // Generate filter hints
     const filterHints: string[] = []
-    if (args.search) {
-        filterHints.push(`search: "${args.search}"`)
+    if (args.searchText) {
+        filterHints.push(`searchText: "${args.searchText}"`)
     }
 
     // Generate project preview lines
@@ -110,10 +110,10 @@ function generateTextContent({
     // Generate helpful suggestions for empty results
     const zeroReasonHints: string[] = []
     if (projects.length === 0) {
-        if (args.search) {
+        if (args.searchText) {
             zeroReasonHints.push('Try broader search terms')
             zeroReasonHints.push('Check spelling')
-            zeroReasonHints.push('Remove search to see all projects')
+            zeroReasonHints.push('Remove searchText to see all projects')
         } else {
             zeroReasonHints.push('No projects created yet')
             zeroReasonHints.push(`Use ${ADD_PROJECTS} to create a project`)
@@ -123,7 +123,7 @@ function generateTextContent({
     return summarizeList({
         subject,
         count: projects.length,
-        limit: args.search ? undefined : args.limit,
+        limit: args.searchText ? undefined : args.limit,
         nextCursor: nextCursor ?? undefined,
         filterHints,
         previewLines: previewWithMore,

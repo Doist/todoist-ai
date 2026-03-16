@@ -251,7 +251,10 @@ describe(`${FIND_LABELS} tool`, () => {
                 createMockApiResponse(matchingLabels, null),
             )
 
-            const result = await findLabels.execute({ search: 'work', limit: 50 }, mockTodoistApi)
+            const result = await findLabels.execute(
+                { searchText: 'work', limit: 50 },
+                mockTodoistApi,
+            )
 
             expect(mockTodoistApi.searchLabels).toHaveBeenCalledWith({
                 query: '*work*',
@@ -265,7 +268,7 @@ describe(`${FIND_LABELS} tool`, () => {
             expect(structuredContent.totalCount).toBe(2)
             expect(structuredContent.hasMore).toBe(false)
             expect(structuredContent.nextCursor).toBeUndefined()
-            expect(structuredContent.appliedFilters).toEqual({ search: 'work' })
+            expect(structuredContent.appliedFilters).toEqual({ searchText: 'work' })
             expect(result.textContent).toMatchSnapshot()
         })
 
@@ -277,7 +280,10 @@ describe(`${FIND_LABELS} tool`, () => {
                 .mockResolvedValueOnce(createMockApiResponse(page1Labels, 'page-2-cursor'))
                 .mockResolvedValueOnce(createMockApiResponse(page2Labels, null))
 
-            const result = await findLabels.execute({ search: 'work', limit: 10 }, mockTodoistApi)
+            const result = await findLabels.execute(
+                { searchText: 'work', limit: 10 },
+                mockTodoistApi,
+            )
 
             expect(mockTodoistApi.searchLabels).toHaveBeenCalledTimes(2)
             expect(mockTodoistApi.searchLabels).toHaveBeenNthCalledWith(1, {
@@ -300,7 +306,7 @@ describe(`${FIND_LABELS} tool`, () => {
             mockTodoistApi.searchLabels.mockResolvedValue(createMockApiResponse([]))
 
             const result = await findLabels.execute(
-                { search: 'nonexistent', limit: 50 },
+                { searchText: 'nonexistent', limit: 50 },
                 mockTodoistApi,
             )
 
@@ -322,7 +328,7 @@ describe(`${FIND_LABELS} tool`, () => {
         it('should propagate errors from searchLabels', async () => {
             mockTodoistApi.searchLabels.mockRejectedValue(new Error(TEST_ERRORS.API_UNAUTHORIZED))
             await expect(
-                findLabels.execute({ search: 'work', limit: 50 }, mockTodoistApi),
+                findLabels.execute({ searchText: 'work', limit: 50 }, mockTodoistApi),
             ).rejects.toThrow(TEST_ERRORS.API_UNAUTHORIZED)
         })
     })

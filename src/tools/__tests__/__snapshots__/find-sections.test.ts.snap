@@ -43,5 +43,5 @@ Preview:
 
 exports[`find-sections tool > searching sections by name > should handle search with no matches 1`] = `
 "Sections in project 6cfCcrrCFg2xP94Q matching "nonexistent": 0.
-No results. Try broader search terms; Check spelling; Remove search to see all sections."
+No results. Try broader search terms; Check spelling; Remove searchText to see all sections."
 `;
