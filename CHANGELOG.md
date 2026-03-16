@@ -1,5 +1,17 @@
 # Changelog
 
+## [8.0.0](https://github.com/Doist/todoist-ai/compare/v7.17.0...v8.0.0) (2026-03-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename search param to searchText for consistency ([#388](https://github.com/Doist/todoist-ai/issues/388))
+
+### Bug Fixes
+
+* preserve user-supplied wildcards in search queries ([#385](https://github.com/Doist/todoist-ai/issues/385)) ([7bdd94d](https://github.com/Doist/todoist-ai/commit/7bdd94d87e8c4efc02577a4d7ae576be90ef7ee5))
+* rename search param to searchText for consistency ([#388](https://github.com/Doist/todoist-ai/issues/388)) ([9c4c6c7](https://github.com/Doist/todoist-ai/commit/9c4c6c786e80d98c52e043e55eb0c6643a831ac3))
+
 ## [7.17.0](https://github.com/Doist/todoist-ai/compare/v7.16.0...v7.17.0) (2026-03-15)
 
 
