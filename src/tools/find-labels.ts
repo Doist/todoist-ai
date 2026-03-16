@@ -12,7 +12,7 @@ const ArgsSchema = {
         .string()
         .optional()
         .describe(
-            'Search for a label by name (partial and case insensitive match). If omitted, all labels are returned.',
+            'Search for a label by name (partial and case insensitive match). Supports wildcards (e.g. "work*" for prefix match). Use "\\*" for a literal asterisk. If omitted, all labels are returned.',
         ),
     limit: z
         .number()

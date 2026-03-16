@@ -13,7 +13,7 @@ const ArgsSchema = {
         .string()
         .optional()
         .describe(
-            'Search for a project by name (partial and case insensitive match). If omitted, all projects are returned.',
+            'Search for a project by name (partial and case insensitive match). Supports wildcards (e.g. "work*" for prefix match). Use "\\*" for a literal asterisk. If omitted, all projects are returned.',
         ),
     limit: z
         .number()
