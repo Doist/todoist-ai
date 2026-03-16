@@ -380,16 +380,28 @@ End of description.`)
             expect(toWildcardQuery('work')).toBe('*work*')
         })
 
-        it('should escape literal asterisks', () => {
-            expect(toWildcardQuery('my * project')).toBe('*my \\* project*')
-        })
-
         it('should escape literal backslashes', () => {
             expect(toWildcardQuery('back\\slash')).toBe('*back\\\\slash*')
         })
 
-        it('should escape backslashes before asterisks', () => {
-            expect(toWildcardQuery('a\\*b')).toBe('*a\\\\\\*b*')
+        it('should preserve user-supplied wildcard for prefix matching', () => {
+            expect(toWildcardQuery('work*')).toBe('work*')
+        })
+
+        it('should preserve user-supplied wildcard for suffix matching', () => {
+            expect(toWildcardQuery('*work')).toBe('*work')
+        })
+
+        it('should preserve query already wrapped with wildcards', () => {
+            expect(toWildcardQuery('*work*')).toBe('*work*')
+        })
+
+        it('should treat escaped asterisk as literal and still wrap', () => {
+            expect(toWildcardQuery('my \\* project')).toBe('*my \\\\* project*')
+        })
+
+        it('should escape backslashes before wrapping when no unescaped wildcard', () => {
+            expect(toWildcardQuery('a\\*b')).toBe('*a\\\\*b*')
         })
     })
 

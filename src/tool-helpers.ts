@@ -130,10 +130,14 @@ export async function fetchAllPages<
 
 /**
  * Wraps a search query with wildcards for substring matching.
- * Escapes any literal backslashes and asterisks in the query first.
+ * If the query already contains unescaped wildcards, it is returned as-is
+ * to preserve intentional wildcard patterns (e.g. prefix matching with "work*").
  */
 export function toWildcardQuery(query: string): string {
-    const escaped = query.replaceAll('\\', '\\\\').replaceAll('*', '\\*')
+    if (/(?<!\\)\*/.test(query)) {
+        return query
+    }
+    const escaped = query.replaceAll('\\', '\\\\')
     return `*${escaped}*`
 }
 
