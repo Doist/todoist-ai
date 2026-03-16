@@ -95,25 +95,58 @@ const addTasks = {
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
     async execute({ tasks }, client) {
-        // Process all tasks in parallel
-        const results = await Promise.allSettled(tasks.map((task) => processTask(task, client)))
+        // Group tasks by destination to preserve sibling order within each group,
+        // while parallelizing across different destinations
+        const groups = new Map<string, Array<{ task: (typeof tasks)[number]; index: number }>>()
+        tasks.forEach((task, index) => {
+            const key = destinationKey(task)
+            const group = groups.get(key)
+            if (group) {
+                group.push({ task, index })
+            } else {
+                groups.set(key, [{ task, index }])
+            }
+        })
+
+        // Process groups in parallel; within each group, process sequentially
+        type IndexedResult = { index: number; result: PromiseSettledResult<Task> }
+        const groupResults = await Promise.all(
+            [...groups.values()].map(async (group) => {
+                const results: IndexedResult[] = []
+                for (const { task, index } of group) {
+                    try {
+                        const created = await processTask(task, client)
+                        results.push({ index, result: { status: 'fulfilled', value: created } })
+                    } catch (error) {
+                        results.push({
+                            index,
+                            result: { status: 'rejected', reason: error },
+                        })
+                    }
+                }
+                return results
+            }),
+        )
+
+        // Flatten and sort by original index to maintain input order in the response
+        const indexed = groupResults.flat().sort((a, b) => a.index - b.index)
 
         const newTasks: Task[] = []
         const failures: Array<{ item: string; error: string }> = []
 
-        results.forEach((result, i) => {
+        for (const { index, result } of indexed) {
             if (result.status === 'fulfilled') {
                 newTasks.push(result.value)
             } else {
                 failures.push({
-                    item: tasks[i]?.content ?? `Task ${i + 1}`,
+                    item: tasks[index]?.content ?? `Task ${index + 1}`,
                     error:
                         result.reason instanceof Error
                             ? result.reason.message
                             : String(result.reason),
                 })
             }
-        })
+        }
 
         // If all tasks failed, throw an error
         if (newTasks.length === 0 && failures.length > 0) {
@@ -142,6 +175,14 @@ const addTasks = {
         }
     },
 } satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
+
+/**
+ * Groups tasks by their destination so sibling tasks are created sequentially
+ * (preserving input order) while tasks in different destinations run in parallel.
+ */
+function destinationKey(task: z.infer<typeof TaskSchema>): string {
+    return `${task.projectId ?? ''}|${task.sectionId ?? ''}|${task.parentId ?? ''}`
+}
 
 async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi): Promise<Task> {
     const {
