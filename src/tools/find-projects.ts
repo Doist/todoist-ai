@@ -96,7 +96,7 @@ function generateTextContent({
     // Generate filter hints
     const filterHints: string[] = []
     if (args.searchText) {
-        filterHints.push(`search: "${args.searchText}"`)
+        filterHints.push(`searchText: "${args.searchText}"`)
     }
 
     // Generate project preview lines
@@ -113,7 +113,7 @@ function generateTextContent({
         if (args.searchText) {
             zeroReasonHints.push('Try broader search terms')
             zeroReasonHints.push('Check spelling')
-            zeroReasonHints.push('Remove search to see all projects')
+            zeroReasonHints.push('Remove searchText to see all projects')
         } else {
             zeroReasonHints.push('No projects created yet')
             zeroReasonHints.push(`Use ${ADD_PROJECTS} to create a project`)

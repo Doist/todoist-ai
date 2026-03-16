@@ -18,20 +18,20 @@ Preview:
 
 exports[`find-projects tool > searching projects > should handle search with 'case insensitive matching' 1`] = `
 "All projects matching "IMPORTANT": 1.
-Filter: search: "IMPORTANT".
+Filter: searchText: "IMPORTANT".
 Preview:
     Important Project • id=6cfCcrrCFg2xP94Q"
 `;
 
 exports[`find-projects tool > searching projects > should handle search with 'no matches' 1`] = `
 "All projects matching "nonexistent": 0.
-Filter: search: "nonexistent".
-No results. Try broader search terms; Check spelling; Remove search to see all projects."
+Filter: searchText: "nonexistent".
+No results. Try broader search terms; Check spelling; Remove searchText to see all projects."
 `;
 
 exports[`find-projects tool > searching projects > should search projects by name (case insensitive) 1`] = `
 "All projects matching "work": 2.
-Filter: search: "work".
+Filter: searchText: "work".
 Preview:
     Work Project • id=work-project-id
     Hobby Work • id=hobby-project-id"

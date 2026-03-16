@@ -96,7 +96,7 @@ function generateTextContent({
     if (searchText) {
         zeroReasonHints.push('Try broader search terms')
         zeroReasonHints.push('Check spelling')
-        zeroReasonHints.push('Remove search to see all sections')
+        zeroReasonHints.push('Remove searchText to see all sections')
     } else {
         zeroReasonHints.push('Project has no sections yet')
         zeroReasonHints.push(`Use ${ADD_SECTIONS} to create sections`)

@@ -164,7 +164,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Try broader search terms')
             expect(textContent).toContain('Check spelling')
-            expect(textContent).toContain('Remove search to see all sections')
+            expect(textContent).toContain('Remove searchText to see all sections')
         })
 
         it('should handle case sensitive search correctly', async () => {

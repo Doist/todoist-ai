@@ -43,14 +43,14 @@ No shared labels."
 
 exports[`find-labels tool > searching labels > should return empty list when no labels match exact search 1`] = `
 "All labels matching "nonexistent": 0.
-Filter: search: "nonexistent".
-No results. Try broader search terms; Check spelling; Remove search to see all labels.
+Filter: searchText: "nonexistent".
+No results. Try broader search terms; Check spelling; Remove searchText to see all labels.
 No shared labels."
 `;
 
 exports[`find-labels tool > searching labels > should search labels by name 1`] = `
 "All labels matching "work": 2.
-Filter: search: "work".
+Filter: searchText: "work".
 Preview:
     Work (blue) • id=label-1
     Work Home (green) • id=label-2

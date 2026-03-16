@@ -97,7 +97,7 @@ function generateTextContent({
 
     const filterHints: string[] = []
     if (args.searchText) {
-        filterHints.push(`search: "${args.searchText}"`)
+        filterHints.push(`searchText: "${args.searchText}"`)
     }
 
     const previewLimit = 10
@@ -112,7 +112,7 @@ function generateTextContent({
         if (args.searchText) {
             zeroReasonHints.push('Try broader search terms')
             zeroReasonHints.push('Check spelling')
-            zeroReasonHints.push('Remove search to see all labels')
+            zeroReasonHints.push('Remove searchText to see all labels')
         } else {
             zeroReasonHints.push('No personal labels created yet')
         }
