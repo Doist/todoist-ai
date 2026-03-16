@@ -397,11 +397,15 @@ End of description.`)
         })
 
         it('should treat escaped asterisk as literal and still wrap', () => {
-            expect(toWildcardQuery('my \\* project')).toBe('*my \\\\* project*')
+            expect(toWildcardQuery('my \\* project')).toBe('*my \\* project*')
         })
 
-        it('should escape backslashes before wrapping when no unescaped wildcard', () => {
-            expect(toWildcardQuery('a\\*b')).toBe('*a\\\\*b*')
+        it('should preserve escaped asterisk when wrapping', () => {
+            expect(toWildcardQuery('a\\*b')).toBe('*a\\*b*')
+        })
+
+        it('should detect unescaped wildcard after escaped backslash', () => {
+            expect(toWildcardQuery('a\\\\*b')).toBe('a\\\\*b')
         })
     })
 

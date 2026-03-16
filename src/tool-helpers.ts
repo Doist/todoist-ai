@@ -134,10 +134,12 @@ export async function fetchAllPages<
  * to preserve intentional wildcard patterns (e.g. prefix matching with "work*").
  */
 export function toWildcardQuery(query: string): string {
-    if (/(?<!\\)\*/.test(query)) {
+    // Unescaped wildcard = `*` preceded by an even number of backslashes (including zero)
+    if (/(?<!\\)(?:\\\\)*\*/.test(query)) {
         return query
     }
-    const escaped = query.replaceAll('\\', '\\\\')
+    // Only escape backslashes not followed by `*` to preserve literal asterisks (\*)
+    const escaped = query.replaceAll(/\\(?!\*)/g, '\\\\')
     return `*${escaped}*`
 }
 

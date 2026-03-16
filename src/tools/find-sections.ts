@@ -19,7 +19,7 @@ const ArgsSchema = {
         .string()
         .optional()
         .describe(
-            'Search for a section by name (partial and case insensitive match). If omitted, all sections in the project are returned.',
+            'Search for a section by name (partial and case insensitive match). Supports wildcards (e.g. "work*" for prefix match). Use "\\*" for a literal asterisk. If omitted, all sections in the project are returned.',
         ),
 }
 
