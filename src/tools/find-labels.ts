@@ -8,7 +8,7 @@ import { formatLabelPreview, summarizeList } from '../utils/response-builders.js
 import { ToolNames } from '../utils/tool-names.js'
 
 const ArgsSchema = {
-    search: z
+    searchText: z
         .string()
         .optional()
         .describe(
@@ -25,7 +25,7 @@ const ArgsSchema = {
         .string()
         .optional()
         .describe(
-            'The cursor to get the next page of labels (cursor is obtained from the previous call to this tool, with the same parameters). Ignored when search is provided.',
+            'The cursor to get the next page of labels (cursor is obtained from the previous call to this tool, with the same parameters). Ignored when searchText is provided.',
         ),
 }
 
@@ -53,8 +53,8 @@ const findLabels = {
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
     async execute(args, client) {
         const [personalResult, sharedLabels] = await Promise.all([
-            args.search
-                ? searchAllLabels(client, args.search).then((results) => ({
+            args.searchText
+                ? searchAllLabels(client, args.searchText).then((results) => ({
                       results,
                       nextCursor: null,
                   }))
@@ -64,8 +64,8 @@ const findLabels = {
 
         const { results, nextCursor } = personalResult
 
-        const appliedFilters = args.search
-            ? { search: args.search }
+        const appliedFilters = args.searchText
+            ? { searchText: args.searchText }
             : { limit: args.limit, cursor: args.cursor }
 
         return {
@@ -93,11 +93,11 @@ function generateTextContent({
     nextCursor: string | null
     sharedLabels: string[]
 }) {
-    const subject = args.search ? `All labels matching "${args.search}"` : 'Labels'
+    const subject = args.searchText ? `All labels matching "${args.searchText}"` : 'Labels'
 
     const filterHints: string[] = []
-    if (args.search) {
-        filterHints.push(`search: "${args.search}"`)
+    if (args.searchText) {
+        filterHints.push(`search: "${args.searchText}"`)
     }
 
     const previewLimit = 10
@@ -109,7 +109,7 @@ function generateTextContent({
 
     const zeroReasonHints: string[] = []
     if (labels.length === 0) {
-        if (args.search) {
+        if (args.searchText) {
             zeroReasonHints.push('Try broader search terms')
             zeroReasonHints.push('Check spelling')
             zeroReasonHints.push('Remove search to see all labels')
@@ -127,7 +127,7 @@ function generateTextContent({
         summarizeList({
             subject,
             count: labels.length,
-            limit: args.search ? undefined : args.limit,
+            limit: args.searchText ? undefined : args.limit,
             nextCursor: nextCursor ?? undefined,
             filterHints,
             previewLines: previewWithMore,

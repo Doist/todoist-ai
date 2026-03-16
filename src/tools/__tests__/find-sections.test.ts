@@ -79,7 +79,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             expect(structuredContent.totalCount).toBe(4)
             expect(structuredContent.appliedFilters).toEqual({
                 projectId: TEST_IDS.PROJECT_TEST,
-                search: undefined,
+                searchText: undefined,
             })
         })
 
@@ -133,7 +133,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             })
 
             const result = await findSections.execute(
-                { projectId: TEST_IDS.PROJECT_TEST, search: 'progress' },
+                { projectId: TEST_IDS.PROJECT_TEST, searchText: 'progress' },
                 mockTodoistApi,
             )
 
@@ -156,7 +156,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             mockTodoistApi.searchSections.mockResolvedValue({ results: [], nextCursor: null })
 
             const result = await findSections.execute(
-                { projectId: TEST_IDS.PROJECT_TEST, search: 'nonexistent' },
+                { projectId: TEST_IDS.PROJECT_TEST, searchText: 'nonexistent' },
                 mockTodoistApi,
             )
 
@@ -182,7 +182,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             })
 
             const result = await findSections.execute(
-                { projectId: TEST_IDS.PROJECT_TEST, search: 'IMPORTANT' },
+                { projectId: TEST_IDS.PROJECT_TEST, searchText: 'IMPORTANT' },
                 mockTodoistApi,
             )
 
@@ -214,7 +214,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             })
 
             const result = await findSections.execute(
-                { projectId: TEST_IDS.PROJECT_TEST, search: 'task' },
+                { projectId: TEST_IDS.PROJECT_TEST, searchText: 'task' },
                 mockTodoistApi,
             )
 
@@ -247,7 +247,7 @@ describe(`${FIND_SECTIONS} tool`, () => {
             })
 
             const result = await findSections.execute(
-                { projectId: TEST_IDS.PROJECT_TEST, search: 'done' },
+                { projectId: TEST_IDS.PROJECT_TEST, searchText: 'done' },
                 mockTodoistApi,
             )
 

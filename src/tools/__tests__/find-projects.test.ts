@@ -73,7 +73,7 @@ describe(`${FIND_PROJECTS} tool`, () => {
                     totalCount: 3,
                     hasMore: false,
                     appliedFilters: {
-                        search: undefined,
+                        searchText: undefined,
                         limit: 50,
                         cursor: undefined,
                     },
@@ -129,7 +129,10 @@ describe(`${FIND_PROJECTS} tool`, () => {
             ]
 
             mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse(matchingProjects))
-            const result = await findProjects.execute({ search: 'work', limit: 50 }, mockTodoistApi)
+            const result = await findProjects.execute(
+                { searchText: 'work', limit: 50 },
+                mockTodoistApi,
+            )
 
             // When searching, should use maximum limit and ignore user's limit parameter
             expect(mockTodoistApi.searchProjects).toHaveBeenCalledWith({
@@ -146,7 +149,7 @@ describe(`${FIND_PROJECTS} tool`, () => {
             expect(structuredContent.hasMore).toBe(false) // Always false when searching
             expect(structuredContent.nextCursor).toBeUndefined() // No cursor when searching
             expect(structuredContent.appliedFilters).toEqual({
-                search: 'work',
+                searchText: 'work',
                 limit: 50,
                 cursor: undefined,
             })
@@ -166,7 +169,10 @@ describe(`${FIND_PROJECTS} tool`, () => {
                 .mockResolvedValueOnce(createMockApiResponse(page1Projects, 'page-2-cursor'))
                 .mockResolvedValueOnce(createMockApiResponse(page2Projects, null))
 
-            const result = await findProjects.execute({ search: 'work', limit: 10 }, mockTodoistApi)
+            const result = await findProjects.execute(
+                { searchText: 'work', limit: 10 },
+                mockTodoistApi,
+            )
 
             // Should have made 2 API calls to get all matching projects
             expect(mockTodoistApi.searchProjects).toHaveBeenCalledTimes(2)
@@ -211,7 +217,10 @@ describe(`${FIND_PROJECTS} tool`, () => {
             const mockProjects = apiProjects.map((name) => createMockProject({ name }))
             mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse(mockProjects))
 
-            const result = await findProjects.execute({ search, limit: 50 }, mockTodoistApi)
+            const result = await findProjects.execute(
+                { searchText: search, limit: 50 },
+                mockTodoistApi,
+            )
             expect(result.textContent).toMatchSnapshot()
 
             // Verify structured content
@@ -219,7 +228,7 @@ describe(`${FIND_PROJECTS} tool`, () => {
             expect(structuredContent.projects).toHaveLength(expectedCount)
             expect(structuredContent).toEqual(
                 expect.objectContaining({
-                    appliedFilters: expect.objectContaining({ search }),
+                    appliedFilters: expect.objectContaining({ searchText: search }),
                 }),
             )
         })
@@ -320,7 +329,7 @@ describe(`${FIND_PROJECTS} tool`, () => {
             )
 
             const result = await findProjects.execute(
-                { search: 'inbox', limit: 50 },
+                { searchText: 'inbox', limit: 50 },
                 mockTodoistApi,
             )
 
@@ -344,7 +353,10 @@ describe(`${FIND_PROJECTS} tool`, () => {
                 createMockApiResponse([matchingProject]),
             )
 
-            const result = await findProjects.execute({ search: 'work', limit: 50 }, mockTodoistApi)
+            const result = await findProjects.execute(
+                { searchText: 'work', limit: 50 },
+                mockTodoistApi,
+            )
 
             expect(result.structuredContent.projects).toHaveLength(1)
             expect(result.structuredContent.projects[0]?.name).toBe('Work Project')
