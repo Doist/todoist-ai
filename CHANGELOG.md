@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.0.1](https://github.com/Doist/todoist-ai/compare/v8.0.0...v8.0.1) (2026-03-17)
+
+
+### Bug Fixes
+
+* parallelize add-tasks to prevent batch timeout ([#389](https://github.com/Doist/todoist-ai/issues/389)) ([28ba630](https://github.com/Doist/todoist-ai/commit/28ba6303765907d9ac9ef54f04943a323f884400))
+
 ## [8.0.0](https://github.com/Doist/todoist-ai/compare/v7.17.0...v8.0.0) (2026-03-16)
 
 
