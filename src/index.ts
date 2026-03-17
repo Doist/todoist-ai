@@ -2,6 +2,8 @@ import { FEATURE_NAMES, type Feature, type FeatureName, type Features } from './
 import { getMcpServer } from './mcp-server.js'
 // Comment management tools
 import { addComments } from './tools/add-comments.js'
+// Filter management tools
+import { addFilters } from './tools/add-filters.js'
 // Label management tools
 import { addLabels } from './tools/add-labels.js'
 // Project management tools
@@ -18,6 +20,7 @@ import { fetch } from './tools/fetch.js'
 import { findActivity } from './tools/find-activity.js'
 import { findComments } from './tools/find-comments.js'
 import { findCompletedTasks } from './tools/find-completed-tasks.js'
+import { findFilters } from './tools/find-filters.js'
 import { findLabels } from './tools/find-labels.js'
 // Assignment and collaboration tools
 import { findProjectCollaborators } from './tools/find-project-collaborators.js'
@@ -32,6 +35,7 @@ import { rescheduleTasks } from './tools/reschedule-tasks.js'
 import { search } from './tools/search.js'
 import { uncompleteTasks } from './tools/uncomplete-tasks.js'
 import { updateComments } from './tools/update-comments.js'
+import { updateFilters } from './tools/update-filters.js'
 import { updateProjects } from './tools/update-projects.js'
 import { updateSections } from './tools/update-sections.js'
 import { updateTasks } from './tools/update-tasks.js'
@@ -62,6 +66,11 @@ const tools = {
     // Label management tools
     addLabels,
     findLabels,
+    // Filter management tools
+    findFilters,
+    addFilters,
+    updateFilters,
+
     // Activity and audit tools
     findActivity,
     // General tools
@@ -105,6 +114,10 @@ export {
     // Label management tools
     addLabels,
     findLabels,
+    // Filter management tools
+    findFilters,
+    addFilters,
+    updateFilters,
     // Activity and audit tools
     findActivity,
     // General tools

@@ -1,20 +1,19 @@
+import { createCommand } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ToolNames } from '../utils/tool-names.js'
 
+const entityTypes = ['project', 'section', 'task', 'comment', 'label', 'filter'] as const
+
 const ArgsSchema = {
-    type: z
-        .enum(['project', 'section', 'task', 'comment', 'label'])
-        .describe('The type of entity to delete.'),
+    type: z.enum(entityTypes).describe('The type of entity to delete.'),
     id: z.string().min(1).describe('The ID of the entity to delete.'),
 }
 
 const OutputSchema = {
     deletedEntity: z
         .object({
-            type: z
-                .enum(['project', 'section', 'task', 'comment', 'label'])
-                .describe('The type of deleted entity.'),
+            type: z.enum(entityTypes).describe('The type of deleted entity.'),
             id: z.string().describe('The ID of the deleted entity.'),
         })
         .describe('Information about the deleted entity.'),
@@ -23,7 +22,7 @@ const OutputSchema = {
 
 const deleteObject = {
     name: ToolNames.DELETE_OBJECT,
-    description: 'Delete a project, section, task, comment, or label by its ID.',
+    description: 'Delete a project, section, task, comment, label, or filter by its ID.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
@@ -43,6 +42,11 @@ const deleteObject = {
                 break
             case 'label':
                 await client.deleteLabel(args.id)
+                break
+            case 'filter':
+                await client.sync({
+                    commands: [createCommand('filter_delete', { id: args.id })],
+                })
                 break
         }
 
