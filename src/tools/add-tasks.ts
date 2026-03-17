@@ -1,17 +1,20 @@
 import type { AddTaskArgs, Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { mapTask, resolveInboxProjectId } from '../tool-helpers.js'
+import { isInboxProjectId, mapTask } from '../tool-helpers.js'
 import { assignmentValidator } from '../utils/assignment-validator.js'
 import { DurationParseError, parseDuration } from '../utils/duration-parser.js'
-import { TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
+import { FailureSchema, TaskSchema as TaskOutputSchema } from '../utils/output-schemas.js'
 import {
     convertPriorityToNumber,
     PRIORITY_INPUT_DESCRIPTION,
     PrioritySchema,
 } from '../utils/priorities.js'
-import { summarizeTaskOperation } from '../utils/response-builders.js'
+import { summarizeBatch, summarizeTaskOperation } from '../utils/response-builders.js'
 import { ToolNames } from '../utils/tool-names.js'
+
+// Maximum tasks per operation to prevent abuse and timeouts
+const MAX_TASKS_PER_OPERATION = 25
 
 const TaskSchema = z.object({
     content: z
@@ -68,12 +71,20 @@ const TaskSchema = z.object({
 })
 
 const ArgsSchema = {
-    tasks: z.array(TaskSchema).min(1).describe('The array of tasks to add.'),
+    tasks: z
+        .array(TaskSchema)
+        .min(1)
+        .max(MAX_TASKS_PER_OPERATION)
+        .describe(`The array of tasks to add (max ${MAX_TASKS_PER_OPERATION}).`),
 }
 
 const OutputSchema = {
     tasks: z.array(TaskOutputSchema).describe('The created tasks.'),
     totalCount: z.number().describe('The total number of tasks created.'),
+    failures: z.array(FailureSchema).describe('Failed task creations with error details.'),
+    totalRequested: z.number().describe('The total number of tasks requested.'),
+    successCount: z.number().describe('The number of successfully created tasks.'),
+    failureCount: z.number().describe('The number of failed task creations.'),
 }
 
 const addTasks = {
@@ -84,14 +95,70 @@ const addTasks = {
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
     async execute({ tasks }, client) {
+        // Group tasks by destination to preserve sibling order within each group,
+        // while parallelizing across different destinations
+        const groups = new Map<string, Array<{ task: (typeof tasks)[number]; index: number }>>()
+        tasks.forEach((task, index) => {
+            const key = destinationKey(task)
+            const group = groups.get(key)
+            if (group) {
+                group.push({ task, index })
+            } else {
+                groups.set(key, [{ task, index }])
+            }
+        })
+
+        // Process groups in parallel; within each group, process sequentially
+        type IndexedResult = { index: number; result: PromiseSettledResult<Task> }
+        const groupResults = await Promise.all(
+            [...groups.values()].map(async (group) => {
+                const results: IndexedResult[] = []
+                for (const { task, index } of group) {
+                    try {
+                        const created = await processTask(task, client)
+                        results.push({ index, result: { status: 'fulfilled', value: created } })
+                    } catch (error) {
+                        results.push({
+                            index,
+                            result: { status: 'rejected', reason: error },
+                        })
+                    }
+                }
+                return results
+            }),
+        )
+
+        // Flatten and sort by original index to maintain input order in the response
+        const indexed = groupResults.flat().sort((a, b) => a.index - b.index)
+
         const newTasks: Task[] = []
-        for (const task of tasks) {
-            newTasks.push(await processTask(task, client))
+        const failures: Array<{ item: string; error: string }> = []
+
+        for (const { index, result } of indexed) {
+            if (result.status === 'fulfilled') {
+                newTasks.push(result.value)
+            } else {
+                failures.push({
+                    item: tasks[index]?.content ?? `Task ${index + 1}`,
+                    error:
+                        result.reason instanceof Error
+                            ? result.reason.message
+                            : String(result.reason),
+                })
+            }
         }
+
+        // If all tasks failed, throw an error
+        if (newTasks.length === 0 && failures.length > 0) {
+            const details = failures.map((f) => `"${f.item}": ${f.error}`).join('; ')
+            throw new Error(`All ${failures.length} task(s) failed to create: ${details}`)
+        }
+
         const mappedTasks = newTasks.map(mapTask)
 
         const textContent = generateTextContent({
             tasks: mappedTasks,
+            failures,
             args: { tasks },
         })
 
@@ -100,10 +167,22 @@ const addTasks = {
             structuredContent: {
                 tasks: mappedTasks,
                 totalCount: mappedTasks.length,
+                failures,
+                totalRequested: tasks.length,
+                successCount: newTasks.length,
+                failureCount: failures.length,
             },
         }
     },
 } satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
+
+/**
+ * Groups tasks by their destination so sibling tasks are created sequentially
+ * (preserving input order) while tasks in different destinations run in parallel.
+ */
+function destinationKey(task: z.infer<typeof TaskSchema>): string {
+    return `${task.projectId ?? ''}|${task.sectionId ?? ''}|${task.parentId ?? ''}`
+}
 
 async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi): Promise<Task> {
     const {
@@ -119,11 +198,8 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
         ...otherTaskArgs
     } = task
 
-    // Resolve "inbox" to actual inbox project ID if needed
-    const resolvedProjectId = await resolveInboxProjectId({
-        projectId,
-        client,
-    })
+    // Strip "inbox" — the API defaults to inbox when no projectId is provided
+    const resolvedProjectId = isInboxProjectId(projectId) ? undefined : projectId
 
     // Validate project is not archived
     if (resolvedProjectId) {
@@ -224,15 +300,17 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
 
 function generateTextContent({
     tasks,
+    failures,
     args,
 }: {
     tasks: ReturnType<typeof mapTask>[]
+    failures: Array<{ item: string; error: string }>
     args: z.infer<z.ZodObject<typeof ArgsSchema>>
 }) {
     // Generate context description for mixed contexts
     const contextTypes = new Set<string>()
     for (const task of args.tasks) {
-        if (task.projectId) contextTypes.add('projects')
+        if (task.projectId && !isInboxProjectId(task.projectId)) contextTypes.add('projects')
         else if (task.sectionId) contextTypes.add('sections')
         else if (task.parentId) contextTypes.add('subtasks')
         else contextTypes.add('inbox')
@@ -246,10 +324,22 @@ function generateTextContent({
         projectContext = 'to multiple contexts'
     }
 
+    // Use batch summary when there are failures, task summary when all succeeded
+    if (failures.length > 0) {
+        return summarizeBatch({
+            action: `Added tasks${projectContext ? ` ${projectContext}` : ''}`,
+            success: tasks.length,
+            total: args.tasks.length,
+            successItems: tasks.map((t) => t.content ?? 'Untitled'),
+            successLabel: 'Created',
+            failures,
+        })
+    }
+
     return summarizeTaskOperation('Added', tasks, {
         context: projectContext,
         showDetails: true,
     })
 }
 
-export { addTasks }
+export { addTasks, MAX_TASKS_PER_OPERATION }

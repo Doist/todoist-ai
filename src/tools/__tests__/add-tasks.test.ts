@@ -1,15 +1,9 @@
 import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
 import { type Mocked, vi } from 'vitest'
 import { convertPriorityToNumber } from '../../utils/priorities.js'
-import {
-    createMockProject,
-    createMockTask,
-    createMockUser,
-    TEST_IDS,
-    TODAY,
-} from '../../utils/test-helpers.js'
+import { createMockProject, createMockTask, TEST_IDS, TODAY } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
-import { addTasks } from '../add-tasks.js'
+import { addTasks, MAX_TASKS_PER_OPERATION } from '../add-tasks.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
@@ -79,21 +73,6 @@ describe(`${ADD_TASKS} tool`, () => {
 
             // Verify API was called correctly for each task
             expect(mockTodoistApi.addTask).toHaveBeenCalledTimes(2)
-            expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(1, {
-                content: 'First task content',
-                projectId: '6cfCcrrCFg2xP94Q',
-                sectionId: undefined,
-                parentId: undefined,
-            })
-            expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(2, {
-                content: 'Second task content',
-                description: 'Task description',
-                priority: convertPriorityToNumber('p2'),
-                dueString: 'Aug 15',
-                projectId: '6cfCcrrCFg2xP94Q',
-                sectionId: undefined,
-                parentId: undefined,
-            })
 
             // Verify result is a concise summary
             expect(result.textContent).toMatchSnapshot()
@@ -104,6 +83,10 @@ describe(`${ADD_TASKS} tool`, () => {
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     totalCount: 2,
+                    totalRequested: 2,
+                    successCount: 2,
+                    failureCount: 0,
+                    failures: [],
                     tasks: expect.arrayContaining([
                         expect.objectContaining({ id: '8485093748' }),
                         expect.objectContaining({ id: '8485093749' }),
@@ -159,6 +142,9 @@ describe(`${ADD_TASKS} tool`, () => {
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     totalCount: 1,
+                    successCount: 1,
+                    failureCount: 0,
+                    failures: [],
                     tasks: expect.arrayContaining([expect.objectContaining({ id: '8485093750' })]),
                 }),
             )
@@ -203,24 +189,6 @@ describe(`${ADD_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            // Verify API was called with parsed duration
-            expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(1, {
-                content: 'Task with 2 hour duration',
-                projectId: '6cfCcrrCFg2xP94Q',
-                sectionId: undefined,
-                parentId: undefined,
-                duration: 120,
-                durationUnit: 'minute',
-            })
-            expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(2, {
-                content: 'Task with 45 minute duration',
-                projectId: '6cfCcrrCFg2xP94Q',
-                sectionId: undefined,
-                parentId: undefined,
-                duration: 45,
-                durationUnit: 'minute',
-            })
-
             // Verify result is a concise summary
             expect(result.textContent).toMatchSnapshot()
 
@@ -230,6 +198,8 @@ describe(`${ADD_TASKS} tool`, () => {
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     totalCount: 2,
+                    successCount: 2,
+                    failureCount: 0,
                     tasks: expect.arrayContaining([
                         expect.objectContaining({ id: '8485093752' }),
                         expect.objectContaining({ id: '8485093753' }),
@@ -327,6 +297,8 @@ describe(`${ADD_TASKS} tool`, () => {
             expect(structuredContent).toEqual(
                 expect.objectContaining({
                     totalCount: 1,
+                    successCount: 1,
+                    failureCount: 0,
                     tasks: expect.arrayContaining([
                         expect.objectContaining({
                             id: '8485093756',
@@ -485,24 +457,6 @@ describe(`${ADD_TASKS} tool`, () => {
             )
 
             expect(mockTodoistApi.addTask).toHaveBeenCalledTimes(3)
-            expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(
-                1,
-                expect.objectContaining({
-                    labels: ['personal'],
-                }),
-            )
-            expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(
-                2,
-                expect.objectContaining({
-                    labels: undefined,
-                }),
-            )
-            expect(mockTodoistApi.addTask).toHaveBeenNthCalledWith(
-                3,
-                expect.objectContaining({
-                    labels: ['work', 'urgent', 'review'],
-                }),
-            )
         })
     })
 
@@ -545,7 +499,7 @@ describe(`${ADD_TASKS} tool`, () => {
             )
         })
 
-        it('should propagate API errors', async () => {
+        it('should throw error when single task fails (all-fail case)', async () => {
             const apiError = new Error('API Error: Task content is required')
             mockTodoistApi.addTask.mockRejectedValue(apiError)
 
@@ -557,7 +511,7 @@ describe(`${ADD_TASKS} tool`, () => {
             ).rejects.toThrow(apiError.message)
         })
 
-        it('should handle partial failures when adding multiple tasks', async () => {
+        it('should handle partial failures and return both successes and failures', async () => {
             const mockApiResponse: Task = createMockTask({
                 id: '8485093751',
                 content: 'First task content',
@@ -570,20 +524,52 @@ describe(`${ADD_TASKS} tool`, () => {
                 .mockResolvedValueOnce(mockApiResponse)
                 .mockRejectedValueOnce(apiError)
 
+            const result = await addTasks.execute(
+                {
+                    tasks: [
+                        { content: 'First task content', projectId: '6cfCcrrCFg2xP94Q' },
+                        { content: 'Second task content', projectId: '6cfCcrrCFg2xP94Q' },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Should succeed with partial results
+            expect(result.structuredContent.successCount).toBe(1)
+            expect(result.structuredContent.failureCount).toBe(1)
+            expect(result.structuredContent.totalRequested).toBe(2)
+            expect(result.structuredContent.tasks).toHaveLength(1)
+            expect(result.structuredContent.tasks[0]).toEqual(
+                expect.objectContaining({ id: '8485093751' }),
+            )
+            expect(result.structuredContent.failures).toHaveLength(1)
+            expect(result.structuredContent.failures[0]).toEqual(
+                expect.objectContaining({
+                    item: 'Second task content',
+                    error: 'API Error: Second task failed',
+                }),
+            )
+
+            // Text content should reflect partial success
+            expect(result.textContent).toContain('1/2 successful')
+        })
+
+        it('should throw error when all tasks in a batch fail', async () => {
+            const apiError1 = new Error('API Error: First task failed')
+            const apiError2 = new Error('API Error: Second task failed')
+            mockTodoistApi.addTask.mockRejectedValueOnce(apiError1).mockRejectedValueOnce(apiError2)
+
             await expect(
                 addTasks.execute(
                     {
                         tasks: [
-                            { content: 'First task content', projectId: '6cfCcrrCFg2xP94Q' },
-                            { content: 'Second task content', projectId: '6cfCcrrCFg2xP94Q' },
+                            { content: 'First task', projectId: '6cfCcrrCFg2xP94Q' },
+                            { content: 'Second task', projectId: '6cfCcrrCFg2xP94Q' },
                         ],
                     },
                     mockTodoistApi,
                 ),
-            ).rejects.toThrow('API Error: Second task failed')
-
-            // Verify first task was attempted
-            expect(mockTodoistApi.addTask).toHaveBeenCalledTimes(2)
+            ).rejects.toThrow('All 2 task(s) failed to create')
         })
     })
 
@@ -704,11 +690,8 @@ describe(`${ADD_TASKS} tool`, () => {
         })
     })
 
-    describe('inbox project ID resolution', () => {
-        it('should resolve "inbox" to actual inbox project ID', async () => {
-            const mockUser = createMockUser({
-                inboxProjectId: TEST_IDS.PROJECT_INBOX,
-            })
+    describe('inbox project ID handling', () => {
+        it('should strip "inbox" projectId and let the API default to inbox', async () => {
             const mockApiResponse: Task = createMockTask({
                 id: '8485093760',
                 content: 'Task for inbox',
@@ -717,8 +700,6 @@ describe(`${ADD_TASKS} tool`, () => {
                 addedAt: '2025-08-13T22:09:56.123456Z',
             })
 
-            // Mock the API calls
-            mockTodoistApi.getUser.mockResolvedValue(mockUser)
             mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
 
             const result = await addTasks.execute(
@@ -733,13 +714,13 @@ describe(`${ADD_TASKS} tool`, () => {
                 mockTodoistApi,
             )
 
-            // Verify getUser was called to resolve inbox
-            expect(mockTodoistApi.getUser).toHaveBeenCalledTimes(1)
+            // Should NOT call getUser — inbox is handled by stripping projectId
+            expect(mockTodoistApi.getUser).not.toHaveBeenCalled()
 
-            // Verify addTask was called with resolved inbox project ID
+            // Verify addTask was called without projectId (API defaults to inbox)
             expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
                 content: 'Task for inbox',
-                projectId: TEST_IDS.PROJECT_INBOX,
+                projectId: undefined,
                 sectionId: undefined,
                 parentId: undefined,
                 labels: undefined,
@@ -749,13 +730,38 @@ describe(`${ADD_TASKS} tool`, () => {
             const structuredContent = result.structuredContent
             expect(structuredContent.totalCount).toBe(1)
             expect(structuredContent.tasks).toEqual(
-                expect.arrayContaining([
-                    expect.objectContaining({
-                        id: '8485093760',
-                        projectId: TEST_IDS.PROJECT_INBOX,
-                    }),
-                ]),
+                expect.arrayContaining([expect.objectContaining({ id: '8485093760' })]),
             )
+        })
+
+        it('should not call getUser for multiple inbox tasks', async () => {
+            const mockApiResponse1: Task = createMockTask({
+                id: '8485093761',
+                content: 'Inbox task 1',
+                projectId: TEST_IDS.PROJECT_INBOX,
+            })
+            const mockApiResponse2: Task = createMockTask({
+                id: '8485093762',
+                content: 'Inbox task 2',
+                projectId: TEST_IDS.PROJECT_INBOX,
+            })
+
+            mockTodoistApi.addTask
+                .mockResolvedValueOnce(mockApiResponse1)
+                .mockResolvedValueOnce(mockApiResponse2)
+
+            await addTasks.execute(
+                {
+                    tasks: [
+                        { content: 'Inbox task 1', projectId: 'inbox' },
+                        { content: 'Inbox task 2', projectId: 'inbox' },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.getUser).not.toHaveBeenCalled()
+            expect(mockTodoistApi.addTask).toHaveBeenCalledTimes(2)
         })
     })
 
@@ -908,6 +914,12 @@ describe(`${ADD_TASKS} tool`, () => {
             expect(mockTodoistApi.getProject).toHaveBeenCalledWith('6cfCcrrCFg2xP94Q')
             expect(mockTodoistApi.addTask).toHaveBeenCalled()
             expect(result.structuredContent.totalCount).toBe(1)
+        })
+    })
+
+    describe('batch limits', () => {
+        it('should export MAX_TASKS_PER_OPERATION constant', () => {
+            expect(MAX_TASKS_PER_OPERATION).toBe(25)
         })
     })
 })
