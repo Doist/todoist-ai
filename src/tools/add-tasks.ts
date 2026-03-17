@@ -60,7 +60,7 @@ const TaskSchema = z.object({
         .string()
         .optional()
         .describe(
-            'Assign task to this user. Can be a user ID, name, or email address. User must be a collaborator on the target project.',
+            'Assign task to this user. Can be "me" (assigns to current user), a user ID, name, or email address. User must be a collaborator on the target project.',
         ),
     isUncompletable: z
         .boolean()

@@ -27,7 +27,7 @@ const ArgsSchema = {
         .string()
         .optional()
         .describe(
-            'The user to assign tasks to. Can be user ID, name, or email. Required for assign and reassign operations.',
+            'The user to assign tasks to. Can be "me" (assigns to current user), a user ID, name, or email. Required for assign and reassign operations.',
         ),
     fromAssigneeUser: z
         .string()
@@ -128,23 +128,8 @@ const manageAssignments = {
         }
 
         if (validTasks.length === 0) {
-            const textContent = generateTextContent({
-                operation,
-                results: taskErrors,
-                dryRun,
-            })
-
-            return {
-                textContent,
-                structuredContent: {
-                    operation,
-                    results: taskErrors,
-                    totalRequested: taskIds.length,
-                    successful: 0,
-                    failed: taskErrors.length,
-                    dryRun,
-                },
-            }
+            const details = taskErrors.map((r) => `"${r.taskId}": ${r.error}`).join('; ')
+            throw new Error(`All ${taskErrors.length} task(s) failed: ${details}`)
         }
 
         // Pre-resolve fromAssigneeUser once for reassign operations
@@ -223,6 +208,13 @@ const manageAssignments = {
 
             const unassignResults = await Promise.all(unassignPromises)
             const allResults = [...unassignResults, ...taskErrors]
+
+            // If all operations failed, throw so MCP clients see isError: true
+            // Guard against empty allResults (e.g. reassign filtered out all tasks via fromAssigneeUser)
+            if (allResults.length > 0 && allResults.every((r) => !r.success)) {
+                const details = allResults.map((r) => `"${r.taskId}": ${r.error}`).join('; ')
+                throw new Error(`All ${allResults.length} unassign operation(s) failed: ${details}`)
+            }
 
             const textContent = generateTextContent({
                 operation,
@@ -338,6 +330,13 @@ const manageAssignments = {
         // Handle assign/reassign operations - validate then execute
         const assignmentResults = await processAssignments(validAssignments, !dryRun)
         const allResults = [...assignmentResults, ...validationErrors, ...taskErrors]
+
+        // If all operations failed, throw so MCP clients see isError: true
+        // Guard against empty allResults (e.g. reassign filtered out all tasks via fromAssigneeUser)
+        if (allResults.length > 0 && allResults.every((r) => !r.success)) {
+            const details = allResults.map((r) => `"${r.taskId}": ${r.error}`).join('; ')
+            throw new Error(`All ${allResults.length} ${operation} operation(s) failed: ${details}`)
+        }
 
         const textContent = generateTextContent({
             operation,

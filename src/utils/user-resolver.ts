@@ -32,10 +32,13 @@ const collaboratorsCache = new Map<
 
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
+/** Keyword that resolves to the current authenticated user. */
+export const SELF_USER_KEYWORD = 'me' as const
+
 export class UserResolver {
     /**
      * Resolve a user name or ID to a user ID by looking up collaborators across all shared projects.
-     * Supports exact name matches, partial matches, and email matches.
+     * Supports exact name matches, partial matches, email matches, and the "me" keyword.
      */
     async resolveUser(client: TodoistApi, nameOrId: string): Promise<ResolvedUser | null> {
         // Input validation
@@ -49,6 +52,22 @@ export class UserResolver {
         const cached = userResolutionCache.get(trimmedInput)
         if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
             return cached.result
+        }
+
+        // Handle "me" keyword — resolve to the current authenticated user
+        // Case-insensitive: LLMs may send "Me", "ME", etc.
+        // Not cached: the cache is process-global and "me" resolves differently per client/account
+        if (trimmedInput.toLowerCase() === SELF_USER_KEYWORD) {
+            try {
+                const currentUser = await client.getUser()
+                return {
+                    userId: currentUser.id,
+                    displayName: currentUser.fullName,
+                    email: currentUser.email,
+                }
+            } catch (_error) {
+                return null
+            }
         }
 
         // If it looks like a user ID already, return as-is

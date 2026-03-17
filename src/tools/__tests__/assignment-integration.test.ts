@@ -498,6 +498,68 @@ describe('Assignment Integration Tests', () => {
             )
         })
 
+        it('should throw when all task fetches fail', async () => {
+            mockTodoistApi.getTask.mockReset()
+            mockTodoistApi.getTask.mockRejectedValue(new Error('Not found'))
+
+            await expect(
+                manageAssignments.execute(
+                    {
+                        operation: 'assign',
+                        taskIds: ['bad-1', 'bad-2'],
+                        responsibleUser: 'john@example.com',
+                        dryRun: false,
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow('All 2 task(s) failed')
+        })
+
+        it('should throw when all assign validations fail', async () => {
+            mockTodoistApi.getTask.mockReset()
+            mockTodoistApi.getTask.mockResolvedValue(mockTask)
+
+            const mockAssignmentValidator = vi.mocked(assignmentValidator)
+            mockAssignmentValidator.validateBulkAssignment.mockResolvedValueOnce([
+                {
+                    isValid: false,
+                    error: {
+                        type: AssignmentErrorType.PROJECT_NOT_SHARED,
+                        message: 'Project is not shared',
+                    },
+                },
+            ])
+
+            await expect(
+                manageAssignments.execute(
+                    {
+                        operation: 'assign',
+                        taskIds: ['task-123'],
+                        responsibleUser: 'john@example.com',
+                        dryRun: false,
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow('All 1 assign operation(s) failed')
+        })
+
+        it('should throw when all unassign operations fail', async () => {
+            mockTodoistApi.getTask.mockReset()
+            mockTodoistApi.getTask.mockResolvedValue(mockTask)
+            mockTodoistApi.updateTask.mockRejectedValue(new Error('API error'))
+
+            await expect(
+                manageAssignments.execute(
+                    {
+                        operation: 'unassign',
+                        taskIds: ['task-123'],
+                        dryRun: false,
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow('All 1 unassign operation(s) failed')
+        })
+
         it('should require responsibleUser for assign operations', async () => {
             await expect(
                 manageAssignments.execute(

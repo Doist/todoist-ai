@@ -67,7 +67,7 @@ const TasksUpdateSchema = z.object({
         .string()
         .optional()
         .describe(
-            'Change task assignment. Use "unassign" to remove assignment. Can be user ID, name, or email. User must be a project collaborator.',
+            'Change task assignment. Use "unassign" to remove assignment. Can be "me" (assigns to current user), a user ID, name, or email. User must be a project collaborator.',
         ),
     labels: z
         .array(z.string())
