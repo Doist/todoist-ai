@@ -2,7 +2,6 @@ import { type ColorKey, createCommand } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ColorOutputSchema, ColorSchema } from '../utils/colors.js'
-import { FILTER_COLOR_READ_REMAP, FILTER_COLOR_REMAP } from '../utils/filter-colors.js'
 import { ToolNames } from '../utils/tool-names.js'
 import { FilterOutputSchema } from './find-filters.js'
 
@@ -45,17 +44,12 @@ const addFilters = {
         const tempIds = filters.map((_, i) => `tempFilterAdd${i}${ts}`)
 
         const commands = filters.map((filter, i) => {
-            const safeColor =
-                filter.color !== undefined
-                    ? (FILTER_COLOR_REMAP[filter.color] ?? filter.color)
-                    : undefined
-
             return createCommand(
                 'filter_add',
                 {
                     name: filter.name,
                     query: filter.query,
-                    ...(safeColor !== undefined ? { color: safeColor as ColorKey } : {}),
+                    ...(filter.color !== undefined ? { color: filter.color as ColorKey } : {}),
                     ...(filter.isFavorite !== undefined ? { isFavorite: filter.isFavorite } : {}),
                 },
                 tempIds[i],
@@ -73,15 +67,8 @@ const addFilters = {
                 const tempId = tempIds[i]
                 const realId = tempId !== undefined ? tempIdMapping[tempId] : undefined
                 if (!realId) return null
-                const safeColor =
-                    filter.color !== undefined
-                        ? (FILTER_COLOR_REMAP[filter.color] ?? filter.color)
-                        : undefined
-                // Remap back to REST API color key for output (e.g. teal → turquoise)
                 const outputColor =
-                    safeColor !== undefined
-                        ? ColorOutputSchema.parse(FILTER_COLOR_READ_REMAP[safeColor] ?? safeColor)
-                        : undefined
+                    filter.color !== undefined ? ColorOutputSchema.parse(filter.color) : undefined
                 return {
                     id: realId,
                     name: filter.name,

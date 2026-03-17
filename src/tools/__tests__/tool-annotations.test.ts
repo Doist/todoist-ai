@@ -195,13 +195,6 @@ const TOOL_EXPECTATIONS: ToolExpectation[] = [
         idempotentHint: false,
     },
     {
-        name: ToolNames.DELETE_FILTER,
-        title: 'Todoist: Delete Filter',
-        readOnlyHint: false,
-        destructiveHint: true,
-        idempotentHint: true,
-    },
-    {
         name: ToolNames.FIND_ACTIVITY,
         title: 'Todoist: Find Activity',
         readOnlyHint: true,

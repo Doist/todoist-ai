@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ColorOutputSchema } from '../utils/colors.js'
-import { FILTER_COLOR_READ_REMAP } from '../utils/filter-colors.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const ArgsSchema = {
@@ -49,7 +48,7 @@ const findFilters = {
             id: f.id,
             name: f.name,
             query: f.query,
-            color: ColorOutputSchema.parse(FILTER_COLOR_READ_REMAP[f.color] ?? f.color),
+            color: ColorOutputSchema.parse(f.color),
             isFavorite: f.isFavorite,
             itemOrder: f.itemOrder,
         }))

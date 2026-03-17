@@ -2,7 +2,6 @@ import { type ColorKey, createCommand } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ColorOutputSchema, ColorSchema } from '../utils/colors.js'
-import { FILTER_COLOR_READ_REMAP, FILTER_COLOR_REMAP } from '../utils/filter-colors.js'
 import { ToolNames } from '../utils/tool-names.js'
 import { FilterOutputSchema } from './find-filters.js'
 
@@ -76,11 +75,10 @@ const updateFilters = {
 
         const commands = toUpdate.map((filter) => {
             const { id, color, ...otherArgs } = filter
-            const safeColor = color !== undefined ? (FILTER_COLOR_REMAP[color] ?? color) : undefined
             return createCommand('filter_update', {
                 id,
                 ...otherArgs,
-                ...(safeColor !== undefined ? { color: safeColor as ColorKey } : {}),
+                ...(color !== undefined ? { color: color as ColorKey } : {}),
             })
         })
 
@@ -96,7 +94,7 @@ const updateFilters = {
                 id: f.id,
                 name: f.name,
                 query: f.query,
-                color: ColorOutputSchema.parse(FILTER_COLOR_READ_REMAP[f.color] ?? f.color),
+                color: ColorOutputSchema.parse(f.color),
                 isFavorite: f.isFavorite,
                 itemOrder: f.itemOrder,
             }))

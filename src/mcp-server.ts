@@ -17,7 +17,6 @@ import { addProjects } from './tools/add-projects.js'
 import { addSections } from './tools/add-sections.js'
 import { addTasks } from './tools/add-tasks.js'
 import { completeTasks } from './tools/complete-tasks.js'
-import { deleteFilter } from './tools/delete-filter.js'
 import { deleteObject } from './tools/delete-object.js'
 import { fetch } from './tools/fetch.js'
 import { fetchObject } from './tools/fetch-object.js'
@@ -93,13 +92,12 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **find-filters**: List all personal filters or search by name; filters are saved task views using query syntax
 - **add-filters**: Create personal filters with name, query (e.g. "today & p1"), color, and favorite flag
 - **update-filters**: Modify existing filters' name, query, color, or favorite status
-- **delete-filter**: Remove a personal filter by ID
 
 **Activity & Audit:**
 - **find-activity**: Retrieve recent activity logs to monitor and audit changes. Shows events from all users by default; use initiatorId to filter by specific user. Filter by object type (task/project/comment), event type (added/updated/deleted/completed/uncompleted/archived/unarchived/shared/left), and specific objects (objectId, projectId, taskId). Useful for tracking who did what and when. Note: Date-based filtering is not supported.
 
 **General Operations:**
-- **delete-object**: Remove projects, sections, tasks, comments, or labels by type and ID
+- **delete-object**: Remove projects, sections, tasks, comments, labels, or filters by type and ID
 - **fetch-object**: Fetch a single task, project, comment, or section by its ID
 - **user-info**: Get user details including timezone, goals, and plan information
 
@@ -218,7 +216,6 @@ function getMcpServer({
     registerTool({ tool: findFilters, ...toolArgs })
     registerTool({ tool: addFilters, ...toolArgs })
     registerTool({ tool: updateFilters, ...toolArgs })
-    registerTool({ tool: deleteFilter, ...toolArgs })
 
     // Activity and audit tools
     registerTool({ tool: findActivity, ...toolArgs })

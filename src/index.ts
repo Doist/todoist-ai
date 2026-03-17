@@ -13,7 +13,6 @@ import { addSections } from './tools/add-sections.js'
 // Task management tools
 import { addTasks } from './tools/add-tasks.js'
 import { completeTasks } from './tools/complete-tasks.js'
-import { deleteFilter } from './tools/delete-filter.js'
 // General tools
 import { deleteObject } from './tools/delete-object.js'
 import { fetch } from './tools/fetch.js'
@@ -71,7 +70,7 @@ const tools = {
     findFilters,
     addFilters,
     updateFilters,
-    deleteFilter,
+
     // Activity and audit tools
     findActivity,
     // General tools
@@ -119,7 +118,6 @@ export {
     findFilters,
     addFilters,
     updateFilters,
-    deleteFilter,
     // Activity and audit tools
     findActivity,
     // General tools

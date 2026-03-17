@@ -54,7 +54,6 @@ export const ToolNames = {
     FIND_FILTERS: 'find-filters',
     ADD_FILTERS: 'add-filters',
     UPDATE_FILTERS: 'update-filters',
-    DELETE_FILTER: 'delete-filter',
 
     // Workspace tools
     LIST_WORKSPACES: 'list-workspaces',

@@ -24,7 +24,6 @@ import { addProjects } from '../src/tools/add-projects.js'
 import { addSections } from '../src/tools/add-sections.js'
 import { addTasks } from '../src/tools/add-tasks.js'
 import { completeTasks } from '../src/tools/complete-tasks.js'
-import { deleteFilter } from '../src/tools/delete-filter.js'
 import { deleteObject } from '../src/tools/delete-object.js'
 import { fetch } from '../src/tools/fetch.js'
 import { fetchObject } from '../src/tools/fetch-object.js'
@@ -75,7 +74,6 @@ const tools: Record<string, ExecutableTool> = {
     'add-labels': addLabels,
     'complete-tasks': completeTasks,
     'uncomplete-tasks': uncompleteTasks,
-    'delete-filter': deleteFilter,
     'delete-object': deleteObject,
     fetch: fetch,
     'fetch-object': fetchObject,
