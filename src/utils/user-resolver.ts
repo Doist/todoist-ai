@@ -55,16 +55,16 @@ export class UserResolver {
         }
 
         // Handle "me" keyword — resolve to the current authenticated user
-        if (trimmedInput === SELF_USER_KEYWORD) {
+        // Case-insensitive: LLMs may send "Me", "ME", etc.
+        // Not cached: the cache is process-global and "me" resolves differently per client/account
+        if (trimmedInput.toLowerCase() === SELF_USER_KEYWORD) {
             try {
                 const currentUser = await client.getUser()
-                const result: ResolvedUser = {
+                return {
                     userId: currentUser.id,
                     displayName: currentUser.fullName,
                     email: currentUser.email,
                 }
-                userResolutionCache.set(trimmedInput, { result, timestamp: Date.now() })
-                return result
             } catch (_error) {
                 return null
             }

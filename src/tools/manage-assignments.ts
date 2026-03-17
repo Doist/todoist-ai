@@ -210,7 +210,8 @@ const manageAssignments = {
             const allResults = [...unassignResults, ...taskErrors]
 
             // If all operations failed, throw so MCP clients see isError: true
-            if (allResults.every((r) => !r.success)) {
+            // Guard against empty allResults (e.g. reassign filtered out all tasks via fromAssigneeUser)
+            if (allResults.length > 0 && allResults.every((r) => !r.success)) {
                 const details = allResults.map((r) => `"${r.taskId}": ${r.error}`).join('; ')
                 throw new Error(`All ${allResults.length} unassign operation(s) failed: ${details}`)
             }
@@ -331,7 +332,8 @@ const manageAssignments = {
         const allResults = [...assignmentResults, ...validationErrors, ...taskErrors]
 
         // If all operations failed, throw so MCP clients see isError: true
-        if (allResults.every((r) => !r.success)) {
+        // Guard against empty allResults (e.g. reassign filtered out all tasks via fromAssigneeUser)
+        if (allResults.length > 0 && allResults.every((r) => !r.success)) {
             const details = allResults.map((r) => `"${r.taskId}": ${r.error}`).join('; ')
             throw new Error(`All ${allResults.length} ${operation} operation(s) failed: ${details}`)
         }

@@ -40,11 +40,22 @@ describe('UserResolver', () => {
             })
         })
 
-        it('should cache "me" resolution', async () => {
+        it('should resolve "Me" case-insensitively', async () => {
+            const result = await resolver.resolveUser(mockClient, 'Me')
+
+            expect(mockClient.getUser).toHaveBeenCalledOnce()
+            expect(result).toEqual({
+                userId: '12345',
+                displayName: 'Test User',
+                email: 'test@example.com',
+            })
+        })
+
+        it('should not cache "me" resolution (cache is process-global)', async () => {
             await resolver.resolveUser(mockClient, 'me')
             await resolver.resolveUser(mockClient, 'me')
 
-            expect(mockClient.getUser).toHaveBeenCalledOnce()
+            expect(mockClient.getUser).toHaveBeenCalledTimes(2)
         })
 
         it('should return null if getUser fails', async () => {
@@ -53,15 +64,6 @@ describe('UserResolver', () => {
             const result = await resolver.resolveUser(mockClient, 'me')
 
             expect(result).toBeNull()
-        })
-
-        it('should not match "me" case-insensitively (exact keyword only)', async () => {
-            // "Me" and "ME" should not match the keyword — they go through normal resolution
-            const result = await resolver.resolveUser(mockClient, 'ME')
-
-            // getUser is still called (via the collaborator fallback path), but "ME"
-            // doesn't match the exact keyword so it goes through normal name matching
-            expect(result).toBeNull() // No collaborator named "ME"
         })
     })
 })

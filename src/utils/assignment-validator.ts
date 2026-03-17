@@ -78,7 +78,7 @@ export class AssignmentValidator {
                         type: AssignmentErrorType.PROJECT_NOT_SHARED,
                         message: `Project "${targetProject.name}" is not shared. Task assignments require a shared project with collaborators. Share the project with at least one other person to enable assignments.`,
                         suggestions: [
-                            'Use update-tasks to set other task properties instead',
+                            'Share the project with at least one collaborator to enable assignments',
                             'Use find-project-collaborators to check project sharing status',
                         ],
                     },
