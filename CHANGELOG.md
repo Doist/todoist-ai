@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.0.2](https://github.com/Doist/todoist-ai/compare/v8.0.1...v8.0.2) (2026-03-17)
+
+
+### Bug Fixes
+
+* improve manage-assignments error handling for non-shared projects ([#391](https://github.com/Doist/todoist-ai/issues/391)) ([3105974](https://github.com/Doist/todoist-ai/commit/310597499192730f241e148afbb7d0b1d11ccffc))
+
 ## [8.0.1](https://github.com/Doist/todoist-ai/compare/v8.0.0...v8.0.1) (2026-03-17)
 
 
