@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.1.0](https://github.com/Doist/todoist-ai/compare/v8.0.2...v8.1.0) (2026-03-17)
+
+
+### Features
+
+* add filter management tools (find, add, update, delete) ([#357](https://github.com/Doist/todoist-ai/issues/357)) ([56ea3bc](https://github.com/Doist/todoist-ai/commit/56ea3bc6b2e3421d916dc552bc9c4f743529ecd0))
+
 ## [8.0.2](https://github.com/Doist/todoist-ai/compare/v8.0.1...v8.0.2) (2026-03-17)
 
 
