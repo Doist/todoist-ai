@@ -44,6 +44,7 @@ export const ToolNames = {
     GET_OVERVIEW: 'get-overview',
     DELETE_OBJECT: 'delete-object',
     FETCH_OBJECT: 'fetch-object',
+    REORDER_OBJECTS: 'reorder-objects',
     USER_INFO: 'user-info',
 
     // Label management tools

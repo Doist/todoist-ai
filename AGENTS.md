@@ -31,6 +31,18 @@ When you need to support clearing an optional field:
 - Maintains backward compatibility through dual handling
 - Creates self-documenting APIs with explicit action strings
 
+## Adding a New Tool
+
+When adding a new tool, it must be registered in **all** of these locations:
+
+1. `src/utils/tool-names.ts` — add tool name constant
+2. `src/tools/<tool-name>.ts` — create tool definition
+3. `src/mcp-server.ts` — import, register with `registerTool()`, and add to LLM `instructions` string
+4. `src/index.ts` — import and add to both the `tools` object and the named exports
+5. `scripts/run-tool.ts` — import and add to the `tools` record
+6. `src/tools/__tests__/tool-annotations.test.ts` — add annotation expectation entry
+7. `src/tools/__tests__/<tool-name>.test.ts` — create test file
+
 ## Testing Requirements
 
 When adding new tool parameters:
