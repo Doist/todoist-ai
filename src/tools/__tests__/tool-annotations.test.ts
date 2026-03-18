@@ -202,6 +202,13 @@ const TOOL_EXPECTATIONS: ToolExpectation[] = [
         idempotentHint: true,
     },
     {
+        name: ToolNames.REORDER_OBJECTS,
+        title: 'Todoist: Reorder Objects',
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
         name: ToolNames.USER_INFO,
         title: 'Todoist: User Info',
         readOnlyHint: true,

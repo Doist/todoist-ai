@@ -34,6 +34,7 @@ import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { projectManagement } from './tools/project-management.js'
 import { projectMove } from './tools/project-move.js'
+import { reorderObjects } from './tools/reorder-objects.js'
 import { rescheduleTasks } from './tools/reschedule-tasks.js'
 import { search } from './tools/search.js'
 import { uncompleteTasks } from './tools/uncomplete-tasks.js'
@@ -91,6 +92,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 **General Operations:**
 - **delete-object**: Remove projects, sections, tasks, comments, or labels by type and ID
 - **fetch-object**: Fetch a single task, project, comment, or section by its ID
+- **reorder-objects**: Reorder sibling projects or sections, and optionally move projects to a new parent. For projects: set order to reorder siblings, and/or set parentId to move under a new parent (use "root" for top level). For sections: set order to reorder within a project
 - **user-info**: Get user details including timezone, goals, and plan information
 
 ### Best Practices:
@@ -211,6 +213,7 @@ function getMcpServer({
     registerTool({ tool: getOverview, ...toolArgs })
     registerTool({ tool: deleteObject, ...toolArgs })
     registerTool({ tool: fetchObject, ...toolArgs })
+    registerTool({ tool: reorderObjects, ...toolArgs })
     registerTool({ tool: userInfo, ...toolArgs })
 
     // Assignment and collaboration tools
