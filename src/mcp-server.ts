@@ -10,6 +10,7 @@ import {
     registerResource,
     registerTool,
 } from './mcp-helpers.js'
+import { productivityAnalysis } from './prompts/productivity-analysis.js'
 import { addComments } from './tools/add-comments.js'
 import { addFilters } from './tools/add-filters.js'
 import { addLabels } from './tools/add-labels.js'
@@ -32,6 +33,7 @@ import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { createFindTasksByDateResource } from './tools/find-tasks-by-date.resource.js'
 import { getOverview } from './tools/get-overview.js'
+import { getProductivityStats } from './tools/get-productivity-stats.js'
 import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { projectManagement } from './tools/project-management.js'
@@ -95,6 +97,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 **Activity & Audit:**
 - **find-activity**: Retrieve recent activity logs to monitor and audit changes. Shows events from all users by default; use initiatorId to filter by specific user. Filter by object type (task/project/comment), event type (added/updated/deleted/completed/uncompleted/archived/unarchived/shared/left), and specific objects (objectId, projectId, taskId). Useful for tracking who did what and when. Note: Date-based filtering is not supported.
+- **get-productivity-stats**: Get comprehensive productivity statistics including daily/weekly completion breakdowns, goal streaks (current, last, max), karma score and trends, and historical karma data. No parameters required.
 
 **General Operations:**
 - **delete-object**: Remove projects, sections, tasks, comments, labels, or filters by type and ID
@@ -127,6 +130,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **Project Organization**: add-projects → add-sections → add-tasks with projectId and sectionId
 - **Progress Reviews**: find-completed-tasks (defaults to last 7 days; optionally use explicit date ranges) → get-overview for project summaries
 - **Activity Auditing**: find-activity with event/object filters to track changes, monitor team activity, or investigate specific actions
+- **Productivity Analysis**: Use the productivity-analysis prompt for comprehensive analysis combining user-info, get-productivity-stats, and find-completed-tasks data into actionable insights
 
 Always provide clear, actionable task titles and descriptions. Use the overview tools to give users context about their workload and project status.
 `
@@ -152,6 +156,7 @@ function getMcpServer({
         {
             capabilities: {
                 tools: { listChanged: true },
+                prompts: { listChanged: true },
             },
             instructions,
         },
@@ -219,6 +224,7 @@ function getMcpServer({
 
     // Activity and audit tools
     registerTool({ tool: findActivity, ...toolArgs })
+    registerTool({ tool: getProductivityStats, ...toolArgs })
 
     // General tools
     registerTool({ tool: getOverview, ...toolArgs })
@@ -236,6 +242,19 @@ function getMcpServer({
     // OpenAI MCP tools
     registerTool({ tool: search, ...toolArgs })
     registerTool({ tool: fetch, ...toolArgs })
+
+    /**
+     * Prompts
+     */
+    server.registerPrompt(
+        productivityAnalysis.name,
+        {
+            title: productivityAnalysis.title,
+            description: productivityAnalysis.description,
+            argsSchema: productivityAnalysis.argsSchema,
+        },
+        productivityAnalysis.callback,
+    )
 
     return server
 }
