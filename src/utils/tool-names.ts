@@ -39,6 +39,7 @@ export const ToolNames = {
 
     // Activity and audit tools
     FIND_ACTIVITY: 'find-activity',
+    GET_PRODUCTIVITY_STATS: 'get-productivity-stats',
 
     // General tools
     GET_OVERVIEW: 'get-overview',

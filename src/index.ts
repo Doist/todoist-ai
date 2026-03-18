@@ -29,6 +29,7 @@ import { findSections } from './tools/find-sections.js'
 import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { getOverview } from './tools/get-overview.js'
+import { getProductivityStats } from './tools/get-productivity-stats.js'
 import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { reorderObjects } from './tools/reorder-objects.js'
@@ -74,6 +75,7 @@ const tools = {
 
     // Activity and audit tools
     findActivity,
+    getProductivityStats,
     // General tools
     getOverview,
     deleteObject,
@@ -122,6 +124,7 @@ export {
     updateFilters,
     // Activity and audit tools
     findActivity,
+    getProductivityStats,
     // General tools
     getOverview,
     deleteObject,
