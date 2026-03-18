@@ -28,6 +28,7 @@ import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { getOverview } from './tools/get-overview.js'
 import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
+import { reorderObjects } from './tools/reorder-objects.js'
 import { rescheduleTasks } from './tools/reschedule-tasks.js'
 import { search } from './tools/search.js'
 import { uncompleteTasks } from './tools/uncomplete-tasks.js'
@@ -67,6 +68,7 @@ const tools = {
     // General tools
     getOverview,
     deleteObject,
+    reorderObjects,
     userInfo,
     // Assignment and collaboration tools
     findProjectCollaborators,
@@ -110,6 +112,7 @@ export {
     // General tools
     getOverview,
     deleteObject,
+    reorderObjects,
     userInfo,
     // Assignment and collaboration tools
     findProjectCollaborators,

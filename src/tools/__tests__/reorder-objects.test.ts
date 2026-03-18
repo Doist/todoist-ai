@@ -258,6 +258,21 @@ describe(`${REORDER_OBJECTS} tool`, () => {
             ).rejects.toThrow('parentId is only supported when type is "project"')
         })
 
+        it('should throw when duplicate item IDs are provided', async () => {
+            await expect(
+                reorderObjects.execute(
+                    {
+                        type: 'project',
+                        items: [
+                            { id: 'proj-1', order: 0 },
+                            { id: 'proj-1', order: 1 },
+                        ],
+                    },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow('Duplicate item id=proj-1')
+        })
+
         it('should throw when item has neither order nor parentId', async () => {
             await expect(
                 reorderObjects.execute(

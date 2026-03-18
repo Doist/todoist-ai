@@ -64,7 +64,12 @@ const reorderObjects = {
     async execute(args, client) {
         const { type, items } = args
 
+        const seenIds = new Set<string>()
         for (const item of items) {
+            if (seenIds.has(item.id)) {
+                throw new Error(`Duplicate item id=${item.id}. Each item must appear only once.`)
+            }
+            seenIds.add(item.id)
             if (item.order === undefined && item.parentId === undefined) {
                 throw new Error(
                     `Item id=${item.id} must have at least one of "order" or "parentId".`,
