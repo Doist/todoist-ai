@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.3.0](https://github.com/Doist/todoist-ai/compare/v8.2.0...v8.3.0) (2026-03-18)
+
+
+### Features
+
+* add productivity analysis prompt and get-productivity-stats tool ([#394](https://github.com/Doist/todoist-ai/issues/394)) ([20ff657](https://github.com/Doist/todoist-ai/commit/20ff65716b200b1c846cc058d5d53573e29b853f))
+
 ## [8.2.0](https://github.com/Doist/todoist-ai/compare/v8.1.0...v8.2.0) (2026-03-18)
 
 
