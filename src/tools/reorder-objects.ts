@@ -117,6 +117,8 @@ const reorderObjects = {
             }
         }
 
+        // The SDK throws TodoistRequestError if any syncStatus entry is non-ok,
+        // so we catch and rethrow with contextual information.
         try {
             await client.sync({ commands })
         } catch (error) {
