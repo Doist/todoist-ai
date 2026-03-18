@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.2.0](https://github.com/Doist/todoist-ai/compare/v8.1.0...v8.2.0) (2026-03-18)
+
+
+### Features
+
+* add reorder-objects tool for project and section reordering ([#395](https://github.com/Doist/todoist-ai/issues/395)) ([d8efccc](https://github.com/Doist/todoist-ai/commit/d8efccc6c67f61e44d19c18be57cb2ae43876b28))
+
 ## [8.1.0](https://github.com/Doist/todoist-ai/compare/v8.0.2...v8.1.0) (2026-03-17)
 
 
