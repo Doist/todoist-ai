@@ -1,5 +1,6 @@
+import type { ContentBlock } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod'
-import type { ContentItem, TodoistTool } from '../todoist-tool.js'
+import type { TodoistTool } from '../todoist-tool.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
@@ -107,7 +108,7 @@ const viewAttachment = {
         const response = await client.viewAttachment(fileUrl)
 
         const contentLength = response.headers['content-length']
-        const fileSize = contentLength ? Number.parseInt(contentLength, 10) : undefined
+        const headerFileSize = contentLength ? Number.parseInt(contentLength, 10) : undefined
         const fileName = getFileNameFromUrl(fileUrl)
 
         // Determine MIME type from Content-Type header, fall back to URL extension
@@ -118,8 +119,24 @@ const viewAttachment = {
                 ? headerMime
                 : (getMimeTypeFromUrl(fileUrl) ?? headerMime ?? 'application/octet-stream')
 
-        // Check file size limit
-        if (fileSize && fileSize > MAX_FILE_SIZE) {
+        // Early reject if content-length header exceeds limit
+        if (headerFileSize && headerFileSize > MAX_FILE_SIZE) {
+            return {
+                textContent: `Attachment "${fileName ?? fileUrl}" is too large to display inline (${(headerFileSize / 1024 / 1024).toFixed(1)}MB, limit is 10MB). File type: ${mimeType}`,
+                structuredContent: {
+                    fileName,
+                    fileType: mimeType,
+                    fileSize: headerFileSize,
+                    contentDelivery: 'metadata_only' as const,
+                },
+            }
+        }
+
+        // Read body and enforce size limit on actual bytes
+        const buffer = Buffer.from(await response.arrayBuffer())
+        const fileSize = buffer.byteLength
+
+        if (fileSize > MAX_FILE_SIZE) {
             return {
                 textContent: `Attachment "${fileName ?? fileUrl}" is too large to display inline (${(fileSize / 1024 / 1024).toFixed(1)}MB, limit is 10MB). File type: ${mimeType}`,
                 structuredContent: {
@@ -132,11 +149,10 @@ const viewAttachment = {
         }
 
         const category = getContentCategory(mimeType)
-        const contentItems: ContentItem[] = []
+        const contentItems: ContentBlock[] = []
         let contentDelivery: 'image' | 'text' | 'embedded_resource'
 
         if (category === 'image') {
-            const buffer = Buffer.from(await response.arrayBuffer())
             contentItems.push({
                 type: 'image',
                 data: buffer.toString('base64'),
@@ -144,14 +160,12 @@ const viewAttachment = {
             })
             contentDelivery = 'image'
         } else if (category === 'text') {
-            const text = await response.text()
             contentItems.push({
                 type: 'text',
-                text,
+                text: buffer.toString('utf-8'),
             })
             contentDelivery = 'text'
         } else {
-            const buffer = Buffer.from(await response.arrayBuffer())
             contentItems.push({
                 type: 'resource',
                 resource: {
@@ -163,7 +177,7 @@ const viewAttachment = {
             contentDelivery = 'embedded_resource'
         }
 
-        const textContent = `Attachment: ${fileName ?? 'unknown'} (${mimeType}${fileSize ? `, ${(fileSize / 1024).toFixed(1)}KB` : ''})`
+        const textContent = `Attachment: ${fileName ?? 'unknown'} (${mimeType}, ${(fileSize / 1024).toFixed(1)}KB)`
 
         return {
             textContent,

@@ -1,8 +1,12 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
 import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/mcp.js'
-import type { TextResourceContents, ToolAnnotations } from '@modelcontextprotocol/sdk/types.js'
+import type {
+    ContentBlock,
+    TextResourceContents,
+    ToolAnnotations,
+} from '@modelcontextprotocol/sdk/types.js'
 import type { z } from 'zod'
-import type { ContentItem, TodoistTool } from './todoist-tool.js'
+import type { TodoistTool } from './todoist-tool.js'
 import { formatToolExecutionError } from './tool-execution-error.js'
 import { removeNullFields } from './utils/sanitize-data.js'
 import { ToolNames } from './utils/tool-names.js'
@@ -79,7 +83,7 @@ function getToolOutput<StructuredContent extends Record<string, unknown>>({
 }: {
     textContent: string | undefined
     structuredContent: StructuredContent | undefined
-    contentItems?: ContentItem[]
+    contentItems?: ContentBlock[]
 }) {
     // Remove null fields from structured content before returning
     const sanitizedContent = removeNullFields(structuredContent)

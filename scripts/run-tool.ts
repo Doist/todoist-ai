@@ -64,7 +64,7 @@ type ExecutableTool = {
         // biome-ignore lint/suspicious/noExplicitAny: tools have varying parameter schemas
         args: any,
         client: TodoistApi,
-    ) => Promise<{ textContent?: string; structuredContent?: unknown }>
+    ) => Promise<{ textContent?: string; structuredContent?: unknown; contentItems?: unknown[] }>
 }
 
 const tools: Record<string, ExecutableTool> = {
@@ -191,6 +191,28 @@ async function main() {
         if (result.structuredContent) {
             console.log('\nStructured output:')
             console.log(JSON.stringify(result.structuredContent, null, 2))
+        }
+
+        if (result.contentItems?.length) {
+            console.log(`\nContent items: ${result.contentItems.length}`)
+            for (const item of result.contentItems) {
+                const entry = item as Record<string, unknown>
+                if (entry.type === 'image') {
+                    const data = entry.data as string
+                    console.log(
+                        `  [image] ${entry.mimeType} (${Math.round((data.length * 0.75) / 1024)}KB base64)`,
+                    )
+                } else if (entry.type === 'text') {
+                    const text = entry.text as string
+                    console.log(`  [text] ${text.length > 200 ? `${text.slice(0, 200)}...` : text}`)
+                } else if (entry.type === 'resource') {
+                    const resource = entry.resource as Record<string, unknown>
+                    const blob = resource.blob as string
+                    console.log(
+                        `  [resource] ${resource.mimeType} (${Math.round((blob.length * 0.75) / 1024)}KB base64)`,
+                    )
+                }
+            }
         }
     } catch (error) {
         console.error('Tool execution failed:', error)

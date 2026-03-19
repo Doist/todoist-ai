@@ -366,7 +366,7 @@ describe('view-attachment tool', () => {
     })
 
     describe('file size handling', () => {
-        it('should return metadata-only for files exceeding 10MB', async () => {
+        it('should return metadata-only when content-length header exceeds 10MB', async () => {
             const largeSize = (11 * 1024 * 1024).toString()
             mockTodoistApi.viewAttachment.mockResolvedValue(
                 createMockResponse({
@@ -387,11 +387,29 @@ describe('view-attachment tool', () => {
             expect(result.textContent).toContain('10MB')
         })
 
-        it('should include file size in text content when available', async () => {
+        it('should return metadata-only when actual body exceeds 10MB even without content-length', async () => {
+            const largeBody = new ArrayBuffer(11 * 1024 * 1024)
+            mockTodoistApi.viewAttachment.mockResolvedValue(
+                createMockResponse({
+                    contentType: 'image/png',
+                    body: largeBody,
+                }),
+            )
+
+            const result = await viewAttachment.execute(
+                { fileUrl: 'https://files.todoist.com/upload/huge.png' },
+                mockTodoistApi,
+            )
+
+            expect(result.contentItems).toBeUndefined()
+            expect(result.structuredContent.contentDelivery).toBe('metadata_only')
+            expect(result.textContent).toContain('too large')
+        })
+
+        it('should use actual body size for fileSize in structured content', async () => {
             mockTodoistApi.viewAttachment.mockResolvedValue(
                 createMockResponse({
                     contentType: 'text/plain',
-                    contentLength: '1024',
                     body: 'hello',
                 }),
             )
@@ -401,8 +419,8 @@ describe('view-attachment tool', () => {
                 mockTodoistApi,
             )
 
-            expect(result.structuredContent.fileSize).toBe(1024)
-            expect(result.textContent).toContain('1.0KB')
+            expect(result.structuredContent.fileSize).toBe(5)
+            expect(result.textContent).toContain('KB')
         })
     })
 
