@@ -33,6 +33,9 @@ export const ToolNames = {
     UPDATE_COMMENTS: 'update-comments',
     FIND_COMMENTS: 'find-comments',
 
+    // Attachment tools
+    VIEW_ATTACHMENT: 'view-attachment',
+
     // Assignment and collaboration tools
     FIND_PROJECT_COLLABORATORS: 'find-project-collaborators',
     MANAGE_ASSIGNMENTS: 'manage-assignments',

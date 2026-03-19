@@ -146,6 +146,13 @@ const TOOL_EXPECTATIONS: ToolExpectation[] = [
         idempotentHint: true,
     },
     {
+        name: ToolNames.VIEW_ATTACHMENT,
+        title: 'Todoist: View Attachment',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
         name: ToolNames.ADD_LABELS,
         title: 'Todoist: Add Labels',
         readOnlyHint: false,

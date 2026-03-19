@@ -1,10 +1,11 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
-import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js'
+import type { ContentBlock, ToolAnnotations } from '@modelcontextprotocol/sdk/types.js'
 import type { z } from 'zod'
 
 type ExecuteResult<Output extends z.ZodRawShape> = Promise<{
     textContent?: string
     structuredContent?: z.infer<z.ZodObject<Output>>
+    contentItems?: ContentBlock[]
 }>
 
 type RequiredToolAnnotations = ToolAnnotations & {
