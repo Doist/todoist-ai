@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.4.0](https://github.com/Doist/todoist-ai/compare/v8.3.0...v8.4.0) (2026-03-19)
+
+
+### Features
+
+* add view-attachment tool ([#398](https://github.com/Doist/todoist-ai/issues/398)) ([41d4962](https://github.com/Doist/todoist-ai/commit/41d496200b8f389784ea9d160f2ea41218e52db5))
+
 ## [8.3.0](https://github.com/Doist/todoist-ai/compare/v8.2.0...v8.3.0) (2026-03-18)
 
 
