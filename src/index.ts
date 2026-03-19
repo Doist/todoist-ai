@@ -42,6 +42,7 @@ import { updateProjects } from './tools/update-projects.js'
 import { updateSections } from './tools/update-sections.js'
 import { updateTasks } from './tools/update-tasks.js'
 import { userInfo } from './tools/user-info.js'
+import { viewAttachment } from './tools/view-attachment.js'
 
 const tools = {
     // Task management tools
@@ -65,6 +66,8 @@ const tools = {
     addComments,
     updateComments,
     findComments,
+    // Attachment tools
+    viewAttachment,
     // Label management tools
     addLabels,
     findLabels,
@@ -115,6 +118,8 @@ export {
     addComments,
     updateComments,
     findComments,
+    // Attachment tools
+    viewAttachment,
     // Label management tools
     addLabels,
     findLabels,

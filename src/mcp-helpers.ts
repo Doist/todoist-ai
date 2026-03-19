@@ -2,7 +2,7 @@ import type { TodoistApi } from '@doist/todoist-api-typescript'
 import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/mcp.js'
 import type { TextResourceContents, ToolAnnotations } from '@modelcontextprotocol/sdk/types.js'
 import type { z } from 'zod'
-import type { TodoistTool } from './todoist-tool.js'
+import type { ContentItem, TodoistTool } from './todoist-tool.js'
 import { formatToolExecutionError } from './tool-execution-error.js'
 import { removeNullFields } from './utils/sanitize-data.js'
 import { ToolNames } from './utils/tool-names.js'
@@ -75,16 +75,33 @@ const USE_STRUCTURED_CONTENT =
 function getToolOutput<StructuredContent extends Record<string, unknown>>({
     textContent,
     structuredContent,
+    contentItems,
 }: {
     textContent: string | undefined
     structuredContent: StructuredContent | undefined
+    contentItems?: ContentItem[]
 }) {
     // Remove null fields from structured content before returning
     const sanitizedContent = removeNullFields(structuredContent)
 
     // Always include structuredContent when available since all tools have outputSchema
     const result: Record<string, unknown> = {}
-    if (textContent) result.content = [{ type: 'text' as const, text: textContent }]
+
+    const contentArray: Array<Record<string, unknown>> = []
+
+    if (textContent) {
+        contentArray.push({ type: 'text' as const, text: textContent })
+    }
+
+    // Append any extra content items (images, embedded resources, etc.)
+    if (contentItems) {
+        contentArray.push(...contentItems)
+    }
+
+    if (contentArray.length > 0) {
+        result.content = contentArray
+    }
+
     if (structuredContent) result.structuredContent = sanitizedContent
 
     // Legacy support: also include JSON in content when USE_STRUCTURED_CONTENT is false
@@ -216,7 +233,7 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
     // @ts-expect-error I give up
     const cb: ToolCallback<Params> = async (args: z.infer<z.ZodObject<Params>>, _context) => {
         try {
-            let { textContent, structuredContent } = await tool.execute(
+            let { textContent, structuredContent, contentItems } = await tool.execute(
                 args as z.infer<z.ZodObject<Params>>,
                 client,
             )
@@ -231,7 +248,7 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
                 }
             }
 
-            return getToolOutput({ textContent, structuredContent })
+            return getToolOutput({ textContent, structuredContent, contentItems })
         } catch (error) {
             console.error(`Error executing tool ${tool.name}:`, { args, error })
             return getErrorOutput(formatToolExecutionError(error))

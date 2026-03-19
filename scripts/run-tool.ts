@@ -52,6 +52,7 @@ import { updateProjects } from '../src/tools/update-projects.js'
 import { updateSections } from '../src/tools/update-sections.js'
 import { updateTasks } from '../src/tools/update-tasks.js'
 import { userInfo } from '../src/tools/user-info.js'
+import { viewAttachment } from '../src/tools/view-attachment.js'
 
 config()
 
@@ -102,6 +103,7 @@ const tools: Record<string, ExecutableTool> = {
     'update-sections': updateSections,
     'update-tasks': updateTasks,
     'user-info': userInfo,
+    'view-attachment': viewAttachment,
 }
 
 function printUsage() {

@@ -2,9 +2,19 @@ import type { TodoistApi } from '@doist/todoist-api-typescript'
 import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js'
 import type { z } from 'zod'
 
+/**
+ * A raw MCP content block that can be returned alongside textContent/structuredContent.
+ * Used for non-text content like images and binary resources.
+ */
+type ContentItem =
+    | { type: 'image'; data: string; mimeType: string }
+    | { type: 'text'; text: string }
+    | { type: 'resource'; resource: { uri: string; mimeType?: string; blob: string } }
+
 type ExecuteResult<Output extends z.ZodRawShape> = Promise<{
     textContent?: string
     structuredContent?: z.infer<z.ZodObject<Output>>
+    contentItems?: ContentItem[]
 }>
 
 type RequiredToolAnnotations = ToolAnnotations & {
@@ -67,4 +77,4 @@ type TodoistTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape> = {
     execute: (args: z.infer<z.ZodObject<Params>>, client: TodoistApi) => ExecuteResult<Output>
 }
 
-export type { RequiredToolAnnotations, TodoistTool }
+export type { ContentItem, RequiredToolAnnotations, TodoistTool }

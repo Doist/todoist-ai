@@ -48,6 +48,7 @@ import { updateProjects } from './tools/update-projects.js'
 import { updateSections } from './tools/update-sections.js'
 import { updateTasks } from './tools/update-tasks.js'
 import { userInfo } from './tools/user-info.js'
+import { viewAttachment } from './tools/view-attachment.js'
 import { loadTaskListWidget } from './utils/widget-loader.js'
 
 const taskListWidget = loadTaskListWidget()
@@ -88,6 +89,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 **Collaboration & Comments:**
 - **add-comments/update-comments/find-comments**: Manage task and project discussions
+- **view-attachment**: View file attachments from comments. Pass the fileUrl from a comment's fileAttachment. Returns images inline, text files as text, and binary files as embedded resources.
 - **find-project-collaborators**: Find team members by name or email for assignments
 - **manage-assignments**: Bulk assign/unassign/reassign up to 50 tasks with atomic operations and dry-run validation
 
@@ -214,6 +216,9 @@ function getMcpServer({
     registerTool({ tool: addComments, ...toolArgs })
     registerTool({ tool: findComments, ...toolArgs })
     registerTool({ tool: updateComments, ...toolArgs })
+
+    // Attachment tools
+    registerTool({ tool: viewAttachment, ...toolArgs })
 
     // Label management tools
     registerTool({ tool: addLabels, ...toolArgs })
