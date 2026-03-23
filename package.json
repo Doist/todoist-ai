@@ -49,7 +49,7 @@
         "lint:write": "biome lint --write",
         "format:check": "biome format",
         "format:write": "biome format --write",
-        "lint:schemas": "npm run build && npx tsc scripts/validate-schemas.ts --outDir dist/scripts --moduleResolution node --module ESNext --target es2021 --esModuleInterop --skipLibCheck --declaration false && node dist/scripts/validate-schemas.js",
+        "lint:schemas": "npm run build && npx tsc scripts/validate-schemas.ts --ignoreConfig --outDir dist/scripts --moduleResolution bundler --module ESNext --target es2021 --types node --skipLibCheck --declaration false && node dist/scripts/validate-schemas.js",
         "check": "biome check && npm run lint:schemas",
         "check:fix": "biome check --fix --unsafe",
         "prepare": "husky"
@@ -83,7 +83,7 @@
         "rimraf": "6.1.3",
         "snarkdown": "2.0.0",
         "tsx": "4.21.0",
-        "typescript": "5.9.3",
+        "typescript": "6.0.2",
         "vite": "7.3.1",
         "vite-plugin-dts": "4.5.4",
         "vitest": "4.1.0"
