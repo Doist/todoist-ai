@@ -49,7 +49,7 @@
         "lint:write": "biome lint --write",
         "format:check": "biome format",
         "format:write": "biome format --write",
-        "lint:schemas": "npm run build && npx tsc scripts/validate-schemas.ts --outDir dist/scripts --moduleResolution bundler --module ESNext --target es2021 --skipLibCheck --declaration false && node dist/scripts/validate-schemas.js",
+        "lint:schemas": "npm run build && npx tsc scripts/validate-schemas.ts --ignoreConfig --outDir dist/scripts --moduleResolution bundler --module ESNext --target es2021 --types node --skipLibCheck --declaration false && node dist/scripts/validate-schemas.js",
         "check": "biome check && npm run lint:schemas",
         "check:fix": "biome check --fix --unsafe",
         "prepare": "husky"
