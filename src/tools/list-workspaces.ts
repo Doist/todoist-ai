@@ -1,4 +1,10 @@
-import type { TodoistApi } from '@doist/todoist-api-typescript'
+import {
+    type TodoistApi,
+    WORKSPACE_PLANS,
+    WORKSPACE_ROLES,
+    type WorkspacePlan,
+    type WorkspaceRole,
+} from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -8,8 +14,8 @@ const ArgsSchema = {}
 const WorkspaceOutputSchema = {
     id: z.string().describe('The unique identifier for the workspace.'),
     name: z.string().describe('The name of the workspace.'),
-    plan: z.enum(['STARTER', 'BUSINESS']).describe('The workspace plan type.'),
-    role: z.enum(['ADMIN', 'MEMBER', 'GUEST']).describe("The user's role in the workspace."),
+    plan: z.enum(WORKSPACE_PLANS).describe('The workspace plan type.'),
+    role: z.enum(WORKSPACE_ROLES).describe("The user's role in the workspace."),
     isLinkSharingEnabled: z
         .boolean()
         .describe('Whether link sharing is enabled for the workspace.'),
@@ -27,8 +33,8 @@ const OutputSchema = {
 type WorkspaceOutput = {
     id: string
     name: string
-    plan: 'STARTER' | 'BUSINESS'
-    role: 'ADMIN' | 'MEMBER' | 'GUEST'
+    plan: WorkspacePlan
+    role: WorkspaceRole
     isLinkSharingEnabled: boolean
     isGuestAllowed: boolean
     createdAt: string
@@ -111,4 +117,4 @@ const listWorkspaces = {
     },
 } satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
-export { listWorkspaces, type WorkspacesStructured, type WorkspaceOutput }
+export { listWorkspaces, type WorkspaceOutput, type WorkspacesStructured }
