@@ -37,26 +37,28 @@ const TasksUpdateSchema = z.object({
     parentId: z.string().optional().describe('The new parent task ID (for subtasks).'),
     order: z.number().optional().describe('The new order of the task within its parent/section.'),
     priority: PrioritySchema.optional().describe(PRIORITY_INPUT_DESCRIPTION),
-    dueString: z.preprocess(
-        // Keep accepting legacy null while exposing a Gemini-compatible string schema.
-        (value) => (value === null ? 'remove' : value),
-        z
-            .string()
-            .optional()
-            .describe(
-                'The new due date for the task in natural language (e.g., "tomorrow at 5pm"). Use "remove" to clear the due date.',
-            ),
-    ),
-    deadlineDate: z.preprocess(
-        // Keep accepting legacy null while exposing a Gemini-compatible string schema.
-        (value) => (value === null ? 'remove' : value),
-        z
-            .string()
-            .optional()
-            .describe(
-                'The new deadline date for the task in ISO 8601 format (YYYY-MM-DD, e.g., "2025-12-31"). Deadlines are immovable constraints shown with a different indicator than due dates. Use "remove" to clear the deadline.',
-            ),
-    ),
+    dueString: z
+        .preprocess(
+            // Keep accepting legacy null while exposing a Gemini-compatible string schema.
+            (value) => (value === null ? 'remove' : value),
+            z
+                .string()
+                .describe(
+                    'The new due date for the task in natural language (e.g., "tomorrow at 5pm"). Use "remove" to clear the due date.',
+                ),
+        )
+        .optional(),
+    deadlineDate: z
+        .preprocess(
+            // Keep accepting legacy null while exposing a Gemini-compatible string schema.
+            (value) => (value === null ? 'remove' : value),
+            z
+                .string()
+                .describe(
+                    'The new deadline date for the task in ISO 8601 format (YYYY-MM-DD, e.g., "2025-12-31"). Deadlines are immovable constraints shown with a different indicator than due dates. Use "remove" to clear the deadline.',
+                ),
+        )
+        .optional(),
     duration: z
         .string()
         .optional()
