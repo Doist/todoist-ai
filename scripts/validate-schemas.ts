@@ -273,7 +273,10 @@ async function main() {
 }
 
 // Run if this script is executed directly
-if (process.argv[1]?.endsWith('validate-schemas.js')) {
+if (
+    process.argv[1]?.endsWith('validate-schemas.ts') ||
+    process.argv[1]?.endsWith('validate-schemas.js')
+) {
     main()
 }
 
