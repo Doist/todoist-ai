@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.4.2](https://github.com/Doist/todoist-ai/compare/v8.4.1...v8.4.2) (2026-03-25)
+
+
+### Bug Fixes
+
+* promote noNonNullAssertion to error ([#412](https://github.com/Doist/todoist-ai/issues/412)) ([61a7184](https://github.com/Doist/todoist-ai/commit/61a718459ab43affa0e981d8485236b4e94ecd9e))
+
 ## [8.4.1](https://github.com/Doist/todoist-ai/compare/v8.4.0...v8.4.1) (2026-03-25)
 
 
