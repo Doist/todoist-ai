@@ -104,23 +104,23 @@ describe(`${GET_PRODUCTIVITY_STATS} tool`, () => {
         expect(mockTodoistApi.getProductivityStats).toHaveBeenCalledWith()
 
         // Verify structured content
-        const sc = result.structuredContent!
-        expect(sc.completedCount).toBe(5230)
-        expect(sc.karma).toBe(86394)
-        expect(sc.karmaTrend).toBe('up')
-        expect(sc.goals.dailyGoal).toBe(10)
-        expect(sc.goals.weeklyGoal).toBe(50)
-        expect(sc.goals.currentDailyStreak.count).toBe(14)
-        expect(sc.goals.currentWeeklyStreak.count).toBe(6)
-        expect(sc.goals.maxDailyStreak.count).toBe(30)
-        expect(sc.goals.maxWeeklyStreak.count).toBe(12)
-        expect(sc.goals.vacationMode).toBe(0)
-        expect(sc.goals.karmaDisabled).toBe(0)
-        expect(sc.daysItems).toHaveLength(3)
-        expect(sc.weekItems).toHaveLength(2)
-        expect(sc.karmaGraphData).toHaveLength(2)
-        expect(sc.karmaUpdateReasons).toHaveLength(1)
-        expect(sc.projectColors).toEqual({ proj1: 'berry_red', proj2: 'blue' })
+        const sc = result.structuredContent
+        expect(sc?.completedCount).toBe(5230)
+        expect(sc?.karma).toBe(86394)
+        expect(sc?.karmaTrend).toBe('up')
+        expect(sc?.goals.dailyGoal).toBe(10)
+        expect(sc?.goals.weeklyGoal).toBe(50)
+        expect(sc?.goals.currentDailyStreak.count).toBe(14)
+        expect(sc?.goals.currentWeeklyStreak.count).toBe(6)
+        expect(sc?.goals.maxDailyStreak.count).toBe(30)
+        expect(sc?.goals.maxWeeklyStreak.count).toBe(12)
+        expect(sc?.goals.vacationMode).toBe(0)
+        expect(sc?.goals.karmaDisabled).toBe(0)
+        expect(sc?.daysItems).toHaveLength(3)
+        expect(sc?.weekItems).toHaveLength(2)
+        expect(sc?.karmaGraphData).toHaveLength(2)
+        expect(sc?.karmaUpdateReasons).toHaveLength(1)
+        expect(sc?.projectColors).toEqual({ proj1: 'berry_red', proj2: 'blue' })
     })
 
     it('should include key stats in text content', async () => {
@@ -129,7 +129,7 @@ describe(`${GET_PRODUCTIVITY_STATS} tool`, () => {
 
         const result = await getProductivityStats.execute({}, mockTodoistApi)
 
-        const text = result.textContent!
+        const text = result.textContent
         expect(text).toContain('5,230')
         expect(text).toContain('86,394')
         expect(text).toContain('up')
@@ -147,7 +147,7 @@ describe(`${GET_PRODUCTIVITY_STATS} tool`, () => {
 
         const result = await getProductivityStats.execute({}, mockTodoistApi)
 
-        const text = result.textContent!
+        const text = result.textContent
         expect(text).toContain('2026-03-17: 12 tasks')
         expect(text).toContain('2026-03-16: 8 tasks')
         expect(text).toContain('2026-03-15: 5 tasks')
@@ -159,7 +159,7 @@ describe(`${GET_PRODUCTIVITY_STATS} tool`, () => {
 
         const result = await getProductivityStats.execute({}, mockTodoistApi)
 
-        const text = result.textContent!
+        const text = result.textContent
         expect(text).toContain('2026-03-11 to 2026-03-17: 45 tasks')
         expect(text).toContain('2026-03-04 to 2026-03-10: 38 tasks')
     })
@@ -170,7 +170,7 @@ describe(`${GET_PRODUCTIVITY_STATS} tool`, () => {
 
         const result = await getProductivityStats.execute({}, mockTodoistApi)
 
-        const text = result.textContent!
+        const text = result.textContent
         expect(text).not.toContain('Recent Daily Completions')
         expect(text).not.toContain('Recent Weekly Completions')
         expect(result.structuredContent?.daysItems).toHaveLength(0)

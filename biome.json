@@ -16,7 +16,8 @@
             "recommended": true,
             "style": {
                 "useImportType": "off",
-                "noEnum": "error"
+                "noEnum": "error",
+                "noNonNullAssertion": "error"
             },
             "correctness": {
                 "noUnusedVariables": "error",
