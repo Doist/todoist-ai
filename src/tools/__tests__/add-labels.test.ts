@@ -31,8 +31,8 @@ describe(`${ADD_LABELS} tool`, () => {
             expect(mockTodoistApi.addLabel).toHaveBeenCalledWith({ name: 'Work', color: 'blue' })
             expect(result.structuredContent.labels).toHaveLength(1)
             expect(result.structuredContent.totalCount).toBe(1)
-            expect(result.structuredContent.labels[0]!.name).toBe('Work')
-            expect(result.structuredContent.labels[0]!.id).toBe('label-1')
+            expect(result.structuredContent.labels[0]?.name).toBe('Work')
+            expect(result.structuredContent.labels[0]?.id).toBe('label-1')
             expect(result.textContent).toContain('Added 1 label')
             expect(result.textContent).toContain('Work')
             expect(result.textContent).toMatchSnapshot()
@@ -72,12 +72,12 @@ describe(`${ADD_LABELS} tool`, () => {
                 mockTodoistApi,
             )
 
-            const label = result.structuredContent.labels[0]!
-            expect(label.id).toBe('label-1')
-            expect(label.name).toBe('Work')
-            expect(label.color).toBe('blue')
-            expect(label.order).toBe(5)
-            expect(label.isFavorite).toBe(true)
+            const label = result.structuredContent.labels[0]
+            expect(label?.id).toBe('label-1')
+            expect(label?.name).toBe('Work')
+            expect(label?.color).toBe('blue')
+            expect(label?.order).toBe(5)
+            expect(label?.isFavorite).toBe(true)
         })
 
         it('should reject when one of multiple label creates fails', async () => {
