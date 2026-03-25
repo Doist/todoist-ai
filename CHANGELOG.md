@@ -1,5 +1,14 @@
 # Changelog
 
+## [8.4.1](https://github.com/Doist/todoist-ai/compare/v8.4.0...v8.4.1) (2026-03-25)
+
+
+### Bug Fixes
+
+* **deps:** update all dependencies ([#402](https://github.com/Doist/todoist-ai/issues/402)) ([a5da0b1](https://github.com/Doist/todoist-ai/commit/a5da0b1b1b1e67db9e90e9597098f6276df83652))
+* move .optional() outside z.preprocess() for dueString/deadlineDate ([#410](https://github.com/Doist/todoist-ai/issues/410)) ([053df3b](https://github.com/Doist/todoist-ai/commit/053df3b3729f421c6c8a68fa639f65a3581cb337))
+* use tsx for lint:schemas to fix TS6 compatibility ([#411](https://github.com/Doist/todoist-ai/issues/411)) ([68f7b16](https://github.com/Doist/todoist-ai/commit/68f7b1659de97d39ad919cc20a51efb787045700))
+
 ## [8.4.0](https://github.com/Doist/todoist-ai/compare/v8.3.0...v8.4.0) (2026-03-19)
 
 
