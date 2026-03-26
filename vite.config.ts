@@ -1,12 +1,37 @@
-import { resolve } from 'node:path'
+import { existsSync, readdirSync, rmSync } from 'node:fs'
+import { join, resolve } from 'node:path'
+import type { Plugin } from 'vite'
 import dts from 'vite-plugin-dts'
 import { defineConfig } from 'vitest/config'
 
+const DIST_DIR = resolve(__dirname, 'dist')
+const PRESERVED_DIST_ENTRIES = new Set(['mcp-apps'])
+
+function cleanDistPreservingMcpApps(): Plugin {
+    return {
+        name: 'clean-dist-preserving-mcp-apps',
+        buildStart() {
+            if (!existsSync(DIST_DIR)) {
+                return
+            }
+
+            for (const entry of readdirSync(DIST_DIR)) {
+                if (PRESERVED_DIST_ENTRIES.has(entry)) {
+                    continue
+                }
+
+                rmSync(join(DIST_DIR, entry), { recursive: true, force: true })
+            }
+        },
+    }
+}
+
 export default defineConfig({
     plugins: [
+        cleanDistPreservingMcpApps(),
         dts({
             include: ['src/**/*'],
-            exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts', 'src/widgets/**/*'],
+            exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts', 'src/mcp-apps/**/*'],
             entryRoot: 'src',
         }),
     ],
@@ -50,7 +75,7 @@ export default defineConfig({
         },
         target: 'node18', // Target Node.js 18+
         outDir: 'dist',
-        emptyOutDir: true,
+        emptyOutDir: false,
         sourcemap: false,
         ssr: true, // Server-side rendering mode for Node.js
         minify: true,

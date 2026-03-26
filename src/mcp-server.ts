@@ -1,6 +1,7 @@
 import { TodoistApi } from '@doist/todoist-api-typescript'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
+import { registerTaskListApp, taskListResourceUri } from './mcp-apps/resources.js'
 import {
     FEATURE_NAMES,
     type Feature,
@@ -181,6 +182,20 @@ function getMcpServer({
     const todoist = new TodoistApi(todoistApiKey, { baseUrl })
 
     /**
+     * MCP Apps
+     */
+    const findTasksByDateToolWithUi = {
+        ...findTasksByDate,
+        _meta: {
+            ui: {
+                resourceUri: taskListResourceUri,
+            },
+        },
+    }
+
+    registerTaskListApp(server)
+
+    /**
      * Tools
      */
     const toolArgs = { server, client: todoist, features }
@@ -192,7 +207,7 @@ function getMcpServer({
     registerTool({ tool: updateTasks, ...toolArgs })
     registerTool({ tool: rescheduleTasks, ...toolArgs })
     registerTool({ tool: findTasks, ...toolArgs })
-    registerTool({ tool: findTasksByDate, ...toolArgs })
+    registerTool({ tool: findTasksByDateToolWithUi, ...toolArgs })
     registerTool({ tool: findCompletedTasks, ...toolArgs })
 
     // Project management tools
