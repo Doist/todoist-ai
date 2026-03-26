@@ -1,10 +1,7 @@
 import type { TodoistApi } from '@doist/todoist-api-typescript'
+import { registerAppTool } from '@modelcontextprotocol/ext-apps/server'
 import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/mcp.js'
-import type {
-    ContentBlock,
-    TextResourceContents,
-    ToolAnnotations,
-} from '@modelcontextprotocol/sdk/types.js'
+import type { ContentBlock, ToolAnnotations } from '@modelcontextprotocol/sdk/types.js'
 import type { z } from 'zod'
 import type { TodoistTool } from './todoist-tool.js'
 import { formatToolExecutionError } from './tool-execution-error.js'
@@ -48,9 +45,9 @@ type Feature = {
  */
 type Features = Feature[]
 
-type McpTextResource = {
-    name: string
-} & TextResourceContents
+type AppToolMeta =
+    | ({ ui: Record<string, unknown> } & Record<string, unknown>)
+    | ({ 'ui/resourceUri': string } & Record<string, unknown>)
 
 /**
  * Wether to return the structured content directly, vs. in the `content` part of the output.
@@ -154,14 +151,16 @@ function formatToolTitle(toolName: string): string {
         .join(' ')
 }
 
-function addMetaToTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape = z.ZodRawShape>(
-    tool: TodoistTool<Params, Output>,
-    meta: TodoistTool<Params, Output>['_meta'],
-): TodoistTool<Params, Output> {
-    return {
-        ...tool,
-        _meta: meta,
+function hasAppUiMeta(meta: Record<string, unknown> | undefined): meta is AppToolMeta {
+    if (!meta) {
+        return false
     }
+
+    if (typeof meta['ui/resourceUri'] === 'string') {
+        return true
+    }
+
+    return typeof meta.ui === 'object' && meta.ui !== null
 }
 
 /**
@@ -259,31 +258,32 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
         }
     }
 
-    // Use registerTool to support outputSchema
-    server.registerTool(
-        tool.name,
-        {
-            description: tool.description,
-            inputSchema: tool.parameters,
-            outputSchema: tool.outputSchema as Output,
-            annotations: getMcpAnnotations(tool),
-            ...(tool._meta ? { _meta: tool._meta } : {}),
-        },
-        cb,
-    )
-}
+    const toolConfig = {
+        description: tool.description,
+        inputSchema: tool.parameters,
+        outputSchema: tool.outputSchema as Output,
+        annotations: getMcpAnnotations(tool),
+        ...(tool._meta ? { _meta: tool._meta } : {}),
+    }
 
-function registerResource(server: McpServer, resource: McpTextResource) {
-    const { name, ...contents } = resource
-    server.registerResource(name, resource.uri, {}, async () => ({
-        contents: [contents],
-    }))
+    if (hasAppUiMeta(tool._meta)) {
+        registerAppTool(
+            server,
+            tool.name,
+            {
+                ...toolConfig,
+                _meta: tool._meta,
+            },
+            cb,
+        )
+        return
+    }
+
+    server.registerTool(tool.name, toolConfig, cb)
 }
 
 export {
-    addMetaToTool,
     FEATURE_NAMES,
-    registerResource,
     registerTool,
     stripEmailsFromObject,
     stripEmailsFromText,

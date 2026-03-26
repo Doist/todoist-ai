@@ -3,6 +3,11 @@ import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { getMcpServer } from '../../mcp-server.js'
 import { ToolNames } from '../../utils/tool-names.js'
 
+type RegisteredToolSpec = {
+    annotations?: unknown
+    _meta?: Record<string, unknown>
+}
+
 type ToolExpectation = {
     name: string
     title: string
@@ -302,7 +307,7 @@ const TOOL_EXPECTATIONS: ToolExpectation[] = [
 ]
 
 describe('Tool annotations', () => {
-    const registered: Map<string, { annotations?: unknown }> = new Map()
+    const registered: Map<string, RegisteredToolSpec> = new Map()
 
     beforeAll(() => {
         const registerToolSpy = vi.spyOn(McpServer.prototype, 'registerTool')
@@ -315,7 +320,7 @@ describe('Tool annotations', () => {
             if (typeof name !== 'string') continue
             if (!toolSpec || typeof toolSpec !== 'object') continue
 
-            registered.set(name, toolSpec as { annotations?: unknown })
+            registered.set(name, toolSpec as RegisteredToolSpec)
         }
 
         registerToolSpy.mockRestore()
@@ -341,5 +346,16 @@ describe('Tool annotations', () => {
                 idempotentHint: toolExpectation.idempotentHint,
             })
         })
+    })
+
+    it('normalizes MCP App metadata for find-tasks-by-date', () => {
+        const toolSpec = registered.get(ToolNames.FIND_TASKS_BY_DATE)
+        expect(toolSpec?._meta).toBeDefined()
+
+        const uiMeta = toolSpec?._meta?.ui as { resourceUri?: string } | undefined
+        const legacyResourceUri = toolSpec?._meta?.['ui/resourceUri']
+
+        expect(uiMeta?.resourceUri).toMatch(/^ui:\/\/todoist\/task-list@/)
+        expect(legacyResourceUri).toBe(uiMeta?.resourceUri)
     })
 })
