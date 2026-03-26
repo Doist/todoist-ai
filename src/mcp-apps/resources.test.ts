@@ -23,8 +23,11 @@ describe('registerTaskListApp', () => {
             | undefined
 
         expect(readCallback).toBeDefined()
+        if (!readCallback) {
+            throw new Error('registerResource callback was not captured')
+        }
 
-        const result = await readCallback!()
+        const result = await readCallback()
 
         expect(result.contents).toHaveLength(1)
         expect(result.contents[0]?.uri).toBe(taskListResourceUri)

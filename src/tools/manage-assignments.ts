@@ -249,7 +249,7 @@ const manageAssignments = {
             const assignment = assignments[i]
             const validation = validationResults[i]
 
-            if (assignment && validation && validation.isValid) {
+            if (assignment && validation?.isValid) {
                 validAssignments.push({ assignment, validation })
             } else if (assignment?.taskId) {
                 validationErrors.push({
