@@ -1,3 +1,4 @@
+import { LOCATION_TRIGGERS } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { ColorOutputSchema } from './colors.js'
 import { PrioritySchema } from './priorities.js'
@@ -176,7 +177,7 @@ const ReminderSchema = z.object({
     locLat: z.string().optional().describe('Latitude (location reminders only).'),
     locLong: z.string().optional().describe('Longitude (location reminders only).'),
     locTrigger: z
-        .enum(['on_enter', 'on_leave'])
+        .enum(LOCATION_TRIGGERS)
         .optional()
         .describe('Trigger type: on_enter or on_leave (location reminders only).'),
     radius: z.number().optional().describe('Geofence radius in meters (location reminders only).'),

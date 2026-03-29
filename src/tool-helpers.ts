@@ -436,5 +436,24 @@ function mapReminder(reminder: Reminder) {
     }
 }
 
+/**
+ * Count reminders by category: time-based (relative/absolute) and location.
+ */
+function countRemindersByType(reminders: { type: string }[]) {
+    const timeBasedCount = reminders.filter(
+        (r) => r.type === 'relative' || r.type === 'absolute',
+    ).length
+    const locationCount = reminders.filter((r) => r.type === 'location').length
+    return { timeBasedCount, locationCount }
+}
+
 export type { MappedTask }
-export { getTasksByFilter, mapActivityEvent, mapComment, mapProject, mapReminder, mapTask }
+export {
+    countRemindersByType,
+    getTasksByFilter,
+    mapActivityEvent,
+    mapComment,
+    mapProject,
+    mapReminder,
+    mapTask,
+}

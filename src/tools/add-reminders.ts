@@ -1,7 +1,11 @@
-import type { AddReminderArgs } from '@doist/todoist-api-typescript'
+import {
+    type AddReminderArgs,
+    LOCATION_TRIGGERS,
+    REMINDER_DELIVERY_SERVICES,
+} from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { mapReminder } from '../tool-helpers.js'
+import { countRemindersByType, mapReminder } from '../tool-helpers.js'
 import { ReminderSchema as ReminderOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -18,7 +22,7 @@ const RelativeReminderInputSchema = z.object({
             'Minutes before the task due time to trigger the reminder. E.g., 30 for 30 minutes before, 60 for 1 hour before, 1440 for 1 day before.',
         ),
     service: z
-        .enum(['email', 'push'])
+        .enum(REMINDER_DELIVERY_SERVICES)
         .optional()
         .describe('Delivery method: "email" or "push" notification. Defaults to push.'),
 })
@@ -44,7 +48,7 @@ const AbsoluteReminderInputSchema = z.object({
         })
         .describe('The specific date/time for the reminder.'),
     service: z
-        .enum(['email', 'push'])
+        .enum(REMINDER_DELIVERY_SERVICES)
         .optional()
         .describe('Delivery method: "email" or "push" notification. Defaults to push.'),
 })
@@ -56,7 +60,7 @@ const LocationReminderInputSchema = z.object({
     locLat: z.string().describe('Latitude of the location as a string, e.g. "37.7749".'),
     locLong: z.string().describe('Longitude of the location as a string, e.g. "-122.4194".'),
     locTrigger: z
-        .enum(['on_enter', 'on_leave'])
+        .enum(LOCATION_TRIGGERS)
         .describe('When to trigger: "on_enter" (arriving) or "on_leave" (departing).'),
     radius: z
         .number()
@@ -141,10 +145,7 @@ const addReminders = {
 } satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
 function generateTextContent(reminders: ReturnType<typeof mapReminder>[]): string {
-    const timeBasedCount = reminders.filter(
-        (r) => r.type === 'relative' || r.type === 'absolute',
-    ).length
-    const locationCount = reminders.filter((r) => r.type === 'location').length
+    const { timeBasedCount, locationCount } = countRemindersByType(reminders)
 
     const parts: string[] = []
     if (timeBasedCount > 0) {

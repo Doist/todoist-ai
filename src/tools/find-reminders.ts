@@ -8,7 +8,7 @@ import type {
 } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { fetchAllPages, mapReminder } from '../tool-helpers.js'
+import { countRemindersByType, fetchAllPages, mapReminder } from '../tool-helpers.js'
 import { ReminderSchema as ReminderOutputSchema } from '../utils/output-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -133,10 +133,7 @@ function generateTextContent(reminders: ReturnType<typeof mapReminder>[], taskId
         return `No reminders found for task ${taskId}`
     }
 
-    const timeBasedCount = reminders.filter(
-        (r) => r.type === 'relative' || r.type === 'absolute',
-    ).length
-    const locationCount = reminders.filter((r) => r.type === 'location').length
+    const { timeBasedCount, locationCount } = countRemindersByType(reminders)
 
     const parts: string[] = []
     if (timeBasedCount > 0) {

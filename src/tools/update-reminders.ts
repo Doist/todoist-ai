@@ -1,3 +1,4 @@
+import { LOCATION_TRIGGERS, REMINDER_DELIVERY_SERVICES } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapReminder } from '../tool-helpers.js'
@@ -14,7 +15,7 @@ const RelativeReminderUpdateSchema = z.object({
         .optional()
         .describe('New minute offset before task due time.'),
     service: z
-        .enum(['email', 'push'])
+        .enum(REMINDER_DELIVERY_SERVICES)
         .optional()
         .describe('New delivery method: "email" or "push".'),
 })
@@ -32,7 +33,7 @@ const AbsoluteReminderUpdateSchema = z.object({
         .optional()
         .describe('New due date/time for the reminder.'),
     service: z
-        .enum(['email', 'push'])
+        .enum(REMINDER_DELIVERY_SERVICES)
         .optional()
         .describe('New delivery method: "email" or "push".'),
 })
@@ -44,7 +45,7 @@ const LocationReminderUpdateSchema = z.object({
     locLat: z.string().optional().describe('New latitude.'),
     locLong: z.string().optional().describe('New longitude.'),
     locTrigger: z
-        .enum(['on_enter', 'on_leave'])
+        .enum(LOCATION_TRIGGERS)
         .optional()
         .describe('New trigger condition: "on_enter" or "on_leave".'),
     radius: z.number().int().optional().describe('New radius in meters.'),
