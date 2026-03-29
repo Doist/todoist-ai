@@ -35,6 +35,10 @@ export const ApiLimits = {
     LABELS_DEFAULT: 50,
     /** Maximum limit for label listings */
     LABELS_MAX: 200,
+    /** Default limit for reminder listings */
+    REMINDERS_DEFAULT: 50,
+    /** Maximum limit for reminder search operations */
+    REMINDERS_MAX: 200,
 } as const
 
 // UI Display Limits

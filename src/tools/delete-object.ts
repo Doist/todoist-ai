@@ -3,7 +3,16 @@ import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ToolNames } from '../utils/tool-names.js'
 
-const entityTypes = ['project', 'section', 'task', 'comment', 'label', 'filter'] as const
+const entityTypes = [
+    'project',
+    'section',
+    'task',
+    'comment',
+    'label',
+    'filter',
+    'reminder',
+    'location_reminder',
+] as const
 
 const ArgsSchema = {
     type: z.enum(entityTypes).describe('The type of entity to delete.'),
@@ -22,7 +31,8 @@ const OutputSchema = {
 
 const deleteObject = {
     name: ToolNames.DELETE_OBJECT,
-    description: 'Delete a project, section, task, comment, label, or filter by its ID.',
+    description:
+        'Delete a project, section, task, comment, label, filter, reminder, or location_reminder by its ID.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
@@ -47,6 +57,12 @@ const deleteObject = {
                 await client.sync({
                     commands: [createCommand('filter_delete', { id: args.id })],
                 })
+                break
+            case 'reminder':
+                await client.deleteReminder(args.id)
+                break
+            case 'location_reminder':
+                await client.deleteLocationReminder(args.id)
                 break
         }
 

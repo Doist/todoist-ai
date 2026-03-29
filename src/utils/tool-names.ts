@@ -33,6 +33,11 @@ export const ToolNames = {
     UPDATE_COMMENTS: 'update-comments',
     FIND_COMMENTS: 'find-comments',
 
+    // Reminder management tools
+    ADD_REMINDERS: 'add-reminders',
+    UPDATE_REMINDERS: 'update-reminders',
+    FIND_REMINDERS: 'find-reminders',
+
     // Attachment tools
     VIEW_ATTACHMENT: 'view-attachment',
 
