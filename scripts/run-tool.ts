@@ -23,6 +23,7 @@ import { addLabels } from '../src/tools/add-labels.js'
 import { addProjects } from '../src/tools/add-projects.js'
 import { addSections } from '../src/tools/add-sections.js'
 import { addTasks } from '../src/tools/add-tasks.js'
+import { analyzeProjectHealth } from '../src/tools/analyze-project-health.js'
 import { completeTasks } from '../src/tools/complete-tasks.js'
 import { deleteObject } from '../src/tools/delete-object.js'
 import { fetch } from '../src/tools/fetch.js'
@@ -38,7 +39,9 @@ import { findSections } from '../src/tools/find-sections.js'
 import { findTasks } from '../src/tools/find-tasks.js'
 import { findTasksByDate } from '../src/tools/find-tasks-by-date.js'
 import { getOverview } from '../src/tools/get-overview.js'
+import { getProjectActivityStats } from '../src/tools/get-project-activity-stats.js'
 import { getProjectHealth } from '../src/tools/get-project-health.js'
+import { getWorkspaceInsights } from '../src/tools/get-workspace-insights.js'
 import { listWorkspaces } from '../src/tools/list-workspaces.js'
 import { manageAssignments } from '../src/tools/manage-assignments.js'
 import { projectManagement } from '../src/tools/project-management.js'
@@ -92,6 +95,9 @@ const tools: Record<string, ExecutableTool> = {
     'find-tasks-by-date': findTasksByDate,
     'get-overview': getOverview,
     'get-project-health': getProjectHealth,
+    'get-project-activity-stats': getProjectActivityStats,
+    'analyze-project-health': analyzeProjectHealth,
+    'get-workspace-insights': getWorkspaceInsights,
     'list-workspaces': listWorkspaces,
     'manage-assignments': manageAssignments,
     'project-management': projectManagement,

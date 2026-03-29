@@ -12,6 +12,7 @@ import { addProjects } from './tools/add-projects.js'
 import { addSections } from './tools/add-sections.js'
 // Task management tools
 import { addTasks } from './tools/add-tasks.js'
+import { analyzeProjectHealth } from './tools/analyze-project-health.js'
 import { completeTasks } from './tools/complete-tasks.js'
 // General tools
 import { deleteObject } from './tools/delete-object.js'
@@ -30,7 +31,9 @@ import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { getOverview } from './tools/get-overview.js'
 import { getProductivityStats } from './tools/get-productivity-stats.js'
+import { getProjectActivityStats } from './tools/get-project-activity-stats.js'
 import { getProjectHealth } from './tools/get-project-health.js'
+import { getWorkspaceInsights } from './tools/get-workspace-insights.js'
 import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { reorderObjects } from './tools/reorder-objects.js'
@@ -82,6 +85,9 @@ const tools = {
     getProductivityStats,
     // Health and insights tools
     getProjectHealth,
+    getProjectActivityStats,
+    analyzeProjectHealth,
+    getWorkspaceInsights,
     // General tools
     getOverview,
     deleteObject,
@@ -109,6 +115,7 @@ export {
     addSections,
     // Task management tools
     addTasks,
+    analyzeProjectHealth,
     completeTasks,
     deleteObject,
     FEATURE_NAMES,
@@ -133,8 +140,10 @@ export {
     // General tools
     getOverview,
     getProductivityStats,
+    getProjectActivityStats,
     // Health and insights tools
     getProjectHealth,
+    getWorkspaceInsights,
     // Workspace tools
     listWorkspaces,
     manageAssignments,
