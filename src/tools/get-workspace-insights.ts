@@ -91,10 +91,10 @@ const getWorkspaceInsights = {
             '',
         ]
 
-        for (const p of projectInsights) {
-            const status = p.health?.status ?? 'N/A'
-            const progress = p.progress ? `${p.progress.progressPercent}%` : 'N/A'
-            lines.push(`- Project ${p.projectId}: status=${status}, progress=${progress}`)
+        for (const insight of projectInsights) {
+            const status = insight.health?.status ?? 'N/A'
+            const progress = insight.progress ? `${insight.progress.progressPercent}%` : 'N/A'
+            lines.push(`- Project ${insight.projectId}: status=${status}, progress=${progress}`)
         }
 
         return {
