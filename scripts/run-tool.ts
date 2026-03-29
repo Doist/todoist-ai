@@ -38,6 +38,7 @@ import { findSections } from '../src/tools/find-sections.js'
 import { findTasks } from '../src/tools/find-tasks.js'
 import { findTasksByDate } from '../src/tools/find-tasks-by-date.js'
 import { getOverview } from '../src/tools/get-overview.js'
+import { getProjectHealth } from '../src/tools/get-project-health.js'
 import { listWorkspaces } from '../src/tools/list-workspaces.js'
 import { manageAssignments } from '../src/tools/manage-assignments.js'
 import { projectManagement } from '../src/tools/project-management.js'
@@ -90,6 +91,7 @@ const tools: Record<string, ExecutableTool> = {
     'find-tasks': findTasks,
     'find-tasks-by-date': findTasksByDate,
     'get-overview': getOverview,
+    'get-project-health': getProjectHealth,
     'list-workspaces': listWorkspaces,
     'manage-assignments': manageAssignments,
     'project-management': projectManagement,

@@ -30,6 +30,7 @@ import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { getOverview } from './tools/get-overview.js'
 import { getProductivityStats } from './tools/get-productivity-stats.js'
+import { getProjectHealth } from './tools/get-project-health.js'
 import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { reorderObjects } from './tools/reorder-objects.js'
@@ -79,6 +80,8 @@ const tools = {
     // Activity and audit tools
     findActivity,
     getProductivityStats,
+    // Health and insights tools
+    getProjectHealth,
     // General tools
     getOverview,
     deleteObject,
@@ -94,53 +97,59 @@ const tools = {
     fetch,
 }
 
-export { tools, getMcpServer, FEATURE_NAMES, type Feature, type FeatureName, type Features }
-
 export {
+    // Comment management tools
+    addComments,
+    addFilters,
+    // Label management tools
+    addLabels,
+    // Project management tools
+    addProjects,
+    // Section management tools
+    addSections,
     // Task management tools
     addTasks,
     completeTasks,
-    uncompleteTasks,
-    updateTasks,
-    findTasks,
-    findTasksByDate,
-    findCompletedTasks,
-    rescheduleTasks,
-    // Project management tools
-    addProjects,
-    updateProjects,
-    findProjects,
-    // Section management tools
-    addSections,
-    updateSections,
-    findSections,
-    // Comment management tools
-    addComments,
-    updateComments,
-    findComments,
-    // Attachment tools
-    viewAttachment,
-    // Label management tools
-    addLabels,
-    findLabels,
-    // Filter management tools
-    findFilters,
-    addFilters,
-    updateFilters,
+    deleteObject,
+    FEATURE_NAMES,
+    type Feature,
+    type FeatureName,
+    type Features,
+    fetch,
     // Activity and audit tools
     findActivity,
-    getProductivityStats,
-    // General tools
-    getOverview,
-    deleteObject,
-    reorderObjects,
-    userInfo,
+    findComments,
+    findCompletedTasks,
+    // Filter management tools
+    findFilters,
+    findLabels,
     // Assignment and collaboration tools
     findProjectCollaborators,
-    manageAssignments,
+    findProjects,
+    findSections,
+    findTasks,
+    findTasksByDate,
+    getMcpServer,
+    // General tools
+    getOverview,
+    getProductivityStats,
+    // Health and insights tools
+    getProjectHealth,
     // Workspace tools
     listWorkspaces,
+    manageAssignments,
+    reorderObjects,
+    rescheduleTasks,
     // OpenAI MCP tools
     search,
-    fetch,
+    tools,
+    uncompleteTasks,
+    updateComments,
+    updateFilters,
+    updateProjects,
+    updateSections,
+    updateTasks,
+    userInfo,
+    // Attachment tools
+    viewAttachment,
 }

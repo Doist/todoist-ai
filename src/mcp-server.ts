@@ -34,6 +34,7 @@ import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { createFindTasksByDateResource } from './tools/find-tasks-by-date.resource.js'
 import { getOverview } from './tools/get-overview.js'
 import { getProductivityStats } from './tools/get-productivity-stats.js'
+import { getProjectHealth } from './tools/get-project-health.js'
 import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { projectManagement } from './tools/project-management.js'
@@ -102,6 +103,9 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **find-activity**: Retrieve recent activity logs to monitor and audit changes. Shows events from all users by default; use initiatorId to filter by specific user. Filter by object type (task/project/comment), event type (added/updated/deleted/completed/uncompleted/archived/unarchived/shared/left), and specific objects (objectId, projectId, taskId). Useful for tracking who did what and when. Note: Date-based filtering is not supported.
 - **get-productivity-stats**: Get comprehensive productivity statistics including daily/weekly completion breakdowns, goal streaks (current, last, max), karma score and trends, and historical karma data. No parameters required.
 
+**Project Health & Insights:**
+- **get-project-health**: Get comprehensive health assessment for a project including completion progress (completed/active counts, percentage), health status (EXCELLENT/ON_TRACK/AT_RISK/CRITICAL), description, and task-level recommendations. Use includeContext=true for detailed metrics (overdue tasks, weekly activity, avg completion time) and full task data. Health data may be stale — check isStale flag.
+
 **General Operations:**
 - **delete-object**: Remove projects, sections, tasks, comments, labels, or filters by type and ID
 - **fetch-object**: Fetch a single task, project, comment, or section by its ID
@@ -135,6 +139,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **Progress Reviews**: find-completed-tasks (defaults to last 7 days; optionally use explicit date ranges) → get-overview for project summaries
 - **Activity Auditing**: find-activity with event/object filters to track changes, monitor team activity, or investigate specific actions
 - **Productivity Analysis**: Use the productivity-analysis prompt for comprehensive analysis combining user-info, get-productivity-stats, and find-completed-tasks data into actionable insights
+- **Project Health Reviews**: get-project-health → get-project-health with includeContext=true for detailed metrics and task data
 
 Always provide clear, actionable task titles and descriptions. Use the overview tools to give users context about their workload and project status.
 `
@@ -233,6 +238,9 @@ function getMcpServer({
     registerTool({ tool: findActivity, ...toolArgs })
     registerTool({ tool: getProductivityStats, ...toolArgs })
 
+    // Health and insights tools
+    registerTool({ tool: getProjectHealth, ...toolArgs })
+
     // General tools
     registerTool({ tool: getOverview, ...toolArgs })
     registerTool({ tool: deleteObject, ...toolArgs })
@@ -267,4 +275,4 @@ function getMcpServer({
     return server
 }
 
-export { getMcpServer, FEATURE_NAMES, type Feature, type FeatureName, type Features }
+export { FEATURE_NAMES, type Feature, type FeatureName, type Features, getMcpServer }
