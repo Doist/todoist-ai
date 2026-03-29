@@ -45,6 +45,12 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
+            - name: Build
+              run: npm run build
+
+            - name: Run tests
+              run: npm test
+
             - name: Capture previous tag
               id: previous_tag
               run: echo "tag=$(git describe --tags --abbrev=0 2>/dev/null || true)" >> "$GITHUB_OUTPUT"
