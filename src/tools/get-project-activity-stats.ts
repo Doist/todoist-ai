@@ -24,20 +24,20 @@ const OutputSchema = {
         .array(
             z.object({
                 date: z.string().describe('Date in ISO format.'),
-                totalCount: z.number().describe('Total activity count for this day.'),
+                totalCount: z.number().describe('Number of tasks completed on this day.'),
             }),
         )
-        .describe('Daily activity counts.'),
+        .describe('Daily task completion counts.'),
     weekItems: z
         .array(
             z.object({
                 fromDate: z.string().describe('Start date of the week.'),
                 toDate: z.string().describe('End date of the week.'),
-                totalCount: z.number().describe('Total activity count for this week.'),
+                totalCount: z.number().describe('Number of tasks completed in this week.'),
             }),
         )
         .nullable()
-        .describe('Weekly rollup counts. Only included when includeWeeklyCounts is true.'),
+        .describe('Weekly completion rollups. Only included when includeWeeklyCounts is true.'),
 }
 
 function generateTextContent(projectId: string, stats: ProjectActivityStats): string {
@@ -66,7 +66,7 @@ function generateTextContent(projectId: string, stats: ProjectActivityStats): st
 const getProjectActivityStats = {
     name: ToolNames.GET_PROJECT_ACTIVITY_STATS,
     description:
-        'Get daily and optional weekly activity statistics for a project. Shows task completion counts over a configurable time window (1-12 weeks). Useful for identifying activity trends and patterns.',
+        'Get daily and optional weekly task completion counts for a project over a configurable time window (1-12 weeks). Useful for identifying completion trends and patterns.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: {

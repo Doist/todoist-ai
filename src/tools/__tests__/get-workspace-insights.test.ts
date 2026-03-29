@@ -23,7 +23,11 @@ function createMockInsights(overrides: Partial<WorkspaceInsights> = {}): Workspa
         projectInsights: [
             {
                 projectId: 'proj-1',
-                health: { status: 'EXCELLENT', isStale: false, updateInProgress: false },
+                health: {
+                    status: 'EXCELLENT',
+                    isStale: false,
+                    updateInProgress: false,
+                },
                 progress: {
                     projectId: 'proj-1',
                     completedCount: 20,
@@ -33,7 +37,11 @@ function createMockInsights(overrides: Partial<WorkspaceInsights> = {}): Workspa
             },
             {
                 projectId: 'proj-2',
-                health: { status: 'AT_RISK', isStale: false, updateInProgress: false },
+                health: {
+                    status: 'AT_RISK',
+                    isStale: false,
+                    updateInProgress: false,
+                },
                 progress: {
                     projectId: 'proj-2',
                     completedCount: 3,
@@ -90,12 +98,12 @@ describe('get-workspace-insights tool', () => {
             projectInsights: [
                 {
                     projectId: 'proj-1',
-                    health: { status: 'EXCELLENT' },
+                    health: { status: 'EXCELLENT', isStale: false, updateInProgress: false },
                     progress: { completedCount: 20, activeCount: 5, progressPercent: 80 },
                 },
                 {
                     projectId: 'proj-2',
-                    health: { status: 'AT_RISK' },
+                    health: { status: 'AT_RISK', isStale: false, updateInProgress: false },
                     progress: { completedCount: 3, activeCount: 12, progressPercent: 20 },
                 },
                 {

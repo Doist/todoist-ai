@@ -12,7 +12,8 @@ const ArgsSchema = {
             'The workspace ID or name. Supports exact ID, exact name match (case-insensitive), or unique partial name match.',
         ),
     projectIds: z
-        .array(z.string())
+        .array(z.string().min(1))
+        .min(1)
         .optional()
         .describe('Optional list of project IDs to scope insights to specific projects.'),
 }
@@ -22,6 +23,10 @@ const ProjectInsightSchema = z.object({
     health: z
         .object({
             status: z.enum(HEALTH_STATUSES).describe('The health status of the project.'),
+            isStale: z.boolean().describe('Whether the health data is stale.'),
+            updateInProgress: z
+                .boolean()
+                .describe('Whether a health analysis update is in progress.'),
         })
         .nullable()
         .describe('Health data for this project, if available.'),
@@ -63,7 +68,13 @@ const getWorkspaceInsights = {
 
         const projectInsights = insights.projectInsights.map((p) => ({
             projectId: p.projectId,
-            health: p.health ? { status: p.health.status } : null,
+            health: p.health
+                ? {
+                      status: p.health.status,
+                      isStale: p.health.isStale,
+                      updateInProgress: p.health.updateInProgress,
+                  }
+                : null,
             progress: p.progress
                 ? {
                       completedCount: p.progress.completedCount,

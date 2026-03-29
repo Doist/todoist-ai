@@ -30,7 +30,7 @@ const OutputSchema = {
     message: z.string().describe('A human-readable message about the analysis status.'),
 }
 
-const getProjectHealth = {
+const analyzeProjectHealth = {
     name: ToolNames.ANALYZE_PROJECT_HEALTH,
     description:
         'Trigger a new health analysis for a project. Use this when the health data is stale or you want a fresh assessment. The analysis may take time to complete — use get-project-health afterward to see updated results.',
@@ -65,4 +65,4 @@ const getProjectHealth = {
     },
 } satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
-export { getProjectHealth as analyzeProjectHealth }
+export { analyzeProjectHealth }
