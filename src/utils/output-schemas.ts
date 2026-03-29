@@ -1,4 +1,4 @@
-import { LOCATION_TRIGGERS } from '@doist/todoist-api-typescript'
+import { LOCATION_TRIGGERS, REMINDER_TYPES } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { ColorOutputSchema } from './colors.js'
 import { PrioritySchema } from './priorities.js'
@@ -163,9 +163,7 @@ const ReminderDueSchema = z.object({
 const ReminderSchema = z.object({
     id: z.string().describe('The unique ID of the reminder.'),
     taskId: z.string().describe('The task ID this reminder belongs to.'),
-    type: z
-        .enum(['relative', 'absolute', 'location'])
-        .describe('The type of reminder: relative, absolute, or location.'),
+    type: z.enum(REMINDER_TYPES).describe('The type of reminder: relative, absolute, or location.'),
     minuteOffset: z
         .number()
         .optional()
