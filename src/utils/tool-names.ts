@@ -46,6 +46,9 @@ export const ToolNames = {
 
     // Health and insights tools
     GET_PROJECT_HEALTH: 'get-project-health',
+    GET_PROJECT_ACTIVITY_STATS: 'get-project-activity-stats',
+    ANALYZE_PROJECT_HEALTH: 'analyze-project-health',
+    GET_WORKSPACE_INSIGHTS: 'get-workspace-insights',
 
     // General tools
     GET_OVERVIEW: 'get-overview',

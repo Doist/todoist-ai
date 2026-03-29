@@ -17,6 +17,7 @@ import { addLabels } from './tools/add-labels.js'
 import { addProjects } from './tools/add-projects.js'
 import { addSections } from './tools/add-sections.js'
 import { addTasks } from './tools/add-tasks.js'
+import { analyzeProjectHealth } from './tools/analyze-project-health.js'
 import { completeTasks } from './tools/complete-tasks.js'
 import { deleteObject } from './tools/delete-object.js'
 import { fetch } from './tools/fetch.js'
@@ -34,7 +35,9 @@ import { findTasksByDate } from './tools/find-tasks-by-date.js'
 import { createFindTasksByDateResource } from './tools/find-tasks-by-date.resource.js'
 import { getOverview } from './tools/get-overview.js'
 import { getProductivityStats } from './tools/get-productivity-stats.js'
+import { getProjectActivityStats } from './tools/get-project-activity-stats.js'
 import { getProjectHealth } from './tools/get-project-health.js'
+import { getWorkspaceInsights } from './tools/get-workspace-insights.js'
 import { listWorkspaces } from './tools/list-workspaces.js'
 import { manageAssignments } from './tools/manage-assignments.js'
 import { projectManagement } from './tools/project-management.js'
@@ -105,6 +108,9 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 **Project Health & Insights:**
 - **get-project-health**: Get comprehensive health assessment for a project including completion progress (completed/active counts, percentage), health status (EXCELLENT/ON_TRACK/AT_RISK/CRITICAL), description, and task-level recommendations. Use includeContext=true for detailed metrics (overdue tasks, weekly activity, avg completion time) and full task data. Health data may be stale — check isStale flag.
+- **get-project-activity-stats**: Get daily and optional weekly activity statistics for a project over a configurable time window (1-12 weeks). Useful for identifying activity trends.
+- **analyze-project-health**: Trigger a new health analysis for a project. Use when health data is stale. The analysis may take time — use get-project-health afterward to see updated results.
+- **get-workspace-insights**: Get aggregated health and progress insights across all projects in a workspace. Accepts workspace name or ID, with optional project ID filtering.
 
 **General Operations:**
 - **delete-object**: Remove projects, sections, tasks, comments, labels, or filters by type and ID
@@ -139,7 +145,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **Progress Reviews**: find-completed-tasks (defaults to last 7 days; optionally use explicit date ranges) → get-overview for project summaries
 - **Activity Auditing**: find-activity with event/object filters to track changes, monitor team activity, or investigate specific actions
 - **Productivity Analysis**: Use the productivity-analysis prompt for comprehensive analysis combining user-info, get-productivity-stats, and find-completed-tasks data into actionable insights
-- **Project Health Reviews**: get-project-health → get-project-health with includeContext=true for detailed metrics and task data
+- **Project Health Reviews**: get-project-health → analyze-project-health if stale → get-project-health with includeContext=true for detailed metrics → get-workspace-insights for cross-project overview
 
 Always provide clear, actionable task titles and descriptions. Use the overview tools to give users context about their workload and project status.
 `
@@ -240,6 +246,9 @@ function getMcpServer({
 
     // Health and insights tools
     registerTool({ tool: getProjectHealth, ...toolArgs })
+    registerTool({ tool: getProjectActivityStats, ...toolArgs })
+    registerTool({ tool: analyzeProjectHealth, ...toolArgs })
+    registerTool({ tool: getWorkspaceInsights, ...toolArgs })
 
     // General tools
     registerTool({ tool: getOverview, ...toolArgs })

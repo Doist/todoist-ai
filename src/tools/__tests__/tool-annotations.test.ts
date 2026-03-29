@@ -223,6 +223,27 @@ const TOOL_EXPECTATIONS: ToolExpectation[] = [
         idempotentHint: true,
     },
     {
+        name: ToolNames.GET_PROJECT_ACTIVITY_STATS,
+        title: 'Todoist: Get Project Activity Stats',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.ANALYZE_PROJECT_HEALTH,
+        title: 'Todoist: Analyze Project Health',
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.GET_WORKSPACE_INSIGHTS,
+        title: 'Todoist: Get Workspace Insights',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
         name: ToolNames.GET_OVERVIEW,
         title: 'Todoist: Get Overview',
         readOnlyHint: true,
