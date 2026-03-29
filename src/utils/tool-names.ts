@@ -44,6 +44,9 @@ export const ToolNames = {
     FIND_ACTIVITY: 'find-activity',
     GET_PRODUCTIVITY_STATS: 'get-productivity-stats',
 
+    // Health and insights tools
+    GET_PROJECT_HEALTH: 'get-project-health',
+
     // General tools
     GET_OVERVIEW: 'get-overview',
     DELETE_OBJECT: 'delete-object',

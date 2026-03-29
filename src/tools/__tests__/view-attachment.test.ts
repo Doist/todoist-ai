@@ -1,4 +1,4 @@
-import type { TodoistApi, ViewAttachmentResponse } from '@doist/todoist-api-typescript'
+import type { FileResponse, TodoistApi } from '@doist/todoist-api-typescript'
 import type { Mocked } from 'vitest'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { viewAttachment } from '../view-attachment.js'
@@ -17,7 +17,7 @@ function createMockResponse({
     contentType?: string
     contentLength?: string
     body?: ArrayBuffer | string
-}): ViewAttachmentResponse {
+}): FileResponse {
     const headers: Record<string, string> = { 'content-type': contentType }
     if (contentLength) {
         headers['content-length'] = contentLength
