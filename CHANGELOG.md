@@ -1,3 +1,15 @@
+## [8.5.0](https://github.com/Doist/todoist-ai/compare/v8.4.2...v8.5.0) (2026-03-29)
+
+### Features
+
+* add `get-project-health` tool ([#419](https://github.com/Doist/todoist-ai/issues/419)) ([9117788](https://github.com/Doist/todoist-ai/commit/9117788437c93660c09952640f3f98ec728a0557))
+* add activity stats, analyze health, and workspace insights tools ([#420](https://github.com/Doist/todoist-ai/issues/420)) ([5512b6c](https://github.com/Doist/todoist-ai/commit/5512b6c1ecb9262e20fff085b5d08a4c4498d4d5))
+
+### Bug Fixes
+
+* add prepublishOnly script for release safety ([#417](https://github.com/Doist/todoist-ai/issues/417)) ([134d8b6](https://github.com/Doist/todoist-ai/commit/134d8b66686891d3cba48d1ba2156047a70737c4))
+* remove biome format step from release pipeline ([#421](https://github.com/Doist/todoist-ai/issues/421)) ([7aa733d](https://github.com/Doist/todoist-ai/commit/7aa733d543f26a9a731a68924d466b39336bab2d))
+
 # Changelog
 
 ## [8.4.2](https://github.com/Doist/todoist-ai/compare/v8.4.1...v8.4.2) (2026-03-25)
