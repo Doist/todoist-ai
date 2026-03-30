@@ -1,3 +1,9 @@
+## [8.7.1](https://github.com/Doist/todoist-ai/compare/v8.7.0...v8.7.1) (2026-03-30)
+
+### Bug Fixes
+
+* prevent dist cleanup plugin from running during vitest ([#424](https://github.com/Doist/todoist-ai/issues/424)) ([0a98a7c](https://github.com/Doist/todoist-ai/commit/0a98a7c08f7655517596f3ecceb1a997d99d77fa))
+
 ## [8.7.0](https://github.com/Doist/todoist-ai/compare/v8.6.0...v8.7.0) (2026-03-30)
 
 ### Features
