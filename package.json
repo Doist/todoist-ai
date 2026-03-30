@@ -71,7 +71,7 @@
         "@modelcontextprotocol/sdk": "^1.25.0"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.4.7",
+        "@biomejs/biome": "2.4.8",
         "@semantic-release/changelog": "6.0.3",
         "@semantic-release/git": "10.0.1",
         "@types/dompurify": "3.2.0",
@@ -95,7 +95,7 @@
         "typescript": "6.0.2",
         "vite": "7.3.1",
         "vite-plugin-dts": "4.5.4",
-        "vitest": "4.1.0"
+        "vitest": "4.1.1"
     },
     "lint-staged": {
         "*": [
