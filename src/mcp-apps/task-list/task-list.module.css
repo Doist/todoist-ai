@@ -1,5 +1,21 @@
 .widgetContainer {
-    padding: 16px;
+    width: 100%;
+    min-height: 100%;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    gap: 16px;
+}
+
+.contentColumn {
+    width: 100%;
+    max-width: 760px;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .widgetTitle {
@@ -7,27 +23,29 @@
     line-height: 35px;
     font-weight: 700;
     color: #202020;
-    margin-bottom: 16px;
 }
 
 .taskList {
     margin: 0;
     padding: 0;
+    width: 100%;
     list-style: none;
 
     display: flex;
     flex-direction: column;
     gap: 12px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 .openInTodoistButton {
-    position: fixed;
-    bottom: 16px;
-    right: 16px;
-
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    margin-top: auto;
+    align-self: flex-end;
+    flex-shrink: 0;
 
     background: none;
     border: none;
@@ -53,4 +71,12 @@
 
 .openInTodoistButton svg {
     flex-shrink: 0;
+}
+
+.error {
+    font-size: 14px;
+    color: #b42318;
+    min-height: 100%;
+    padding: 24px;
+    background-color: #ffffff;
 }

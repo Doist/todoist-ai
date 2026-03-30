@@ -1,13 +1,12 @@
 import { TodoistApi } from '@doist/todoist-api-typescript'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
+import { registerTaskListApp, taskListResourceUri } from './mcp-apps/resources.js'
 import {
-    addMetaToTool,
     FEATURE_NAMES,
     type Feature,
     type FeatureName,
     type Features,
-    registerResource,
     registerTool,
 } from './mcp-helpers.js'
 import { productivityAnalysis } from './prompts/productivity-analysis.js'
@@ -32,7 +31,6 @@ import { findProjects } from './tools/find-projects.js'
 import { findSections } from './tools/find-sections.js'
 import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
-import { createFindTasksByDateResource } from './tools/find-tasks-by-date.resource.js'
 import { getOverview } from './tools/get-overview.js'
 import { getProductivityStats } from './tools/get-productivity-stats.js'
 import { getProjectActivityStats } from './tools/get-project-activity-stats.js'
@@ -53,11 +51,6 @@ import { updateSections } from './tools/update-sections.js'
 import { updateTasks } from './tools/update-tasks.js'
 import { userInfo } from './tools/user-info.js'
 import { viewAttachment } from './tools/view-attachment.js'
-import { loadTaskListWidget } from './utils/widget-loader.js'
-
-const taskListWidget = loadTaskListWidget()
-const TASK_CARD_FILE_NAME = taskListWidget.fileName
-const taskCardHtml = taskListWidget.content
 
 const instructions = `
 ## Todoist Task and Project Management Tools
@@ -180,21 +173,18 @@ function getMcpServer({
     const todoist = new TodoistApi(todoistApiKey, { baseUrl })
 
     /**
-     * ChatGPT Apps
+     * MCP Apps
      */
-    // Find Tasks by Date
-    // ChatGPT Apps are caching aggressively with no controls, we're injecting a
-    // build timestamp into the URI to bust the cache reliably. Ideally, in the
-    // future they offer best cache-controls.
-    // ref: https://www.epicai.pro/chat-gpt-app-code-walkthrough-kbh1e#rough-edges-for-now
-    const findTasksByDateUri = `ui://widget/${TASK_CARD_FILE_NAME}`
-    const enhancedFindTasksByDateTool = addMetaToTool(findTasksByDate, {
-        'openai/outputTemplate': findTasksByDateUri,
-        'openai/toolInvocation/invoking': 'Displaying the task list',
-        'openai/toolInvocation/invoked': 'Displayed the task list',
-    })
-    const findTasksByDateResource = createFindTasksByDateResource(findTasksByDateUri, taskCardHtml)
-    registerResource(server, findTasksByDateResource)
+    const findTasksByDateToolWithUi = {
+        ...findTasksByDate,
+        _meta: {
+            ui: {
+                resourceUri: taskListResourceUri,
+            },
+        },
+    }
+
+    registerTaskListApp(server)
 
     /**
      * Tools
@@ -208,7 +198,7 @@ function getMcpServer({
     registerTool({ tool: updateTasks, ...toolArgs })
     registerTool({ tool: rescheduleTasks, ...toolArgs })
     registerTool({ tool: findTasks, ...toolArgs })
-    registerTool({ tool: enhancedFindTasksByDateTool, ...toolArgs })
+    registerTool({ tool: findTasksByDateToolWithUi, ...toolArgs })
     registerTool({ tool: findCompletedTasks, ...toolArgs })
 
     // Project management tools

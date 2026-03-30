@@ -1,7 +1,7 @@
 .taskListItem {
     display: grid;
     grid-template-columns: 24px 1fr;
-    gap: 6px;
+    gap: 8px;
 }
 
 .taskContent {
@@ -10,7 +10,10 @@
     color: #202020;
 }
 
-.taskContent a {
+.taskContent a,
+.taskContent a:visited,
+.taskContent a:hover,
+.taskContent a:active {
     color: inherit;
 }
 

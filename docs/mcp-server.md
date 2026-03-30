@@ -174,7 +174,7 @@ curl http://localhost:3000/health
 
 ## MCP Apps (task-list) build pipeline
 
--   The task list widget is bundled and inlined **at Vite build time** via a custom plugin (`virtual:todoist-ai-widgets`).
--   The plugin uses `BUILD_TIMESTAMP` (from `process.env.BUILD_TIMESTAMP` or auto-generated) to cache-bust the widget URI (e.g., `task-list-<timestamp>.html`).
--   The final HTML is **embedded in the JS bundle**; the runtime MCP server does **not** read from `dist/` to find widget files.
--   `npm run build` is sufficient
+-   The task list app is built as a single HTML file in `dist/mcp-apps/index.html`.
+-   The MCP server reads that HTML at startup, hashes it, and uses a `ui://...@<hash>` URI for cache-busting.
+-   `npm run build` builds both the server bundle and the MCP Apps HTML.
+-   `npm run dev` watches both builds and restarts the server when JS or HTML changes.
