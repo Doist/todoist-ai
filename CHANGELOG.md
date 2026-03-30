@@ -1,3 +1,9 @@
+## [8.6.0](https://github.com/Doist/todoist-ai/compare/v8.5.0...v8.6.0) (2026-03-30)
+
+### Features
+
+* add reminder support ([#418](https://github.com/Doist/todoist-ai/issues/418)) ([7b7b6a1](https://github.com/Doist/todoist-ai/commit/7b7b6a1326fc6b66d626bf04762ac2d854c3d0d1))
+
 ## [8.5.0](https://github.com/Doist/todoist-ai/compare/v8.4.2...v8.5.0) (2026-03-29)
 
 ### Features
