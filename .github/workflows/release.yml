@@ -30,7 +30,7 @@ jobs:
         steps:
             - name: Generate bot token
               id: generate_token
-              uses: actions/create-github-app-token@v1
+              uses: actions/create-github-app-token@v3
               with:
                   app-id: ${{ secrets.DOIST_RELEASE_BOT_ID }}
                   private-key: ${{ secrets.DOIST_RELEASE_BOT_PRIVATE_KEY }}
