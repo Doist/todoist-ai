@@ -157,7 +157,7 @@ const TOOL_EXPECTATIONS: ToolExpectation[] = [
         title: 'Todoist: Update Reminders',
         readOnlyHint: false,
         destructiveHint: true,
-        idempotentHint: false,
+        idempotentHint: true,
     },
     {
         name: ToolNames.FIND_REMINDERS,

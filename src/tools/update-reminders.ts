@@ -1,8 +1,13 @@
-import { LOCATION_TRIGGERS, REMINDER_DELIVERY_SERVICES } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapReminder } from '../tool-helpers.js'
 import { ReminderSchema as ReminderOutputSchema } from '../utils/output-schemas.js'
+import {
+    LocationTriggerSchema,
+    MAX_REMINDERS_PER_OPERATION,
+    ReminderDueInputSchema,
+    ReminderServiceSchema,
+} from '../utils/reminder-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 const RelativeReminderUpdateSchema = z.object({
@@ -14,28 +19,14 @@ const RelativeReminderUpdateSchema = z.object({
         .min(0)
         .optional()
         .describe('New minute offset before task due time.'),
-    service: z
-        .enum(REMINDER_DELIVERY_SERVICES)
-        .optional()
-        .describe('New delivery method: "email" or "push".'),
+    service: ReminderServiceSchema.optional().describe('New delivery method: "email" or "push".'),
 })
 
 const AbsoluteReminderUpdateSchema = z.object({
     type: z.literal('absolute'),
     id: z.string().min(1).describe('The ID of the absolute reminder to update.'),
-    due: z
-        .object({
-            date: z.string().optional().describe('Due date in YYYY-MM-DD format.'),
-            string: z.string().optional().describe('Natural language due string.'),
-            timezone: z.string().optional().describe('Timezone for the reminder.'),
-            lang: z.string().optional().describe('Language for parsing the due string.'),
-        })
-        .optional()
-        .describe('New due date/time for the reminder.'),
-    service: z
-        .enum(REMINDER_DELIVERY_SERVICES)
-        .optional()
-        .describe('New delivery method: "email" or "push".'),
+    due: ReminderDueInputSchema.optional().describe('New due date/time for the reminder.'),
+    service: ReminderServiceSchema.optional().describe('New delivery method: "email" or "push".'),
 })
 
 const LocationReminderUpdateSchema = z.object({
@@ -44,10 +35,9 @@ const LocationReminderUpdateSchema = z.object({
     name: z.string().optional().describe('New location name.'),
     locLat: z.string().optional().describe('New latitude.'),
     locLong: z.string().optional().describe('New longitude.'),
-    locTrigger: z
-        .enum(LOCATION_TRIGGERS)
-        .optional()
-        .describe('New trigger condition: "on_enter" or "on_leave".'),
+    locTrigger: LocationTriggerSchema.optional().describe(
+        'New trigger condition: "on_enter" or "on_leave".',
+    ),
     radius: z.number().int().optional().describe('New radius in meters.'),
 })
 
@@ -61,8 +51,9 @@ const ArgsSchema = {
     reminders: z
         .array(ReminderUpdateSchema)
         .min(1)
+        .max(MAX_REMINDERS_PER_OPERATION)
         .describe(
-            'Array of reminders to update. Each must include the reminder type and ID. Only include fields that need to change.',
+            `Array of reminders to update (max ${MAX_REMINDERS_PER_OPERATION}). Each must include the reminder type and ID. Only include fields that need to change.`,
         ),
 }
 
@@ -78,7 +69,7 @@ const updateReminders = {
         'Update existing reminders. Each reminder must specify its type ("relative", "absolute", or "location") and ID. Only include fields that need to change.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
-    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
+    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
     async execute(args, client) {
         const { reminders } = args
 

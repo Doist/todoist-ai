@@ -1,15 +1,15 @@
-import {
-    type AddReminderArgs,
-    LOCATION_TRIGGERS,
-    REMINDER_DELIVERY_SERVICES,
-} from '@doist/todoist-api-typescript'
+import type { AddReminderArgs } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { countRemindersByType, mapReminder } from '../tool-helpers.js'
 import { ReminderSchema as ReminderOutputSchema } from '../utils/output-schemas.js'
+import {
+    LocationTriggerSchema,
+    MAX_REMINDERS_PER_OPERATION,
+    ReminderDueInputSchema,
+    ReminderServiceSchema,
+} from '../utils/reminder-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
-
-const MAX_REMINDERS_PER_OPERATION = 25
 
 const RelativeReminderInputSchema = z.object({
     type: z.literal('relative'),
@@ -21,36 +21,18 @@ const RelativeReminderInputSchema = z.object({
         .describe(
             'Minutes before the task due time to trigger the reminder. E.g., 30 for 30 minutes before, 60 for 1 hour before, 1440 for 1 day before.',
         ),
-    service: z
-        .enum(REMINDER_DELIVERY_SERVICES)
-        .optional()
-        .describe('Delivery method: "email" or "push" notification. Defaults to push.'),
+    service: ReminderServiceSchema.optional().describe(
+        'Delivery method: "email" or "push" notification. Defaults to push.',
+    ),
 })
 
 const AbsoluteReminderInputSchema = z.object({
     type: z.literal('absolute'),
     taskId: z.string().min(1).describe('The ID of the task to set a reminder for.'),
-    due: z
-        .object({
-            date: z
-                .string()
-                .optional()
-                .describe('Due date in YYYY-MM-DD format, e.g. "2025-12-31".'),
-            string: z
-                .string()
-                .optional()
-                .describe('Natural language due string, e.g. "tomorrow at 3pm".'),
-            timezone: z
-                .string()
-                .optional()
-                .describe('Timezone for the reminder, e.g. "America/New_York".'),
-            lang: z.string().optional().describe('Language for parsing the due string, e.g. "en".'),
-        })
-        .describe('The specific date/time for the reminder.'),
-    service: z
-        .enum(REMINDER_DELIVERY_SERVICES)
-        .optional()
-        .describe('Delivery method: "email" or "push" notification. Defaults to push.'),
+    due: ReminderDueInputSchema.describe('The specific date/time for the reminder.'),
+    service: ReminderServiceSchema.optional().describe(
+        'Delivery method: "email" or "push" notification. Defaults to push.',
+    ),
 })
 
 const LocationReminderInputSchema = z.object({
@@ -59,9 +41,9 @@ const LocationReminderInputSchema = z.object({
     name: z.string().min(1).describe('Name of the location, e.g. "Office", "Home".'),
     locLat: z.string().describe('Latitude of the location as a string, e.g. "37.7749".'),
     locLong: z.string().describe('Longitude of the location as a string, e.g. "-122.4194".'),
-    locTrigger: z
-        .enum(LOCATION_TRIGGERS)
-        .describe('When to trigger: "on_enter" (arriving) or "on_leave" (departing).'),
+    locTrigger: LocationTriggerSchema.describe(
+        'When to trigger: "on_enter" (arriving) or "on_leave" (departing).',
+    ),
     radius: z
         .number()
         .int()
