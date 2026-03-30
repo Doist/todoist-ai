@@ -34,7 +34,9 @@ jobs:
               with:
                   app-id: ${{ secrets.DOIST_RELEASE_BOT_ID }}
                   private-key: ${{ secrets.DOIST_RELEASE_BOT_PRIVATE_KEY }}
-                  permissions: contents:write, issues:write, pull-requests:write
+                  permission-contents: write
+                  permission-issues: write
+                  permission-pull-requests: write
 
             - name: Get bot user ID
               id: bot_user
