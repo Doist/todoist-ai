@@ -28,10 +28,23 @@ jobs:
         timeout-minutes: 60
 
         steps:
+            - name: Generate bot token
+              id: generate_token
+              uses: actions/create-github-app-token@v1
+              with:
+                  app-id: ${{ secrets.DOIST_RELEASE_BOT_ID }}
+                  private-key: ${{ secrets.DOIST_RELEASE_BOT_PRIVATE_KEY }}
+
+            - name: Get bot user ID
+              id: bot_user
+              run: echo "id=$(gh api "/users/${{ steps.generate_token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+              env:
+                  GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+
             - name: Checkout repository
               uses: actions/checkout@v4
               with:
-                  token: ${{ secrets.GH_REPO_TOKEN }}
+                  token: ${{ steps.generate_token.outputs.token }}
                   fetch-depth: 0
 
             - name: Setup Node.js
@@ -52,11 +65,11 @@ jobs:
             - name: Release
               run: npx semantic-release
               env:
-                  GITHUB_TOKEN: ${{ secrets.GH_REPO_TOKEN }}
-                  GIT_AUTHOR_EMAIL: doistbot@users.noreply.github.com
-                  GIT_AUTHOR_NAME: Doist Bot
-                  GIT_COMMITTER_EMAIL: doistbot@users.noreply.github.com
-                  GIT_COMMITTER_NAME: Doist Bot
+                  GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+                  GIT_AUTHOR_NAME: ${{ steps.generate_token.outputs.app-slug }}[bot]
+                  GIT_AUTHOR_EMAIL: ${{ steps.bot_user.outputs.id }}+${{ steps.generate_token.outputs.app-slug }}[bot]@users.noreply.github.com
+                  GIT_COMMITTER_NAME: ${{ steps.generate_token.outputs.app-slug }}[bot]
+                  GIT_COMMITTER_EMAIL: ${{ steps.bot_user.outputs.id }}+${{ steps.generate_token.outputs.app-slug }}[bot]@users.noreply.github.com
 
             - name: Derive release announcement
               id: announcement
