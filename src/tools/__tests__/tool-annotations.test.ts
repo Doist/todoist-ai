@@ -146,6 +146,27 @@ const TOOL_EXPECTATIONS: ToolExpectation[] = [
         idempotentHint: true,
     },
     {
+        name: ToolNames.ADD_REMINDERS,
+        title: 'Todoist: Add Reminders',
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+    },
+    {
+        name: ToolNames.UPDATE_REMINDERS,
+        title: 'Todoist: Update Reminders',
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+    },
+    {
+        name: ToolNames.FIND_REMINDERS,
+        title: 'Todoist: Find Reminders',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+    },
+    {
         name: ToolNames.VIEW_ATTACHMENT,
         title: 'Todoist: View Attachment',
         readOnlyHint: true,

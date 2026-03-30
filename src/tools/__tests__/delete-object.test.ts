@@ -10,6 +10,8 @@ const mockTodoistApi = {
     deleteTask: vi.fn(),
     deleteComment: vi.fn(),
     deleteLabel: vi.fn(),
+    deleteReminder: vi.fn(),
+    deleteLocationReminder: vi.fn(),
     sync: vi.fn(),
 } as unknown as Mocked<TodoistApi>
 
@@ -229,6 +231,68 @@ describe(`${DELETE_OBJECT} tool`, () => {
             await expect(
                 deleteObject.execute({ type: 'filter', id: 'non-existent-filter' }, mockTodoistApi),
             ).rejects.toThrow('API Error: Filter not found')
+        })
+    })
+
+    describe('deleting reminders', () => {
+        it('should delete a time-based reminder by ID', async () => {
+            mockTodoistApi.deleteReminder.mockResolvedValue(true)
+
+            const result = await deleteObject.execute(
+                { type: 'reminder', id: 'reminder-123' },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.deleteReminder).toHaveBeenCalledWith('reminder-123')
+            expect(result.textContent).toContain('Deleted reminder: id=reminder-123')
+            expect(result.structuredContent).toEqual({
+                deletedEntity: { type: 'reminder', id: 'reminder-123' },
+                success: true,
+            })
+        })
+
+        it('should propagate reminder deletion errors', async () => {
+            mockTodoistApi.deleteReminder.mockRejectedValue(
+                new Error('API Error: Reminder not found'),
+            )
+
+            await expect(
+                deleteObject.execute(
+                    { type: 'reminder', id: 'non-existent-reminder' },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow('API Error: Reminder not found')
+        })
+    })
+
+    describe('deleting location reminders', () => {
+        it('should delete a location reminder by ID', async () => {
+            mockTodoistApi.deleteLocationReminder.mockResolvedValue(true)
+
+            const result = await deleteObject.execute(
+                { type: 'location_reminder', id: 'loc-reminder-456' },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.deleteLocationReminder).toHaveBeenCalledWith('loc-reminder-456')
+            expect(result.textContent).toContain('Deleted location_reminder: id=loc-reminder-456')
+            expect(result.structuredContent).toEqual({
+                deletedEntity: { type: 'location_reminder', id: 'loc-reminder-456' },
+                success: true,
+            })
+        })
+
+        it('should propagate location reminder deletion errors', async () => {
+            mockTodoistApi.deleteLocationReminder.mockRejectedValue(
+                new Error('API Error: Location reminder not found'),
+            )
+
+            await expect(
+                deleteObject.execute(
+                    { type: 'location_reminder', id: 'non-existent' },
+                    mockTodoistApi,
+                ),
+            ).rejects.toThrow('API Error: Location reminder not found')
         })
     })
 

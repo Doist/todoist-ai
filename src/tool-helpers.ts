@@ -6,6 +6,7 @@ import type {
     Label,
     MoveTaskArgs,
     PersonalProject,
+    Reminder,
     Section,
     Task,
     TodoistApi,
@@ -379,5 +380,80 @@ async function getTasksByFilter({
     }
 }
 
-export { getTasksByFilter, mapActivityEvent, mapComment, mapProject, mapTask }
+/**
+ * Map a reminder's due date to a flattened output format.
+ */
+function mapReminderDue(due: {
+    isRecurring: boolean
+    string: string
+    date: string
+    datetime?: string | null
+    timezone?: string | null
+}) {
+    return {
+        isRecurring: due.isRecurring,
+        string: due.string,
+        date: due.date,
+        datetime: due.datetime ?? undefined,
+        timezone: due.timezone ?? undefined,
+    }
+}
+
+/**
+ * Map a single Todoist reminder to a more structured format, for LLM consumption.
+ * Normalizes SDK's `itemId` to `taskId` for consistency with other tools.
+ * @param reminder - The reminder to map (any of the 3 types).
+ * @returns The mapped reminder.
+ */
+function mapReminder(reminder: Reminder) {
+    const base = {
+        id: reminder.id,
+        taskId: reminder.itemId,
+        type: reminder.type,
+    }
+
+    switch (reminder.type) {
+        case 'relative':
+            return {
+                ...base,
+                minuteOffset: reminder.minuteOffset,
+                due: reminder.due ? mapReminderDue(reminder.due) : undefined,
+            }
+        case 'absolute':
+            return {
+                ...base,
+                due: mapReminderDue(reminder.due),
+            }
+        case 'location':
+            return {
+                ...base,
+                name: reminder.name,
+                locLat: reminder.locLat,
+                locLong: reminder.locLong,
+                locTrigger: reminder.locTrigger,
+                radius: reminder.radius,
+            }
+    }
+}
+
+/**
+ * Count reminders by category: time-based (relative/absolute) and location.
+ */
+function countRemindersByType(reminders: { type: string }[]) {
+    const timeBasedCount = reminders.filter(
+        (r) => r.type === 'relative' || r.type === 'absolute',
+    ).length
+    const locationCount = reminders.filter((r) => r.type === 'location').length
+    return { timeBasedCount, locationCount }
+}
+
 export type { MappedTask }
+export {
+    countRemindersByType,
+    getTasksByFilter,
+    mapActivityEvent,
+    mapComment,
+    mapProject,
+    mapReminder,
+    mapTask,
+}

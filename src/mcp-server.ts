@@ -15,6 +15,7 @@ import { addComments } from './tools/add-comments.js'
 import { addFilters } from './tools/add-filters.js'
 import { addLabels } from './tools/add-labels.js'
 import { addProjects } from './tools/add-projects.js'
+import { addReminders } from './tools/add-reminders.js'
 import { addSections } from './tools/add-sections.js'
 import { addTasks } from './tools/add-tasks.js'
 import { analyzeProjectHealth } from './tools/analyze-project-health.js'
@@ -29,6 +30,7 @@ import { findFilters } from './tools/find-filters.js'
 import { findLabels } from './tools/find-labels.js'
 import { findProjectCollaborators } from './tools/find-project-collaborators.js'
 import { findProjects } from './tools/find-projects.js'
+import { findReminders } from './tools/find-reminders.js'
 import { findSections } from './tools/find-sections.js'
 import { findTasks } from './tools/find-tasks.js'
 import { findTasksByDate } from './tools/find-tasks-by-date.js'
@@ -49,6 +51,7 @@ import { uncompleteTasks } from './tools/uncomplete-tasks.js'
 import { updateComments } from './tools/update-comments.js'
 import { updateFilters } from './tools/update-filters.js'
 import { updateProjects } from './tools/update-projects.js'
+import { updateReminders } from './tools/update-reminders.js'
 import { updateSections } from './tools/update-sections.js'
 import { updateTasks } from './tools/update-tasks.js'
 import { userInfo } from './tools/user-info.js'
@@ -91,6 +94,12 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **get-overview**: Get comprehensive Markdown overview of entire account or specific project with task hierarchies. Project data includes parentId (sub-projects), folderId (workspace folder membership), and childOrder (sibling ordering)
 - **list-workspaces**: Get all workspaces for the user with details like plan type, role, and settings
 
+**Reminders:**
+- **add-reminders**: Create reminders for tasks. Three types: "relative" (minutes before due), "absolute" (specific date/time), or "location" (geofence-triggered). Each reminder must specify a taskId.
+- **find-reminders**: Find reminders by task ID (returns both time-based and location reminders), or get a specific reminder by ID (use reminderId for time-based, locationReminderId for location-based).
+- **update-reminders**: Update existing reminders. Must specify the reminder type ("relative", "absolute", or "location") and ID.
+- Reminders can be deleted using **delete-object** with type "reminder" (time-based) or "location_reminder" (location-based).
+
 **Collaboration & Comments:**
 - **add-comments/update-comments/find-comments**: Manage task and project discussions
 - **view-attachment**: View file attachments from comments. Pass the fileUrl from a comment's fileAttachment. Returns images inline, text files as text, and binary files as embedded resources.
@@ -113,7 +122,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **get-workspace-insights**: Get aggregated health and progress insights across all projects in a workspace. Accepts workspace name or ID, with optional project ID filtering.
 
 **General Operations:**
-- **delete-object**: Remove projects, sections, tasks, comments, labels, or filters by type and ID
+- **delete-object**: Remove projects, sections, tasks, comments, labels, filters, reminders, or location reminders by type and ID
 - **fetch-object**: Fetch a single task, project, comment, or section by its ID
 - **reorder-objects**: Reorder sibling projects or sections, and optionally move projects to a new parent. For projects: set order to reorder siblings, and/or set parentId to move under a new parent (use "root" for top level). For sections: set order to reorder within a project
 - **user-info**: Get user details including timezone, goals, and plan information
@@ -227,6 +236,11 @@ function getMcpServer({
     registerTool({ tool: addComments, ...toolArgs })
     registerTool({ tool: findComments, ...toolArgs })
     registerTool({ tool: updateComments, ...toolArgs })
+
+    // Reminder management tools
+    registerTool({ tool: addReminders, ...toolArgs })
+    registerTool({ tool: findReminders, ...toolArgs })
+    registerTool({ tool: updateReminders, ...toolArgs })
 
     // Attachment tools
     registerTool({ tool: viewAttachment, ...toolArgs })

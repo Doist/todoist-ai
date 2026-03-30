@@ -1,3 +1,4 @@
+import { LOCATION_TRIGGERS, REMINDER_TYPES } from '@doist/todoist-api-typescript'
 import { z } from 'zod'
 import { ColorOutputSchema } from './colors.js'
 import { PrioritySchema } from './priorities.js'
@@ -146,6 +147,41 @@ const LabelSchema = z.object({
 })
 
 /**
+ * Schema for a reminder due date
+ */
+const ReminderDueSchema = z.object({
+    isRecurring: z.boolean().describe('Whether this is a recurring reminder.'),
+    string: z.string().describe('Human-readable due string.'),
+    date: z.string().describe('Due date in ISO format.'),
+    datetime: z.string().optional().describe('Due datetime in ISO format.'),
+    timezone: z.string().optional().describe('Timezone of the reminder.'),
+})
+
+/**
+ * Schema for a mapped reminder object returned by tools
+ */
+const ReminderSchema = z.object({
+    id: z.string().describe('The unique ID of the reminder.'),
+    taskId: z.string().describe('The task ID this reminder belongs to.'),
+    type: z.enum(REMINDER_TYPES).describe('The type of reminder: relative, absolute, or location.'),
+    minuteOffset: z
+        .number()
+        .optional()
+        .describe('Minutes before due time to trigger (relative reminders only).'),
+    due: ReminderDueSchema.optional().describe(
+        'Due date info (absolute and sometimes relative reminders).',
+    ),
+    name: z.string().optional().describe('Location name (location reminders only).'),
+    locLat: z.string().optional().describe('Latitude (location reminders only).'),
+    locLong: z.string().optional().describe('Longitude (location reminders only).'),
+    locTrigger: z
+        .enum(LOCATION_TRIGGERS)
+        .optional()
+        .describe('Trigger type: on_enter or on_leave (location reminders only).'),
+    radius: z.number().optional().describe('Geofence radius in meters (location reminders only).'),
+})
+
+/**
  * Schema for batch operation failure
  */
 const FailureSchema = z.object({
@@ -161,6 +197,7 @@ export {
     FailureSchema,
     LabelSchema,
     ProjectSchema,
+    ReminderSchema,
     SectionSchema,
     TaskSchema,
 }
