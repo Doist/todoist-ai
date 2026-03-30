@@ -1,14 +1,19 @@
 import { useApp, useHostStyles } from '@modelcontextprotocol/ext-apps/react'
 import { useCallback, useMemo, useState } from 'react'
+import type { z } from 'zod'
+import { ArgsSchema } from '../../tools/find-tasks-by-date.js'
+import { ToolNames } from '../../utils/tool-names.js'
 import { Empty } from './empty'
 import { Loading } from './loading'
 import { TaskList } from './task-list'
 import styles from './task-list.module.css'
 import type { Task } from './types'
 
+type FindTasksByDateArgs = z.input<z.ZodObject<typeof ArgsSchema>>
+
 type ToolOutput = {
     tasks: Task[]
-    appliedFilters?: Record<string, unknown>
+    appliedFilters?: FindTasksByDateArgs
 }
 
 type ToolResult = {
@@ -19,7 +24,7 @@ type ToolResult = {
 
 const TODOIST_APP_URL = 'https://app.todoist.com/app'
 
-function getInvocationArgs(args: Record<string, unknown> | null | undefined) {
+function getInvocationArgs(args: FindTasksByDateArgs | null | undefined) {
     if (!args) {
         return null
     }
@@ -65,12 +70,12 @@ function OpenInTodoistButton({ onClick }: { onClick: () => void }) {
 export function App() {
     const [tasks, setTasks] = useState<Task[] | null>(null)
     const [loading, setLoading] = useState(true)
-    const [lastArgs, setLastArgs] = useState<Record<string, unknown> | null>(null)
+    const [lastArgs, setLastArgs] = useState<Omit<FindTasksByDateArgs, 'cursor'> | null>(null)
     const [toolError, setToolError] = useState<string | null>(null)
 
     const handleToolOutput = useCallback((output: ToolOutput) => {
         setTasks(output.tasks)
-        setLastArgs(getInvocationArgs(output.appliedFilters as Record<string, unknown> | undefined))
+        setLastArgs(getInvocationArgs(output.appliedFilters))
         setToolError(null)
         setLoading(false)
     }, [])
@@ -83,7 +88,7 @@ export function App() {
                 setLoading(true)
                 setToolError(null)
                 setTasks(null)
-                setLastArgs(getInvocationArgs((params.arguments ?? {}) as Record<string, unknown>))
+                setLastArgs(getInvocationArgs((params.arguments ?? {}) as FindTasksByDateArgs))
             }
 
             app.ontoolresult = (params) => {
@@ -118,7 +123,7 @@ export function App() {
 
             try {
                 const result = await app.callServerTool({
-                    name: 'complete-tasks',
+                    name: ToolNames.COMPLETE_TASKS,
                     arguments: { ids: [taskId] },
                 })
 

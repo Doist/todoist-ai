@@ -1,17 +1,17 @@
 import DOMPurify from 'dompurify'
 import { useCallback, useMemo } from 'react'
 import snarkdown from 'snarkdown'
+import type { Priority } from '../../utils/priorities.js'
 import styles from './task-list-item.module.css'
-import type { PriorityLevel } from './types'
 
 type Props = {
     id: string
     content: string
-    priority: PriorityLevel
+    priority: Priority
     onComplete: (taskId: string) => void
 }
 
-function CheckBox({ priority, onClick }: { priority: PriorityLevel; onClick: () => void }) {
+function CheckBox({ priority, onClick }: { priority: Priority; onClick: () => void }) {
     const priorityClass = { p1: 'priority1', p2: 'priority2', p3: 'priority3', p4: 'priority4' }[
         priority
     ]

@@ -50,7 +50,7 @@ type AppToolMeta =
     | ({ 'ui/resourceUri': string } & Record<string, unknown>)
 
 /**
- * Wether to return the structured content directly, vs. in the `content` part of the output.
+ * Whether to return the structured content directly, vs. in the `content` part of the output.
  *
  * The `structuredContent` part of the output is relatively new in the spec, and it's not yet
  * supported by all clients. This flag controls wether we return the structured content using this
@@ -71,7 +71,7 @@ const USE_STRUCTURED_CONTENT =
  * @param textContent - The text content to return.
  * @param structuredContent - The structured content to return.
  * @returns The output payload.
- * @see USE_STRUCTURED_CONTENT - Wether to use the structured content feature of the MCP protocol.
+ * @see USE_STRUCTURED_CONTENT - Whether to use the structured content feature of the MCP protocol.
  */
 function getToolOutput<StructuredContent extends Record<string, unknown>>({
     textContent,
@@ -284,10 +284,10 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
 
 export {
     FEATURE_NAMES,
-    registerTool,
-    stripEmailsFromObject,
-    stripEmailsFromText,
     type Feature,
     type FeatureName,
     type Features,
+    registerTool,
+    stripEmailsFromObject,
+    stripEmailsFromText,
 }

@@ -1,7 +1,7 @@
-export type PriorityLevel = 'p1' | 'p2' | 'p3' | 'p4'
+import type { Priority } from '../../utils/priorities.js'
 
 export type Task = {
     id: string
     content: string
-    priority: PriorityLevel
+    priority: Priority
 }
