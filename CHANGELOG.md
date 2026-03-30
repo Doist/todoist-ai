@@ -1,3 +1,9 @@
+## [8.7.0](https://github.com/Doist/todoist-ai/compare/v8.6.0...v8.7.0) (2026-03-30)
+
+### Features
+
+* introduce MCP Apps ([#414](https://github.com/Doist/todoist-ai/issues/414)) ([e10d5e6](https://github.com/Doist/todoist-ai/commit/e10d5e633061d100ac22ce37bc4de98da0ba3782))
+
 ## [8.6.0](https://github.com/Doist/todoist-ai/compare/v8.5.0...v8.6.0) (2026-03-30)
 
 ### Features
