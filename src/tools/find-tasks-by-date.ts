@@ -21,7 +21,7 @@ function parseLocalDate(dateStr: string): Date {
     return new Date(`${dateStr}T00:00:00`)
 }
 
-const ArgsSchema = {
+export const ArgsSchema = {
     startDate: z
         .string()
         .regex(/^(\d{4}-\d{2}-\d{2}|today)$/)

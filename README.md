@@ -154,11 +154,11 @@ See [docs/mcp-server.md](docs/mcp-server.md) for full instructions on setting up
 
 See [docs/dev-setup.md](docs/dev-setup.md) for full setup instructions and [CONTRIBUTING.md](CONTRIBUTING.md) for contributor workflows and quality checks.
 
-### Widgets
+### MCP Apps
 
 This project includes support for **MCP Apps** – interactive UI widgets rendered inline in AI chat interfaces. Widgets provide rich visual representations of tool outputs (e.g., task lists) instead of plain text.
 
-See [docs/widgets.md](docs/widgets.md) for the widget architecture, build pipeline, and development workflow.
+See [docs/mcp-apps.md](docs/mcp-apps.md) for the widget architecture, build pipeline, and development workflow.
 
 ### Quick Start
 

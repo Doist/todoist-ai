@@ -6,9 +6,9 @@ import styles from './task-list-item.module.css'
 
 type Props = {
     id: string
-    onComplete: (taskId: string) => void
-    priority: Priority
     content: string
+    priority: Priority
+    onComplete: (taskId: string) => void
 }
 
 function CheckBox({ priority, onClick }: { priority: Priority; onClick: () => void }) {
@@ -46,17 +46,14 @@ function CheckBox({ priority, onClick }: { priority: Priority; onClick: () => vo
 }
 
 function TaskContent({ content }: { content: string }) {
-    const sanitizedHtml = useMemo(
-        function parseMarkdown() {
-            const html = snarkdown(content)
-            const sanitized = DOMPurify.sanitize(html, {
-                ALLOWED_TAGS: ['strong', 'em', 'a', 'code', 'del', 's'],
-                ALLOWED_ATTR: ['href'],
-            })
-            return sanitized.replace(/<a /g, '<a target="_blank" rel="noopener noreferrer" ')
-        },
-        [content],
-    )
+    const sanitizedHtml = useMemo(() => {
+        const html = snarkdown(content)
+        const sanitized = DOMPurify.sanitize(html, {
+            ALLOWED_TAGS: ['strong', 'em', 'a', 'code', 'del', 's'],
+            ALLOWED_ATTR: ['href'],
+        })
+        return sanitized.replace(/<a /g, '<a target="_blank" rel="noopener noreferrer" ')
+    }, [content])
 
     return (
         <div
@@ -68,15 +65,9 @@ function TaskContent({ content }: { content: string }) {
 }
 
 function TaskListItem({ onComplete, id, priority, content }: Props) {
-    const handleComplete = useCallback(
-        function handleComplete() {
-            if (typeof window?.openai?.callTool === 'function') {
-                window.openai.callTool('complete-tasks', { ids: [id] })
-            }
-            onComplete(id)
-        },
-        [onComplete, id],
-    )
+    const handleComplete = useCallback(() => {
+        onComplete(id)
+    }, [onComplete, id])
 
     return (
         <li className={styles.taskListItem}>
