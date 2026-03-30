@@ -10,6 +10,7 @@ const PRESERVED_DIST_ENTRIES = new Set(['mcp-apps'])
 function cleanDistPreservingMcpApps(): Plugin {
     return {
         name: 'clean-dist-preserving-mcp-apps',
+        apply: 'build',
         buildStart() {
             if (!existsSync(DIST_DIR)) {
                 return
