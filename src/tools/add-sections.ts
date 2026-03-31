@@ -1,4 +1,4 @@
-import type { Section } from '@doist/todoist-api-typescript'
+import type { Section } from '@doist/todoist-sdk'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { isInboxProjectId, resolveInboxProjectId } from '../tool-helpers.js'

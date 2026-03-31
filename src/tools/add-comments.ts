@@ -1,4 +1,4 @@
-import type { AddCommentArgs } from '@doist/todoist-api-typescript'
+import type { AddCommentArgs } from '@doist/todoist-sdk'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { isInboxProjectId, mapComment, resolveInboxProjectId } from '../tool-helpers.js'

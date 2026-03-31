@@ -5,7 +5,7 @@ import type {
     Section,
     Task,
     WorkspaceProject,
-} from '@doist/todoist-api-typescript'
+} from '@doist/todoist-sdk'
 import { type MappedTask } from '../tool-helpers'
 import { convertPriorityToNumber, type Priority } from './priorities'
 

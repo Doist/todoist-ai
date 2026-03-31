@@ -1,5 +1,5 @@
-import type { ColorKey } from '@doist/todoist-api-typescript'
-import { colors } from '@doist/todoist-api-typescript'
+import type { ColorKey } from '@doist/todoist-sdk'
+import { colors } from '@doist/todoist-sdk'
 import { z } from 'zod'
 
 const colorKeys = colors.map((c) => c.key) as [ColorKey, ...ColorKey[]]

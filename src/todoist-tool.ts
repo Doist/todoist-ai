@@ -1,4 +1,4 @@
-import type { TodoistApi } from '@doist/todoist-api-typescript'
+import type { TodoistApi } from '@doist/todoist-sdk'
 import type { ContentBlock, ToolAnnotations } from '@modelcontextprotocol/sdk/types.js'
 import type { z } from 'zod'
 

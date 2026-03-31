@@ -1,4 +1,4 @@
-import type { TodoistApi } from '@doist/todoist-api-typescript'
+import type { TodoistApi } from '@doist/todoist-sdk'
 
 export type ResolvedUser = {
     userId: string

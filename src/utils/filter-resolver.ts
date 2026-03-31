@@ -1,4 +1,4 @@
-import type { Filter, TodoistApi } from '@doist/todoist-api-typescript'
+import type { Filter, TodoistApi } from '@doist/todoist-sdk'
 
 export type ResolvedFilter = {
     filterId: string

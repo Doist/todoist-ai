@@ -90,4 +90,4 @@ function generateTextContent({
     return lines.join('\n')
 }
 
-export { findFilters, FilterOutputSchema }
+export { FilterOutputSchema, findFilters }

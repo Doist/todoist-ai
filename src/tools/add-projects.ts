@@ -1,4 +1,4 @@
-import type { PersonalProject, WorkspaceProject } from '@doist/todoist-api-typescript'
+import type { PersonalProject, WorkspaceProject } from '@doist/todoist-sdk'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapProject } from '../tool-helpers.js'

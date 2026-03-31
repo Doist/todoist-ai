@@ -127,9 +127,7 @@ const getProductivityStats = {
 
 function generateTextContent(
     stats: Awaited<
-        ReturnType<
-            typeof import('@doist/todoist-api-typescript').TodoistApi.prototype.getProductivityStats
-        >
+        ReturnType<typeof import('@doist/todoist-sdk').TodoistApi.prototype.getProductivityStats>
     >,
 ): string {
     const lines: string[] = [

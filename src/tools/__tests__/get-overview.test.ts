@@ -1,4 +1,4 @@
-import type { PersonalProject, Section, Task, TodoistApi } from '@doist/todoist-api-typescript'
+import type { PersonalProject, Section, Task, TodoistApi } from '@doist/todoist-sdk'
 import { type Mocked, vi } from 'vitest'
 import { removeNullFields } from '../../utils/sanitize-data.js'
 import {

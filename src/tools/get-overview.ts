@@ -1,4 +1,4 @@
-import type { Section, TodoistApi } from '@doist/todoist-api-typescript'
+import type { Section, TodoistApi } from '@doist/todoist-sdk'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { isPersonalProject, isWorkspaceProject, mapTask, type Project } from '../tool-helpers.js'
@@ -456,4 +456,4 @@ const getOverview = {
     },
 } satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
-export { getOverview, type AccountOverviewStructured, type ProjectOverviewStructured }
+export { type AccountOverviewStructured, getOverview, type ProjectOverviewStructured }

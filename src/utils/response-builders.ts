@@ -1,4 +1,4 @@
-import type { Label } from '@doist/todoist-api-typescript'
+import type { Label } from '@doist/todoist-sdk'
 import { DisplayLimits } from './constants.js'
 import { type Priority } from './priorities.js'
 import { ToolNames } from './tool-names.js'

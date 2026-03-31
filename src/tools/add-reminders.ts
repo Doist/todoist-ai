@@ -1,4 +1,4 @@
-import type { AddReminderArgs } from '@doist/todoist-api-typescript'
+import type { AddReminderArgs } from '@doist/todoist-sdk'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { countRemindersByType, mapReminder } from '../tool-helpers.js'

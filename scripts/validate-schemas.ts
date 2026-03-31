@@ -280,5 +280,5 @@ if (
     main()
 }
 
-export type { ValidationResult, ValidationIssue }
+export type { ValidationIssue, ValidationResult }
 export { validateAllSchemas }

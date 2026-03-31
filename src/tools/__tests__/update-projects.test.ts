@@ -1,4 +1,4 @@
-import type { PersonalProject, TodoistApi, WorkspaceProject } from '@doist/todoist-api-typescript'
+import type { PersonalProject, TodoistApi, WorkspaceProject } from '@doist/todoist-sdk'
 import { type Mocked, vi } from 'vitest'
 import { z } from 'zod'
 import { ProjectSchema } from '../../utils/output-schemas.js'

@@ -1,4 +1,4 @@
-import { LOCATION_TRIGGERS, REMINDER_TYPES } from '@doist/todoist-api-typescript'
+import { LOCATION_TRIGGERS, REMINDER_TYPES } from '@doist/todoist-sdk'
 import { z } from 'zod'
 import { ColorOutputSchema } from './colors.js'
 import { PrioritySchema } from './priorities.js'

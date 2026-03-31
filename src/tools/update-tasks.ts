@@ -1,4 +1,4 @@
-import type { Task, UpdateTaskArgs } from '@doist/todoist-api-typescript'
+import type { Task, UpdateTaskArgs } from '@doist/todoist-sdk'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { createMoveTaskArgs, mapTask, resolveInboxProjectId } from '../tool-helpers.js'

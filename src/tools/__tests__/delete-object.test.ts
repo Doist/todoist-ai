@@ -1,4 +1,4 @@
-import type { TodoistApi } from '@doist/todoist-api-typescript'
+import type { TodoistApi } from '@doist/todoist-sdk'
 import { beforeEach, describe, expect, it, type Mocked, vi } from 'vitest'
 import { ToolNames } from '../../utils/tool-names.js'
 import { deleteObject } from '../delete-object.js'

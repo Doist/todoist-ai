@@ -186,4 +186,4 @@ const productivityAnalysis = {
     callback,
 }
 
-export { productivityAnalysis, computeDateRange, buildPromptText }
+export { buildPromptText, computeDateRange, productivityAnalysis }

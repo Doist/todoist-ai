@@ -1,4 +1,4 @@
-import type { TodoistApi } from '@doist/todoist-api-typescript'
+import type { TodoistApi } from '@doist/todoist-sdk'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { getDateString } from '../utils/response-builders.js'
@@ -203,4 +203,4 @@ const userInfo = {
     },
 } satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
 
-export { userInfo, type UserInfoStructured }
+export { type UserInfoStructured, userInfo }
