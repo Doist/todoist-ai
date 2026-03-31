@@ -15,12 +15,18 @@ const WorkspaceOutputSchema = {
     id: z.string().describe('The unique identifier for the workspace.'),
     name: z.string().describe('The name of the workspace.'),
     plan: z.enum(WORKSPACE_PLANS).describe('The workspace plan type.'),
-    role: z.enum(WORKSPACE_ROLES).describe("The user's role in the workspace."),
+    role: z
+        .enum(WORKSPACE_ROLES)
+        .optional()
+        .describe("The user's role in the workspace, if available."),
     isLinkSharingEnabled: z
         .boolean()
         .describe('Whether link sharing is enabled for the workspace.'),
     isGuestAllowed: z.boolean().describe('Whether guests are allowed in the workspace.'),
-    createdAt: z.string().describe('The ISO 8601 timestamp when the workspace was created.'),
+    createdAt: z
+        .string()
+        .optional()
+        .describe('The ISO 8601 timestamp when the workspace was created.'),
     creatorId: z.string().describe('The ID of the user who created the workspace.'),
 }
 
@@ -34,10 +40,10 @@ type WorkspaceOutput = {
     id: string
     name: string
     plan: WorkspacePlan
-    role: WorkspaceRole
+    role?: WorkspaceRole
     isLinkSharingEnabled: boolean
     isGuestAllowed: boolean
-    createdAt: string
+    createdAt?: string
     creatorId: string
 }
 
@@ -78,12 +84,16 @@ async function generateWorkspacesList(
             lines.push(`## ${workspace.name}`)
             lines.push(`- **ID:** ${workspace.id}`)
             lines.push(`- **Plan:** ${workspace.plan}`)
-            lines.push(`- **Your Role:** ${workspace.role}`)
+            if (workspace.role) {
+                lines.push(`- **Your Role:** ${workspace.role}`)
+            }
             lines.push(
                 `- **Link Sharing:** ${workspace.isLinkSharingEnabled ? 'Enabled' : 'Disabled'}`,
             )
             lines.push(`- **Guests Allowed:** ${workspace.isGuestAllowed ? 'Yes' : 'No'}`)
-            lines.push(`- **Created:** ${workspace.createdAt}`)
+            if (workspace.createdAt) {
+                lines.push(`- **Created:** ${workspace.createdAt}`)
+            }
             lines.push(`- **Creator ID:** ${workspace.creatorId}`)
             lines.push('')
         }
