@@ -1,4 +1,4 @@
-import { GetTasksArgs } from '@doist/todoist-api-typescript'
+import { GetTasksArgs } from '@doist/todoist-sdk'
 import { z } from 'zod'
 import {
     appendToQuery,

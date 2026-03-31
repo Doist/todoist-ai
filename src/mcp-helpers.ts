@@ -1,4 +1,4 @@
-import type { TodoistApi } from '@doist/todoist-api-typescript'
+import type { TodoistApi } from '@doist/todoist-sdk'
 import { registerAppTool } from '@modelcontextprotocol/ext-apps/server'
 import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/mcp.js'
 import type { ContentBlock, ToolAnnotations } from '@modelcontextprotocol/sdk/types.js'

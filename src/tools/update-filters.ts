@@ -1,4 +1,4 @@
-import { type ColorKey, createCommand } from '@doist/todoist-api-typescript'
+import { type ColorKey, createCommand } from '@doist/todoist-sdk'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ColorOutputSchema, ColorSchema } from '../utils/colors.js'

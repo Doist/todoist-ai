@@ -1,4 +1,4 @@
-import { LOCATION_TRIGGERS, REMINDER_DELIVERY_SERVICES } from '@doist/todoist-api-typescript'
+import { LOCATION_TRIGGERS, REMINDER_DELIVERY_SERVICES } from '@doist/todoist-sdk'
 import { z } from 'zod'
 
 /**

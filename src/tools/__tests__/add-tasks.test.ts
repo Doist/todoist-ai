@@ -1,4 +1,4 @@
-import type { Task, TodoistApi } from '@doist/todoist-api-typescript'
+import type { Task, TodoistApi } from '@doist/todoist-sdk'
 import { type Mocked, vi } from 'vitest'
 import { convertPriorityToNumber } from '../../utils/priorities.js'
 import { createMockProject, createMockTask, TEST_IDS, TODAY } from '../../utils/test-helpers.js'

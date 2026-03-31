@@ -2,7 +2,7 @@ import type {
     MoveProjectToWorkspaceArgs,
     PersonalProject,
     WorkspaceProject,
-} from '@doist/todoist-api-typescript'
+} from '@doist/todoist-sdk'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { mapProject } from '../tool-helpers.js'

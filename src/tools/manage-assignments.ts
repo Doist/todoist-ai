@@ -1,4 +1,4 @@
-import type { Task } from '@doist/todoist-api-typescript'
+import type { Task } from '@doist/todoist-sdk'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import {

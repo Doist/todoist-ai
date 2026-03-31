@@ -15,7 +15,7 @@
  * Requires TODOIST_API_KEY in .env file (and optionally TODOIST_BASE_URL).
  */
 import { readFileSync } from 'node:fs'
-import { TodoistApi } from '@doist/todoist-api-typescript'
+import { TodoistApi } from '@doist/todoist-sdk'
 import { config } from 'dotenv'
 import { addComments } from '../src/tools/add-comments.js'
 import { addFilters } from '../src/tools/add-filters.js'

@@ -53,7 +53,7 @@ export default defineConfig({
             // Externalize dependencies to avoid bundling them
             external: [
                 '@modelcontextprotocol/sdk',
-                '@doist/todoist-api-typescript',
+                '@doist/todoist-sdk',
                 'date-fns',
                 'dotenv',
                 'express',

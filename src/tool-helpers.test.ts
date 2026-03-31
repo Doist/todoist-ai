@@ -1,9 +1,4 @@
-import type {
-    PersonalProject,
-    Section,
-    TodoistApi,
-    WorkspaceProject,
-} from '@doist/todoist-api-typescript'
+import type { PersonalProject, Section, TodoistApi, WorkspaceProject } from '@doist/todoist-sdk'
 import { type Mocked, vi } from 'vitest'
 import {
     createMoveTaskArgs,

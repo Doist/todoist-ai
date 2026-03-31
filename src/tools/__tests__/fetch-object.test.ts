@@ -1,4 +1,4 @@
-import type { Comment, Section, TodoistApi } from '@doist/todoist-api-typescript'
+import type { Comment, Section, TodoistApi } from '@doist/todoist-sdk'
 import { type Mocked, vi } from 'vitest'
 import { createMockProject, createMockTask } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'

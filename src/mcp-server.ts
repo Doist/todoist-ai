@@ -1,4 +1,4 @@
-import { TodoistApi } from '@doist/todoist-api-typescript'
+import { TodoistApi } from '@doist/todoist-sdk'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 import { registerTaskListApp, taskListResourceUri } from './mcp-apps/resources.js'

@@ -1,4 +1,4 @@
-import type { AddTaskArgs, Task, TodoistApi } from '@doist/todoist-api-typescript'
+import type { AddTaskArgs, Task, TodoistApi } from '@doist/todoist-sdk'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { isInboxProjectId, mapTask } from '../tool-helpers.js'

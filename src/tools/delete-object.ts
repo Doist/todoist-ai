@@ -1,4 +1,4 @@
-import { createCommand } from '@doist/todoist-api-typescript'
+import { createCommand } from '@doist/todoist-sdk'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
 import { ToolNames } from '../utils/tool-names.js'

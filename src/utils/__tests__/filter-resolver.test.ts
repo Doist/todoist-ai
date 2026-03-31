@@ -1,4 +1,4 @@
-import type { Filter, TodoistApi } from '@doist/todoist-api-typescript'
+import type { Filter, TodoistApi } from '@doist/todoist-sdk'
 import { type Mocked, vi } from 'vitest'
 import { FilterResolver } from '../filter-resolver.js'
 
