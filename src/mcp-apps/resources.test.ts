@@ -17,9 +17,29 @@ describe('registerTaskListApp', () => {
 
         expect(consoleErrorSpy).not.toHaveBeenCalled()
         expect(registerResourceSpy).toHaveBeenCalledTimes(1)
+        expect(registerResourceSpy.mock.calls[0]?.[2]).toMatchObject({
+            description: 'Interactive task list widget',
+            _meta: {
+                ui: {
+                    prefersBorder: true,
+                    csp: {
+                        connectDomains: [],
+                        resourceDomains: [],
+                    },
+                    domain: 'https://ai.todoist.net',
+                },
+                'openai/widgetDescription': 'Interactive task list widget',
+                'openai/widgetPrefersBorder': true,
+                'openai/widgetCSP': {
+                    connect_domains: [],
+                    resource_domains: [],
+                },
+                'openai/widgetDomain': 'https://ai.todoist.net',
+            },
+        })
 
         const readCallback = registerResourceSpy.mock.calls[0]?.[3] as
-            | (() => Promise<{ contents: Array<{ uri: string; text: string }> }>)
+            | (() => Promise<{ contents: Array<{ uri: string; text: string; _meta?: unknown }> }>)
             | undefined
 
         expect(readCallback).toBeDefined()
@@ -35,5 +55,22 @@ describe('registerTaskListApp', () => {
         expect(result.contents[0]?.text).toContain(
             '<script type="module" src="/main.tsx"></script>',
         )
+        expect(result.contents[0]?._meta).toMatchObject({
+            ui: {
+                prefersBorder: true,
+                csp: {
+                    connectDomains: [],
+                    resourceDomains: [],
+                },
+                domain: 'https://ai.todoist.net',
+            },
+            'openai/widgetDescription': 'Interactive task list widget',
+            'openai/widgetPrefersBorder': true,
+            'openai/widgetCSP': {
+                connect_domains: [],
+                resource_domains: [],
+            },
+            'openai/widgetDomain': 'https://ai.todoist.net',
+        })
     })
 })
