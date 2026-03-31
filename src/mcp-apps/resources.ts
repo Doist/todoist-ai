@@ -36,6 +36,27 @@ function loadTaskListHtml() {
 const taskListHtml = loadTaskListHtml()
 const taskListHash = createHash('sha256').update(taskListHtml).digest('hex').slice(0, 12)
 const taskListResourceUri = `ui://todoist/task-list@${taskListHash}`
+const taskListResourceDescription = 'Interactive task list widget'
+// Apps SDK expects an origin here, so use the hosted MCP origin rather than the full /mcp URL.
+const taskListWidgetDomain = new URL('https://ai.todoist.net/mcp').origin
+const taskListResourceMeta = {
+    ui: {
+        prefersBorder: true,
+        csp: {
+            // The widget is bundled into one HTML file and does not fetch or load external assets.
+            connectDomains: [] as string[],
+            resourceDomains: [] as string[],
+        },
+        domain: taskListWidgetDomain,
+    },
+    'openai/widgetDescription': taskListResourceDescription,
+    'openai/widgetPrefersBorder': true,
+    'openai/widgetCSP': {
+        connect_domains: [] as string[],
+        resource_domains: [] as string[],
+    },
+    'openai/widgetDomain': taskListWidgetDomain,
+}
 
 /**
  * Register the task list MCP App resource on the server.
@@ -46,7 +67,8 @@ function registerTaskListApp(server: McpServer) {
         'todoist-task-list',
         taskListResourceUri,
         {
-            description: 'Interactive task list widget',
+            description: taskListResourceDescription,
+            _meta: taskListResourceMeta,
         },
         async () => ({
             contents: [
@@ -54,6 +76,7 @@ function registerTaskListApp(server: McpServer) {
                     uri: taskListResourceUri,
                     mimeType: RESOURCE_MIME_TYPE,
                     text: taskListHtml,
+                    _meta: taskListResourceMeta,
                 },
             ],
         }),
