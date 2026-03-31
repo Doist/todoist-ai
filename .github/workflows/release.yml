@@ -118,9 +118,7 @@ jobs:
                       echo "should_announce=true"
                       echo "package_version=${package_version}"
                       echo "message<<EOF"
-                      echo "🎉 **${package_name} ${new_tag} Published** (${published_at})"
-                      echo
-                      echo "📝 Changes"
+                      echo "**Todoist MCP & Tools ${new_tag} published** 🚀"
                       echo
                       printf '%s\n' "${changelog}"
                       echo
