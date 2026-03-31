@@ -117,6 +117,29 @@ describe(`${UPDATE_REMINDERS} tool`, () => {
             )
         })
 
+        it('should clear isUrgent with false for relative reminder', async () => {
+            const updatedReminder = createMockRelativeReminder({
+                isUrgent: false,
+            } as Partial<Reminder>)
+            mockTodoistApi.updateReminder.mockResolvedValue(updatedReminder)
+
+            const result = await updateReminders.execute(
+                {
+                    reminders: [{ type: 'relative', id: 'reminder-1', isUrgent: false }],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateReminder).toHaveBeenCalledWith('reminder-1', {
+                reminderType: 'relative',
+                isUrgent: false,
+            })
+
+            expect(result.structuredContent.reminders[0]).toEqual(
+                expect.objectContaining({ isUrgent: false }),
+            )
+        })
+
         it('should update service for relative reminder', async () => {
             const updatedReminder = createMockRelativeReminder()
             mockTodoistApi.updateReminder.mockResolvedValue(updatedReminder)
