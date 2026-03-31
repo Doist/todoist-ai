@@ -1,3 +1,9 @@
+## [8.7.2](https://github.com/Doist/todoist-ai/compare/v8.7.1...v8.7.2) (2026-03-31)
+
+### Bug Fixes
+
+* update SDK to v7.9.1 and handle optional workspace fields ([#427](https://github.com/Doist/todoist-ai/issues/427)) ([9ffe666](https://github.com/Doist/todoist-ai/commit/9ffe66613eec5479c69f9c4fcf19d75f339716fd))
+
 ## [8.7.1](https://github.com/Doist/todoist-ai/compare/v8.7.0...v8.7.1) (2026-03-30)
 
 ### Bug Fixes
