@@ -1,3 +1,9 @@
+## [8.8.2](https://github.com/Doist/todoist-ai/compare/v8.8.1...v8.8.2) (2026-03-31)
+
+### Bug Fixes
+
+* rename @doist/todoist-api-typescript to @doist/todoist-sdk ([#431](https://github.com/Doist/todoist-ai/issues/431)) ([7dd423c](https://github.com/Doist/todoist-ai/commit/7dd423c1f1b57fc8fa8405ce737a7d1d033d02cd))
+
 ## [8.8.1](https://github.com/Doist/todoist-ai/compare/v8.8.0...v8.8.1) (2026-03-31)
 
 ### Bug Fixes
