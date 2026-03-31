@@ -1,3 +1,9 @@
+## [8.8.1](https://github.com/Doist/todoist-ai/compare/v8.8.0...v8.8.1) (2026-03-31)
+
+### Bug Fixes
+
+* Add OpenAI specific meta data to MCP Apps ([#429](https://github.com/Doist/todoist-ai/issues/429)) ([6eff6de](https://github.com/Doist/todoist-ai/commit/6eff6dee367bc4ef036ee532d410055ec074fd6f))
+
 ## [8.8.0](https://github.com/Doist/todoist-ai/compare/v8.7.2...v8.8.0) (2026-03-31)
 
 ### Features
