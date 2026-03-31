@@ -25,3 +25,11 @@ export const ReminderDueInputSchema = z.object({
  * Shared schema for location trigger (on_enter or on_leave).
  */
 export const LocationTriggerSchema = z.enum(LOCATION_TRIGGERS)
+
+/**
+ * Shared schema for the isUrgent flag on time-based reminders (relative and absolute).
+ */
+export const ReminderIsUrgentSchema = z
+    .boolean()
+    .optional()
+    .describe('Whether this is an urgent reminder. Applies to relative and absolute reminders.')

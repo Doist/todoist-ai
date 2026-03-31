@@ -6,6 +6,7 @@ import {
     LocationTriggerSchema,
     MAX_REMINDERS_PER_OPERATION,
     ReminderDueInputSchema,
+    ReminderIsUrgentSchema,
     ReminderServiceSchema,
 } from '../utils/reminder-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -20,6 +21,7 @@ const RelativeReminderUpdateSchema = z.object({
         .optional()
         .describe('New minute offset before task due time.'),
     service: ReminderServiceSchema.optional().describe('New delivery method: "email" or "push".'),
+    isUrgent: ReminderIsUrgentSchema,
 })
 
 const AbsoluteReminderUpdateSchema = z.object({
@@ -27,6 +29,7 @@ const AbsoluteReminderUpdateSchema = z.object({
     id: z.string().min(1).describe('The ID of the absolute reminder to update.'),
     due: ReminderDueInputSchema.optional().describe('New due date/time for the reminder.'),
     service: ReminderServiceSchema.optional().describe('New delivery method: "email" or "push".'),
+    isUrgent: ReminderIsUrgentSchema,
 })
 
 const LocationReminderUpdateSchema = z.object({

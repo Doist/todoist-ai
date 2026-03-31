@@ -94,6 +94,29 @@ describe(`${UPDATE_REMINDERS} tool`, () => {
             )
         })
 
+        it('should update isUrgent for relative reminder', async () => {
+            const updatedReminder = createMockRelativeReminder({
+                isUrgent: true,
+            } as Partial<Reminder>)
+            mockTodoistApi.updateReminder.mockResolvedValue(updatedReminder)
+
+            const result = await updateReminders.execute(
+                {
+                    reminders: [{ type: 'relative', id: 'reminder-1', isUrgent: true }],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateReminder).toHaveBeenCalledWith('reminder-1', {
+                reminderType: 'relative',
+                isUrgent: true,
+            })
+
+            expect(result.structuredContent.reminders[0]).toEqual(
+                expect.objectContaining({ isUrgent: true }),
+            )
+        })
+
         it('should update service for relative reminder', async () => {
             const updatedReminder = createMockRelativeReminder()
             mockTodoistApi.updateReminder.mockResolvedValue(updatedReminder)
@@ -137,6 +160,29 @@ describe(`${UPDATE_REMINDERS} tool`, () => {
 
             expect(result.textContent).toBe('Updated 1 reminder')
             expect(result.structuredContent.updatedReminderIds).toEqual(['reminder-2'])
+        })
+
+        it('should update isUrgent for absolute reminder', async () => {
+            const updatedReminder = createMockAbsoluteReminder({
+                isUrgent: true,
+            } as Partial<Reminder>)
+            mockTodoistApi.updateReminder.mockResolvedValue(updatedReminder)
+
+            const result = await updateReminders.execute(
+                {
+                    reminders: [{ type: 'absolute', id: 'reminder-2', isUrgent: true }],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.updateReminder).toHaveBeenCalledWith('reminder-2', {
+                reminderType: 'absolute',
+                isUrgent: true,
+            })
+
+            expect(result.structuredContent.reminders[0]).toEqual(
+                expect.objectContaining({ isUrgent: true }),
+            )
         })
     })
 
