@@ -418,11 +418,13 @@ function mapReminder(reminder: Reminder) {
                 ...base,
                 minuteOffset: reminder.minuteOffset,
                 due: reminder.due ? mapReminderDue(reminder.due) : undefined,
+                isUrgent: reminder.isUrgent,
             }
         case 'absolute':
             return {
                 ...base,
                 due: mapReminderDue(reminder.due),
+                isUrgent: reminder.isUrgent,
             }
         case 'location':
             return {

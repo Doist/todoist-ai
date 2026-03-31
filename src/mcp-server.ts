@@ -91,6 +91,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 - **add-reminders**: Create reminders for tasks. Three types: "relative" (minutes before due), "absolute" (specific date/time), or "location" (geofence-triggered). Each reminder must specify a taskId.
 - **find-reminders**: Find reminders by task ID (returns both time-based and location reminders), or get a specific reminder by ID (use reminderId for time-based, locationReminderId for location-based).
 - **update-reminders**: Update existing reminders. Must specify the reminder type ("relative", "absolute", or "location") and ID.
+- Relative and absolute reminders support an **isUrgent** flag to mark a reminder as urgent.
 - Reminders can be deleted using **delete-object** with type "reminder" (time-based) or "location_reminder" (location-based).
 
 **Collaboration & Comments:**

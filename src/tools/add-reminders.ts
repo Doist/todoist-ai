@@ -7,6 +7,7 @@ import {
     LocationTriggerSchema,
     MAX_REMINDERS_PER_OPERATION,
     ReminderDueInputSchema,
+    ReminderIsUrgentSchema,
     ReminderServiceSchema,
 } from '../utils/reminder-schemas.js'
 import { ToolNames } from '../utils/tool-names.js'
@@ -24,6 +25,7 @@ const RelativeReminderInputSchema = z.object({
     service: ReminderServiceSchema.optional().describe(
         'Delivery method: "email" or "push" notification. Defaults to push.',
     ),
+    isUrgent: ReminderIsUrgentSchema,
 })
 
 const AbsoluteReminderInputSchema = z.object({
@@ -33,6 +35,7 @@ const AbsoluteReminderInputSchema = z.object({
     service: ReminderServiceSchema.optional().describe(
         'Delivery method: "email" or "push" notification. Defaults to push.',
     ),
+    isUrgent: ReminderIsUrgentSchema,
 })
 
 const LocationReminderInputSchema = z.object({
@@ -91,6 +94,7 @@ const addReminders = {
                         reminderType: 'relative',
                         minuteOffset: reminder.minuteOffset,
                         service: reminder.service,
+                        isUrgent: reminder.isUrgent,
                     } as AddReminderArgs)
                 case 'absolute':
                     return await client.addReminder({
@@ -98,6 +102,7 @@ const addReminders = {
                         reminderType: 'absolute',
                         due: reminder.due,
                         service: reminder.service,
+                        isUrgent: reminder.isUrgent,
                     } as AddReminderArgs)
                 case 'location':
                     return await client.addLocationReminder({

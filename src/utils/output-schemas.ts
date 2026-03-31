@@ -179,6 +179,10 @@ const ReminderSchema = z.object({
         .optional()
         .describe('Trigger type: on_enter or on_leave (location reminders only).'),
     radius: z.number().optional().describe('Geofence radius in meters (location reminders only).'),
+    isUrgent: z
+        .boolean()
+        .optional()
+        .describe('Whether this is an urgent reminder (relative and absolute reminders only).'),
 })
 
 /**

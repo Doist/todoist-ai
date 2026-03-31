@@ -97,6 +97,37 @@ describe(`${ADD_REMINDERS} tool`, () => {
             )
         })
 
+        it('should pass isUrgent parameter for relative reminder', async () => {
+            const mockReminder = createMockRelativeReminder({ isUrgent: true } as Partial<Reminder>)
+            mockTodoistApi.addReminder.mockResolvedValue(mockReminder)
+
+            const result = await addReminders.execute(
+                {
+                    reminders: [
+                        {
+                            type: 'relative',
+                            taskId: 'task-1',
+                            minuteOffset: 30,
+                            isUrgent: true,
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addReminder).toHaveBeenCalledWith({
+                taskId: 'task-1',
+                reminderType: 'relative',
+                minuteOffset: 30,
+                service: undefined,
+                isUrgent: true,
+            })
+
+            expect(result.structuredContent.reminders[0]).toEqual(
+                expect.objectContaining({ isUrgent: true }),
+            )
+        })
+
         it('should pass service parameter for relative reminder', async () => {
             const mockReminder = createMockRelativeReminder()
             mockTodoistApi.addReminder.mockResolvedValue(mockReminder)
@@ -161,6 +192,39 @@ describe(`${ADD_REMINDERS} tool`, () => {
                     totalCount: 1,
                     addedReminderIds: ['reminder-2'],
                 }),
+            )
+        })
+
+        it('should pass isUrgent parameter for absolute reminder', async () => {
+            const mockReminder = createMockAbsoluteReminder({
+                isUrgent: true,
+            } as Partial<Reminder>)
+            mockTodoistApi.addReminder.mockResolvedValue(mockReminder)
+
+            const result = await addReminders.execute(
+                {
+                    reminders: [
+                        {
+                            type: 'absolute',
+                            taskId: 'task-1',
+                            due: { string: 'tomorrow at 3pm' },
+                            isUrgent: true,
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.addReminder).toHaveBeenCalledWith({
+                taskId: 'task-1',
+                reminderType: 'absolute',
+                due: { string: 'tomorrow at 3pm' },
+                service: undefined,
+                isUrgent: true,
+            })
+
+            expect(result.structuredContent.reminders[0]).toEqual(
+                expect.objectContaining({ isUrgent: true }),
             )
         })
     })
