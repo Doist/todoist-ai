@@ -1,3 +1,9 @@
+## [8.8.0](https://github.com/Doist/todoist-ai/compare/v8.7.2...v8.8.0) (2026-03-31)
+
+### Features
+
+* add isUrgent flag support for reminders ([#428](https://github.com/Doist/todoist-ai/issues/428)) ([3da5989](https://github.com/Doist/todoist-ai/commit/3da59894b1786cbaf8a85e4f474639423e1f82b2))
+
 ## [8.7.2](https://github.com/Doist/todoist-ai/compare/v8.7.1...v8.7.2) (2026-03-31)
 
 ### Bug Fixes
