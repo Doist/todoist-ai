@@ -1,3 +1,9 @@
+## [8.8.3](https://github.com/Doist/todoist-ai/compare/v8.8.2...v8.8.3) (2026-04-02)
+
+### Bug Fixes
+
+* add retry with exponential backoff for transient 5xx errors ([#436](https://github.com/Doist/todoist-ai/issues/436)) ([c75dda2](https://github.com/Doist/todoist-ai/commit/c75dda26e5e25861cb4e65221407191a66b3a4aa))
+
 ## [8.8.2](https://github.com/Doist/todoist-ai/compare/v8.8.1...v8.8.2) (2026-03-31)
 
 ### Bug Fixes
