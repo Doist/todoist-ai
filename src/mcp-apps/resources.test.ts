@@ -26,7 +26,6 @@ describe('registerTaskListApp', () => {
                         connectDomains: [],
                         resourceDomains: [],
                     },
-                    domain: 'https://ai.todoist.net',
                 },
                 'openai/widgetDescription': 'Interactive task list widget',
                 'openai/widgetPrefersBorder': true,
@@ -37,6 +36,11 @@ describe('registerTaskListApp', () => {
                 'openai/widgetDomain': 'https://ai.todoist.net',
             },
         })
+
+        const registeredMeta = (
+            registerResourceSpy.mock.calls[0]?.[2] as { _meta: { ui: Record<string, unknown> } }
+        )._meta.ui
+        expect(registeredMeta).not.toHaveProperty('domain')
 
         const readCallback = registerResourceSpy.mock.calls[0]?.[3] as
             | (() => Promise<{ contents: Array<{ uri: string; text: string; _meta?: unknown }> }>)
@@ -62,7 +66,6 @@ describe('registerTaskListApp', () => {
                     connectDomains: [],
                     resourceDomains: [],
                 },
-                domain: 'https://ai.todoist.net',
             },
             'openai/widgetDescription': 'Interactive task list widget',
             'openai/widgetPrefersBorder': true,
@@ -72,5 +75,8 @@ describe('registerTaskListApp', () => {
             },
             'openai/widgetDomain': 'https://ai.todoist.net',
         })
+
+        const contentMeta = (result.contents[0]?._meta as { ui: Record<string, unknown> }).ui
+        expect(contentMeta).not.toHaveProperty('domain')
     })
 })

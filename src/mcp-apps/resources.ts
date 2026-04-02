@@ -37,7 +37,6 @@ const taskListHtml = loadTaskListHtml()
 const taskListHash = createHash('sha256').update(taskListHtml).digest('hex').slice(0, 12)
 const taskListResourceUri = `ui://todoist/task-list@${taskListHash}`
 const taskListResourceDescription = 'Interactive task list widget'
-// Apps SDK expects an origin here, so use the hosted MCP origin rather than the full /mcp URL.
 const taskListWidgetDomain = 'https://ai.todoist.net'
 const taskListResourceMeta = {
     ui: {
@@ -47,7 +46,6 @@ const taskListResourceMeta = {
             connectDomains: [] as string[],
             resourceDomains: [] as string[],
         },
-        domain: taskListWidgetDomain,
     },
     'openai/widgetDescription': taskListResourceDescription,
     'openai/widgetPrefersBorder': true,
