@@ -8,6 +8,12 @@ import { addFilters } from './tools/add-filters.js'
 import { addLabels } from './tools/add-labels.js'
 // Project management tools
 import { addProjects } from './tools/add-projects.js'
+// Goal management tools
+import { addGoals } from './tools/add-goals.js'
+import { completeGoals } from './tools/complete-goals.js'
+import { findGoals } from './tools/find-goals.js'
+import { linkGoalItems } from './tools/link-goal-items.js'
+import { updateGoals } from './tools/update-goals.js'
 // Section management tools
 import { addSections } from './tools/add-sections.js'
 // Task management tools
@@ -66,6 +72,12 @@ const tools = {
     addSections,
     updateSections,
     findSections,
+    // Goal management tools
+    findGoals,
+    addGoals,
+    updateGoals,
+    completeGoals,
+    linkGoalItems,
     // Comment management tools
     addComments,
     updateComments,
@@ -111,11 +123,14 @@ export {
     addLabels,
     // Project management tools
     addProjects,
+    // Goal management tools
+    addGoals,
     // Section management tools
     addSections,
     // Task management tools
     addTasks,
     analyzeProjectHealth,
+    completeGoals,
     completeTasks,
     deleteObject,
     FEATURE_NAMES,
@@ -129,6 +144,7 @@ export {
     findCompletedTasks,
     // Filter management tools
     findFilters,
+    findGoals,
     findLabels,
     // Assignment and collaboration tools
     findProjectCollaborators,
@@ -144,6 +160,7 @@ export {
     // Health and insights tools
     getProjectHealth,
     getWorkspaceInsights,
+    linkGoalItems,
     // Workspace tools
     listWorkspaces,
     manageAssignments,
@@ -155,6 +172,7 @@ export {
     uncompleteTasks,
     updateComments,
     updateFilters,
+    updateGoals,
     updateProjects,
     updateSections,
     updateTasks,
