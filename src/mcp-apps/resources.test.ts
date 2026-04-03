@@ -26,7 +26,6 @@ describe('registerTaskListApp', () => {
                         connectDomains: [],
                         resourceDomains: [],
                     },
-                    domain: 'https://ai.todoist.net',
                 },
                 'openai/widgetDescription': 'Interactive task list widget',
                 'openai/widgetPrefersBorder': true,
@@ -48,6 +47,9 @@ describe('registerTaskListApp', () => {
         }
 
         const result = await readCallback()
+        const registerConfigMeta = registerResourceSpy.mock.calls[0]?.[2]?._meta as
+            | { ui?: Record<string, unknown> }
+            | undefined
 
         expect(result.contents).toHaveLength(1)
         expect(result.contents[0]?.uri).toBe(taskListResourceUri)
@@ -55,6 +57,7 @@ describe('registerTaskListApp', () => {
         expect(result.contents[0]?.text).toContain(
             '<script type="module" src="/main.tsx"></script>',
         )
+        expect(registerConfigMeta?.ui).not.toHaveProperty('domain')
         expect(result.contents[0]?._meta).toMatchObject({
             ui: {
                 prefersBorder: true,
@@ -62,7 +65,6 @@ describe('registerTaskListApp', () => {
                     connectDomains: [],
                     resourceDomains: [],
                 },
-                domain: 'https://ai.todoist.net',
             },
             'openai/widgetDescription': 'Interactive task list widget',
             'openai/widgetPrefersBorder': true,
@@ -72,5 +74,8 @@ describe('registerTaskListApp', () => {
             },
             'openai/widgetDomain': 'https://ai.todoist.net',
         })
+        expect(
+            (result.contents[0]?._meta as { ui?: Record<string, unknown> } | undefined)?.ui,
+        ).not.toHaveProperty('domain')
     })
 })
