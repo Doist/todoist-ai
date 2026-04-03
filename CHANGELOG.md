@@ -1,3 +1,9 @@
+## [8.8.4](https://github.com/Doist/todoist-ai/compare/v8.8.3...v8.8.4) (2026-04-03)
+
+### Bug Fixes
+
+* Remove host-agnostic ui.domain metadata ([#434](https://github.com/Doist/todoist-ai/issues/434)) ([9af04b7](https://github.com/Doist/todoist-ai/commit/9af04b73b847a66e51ef188b9acc7cf153086489)), closes [Doist/Issues#19953](https://github.com/Doist/Issues/issues/19953)
+
 ## [8.8.3](https://github.com/Doist/todoist-ai/compare/v8.8.2...v8.8.3) (2026-04-02)
 
 ### Bug Fixes
