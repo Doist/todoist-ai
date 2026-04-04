@@ -11,10 +11,10 @@ export async function GET() {
     const days = Array.from({ length: 7 }, (_, i) => {
       const date = subDays(today, 6 - i)
       const dateStr = format(date, 'yyyy-MM-dd')
-      const dayData = stats.days_items?.find((d) => d.date === dateStr)
+      const dayData = stats.daysItems?.find((d) => d.date === dateStr)
       return {
         date: format(date, 'EEE'),
-        completed: dayData?.total_completed ?? 0,
+        completed: dayData?.totalCompleted ?? 0,
       }
     })
 
@@ -24,8 +24,8 @@ export async function GET() {
     return NextResponse.json({
       days,
       karma: stats.karma,
-      dailyGoal: stats.goals?.daily_goal ?? 5,
-      weeklyGoal: stats.goals?.weekly_goal ?? 25,
+      dailyGoal: stats.goals?.dailyGoal ?? 5,
+      weeklyGoal: stats.goals?.weeklyGoal ?? 25,
       totalThisWeek,
       avgPerDay,
     })

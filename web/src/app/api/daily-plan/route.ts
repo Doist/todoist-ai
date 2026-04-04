@@ -70,7 +70,7 @@ export async function GET() {
       isOverdue: isOverdue(t),
       durationMinutes: estimateDuration(t),
       labels: t.labels,
-      projectName: projectMap.get(t.project_id) ?? 'Inbox',
+      projectName: projectMap.get(t.projectId) ?? 'Inbox',
     }))
 
     const overdueCount = enrichedTasks.filter((t) => t.isOverdue).length

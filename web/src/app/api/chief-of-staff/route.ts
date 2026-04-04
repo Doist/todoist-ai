@@ -48,9 +48,9 @@ export async function GET() {
         dueDate,
         daysSinceDue,
         isOverdue: daysSinceDue !== null && daysSinceDue > 0,
-        createdAt: t.created_at,
+        createdAt: t.createdAt,
         labels: t.labels,
-        projectName: projectMap.get(t.project_id) ?? 'Inbox',
+        projectName: projectMap.get(t.projectId) ?? 'Inbox',
       }
     })
 

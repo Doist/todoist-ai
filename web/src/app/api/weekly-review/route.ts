@@ -54,14 +54,14 @@ export async function GET() {
     // Count completions per project
     const completedByProject = new Map<string, number>()
     for (const item of completedItems) {
-      const name = projectMap.get(item.project_id) ?? 'Inbox'
+      const name = projectMap.get(item.projectId) ?? 'Inbox'
       completedByProject.set(name, (completedByProject.get(name) ?? 0) + 1)
     }
 
     // Count overdue per project
     const overdueByProject = new Map<string, number>()
     for (const task of overdueTasks) {
-      const name = projectMap.get(task.project_id) ?? 'Inbox'
+      const name = projectMap.get(task.projectId) ?? 'Inbox'
       overdueByProject.set(name, (overdueByProject.get(name) ?? 0) + 1)
     }
 
@@ -81,14 +81,14 @@ export async function GET() {
       content: t.content,
       priority: normalizePriority(t.priority),
       dueDate: t.due?.date ?? null,
-      project: projectMap.get(t.project_id) ?? 'Inbox',
+      project: projectMap.get(t.projectId) ?? 'Inbox',
       labels: t.labels,
     }))
 
     const recentCompleted = completedItems.slice(0, 50).map((t) => ({
       content: t.content,
-      completedAt: t.completed_at,
-      project: projectMap.get(t.project_id) ?? 'Inbox',
+      completedAt: t.completedAt,
+      project: projectMap.get(t.projectId) ?? 'Inbox',
     }))
 
     const prompt = `You are a GTD (Getting Things Done) coach performing a weekly review. Be insightful, specific, and constructive.
@@ -109,9 +109,9 @@ ${JSON.stringify(projectSummary, null, 2)}
 
 Productivity stats:
 - Karma score: ${stats.karma}
-- Daily goal: ${stats.goals?.daily_goal ?? 'N/A'} tasks/day
-- Weekly goal: ${stats.goals?.weekly_goal ?? 'N/A'} tasks/week
-- Last 7 days completions: ${stats.days_items?.slice(-7).map((d) => d.total_completed).join(', ') ?? 'N/A'}
+- Daily goal: ${stats.goals?.dailyGoal ?? 'N/A'} tasks/day
+- Weekly goal: ${stats.goals?.weeklyGoal ?? 'N/A'} tasks/week
+- Last 7 days completions: ${stats.daysItems?.slice(-7).map((d) => d.totalCompleted).join(', ') ?? 'N/A'}
 
 Generate a GTD-style weekly review. Be specific and reference actual task names and projects where possible.
 
@@ -126,8 +126,8 @@ Return exactly this JSON:
     "completionRate": "string like 75%",
     "mostActiveProject": "${mostActiveProject}",
     "karmaScore": ${stats.karma},
-    "dailyGoal": ${stats.goals?.daily_goal ?? 0},
-    "weeklyGoal": ${stats.goals?.weekly_goal ?? 0}
+    "dailyGoal": ${stats.goals?.dailyGoal ?? 0},
+    "weeklyGoal": ${stats.goals?.weeklyGoal ?? 0}
   },
   "wins": ["specific win 1", "specific win 2", "specific win 3"],
   "overdueAnalysis": "Honest 2–3 sentence analysis of overdue patterns and what they reveal",

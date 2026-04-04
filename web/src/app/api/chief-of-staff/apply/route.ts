@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import type { TaskSuggestion } from '../route'
 
 const API_KEY = process.env.TODOIST_API_KEY!
-const REST_BASE = 'https://api.todoist.com/api/v2'
+const REST_BASE = 'https://api.todoist.com/api/v1'
 
 function headers() {
   return { Authorization: `Bearer ${API_KEY}`, 'Content-Type': 'application/json' }
