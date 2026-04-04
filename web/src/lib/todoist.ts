@@ -124,11 +124,13 @@ export async function getProjects(): Promise<TodoistProject[]> {
   return unwrapArray<TodoistProject>(data)
 }
 
-/** Completed tasks since `sinceDate` (ISO datetime string). */
-export async function getCompletedTasks(sinceDate: string): Promise<TodoistCompletedTask[]> {
+/** Completed tasks between `sinceDate` and `untilDate` (ISO datetime strings).
+ *  Both `since` and `until` are required by the API; `until` defaults to now. */
+export async function getCompletedTasks(sinceDate: string, untilDate?: string): Promise<TodoistCompletedTask[]> {
+  const until = untilDate ?? new Date().toISOString()
   const data = await get<{ items: TodoistCompletedTask[] }>(
     '/tasks/completed/by_completion_date',
-    { since: sinceDate, limit: '200' },
+    { since: sinceDate, until, limit: '200' },
   )
   return data.items ?? []
 }
