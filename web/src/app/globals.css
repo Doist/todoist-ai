@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-base: #020617;
+  --color-bg-card: #0f172a;
+  --color-bg-elevated: #1e293b;
+  --color-border: #1e293b;
+  --color-text-primary: #f1f5f9;
+  --color-text-muted: #64748b;
+  --color-accent: #6366f1;
+  --color-accent-hover: #4f46e5;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-p1: #ef4444;
+  --color-p2: #f97316;
+  --color-p3: #3b82f6;
+  --color-p4: #64748b;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+/* Subtle scrollbar styling */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* Prose-like styles for AI-generated report content */
+.report-content h2 { font-size: 1.1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #e2e8f0; }
+.report-content p { color: #94a3b8; line-height: 1.7; margin-bottom: 0.75rem; }
+.report-content ul { list-style: disc; padding-left: 1.5rem; color: #94a3b8; }
+.report-content li { margin-bottom: 0.35rem; }
