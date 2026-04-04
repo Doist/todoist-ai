@@ -1,12 +1,16 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { BarChart3, TrendingUp, Clock, Target, Loader2, AlertCircle, CheckCheck } from 'lucide-react'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell,
-} from 'recharts'
+
+// Load the recharts-based chart only on the client — it uses browser APIs
+const CompletionChart = dynamic(() => import('@/components/ui/completion-chart'), {
+  ssr: false,
+  loading: () => <div className="h-56 animate-pulse rounded-lg bg-slate-800/50" />,
+})
 
 interface Stats {
   days: Array<{ date: string; completed: number }>
@@ -17,16 +21,6 @@ interface Stats {
   avgPerDay: number
 }
 
-function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) {
-  if (!active || !payload?.length) return null
-  return (
-    <div className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs">
-      <div className="text-slate-400">{label}</div>
-      <div className="font-bold text-indigo-400">{payload[0].value} tasks</div>
-    </div>
-  )
-}
-
 export default function AnalyticsPage() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -34,13 +28,18 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     fetch('/api/analytics')
-      .then((r) => r.json())
+      .then(async (r) => {
+        const data = await r.json()
+        if (!r.ok) throw new Error(data.error ?? `HTTP ${r.status}`)
+        return data
+      })
       .then(setStats)
-      .catch((e) => setError(e.message))
+      .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false))
   }, [])
 
-  const maxCompleted = stats ? Math.max(...stats.days.map((d) => d.completed), 1) : 1
+  const days = stats?.days ?? []
+  const dailyGoal = stats?.dailyGoal ?? 5
 
   return (
     <div className="min-h-screen p-8">
@@ -90,32 +89,19 @@ export default function AnalyticsPage() {
           </div>
 
           {/* 7-day bar chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Tasks Completed — Last 7 Days</CardTitle>
-              <Badge variant={stats.totalThisWeek >= stats.weeklyGoal ? 'success' : 'warning'}>
-                {stats.totalThisWeek}/{stats.weeklyGoal} weekly goal
-              </Badge>
-            </CardHeader>
-            <div className="h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stats.days} margin={{ top: 4, right: 4, bottom: 0, left: -24 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: '#1e293b' }} />
-                  <Bar dataKey="completed" radius={[4, 4, 0, 0]}>
-                    {stats.days.map((entry, i) => (
-                      <Cell
-                        key={i}
-                        fill={entry.completed >= stats.dailyGoal ? '#6366f1' : '#334155'}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
+          {days.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Tasks Completed — Last 7 Days</CardTitle>
+                <Badge variant={stats.totalThisWeek >= stats.weeklyGoal ? 'success' : 'warning'}>
+                  {stats.totalThisWeek}/{stats.weeklyGoal} weekly goal
+                </Badge>
+              </CardHeader>
+              <div className="h-56">
+                <CompletionChart days={days} dailyGoal={dailyGoal} />
+              </div>
+            </Card>
+          )}
 
           {/* Coming soon panels */}
           <div className="grid gap-4 lg:grid-cols-2">

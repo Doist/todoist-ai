@@ -1,16 +1,31 @@
 /**
- * Todoist API client — thin wrapper over the REST v2 + Sync v9 APIs.
+ * Todoist API client — wrapper over the REST v2 + API v1 (formerly Sync v9) APIs.
+ *
+ * Todoist deprecated their sync/v9 endpoints in 2025. The replacement is /api/v1/
+ * for previously-sync-only endpoints (completed tasks, stats, user info).
+ *
+ * The REST v2 tasks endpoint now returns a paginated object { results, next_cursor }
+ * instead of a plain array when using filter queries, so we unwrap it explicitly.
  */
 
 const API_KEY = process.env.TODOIST_API_KEY!
 const REST_BASE = 'https://api.todoist.com/api/v2'
-const SYNC_BASE = 'https://api.todoist.com/sync/v9'
+const API_V1_BASE = 'https://api.todoist.com/api/v1'
 
 function restHeaders() {
   return {
     Authorization: `Bearer ${API_KEY}`,
     'Content-Type': 'application/json',
   }
+}
+
+/** Unwrap either a plain array or a paginated { results: T[] } response. */
+function unwrapArray<T>(data: unknown): T[] {
+  if (Array.isArray(data)) return data as T[]
+  if (data && typeof data === 'object' && 'results' in data && Array.isArray((data as { results: unknown }).results)) {
+    return (data as { results: T[] }).results
+  }
+  return []
 }
 
 async function restGet<T>(path: string, params?: Record<string, string>): Promise<T> {
@@ -23,13 +38,13 @@ async function restGet<T>(path: string, params?: Record<string, string>): Promis
   return res.json() as Promise<T>
 }
 
-async function syncGet<T>(path: string, params?: Record<string, string>): Promise<T> {
-  const url = new URL(`${SYNC_BASE}${path}`)
+async function v1Get<T>(path: string, params?: Record<string, string>): Promise<T> {
+  const url = new URL(`${API_V1_BASE}${path}`)
   if (params) {
     for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v)
   }
   const res = await fetch(url.toString(), { headers: restHeaders(), cache: 'no-store' })
-  if (!res.ok) throw new Error(`Todoist Sync error ${res.status}: ${await res.text()}`)
+  if (!res.ok) throw new Error(`Todoist API v1 error ${res.status}: ${await res.text()}`)
   return res.json() as Promise<T>
 }
 
@@ -97,7 +112,9 @@ export function normalizePriority(apiPriority: number): 'p1' | 'p2' | 'p3' | 'p4
 export async function getActiveTasks(filter?: string): Promise<TodoistTask[]> {
   const params: Record<string, string> = {}
   if (filter) params.filter = filter
-  return restGet<TodoistTask[]>('/tasks', params)
+  // REST v2 tasks may return { results: [...] } with cursor pagination
+  const data = await restGet<unknown>('/tasks', params)
+  return unwrapArray<TodoistTask>(data)
 }
 
 export async function getTodayTasks(): Promise<TodoistTask[]> {
@@ -109,24 +126,27 @@ export async function getOverdueTasks(): Promise<TodoistTask[]> {
 }
 
 export async function getProjects(): Promise<TodoistProject[]> {
-  return restGet<TodoistProject[]>('/projects')
+  const data = await restGet<unknown>('/projects')
+  return unwrapArray<TodoistProject>(data)
 }
 
-/** Returns completed tasks since `sinceDate` (ISO string). */
+/** Returns completed tasks since `sinceDate` (ISO string).
+ *  Uses /api/v1/ — the replacement for the deprecated sync/v9 endpoint. */
 export async function getCompletedTasks(sinceDate: string): Promise<TodoistCompletedTask[]> {
-  const data = await syncGet<{ items: TodoistCompletedTask[] }>(
+  const data = await v1Get<{ items: TodoistCompletedTask[] }>(
     '/items/completed/get_all',
     { since: sinceDate, limit: '200' },
   )
-  return data.items
+  return data.items ?? []
 }
 
+/** Uses /api/v1/ — the replacement for the deprecated sync/v9 endpoint. */
 export async function getProductivityStats(): Promise<TodoistStats> {
-  return syncGet<TodoistStats>('/user/productivity_stats')
+  return v1Get<TodoistStats>('/user/productivity_stats')
 }
 
 export async function getUserInfo(): Promise<{ full_name: string; email: string; timezone: string; karma: number }> {
-  const data = await syncGet<{ user: { full_name: string; email: string; timezone: string; karma: number } }>(
+  const data = await v1Get<{ user: { full_name: string; email: string; timezone: string; karma: number } }>(
     '/sync',
     { resource_types: '["user"]' },
   )
