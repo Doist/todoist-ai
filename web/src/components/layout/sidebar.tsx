@@ -9,6 +9,7 @@ import {
   Sparkles,
   Settings,
   Zap,
+  Recycle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -36,6 +37,12 @@ const NAV_ITEMS = [
     href: '/analytics',
     icon: BarChart3,
     description: 'Life productivity patterns',
+  },
+  {
+    label: 'Entropy Cleaner',
+    href: '/entropy',
+    icon: Recycle,
+    description: 'Clean stale task lists',
   },
 ]
 
