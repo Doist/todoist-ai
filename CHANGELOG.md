@@ -1,3 +1,9 @@
+## [8.8.5](https://github.com/Doist/todoist-ai/compare/v8.8.4...v8.8.5) (2026-04-05)
+
+### Bug Fixes
+
+* remove invalid mimeType property from TextContent blocks ([#438](https://github.com/Doist/todoist-ai/issues/438)) ([71fb77c](https://github.com/Doist/todoist-ai/commit/71fb77c1d34d8152aebc0849c33b52be3beb9d68))
+
 ## [8.8.4](https://github.com/Doist/todoist-ai/compare/v8.8.3...v8.8.4) (2026-04-03)
 
 ### Bug Fixes
