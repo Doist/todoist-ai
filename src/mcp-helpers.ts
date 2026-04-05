@@ -112,9 +112,8 @@ function getToolOutput<StructuredContent extends Record<string, unknown>>({
         if (!result.content) {
             result.content = []
         }
-        ;(result.content as Array<{ type: 'text'; text: string; mimeType?: string }>).push({
+        ;(result.content as Array<{ type: 'text'; text: string }>).push({
             type: 'text',
-            mimeType: 'application/json',
             text: json,
         })
     }
