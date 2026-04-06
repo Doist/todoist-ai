@@ -10,7 +10,12 @@ permissions:
 
 jobs:
     add-to-project:
+        name: Add issue to project
         runs-on: ubicloud
+        timeout-minutes: 5
+
+        # Don't run on forks
+        if: github.repository == 'Doist/todoist-ai'
 
         steps:
             - name: Add issue to project
