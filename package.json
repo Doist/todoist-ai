@@ -75,7 +75,7 @@
         "@modelcontextprotocol/sdk": "^1.25.0"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.4.8",
+        "@biomejs/biome": "2.4.10",
         "@modelcontextprotocol/inspector": "0.21.1",
         "@semantic-release/changelog": "6.0.3",
         "@semantic-release/git": "10.0.1",
