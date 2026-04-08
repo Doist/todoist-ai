@@ -106,6 +106,9 @@
             "oxlint --fix",
             "oxfmt --no-error-on-unmatched-pattern"
         ],
+        "*.{md,yml,yaml,css,json}": [
+            "oxfmt --no-error-on-unmatched-pattern"
+        ],
         "src/tools/*.ts": [
             "npm run lint:schemas"
         ],
