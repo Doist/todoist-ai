@@ -32,7 +32,7 @@
     cursor: pointer;
     user-select: none;
     display: grid;
-    grid-template-areas: "center" var(--bounding-box-size);
+    grid-template-areas: 'center' var(--bounding-box-size);
     place-items: center;
     flex-shrink: 0;
     box-sizing: content-box;

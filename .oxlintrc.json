@@ -1,0 +1,23 @@
+{
+    "plugins": ["typescript", "oxc", "unicorn", "import"],
+    "categories": {},
+    "rules": {
+        "no-unused-vars": [
+            "error",
+            {
+                "args": "all",
+                "argsIgnorePattern": "^_",
+                "vars": "all",
+                "varsIgnorePattern": "^_",
+                "caughtErrors": "all",
+                "caughtErrorsIgnorePattern": "^_",
+                "ignoreRestSiblings": false
+            }
+        ],
+        "no-unused-private-class-members": "error",
+        "import/no-namespace": "error",
+        "typescript/no-non-null-assertion": "error",
+        "oxc/no-const-enum": "error"
+    },
+    "ignorePatterns": ["dist/**", "node_modules/**"]
+}

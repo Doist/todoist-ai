@@ -273,7 +273,7 @@ function generateTextContent({
     })
 }
 
-function hasUpdatesToMake({ id, ...otherUpdateArgs }: TaskUpdate) {
+function hasUpdatesToMake({ id: _id, ...otherUpdateArgs }: TaskUpdate) {
     return Object.keys(otherUpdateArgs).length > 0
 }
 

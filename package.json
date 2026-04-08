@@ -51,14 +51,10 @@
         "tool:list": "tsx scripts/run-tool.ts --list",
         "test:executable": "npm run build && node scripts/test-executable.cjs",
         "type-check": "npx tsc --noEmit",
-        "biome:sort-imports": "biome check --formatter-enabled=false --linter-enabled=false --organize-imports-enabled=true --write .",
-        "lint:check": "biome lint",
-        "lint:write": "biome lint --write",
-        "format:check": "biome format",
-        "format:write": "biome format --write",
+        "format:check": "oxlint src scripts && oxfmt --check",
+        "format:fix": "oxlint src scripts --fix && oxfmt",
         "lint:schemas": "npm run build && npx tsx scripts/validate-schemas.ts",
-        "check": "biome check && npm run lint:schemas",
-        "check:fix": "biome check --fix --unsafe",
+        "check": "oxlint src scripts && oxfmt --check && npm run lint:schemas",
         "prepublishOnly": "npm run build && npm test",
         "prepare": "husky"
     },
@@ -75,7 +71,8 @@
         "@modelcontextprotocol/sdk": "^1.25.0"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.4.10",
+        "oxfmt": "0.43.0",
+        "oxlint": "1.58.0",
         "@modelcontextprotocol/inspector": "0.21.1",
         "@semantic-release/changelog": "6.0.3",
         "@semantic-release/git": "10.0.1",
@@ -105,8 +102,12 @@
         "vitest": "4.1.1"
     },
     "lint-staged": {
-        "*": [
-            "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
+        "*.{ts,tsx,js,jsx}": [
+            "oxlint --fix",
+            "oxfmt --no-error-on-unmatched-pattern"
+        ],
+        "*.{md,yml,yaml,css,json}": [
+            "oxfmt --no-error-on-unmatched-pattern"
         ],
         "src/tools/*.ts": [
             "npm run lint:schemas"

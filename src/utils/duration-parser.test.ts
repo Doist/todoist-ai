@@ -53,9 +53,9 @@ describe('parseDuration', () => {
         it('should throw error for empty or null input', () => {
             expect(() => parseDuration('')).toThrow(DurationParseError)
             expect(() => parseDuration('   ')).toThrow('Duration must be a non-empty string')
-            // biome-ignore lint/suspicious/noExplicitAny: Testing error cases with invalid types
+            // oxlint-disable-next-line @typescript-eslint/no-explicit-any -- Testing error cases with invalid types
             expect(() => parseDuration(null as any)).toThrow('Duration must be a non-empty string')
-            // biome-ignore lint/suspicious/noExplicitAny: Testing error cases with invalid types
+            // oxlint-disable-next-line @typescript-eslint/no-explicit-any -- Testing error cases with invalid types
             expect(() => parseDuration(undefined as any)).toThrow(
                 'Duration must be a non-empty string',
             )

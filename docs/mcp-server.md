@@ -34,12 +34,12 @@ This will build the project and run the MCP inspector for manual testing.
 For convenience, we also include a function that initializes an MCP Server with all the tools available:
 
 ```js
-import { getMcpServer } from "@doist/todoist-ai";
+import { getMcpServer } from '@doist/todoist-ai'
 
 async function main() {
-  const server = getMcpServer({ todoistApiKey: process.env.TODOIST_API_KEY });
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
+    const server = getMcpServer({ todoistApiKey: process.env.TODOIST_API_KEY })
+    const transport = new StdioServerTransport()
+    await server.connect(transport)
 }
 ```
 
@@ -53,16 +53,16 @@ Add this section to your `mcp.json` config in Claude, Cursor, etc.:
 
 ```json
 {
-  "mcpServers": {
-    "todoist-ai": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["@doist/todoist-ai"],
-      "env": {
-        "TODOIST_API_KEY": "your-todoist-token-here"
-      }
+    "mcpServers": {
+        "todoist-ai": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["@doist/todoist-ai"],
+            "env": {
+                "TODOIST_API_KEY": "your-todoist-token-here"
+            }
+        }
     }
-  }
 }
 ```
 
@@ -72,16 +72,16 @@ Add this `todoist-ai-tools` section to your `mcp.json` config in Cursor, Claude,
 
 ```json
 {
-  "mcpServers": {
-    "todoist-ai-tools": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["/Users/<your_user_name>/code/todoist-ai-tools/dist/main.js"],
-      "env": {
-        "TODOIST_API_KEY": "your-todoist-token-here"
-      }
+    "mcpServers": {
+        "todoist-ai-tools": {
+            "type": "stdio",
+            "command": "node",
+            "args": ["/Users/<your_user_name>/code/todoist-ai-tools/dist/main.js"],
+            "env": {
+                "TODOIST_API_KEY": "your-todoist-token-here"
+            }
+        }
     }
-  }
 }
 ```
 
@@ -127,12 +127,12 @@ TODOIST_API_KEY=your-key node dist/main-http.js
 
 ### Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `TODOIST_API_KEY` | (required) | Your Todoist API key |
-| `PORT` | `3000` | HTTP server port |
-| `SESSION_TIMEOUT_MS` | `1800000` | Session timeout in milliseconds (30 min default) |
-| `TODOIST_BASE_URL` | (optional) | Custom Todoist API base URL |
+| Variable             | Default    | Description                                      |
+| -------------------- | ---------- | ------------------------------------------------ |
+| `TODOIST_API_KEY`    | (required) | Your Todoist API key                             |
+| `PORT`               | `3000`     | HTTP server port                                 |
+| `SESSION_TIMEOUT_MS` | `1800000`  | Session timeout in milliseconds (30 min default) |
+| `TODOIST_BASE_URL`   | (optional) | Custom Todoist API base URL                      |
 
 ### Local Development
 
@@ -148,19 +148,20 @@ MCP host applications can connect via the `mcp-remote` bridge:
 
 ```json
 {
-  "mcpServers": {
-    "todoist-mcp-http": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["mcp-remote", "http://localhost:3000/mcp"]
+    "mcpServers": {
+        "todoist-mcp-http": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["mcp-remote", "http://localhost:3000/mcp"]
+        }
     }
-  }
 }
 ```
 
 ### Health Check
 
 The HTTP server exposes a health check endpoint at `/health` that returns:
+
 - Server status
 - Number of active sessions
 - Configured session timeout
@@ -174,7 +175,7 @@ curl http://localhost:3000/health
 
 ## MCP Apps (task-list) build pipeline
 
--   The task list app is built as a single HTML file in `dist/mcp-apps/index.html`.
--   The MCP server reads that HTML at startup, hashes it, and uses a `ui://...@<hash>` URI for cache-busting.
--   `npm run build` builds both the server bundle and the MCP Apps HTML.
--   `npm run dev` watches both builds and restarts the server when JS or HTML changes.
+- The task list app is built as a single HTML file in `dist/mcp-apps/index.html`.
+- The MCP server reads that HTML at startup, hashes it, and uses a `ui://...@<hash>` URI for cache-busting.
+- `npm run build` builds both the server bundle and the MCP Apps HTML.
+- `npm run dev` watches both builds and restarts the server when JS or HTML changes.

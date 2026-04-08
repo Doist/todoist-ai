@@ -209,29 +209,28 @@ describe(`${FIND_PROJECTS} tool`, () => {
                 expectedCount: 1,
                 description: 'case insensitive matching',
             },
-        ])('should handle search with $description', async ({
-            search,
-            apiProjects,
-            expectedCount,
-        }) => {
-            const mockProjects = apiProjects.map((name) => createMockProject({ name }))
-            mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse(mockProjects))
+        ])(
+            'should handle search with $description',
+            async ({ search, apiProjects, expectedCount }) => {
+                const mockProjects = apiProjects.map((name) => createMockProject({ name }))
+                mockTodoistApi.searchProjects.mockResolvedValue(createMockApiResponse(mockProjects))
 
-            const result = await findProjects.execute(
-                { searchText: search, limit: 50 },
-                mockTodoistApi,
-            )
-            expect(result.textContent).toMatchSnapshot()
+                const result = await findProjects.execute(
+                    { searchText: search, limit: 50 },
+                    mockTodoistApi,
+                )
+                expect(result.textContent).toMatchSnapshot()
 
-            // Verify structured content
-            const structuredContent = result.structuredContent
-            expect(structuredContent.projects).toHaveLength(expectedCount)
-            expect(structuredContent).toEqual(
-                expect.objectContaining({
-                    appliedFilters: expect.objectContaining({ searchText: search }),
-                }),
-            )
-        })
+                // Verify structured content
+                const structuredContent = result.structuredContent
+                expect(structuredContent.projects).toHaveLength(expectedCount)
+                expect(structuredContent).toEqual(
+                    expect.objectContaining({
+                        appliedFilters: expect.objectContaining({ searchText: search }),
+                    }),
+                )
+            },
+        )
     })
 
     describe('unrecognised color values (issue #343)', () => {

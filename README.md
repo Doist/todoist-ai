@@ -19,31 +19,31 @@ npm install @doist/todoist-ai
 Here's an example using [Vercel's AI SDK](https://ai-sdk.dev/docs/ai-sdk-core/generating-text#streamtext).
 
 ```js
-import { findTasksByDate, addTasks } from "@doist/todoist-ai";
-import { TodoistApi } from "@doist/todoist-sdk";
-import { streamText } from "ai";
+import { findTasksByDate, addTasks } from '@doist/todoist-ai'
+import { TodoistApi } from '@doist/todoist-sdk'
+import { streamText } from 'ai'
 
 // Create Todoist API client
-const client = new TodoistApi(process.env.TODOIST_API_KEY);
+const client = new TodoistApi(process.env.TODOIST_API_KEY)
 
 // Helper to wrap tools with the client
 function wrapTool(tool, todoistClient) {
     return {
         ...tool,
         execute(args) {
-            return tool.execute(args, todoistClient);
+            return tool.execute(args, todoistClient)
         },
-    };
+    }
 }
 
 const result = streamText({
     model: yourModel,
-    system: "You are a helpful Todoist assistant",
+    system: 'You are a helpful Todoist assistant',
     tools: {
         findTasksByDate: wrapTool(findTasksByDate, client),
         addTasks: wrapTool(addTasks, client),
     },
-});
+})
 ```
 
 ## Using as an MCP server
@@ -70,17 +70,18 @@ The Todoist AI MCP server is available as a streamable HTTP service for easy int
 #### Cursor
 
 Create a configuration file:
+
 - **Global:** `~/.cursor/mcp.json`
 - **Project-specific:** `.cursor/mcp.json`
 
 ```json
 {
-  "mcpServers": {
-    "todoist": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "https://ai.todoist.net/mcp"]
+    "mcpServers": {
+        "todoist": {
+            "command": "npx",
+            "args": ["-y", "mcp-remote", "https://ai.todoist.net/mcp"]
+        }
     }
-  }
 }
 ```
 
@@ -98,7 +99,6 @@ Then launch `claude`, execute `/mcp`, then select the `todoist` MCP server.
 
 This will take you through a wizard to authenticate using your browser with Todoist. Once complete you will be able to use todoist in `claude`.
 
-
 #### Visual Studio Code
 
 1. Open Command Palette → MCP: Add Server
@@ -106,12 +106,12 @@ This will take you through a wizard to authenticate using your browser with Todo
 
 ```json
 {
-  "servers": {
-    "todoist": {
-      "type": "http",
-      "url": "https://ai.todoist.net/mcp"
+    "servers": {
+        "todoist": {
+            "type": "http",
+            "url": "https://ai.todoist.net/mcp"
+        }
     }
-  }
 }
 ```
 
@@ -143,8 +143,8 @@ This server includes `search` and `fetch` tools that follow the [OpenAI MCP spec
 
 ## Dependencies
 
--   MCP server using the official [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/typescript-sdk?tab=readme-ov-file#installation)
--   Todoist Typescript API client [@doist/todoist-sdk](https://github.com/Doist/todoist-sdk)
+- MCP server using the official [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/typescript-sdk?tab=readme-ov-file#installation)
+- Todoist Typescript API client [@doist/todoist-sdk](https://github.com/Doist/todoist-sdk)
 
 ## MCP Server Setup
 
@@ -193,7 +193,6 @@ This project uses [release-please](https://github.com/googleapis/release-please)
 ### How it works
 
 1. Make your changes using [Conventional Commits](https://www.conventionalcommits.org/):
-
     - `feat:` for new features (minor version bump)
     - `fix:` for bug fixes (patch version bump)
     - `feat!:` or `fix!:` for breaking changes (major version bump)
@@ -202,7 +201,6 @@ This project uses [release-please](https://github.com/googleapis/release-please)
     - `ci:` for CI changes
 
 2. When commits are pushed to `main`:
-
     - Release-please automatically creates/updates a release PR
     - The PR includes version bump and changelog updates
     - Review the PR and merge when ready
