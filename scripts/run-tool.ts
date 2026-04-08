@@ -26,8 +26,8 @@ import { addTasks } from '../src/tools/add-tasks.js'
 import { analyzeProjectHealth } from '../src/tools/analyze-project-health.js'
 import { completeTasks } from '../src/tools/complete-tasks.js'
 import { deleteObject } from '../src/tools/delete-object.js'
-import { fetch } from '../src/tools/fetch.js'
 import { fetchObject } from '../src/tools/fetch-object.js'
+import { fetch } from '../src/tools/fetch.js'
 import { findActivity } from '../src/tools/find-activity.js'
 import { findComments } from '../src/tools/find-comments.js'
 import { findCompletedTasks } from '../src/tools/find-completed-tasks.js'
@@ -36,8 +36,8 @@ import { findLabels } from '../src/tools/find-labels.js'
 import { findProjectCollaborators } from '../src/tools/find-project-collaborators.js'
 import { findProjects } from '../src/tools/find-projects.js'
 import { findSections } from '../src/tools/find-sections.js'
-import { findTasks } from '../src/tools/find-tasks.js'
 import { findTasksByDate } from '../src/tools/find-tasks-by-date.js'
+import { findTasks } from '../src/tools/find-tasks.js'
 import { getOverview } from '../src/tools/get-overview.js'
 import { getProjectActivityStats } from '../src/tools/get-project-activity-stats.js'
 import { getProjectHealth } from '../src/tools/get-project-health.js'
@@ -65,7 +65,7 @@ type ExecutableTool = {
     name: string
     description: string
     execute: (
-        // biome-ignore lint/suspicious/noExplicitAny: tools have varying parameter schemas
+        // oxlint-disable-next-line @typescript-eslint/no-explicit-any -- tools have varying parameter schemas
         args: any,
         client: TodoistApi,
     ) => Promise<{ textContent?: string; structuredContent?: unknown; contentItems?: unknown[] }>

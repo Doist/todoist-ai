@@ -26,7 +26,7 @@ We use **specialized workflow tools** instead of 30+ API-endpoint tools.
 return {
     textContent: `Action completed: ${result}\n${formatNextSteps(suggestions)}`,
     structuredContent: { data, metadata },
-};
+}
 ```
 
 ## Key Design Decisions
@@ -42,37 +42,37 @@ return {
 
 ### When to Create New Tool
 
--   Represents distinct user workflow
--   Can't elegantly extend existing tools
--   Has unique parameter requirements
+- Represents distinct user workflow
+- Can't elegantly extend existing tools
+- Has unique parameter requirements
 
 ### When to Extend Existing Tool
 
--   Closely related to existing tool's purpose
--   Can be handled with additional parameters
--   Follows same workflow pattern
+- Closely related to existing tool's purpose
+- Can be handled with additional parameters
+- Follows same workflow pattern
 
 ### Naming & Design
 
--   **Action verbs**: `find-`, `add-`, `manage-`, `complete-`
--   **User terminology**: `complete-tasks` not `close-tasks`
--   **Batch support**: When users commonly do multiple items
--   **Smart defaults**: Optional parameters, auto-detect intent
--   **Rich responses**: Structured data + human text + next steps
+- **Action verbs**: `find-`, `add-`, `manage-`, `complete-`
+- **User terminology**: `complete-tasks` not `close-tasks`
+- **Batch support**: When users commonly do multiple items
+- **Smart defaults**: Optional parameters, auto-detect intent
+- **Rich responses**: Structured data + human text + next steps
 
 ## OpenAI MCP Tools
 
 **Exception to the Design Philosophy**: The `search` and `fetch` tools follow the [OpenAI MCP specification](https://platform.openai.com/docs/mcp) which requires specific return formats:
 
--   **`search`**: Returns JSON-encoded array of results with `id`, `title`, `url`
--   **`fetch`**: Returns JSON-encoded object with `id`, `title`, `text`, `url`, `metadata`
+- **`search`**: Returns JSON-encoded array of results with `id`, `title`, `url`
+- **`fetch`**: Returns JSON-encoded object with `id`, `title`, `text`, `url`, `metadata`
 
 These tools return raw JSON strings instead of rich responses with next steps, as required by OpenAI's protocol. They use composite IDs (`task:{id}` or `project:{id}`) to distinguish between entity types.
 
 ## Anti-Patterns ❌
 
--   One-to-one API mapping without added value
--   Overly complex parameters for basic operations
--   Inconsistent interfaces across similar tools
--   Raw API responses without context
--   Forcing multiple tool calls for related operations
+- One-to-one API mapping without added value
+- Overly complex parameters for basic operations
+- Inconsistent interfaces across similar tools
+- Raw API responses without context
+- Forcing multiple tool calls for related operations

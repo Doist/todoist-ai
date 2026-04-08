@@ -2,11 +2,11 @@
 
 The `search` tool is responsible for returning a list of relevant search results from your MCP server's data source, given a user's query.
 
-*Arguments:*
+_Arguments:_
 
 A single query string.
 
-*Returns:*
+_Returns:_
 
 An object with a single key, `results`, whose value is an array of result objects. Each result object should include:
 
@@ -25,12 +25,12 @@ The final tool response should look like:
 
 ```json
 {
-  "content": [
-    {
-      "type": "text",
-      "text": "{\"results\":[{\"id\":\"doc-1\",\"title\":\"...\",\"url\":\"...\"}]}"
-    }
-  ]
+    "content": [
+        {
+            "type": "text",
+            "text": "{\"results\":[{\"id\":\"doc-1\",\"title\":\"...\",\"url\":\"...\"}]}"
+        }
+    ]
 }
 ```
 
@@ -38,11 +38,11 @@ The final tool response should look like:
 
 The fetch tool is used to retrieve the full contents of a search result document or item.
 
-*Arguments:*
+_Arguments:_
 
 A string which is a unique identifier for the search document.
 
-*Returns:*
+_Returns:_
 
 A single object with the following properties:
 
@@ -60,11 +60,11 @@ The final tool response should look like:
 
 ```json
 {
-  "content": [
-    {
-      "type": "text",
-      "text": "{\"id\":\"doc-1\",\"title\":\"...\",\"text\":\"full text...\",\"url\":\"...\"}"
-    }
-  ]
+    "content": [
+        {
+            "type": "text",
+            "text": "{\"id\":\"doc-1\",\"title\":\"...\",\"text\":\"full text...\",\"url\":\"...\"}"
+        }
+    ]
 }
 ```

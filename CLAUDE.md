@@ -7,16 +7,17 @@
 When you need to support clearing an optional field:
 
 1. **Use a special string value** (not `null` - avoids LLM provider compatibility issues, with Gemini in particular)
-   - For assignments: use `"unassign"`
-   - For other fields: use `"remove"` or similar descriptive string
+    - For assignments: use `"unassign"`
+    - For other fields: use `"remove"` or similar descriptive string
 
 2. **Handle both legacy and new patterns in runtime logic** for backward compatibility:
-   ```typescript
-   if (fieldValue === null || fieldValue === 'remove') {
-       // Convert to null for API call
-       updateArgs = { ...updateArgs, fieldName: null }
-   }
-   ```
+
+    ```typescript
+    if (fieldValue === null || fieldValue === 'remove') {
+        // Convert to null for API call
+        updateArgs = { ...updateArgs, fieldName: null }
+    }
+    ```
 
 3. **Update schema description** to document the special string value
 
@@ -60,6 +61,7 @@ npx tsx scripts/run-tool.ts --list  # list all tools
 ```
 
 Examples:
+
 ```bash
 npx tsx scripts/run-tool.ts add-tasks '{"tasks":[{"content":"Test task"}]}'
 npx tsx scripts/run-tool.ts find-tasks '{"searchText":"meeting"}'

@@ -1,63 +1,63 @@
 name: Test
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
 
 # Only a single workflow will run at a time. Cancel any in-progress run.
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
 
 jobs:
-  test:
-    timeout-minutes: 60
-    runs-on: ubicloud # `ubuntu-latest` is the official drop-in replacement
+    test:
+        timeout-minutes: 60
+        runs-on: ubicloud # `ubuntu-latest` is the official drop-in replacement
 
-    services:
-      memcached:
-        image: memcached:1.6-alpine
-        ports:
-          - 11211:11211
-        options: >-
-          --health-cmd "echo 'stats' | nc localhost 11211"
+        services:
+            memcached:
+                image: memcached:1.6-alpine
+                ports:
+                    - 11211:11211
+                options: >-
+                    --health-cmd "echo 'stats' | nc localhost 11211"
 
-    env:
-      MEMCACHED_HOST: localhost
-      MEMCACHED_PORT: 11211
-
-      NODE_ENV: test
-      CI: true
-
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          lfs: true
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: ".nvmrc"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run unit tests
-        run: npm run test
-
-      - name: Run type checks
-        run: npm run type-check
-
-      - name: Run linting checks
-        run: npm run lint:check && npm run format:check
-
-      - name: Validate tool schemas
-        run: npm run lint:schemas
-
-      - name: Test MCP server executable
-        run: npm run test:executable
         env:
-          TODOIST_API_KEY: fake-api-key-for-testing
+            MEMCACHED_HOST: localhost
+            MEMCACHED_PORT: 11211
+
+            NODE_ENV: test
+            CI: true
+
+        steps:
+            - uses: actions/checkout@v5
+              with:
+                  lfs: true
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run unit tests
+              run: npm run test
+
+            - name: Run type checks
+              run: npm run type-check
+
+            - name: Run linting and formatting checks
+              run: npm run format:check
+
+            - name: Validate tool schemas
+              run: npm run lint:schemas
+
+            - name: Test MCP server executable
+              run: npm run test:executable
+              env:
+                  TODOIST_API_KEY: fake-api-key-for-testing

@@ -1,7 +1,7 @@
 import { convertPriorityToNumber } from '../../utils/priorities.js'
 import { TaskListItem } from './task-item'
-import styles from './task-list.module.css'
 import type { Task } from './types'
+import styles from './task-list.module.css'
 
 type Props = {
     tasks: Task[]

@@ -6,8 +6,8 @@ import { ToolNames } from '../../utils/tool-names.js'
 import { Empty } from './empty'
 import { Loading } from './loading'
 import { TaskList } from './task-list'
-import styles from './task-list.module.css'
 import type { Task } from './types'
+import styles from './task-list.module.css'
 
 type FindTasksByDateArgs = z.input<z.ZodObject<typeof ArgsSchema>>
 

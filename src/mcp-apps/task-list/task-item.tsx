@@ -56,11 +56,7 @@ function TaskContent({ content }: { content: string }) {
     }, [content])
 
     return (
-        <div
-            className={styles.taskContent}
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized with DOMPurify
-            dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
-        />
+        <div className={styles.taskContent} dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />
     )
 }
 

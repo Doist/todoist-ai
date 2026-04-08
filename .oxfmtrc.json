@@ -1,0 +1,19 @@
+{
+    "useTabs": false,
+    "tabWidth": 4,
+    "printWidth": 100,
+    "singleQuote": true,
+    "jsxSingleQuote": false,
+    "quoteProps": "as-needed",
+    "trailingComma": "all",
+    "semi": false,
+    "arrowParens": "always",
+    "bracketSameLine": false,
+    "bracketSpacing": true,
+    "singleAttributePerLine": false,
+    "sortImports": {
+        "newlinesBetween": false,
+        "partitionByNewline": true
+    },
+    "ignorePatterns": ["**/package.json", "CHANGELOG.md"]
+}

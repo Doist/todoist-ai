@@ -128,7 +128,7 @@ function generateTextContent({
     return summary
 }
 
-function getSkipReason({ id, ...otherUpdateArgs }: ProjectUpdate): SkipReason | null {
+function getSkipReason({ id: _id, ...otherUpdateArgs }: ProjectUpdate): SkipReason | null {
     const values = Object.values(otherUpdateArgs)
     if (values.length === 0) return 'no-fields'
     if (values.every((v) => v === undefined)) return 'no-valid-values'

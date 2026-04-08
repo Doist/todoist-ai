@@ -6,6 +6,7 @@ import {
 } from '../productivity-analysis.js'
 
 function getPromptText(result: GetPromptResult): string {
+    // oxlint-disable-next-line no-unsafe-optional-chaining -- test helper, messages always present
     return (result.messages[0]?.content as { type: 'text'; text: string }).text
 }
 
@@ -107,26 +108,24 @@ describe('productivity-analysis prompt', () => {
                 excludes: ['### Goal Tracking', '### Completion Trends'],
                 includesOverview: false,
             },
-        ])('should include correct sections for "$focus" focus', ({
-            focus,
-            includes,
-            excludes,
-            includesOverview,
-        }) => {
-            const text = buildPromptText({ period: '7d', focus })
+        ])(
+            'should include correct sections for "$focus" focus',
+            ({ focus, includes, excludes, includesOverview }) => {
+                const text = buildPromptText({ period: '7d', focus })
 
-            for (const section of includes) {
-                expect(text).toContain(section)
-            }
-            for (const section of excludes) {
-                expect(text).not.toContain(section)
-            }
-            if (includesOverview) {
-                expect(text).toContain('get-overview')
-            } else {
-                expect(text).not.toContain('get-overview')
-            }
-        })
+                for (const section of includes) {
+                    expect(text).toContain(section)
+                }
+                for (const section of excludes) {
+                    expect(text).not.toContain(section)
+                }
+                if (includesOverview) {
+                    expect(text).toContain('get-overview')
+                } else {
+                    expect(text).not.toContain('get-overview')
+                }
+            },
+        )
     })
 
     describe('computeDateRange', () => {
@@ -189,19 +188,16 @@ describe('productivity-analysis prompt', () => {
                 until: '2026-03-17',
                 descriptionContains: 'this month',
             },
-        ])('should compute "$period" period ($since to $until)', ({
-            period,
-            date,
-            since,
-            until,
-            descriptionContains,
-        }) => {
-            const range = computeDateRange(period, date)
+        ])(
+            'should compute "$period" period ($since to $until)',
+            ({ period, date, since, until, descriptionContains }) => {
+                const range = computeDateRange(period, date)
 
-            expect(range.since).toBe(since)
-            expect(range.until).toBe(until)
-            expect(range.periodDescription).toContain(descriptionContains)
-        })
+                expect(range.since).toBe(since)
+                expect(range.until).toBe(until)
+                expect(range.periodDescription).toContain(descriptionContains)
+            },
+        )
 
         it('should embed date range in the prompt text', () => {
             const text = buildPromptText({ period: '7d', focus: 'overall' })
