@@ -185,6 +185,12 @@ function destinationKey(task: z.infer<typeof TaskSchema>): string {
 }
 
 async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi): Promise<Task> {
+    // Strip empty strings from optional fields — LLMs often send "" instead of omitting,
+    // but the Todoist API rejects empty strings for fields like sectionId, parentId, etc.
+    const sanitizedTask = Object.fromEntries(
+        Object.entries(task).map(([key, value]) => [key, value === '' ? undefined : value]),
+    ) as z.infer<typeof TaskSchema>
+
     const {
         duration: durationStr,
         projectId,
@@ -196,7 +202,7 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
         labels,
         deadlineDate,
         ...otherTaskArgs
-    } = task
+    } = sanitizedTask
 
     // Strip "inbox" — the API defaults to inbox when no projectId is provided
     const resolvedProjectId = isInboxProjectId(projectId) ? undefined : projectId

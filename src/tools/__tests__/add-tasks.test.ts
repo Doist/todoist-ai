@@ -917,6 +917,59 @@ describe(`${ADD_TASKS} tool`, () => {
         })
     })
 
+    describe('empty string sanitization', () => {
+        it('should strip empty strings from optional fields before calling the API', async () => {
+            const mockApiResponse: Task = createMockTask({
+                id: '8485094010',
+                content: 'Test',
+            })
+
+            mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
+
+            // This is the exact input shape LLMs often send — empty strings for all optional fields
+            const result = await addTasks.execute(
+                {
+                    tasks: [
+                        {
+                            content: 'Test',
+                            description: '',
+                            priority: 'p4',
+                            dueString: '',
+                            deadlineDate: '',
+                            duration: '',
+                            labels: [],
+                            projectId: '',
+                            sectionId: '',
+                            parentId: '',
+                            order: 0,
+                            responsibleUser: '',
+                            isUncompletable: false,
+                        },
+                    ],
+                },
+                mockTodoistApi,
+            )
+
+            // Empty strings should be stripped to undefined, not passed to the API
+            // priority 'p4' is valid (not empty) so it gets converted to numeric 1
+            expect(mockTodoistApi.addTask).toHaveBeenCalledWith({
+                content: 'Test',
+                description: undefined,
+                priority: convertPriorityToNumber('p4'),
+                dueString: undefined,
+                deadlineDate: undefined,
+                labels: [],
+                projectId: undefined,
+                sectionId: undefined,
+                parentId: undefined,
+                order: 0,
+                isUncompletable: false,
+            })
+
+            expect(result.structuredContent.successCount).toBe(1)
+        })
+    })
+
     describe('batch limits', () => {
         it('should export MAX_TASKS_PER_OPERATION constant', () => {
             expect(MAX_TASKS_PER_OPERATION).toBe(25)
