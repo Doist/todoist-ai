@@ -80,10 +80,10 @@ const addTasks = {
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
-    async execute({ tasks: rawTasks }, client) {
-        // Parse tasks through the schema to ensure transforms run (e.g., empty string stripping)
+    async execute(args, client) {
+        // Parse through the schema to ensure transforms run (e.g., empty string stripping)
         // even when execute() is called directly without MCP server parsing
-        const tasks = rawTasks.map((t) => TaskSchema.parse(t))
+        const { tasks } = z.object(ArgsSchema).parse(args)
         // Group tasks by destination to preserve sibling order within each group,
         // while parallelizing across different destinations
         const groups = new Map<string, Array<{ task: (typeof tasks)[number]; index: number }>>()
