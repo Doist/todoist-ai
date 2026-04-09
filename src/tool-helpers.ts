@@ -1,16 +1,18 @@
-import type {
-    ActivityEvent,
-    ColorKey,
-    Comment,
-    CurrentUser,
-    Label,
-    MoveTaskArgs,
-    PersonalProject,
-    Reminder,
-    Section,
-    Task,
-    TodoistApi,
-    WorkspaceProject,
+import {
+    isPersonalProject,
+    isWorkspaceProject,
+    type ActivityEvent,
+    type ColorKey,
+    type Comment,
+    type CurrentUser,
+    type Label,
+    type MoveTaskArgs,
+    type PersonalProject,
+    type Reminder,
+    type Section,
+    type Task,
+    type TodoistApi,
+    type WorkspaceProject,
 } from '@doist/todoist-sdk'
 import z from 'zod'
 import { ApiLimits } from './utils/constants.js'
@@ -28,14 +30,7 @@ export {
 } from './filter-helpers.js'
 
 export type Project = PersonalProject | WorkspaceProject
-
-export function isPersonalProject(project: Project): project is PersonalProject {
-    return 'inboxProject' in project
-}
-
-export function isWorkspaceProject(project: Project): project is WorkspaceProject {
-    return 'workspaceId' in project
-}
+export { isPersonalProject, isWorkspaceProject }
 
 /**
  * Checks if a project ID represents the inbox (case-insensitive).

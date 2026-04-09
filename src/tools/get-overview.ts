@@ -1,7 +1,12 @@
-import type { Section, TodoistApi } from '@doist/todoist-sdk'
+import {
+    isPersonalProject,
+    isWorkspaceProject,
+    type Section,
+    type TodoistApi,
+} from '@doist/todoist-sdk'
 import { z } from 'zod'
 import type { TodoistTool } from '../todoist-tool.js'
-import { isPersonalProject, isWorkspaceProject, mapTask, type Project } from '../tool-helpers.js'
+import { mapTask, type Project } from '../tool-helpers.js'
 import { ApiLimits } from '../utils/constants.js'
 import { ToolNames } from '../utils/tool-names.js'
 
@@ -289,7 +294,9 @@ function buildProjectStructure(
         folderId: isWorkspaceProject(project) ? (project.folderId ?? undefined) : undefined,
         childOrder: project.childOrder,
         sections: sectionsByProject[project.id] || [],
-        children: project.children.map((child) => buildProjectStructure(child, sectionsByProject)),
+        children: project.children.map((child: ProjectWithChildren) =>
+            buildProjectStructure(child, sectionsByProject),
+        ),
     }
 }
 

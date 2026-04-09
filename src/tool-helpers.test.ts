@@ -1,10 +1,8 @@
-import type { PersonalProject, Section, TodoistApi, WorkspaceProject } from '@doist/todoist-sdk'
+import type { PersonalProject, Section, TodoistApi } from '@doist/todoist-sdk'
 import { type Mocked, vi } from 'vitest'
 import {
     createMoveTaskArgs,
     fetchAllPages,
-    isPersonalProject,
-    isWorkspaceProject,
     mapProject,
     mapTask,
     searchAllProjects,
@@ -219,39 +217,6 @@ End of description.`)
                 folderId: 'folder-42',
                 childOrder: 5,
             })
-        })
-    })
-
-    describe('type guards', () => {
-        it('should correctly identify personal projects', () => {
-            const personalProject = {
-                id: 'proj-1',
-                name: 'Personal',
-                color: 'blue',
-                isFavorite: false,
-                isShared: false,
-                parentId: null,
-                inboxProject: true,
-                viewStyle: 'list',
-            } as unknown as PersonalProject
-
-            expect(isPersonalProject(personalProject)).toBe(true)
-            expect(isWorkspaceProject(personalProject)).toBe(false)
-        })
-
-        it('should correctly identify workspace projects', () => {
-            const workspaceProject = {
-                id: 'proj-2',
-                name: 'Workspace',
-                color: 'red',
-                isFavorite: false,
-                isShared: true,
-                viewStyle: 'board',
-                workspaceId: TEST_IDS.WORKSPACE_1,
-            } as unknown as WorkspaceProject
-
-            expect(isWorkspaceProject(workspaceProject)).toBe(true)
-            expect(isPersonalProject(workspaceProject)).toBe(false)
         })
     })
 
