@@ -11,6 +11,7 @@ import {
     PrioritySchema,
 } from '../utils/priorities.js'
 import { summarizeBatch, summarizeTaskOperation } from '../utils/response-builders.js'
+import { optionalString } from '../utils/schema-helpers.js'
 import { ToolNames } from '../utils/tool-names.js'
 
 // Maximum tasks per operation to prevent abuse and timeouts
@@ -23,45 +24,30 @@ const TaskSchema = z.object({
         .describe(
             'The task name/title. Should be concise and actionable (e.g., "Review PR #123", "Call dentist"). For longer content, use the description field instead. Supports Markdown.',
         ),
-    description: z
-        .string()
-        .optional()
-        .describe(
-            'Additional details, notes, or context for the task. Use this for longer content rather than putting it in the task name. Supports Markdown.',
-        ),
+    description: optionalString(
+        'Additional details, notes, or context for the task. Use this for longer content rather than putting it in the task name. Supports Markdown.',
+    ),
     priority: PrioritySchema.optional().describe(PRIORITY_INPUT_DESCRIPTION),
-    dueString: z.string().optional().describe('The due date for the task, in natural language.'),
-    deadlineDate: z
-        .string()
-        .optional()
-        .describe(
-            'The deadline date for the task in ISO 8601 format (YYYY-MM-DD, e.g., "2025-12-31"). Deadlines are immovable constraints shown with a different indicator than due dates.',
-        ),
-    duration: z
-        .string()
-        .optional()
-        .describe(
-            'The duration of the task. Use format: "2h" (hours), "90m" (minutes), "2h30m" (combined), or "1.5h" (decimal hours). Max 24h.',
-        ),
+    dueString: optionalString('The due date for the task, in natural language.'),
+    deadlineDate: optionalString(
+        'The deadline date for the task in ISO 8601 format (YYYY-MM-DD, e.g., "2025-12-31"). Deadlines are immovable constraints shown with a different indicator than due dates.',
+    ),
+    duration: optionalString(
+        'The duration of the task. Use format: "2h" (hours), "90m" (minutes), "2h30m" (combined), or "1.5h" (decimal hours). Max 24h.',
+    ),
     labels: z.array(z.string()).optional().describe('The labels to attach to the task.'),
-    projectId: z
-        .string()
-        .optional()
-        .describe(
-            'The project ID to add this task to. Project ID should be an ID string, or the text "inbox", for inbox tasks.',
-        ),
-    sectionId: z.string().optional().describe('The section ID to add this task to.'),
-    parentId: z.string().optional().describe('The parent task ID (for subtasks).'),
+    projectId: optionalString(
+        'The project ID to add this task to. Project ID should be an ID string, or the text "inbox", for inbox tasks.',
+    ),
+    sectionId: optionalString('The section ID to add this task to.'),
+    parentId: optionalString('The parent task ID (for subtasks).'),
     order: z
         .number()
         .optional()
         .describe('Position of the task among sibling tasks under the same parent/section.'),
-    responsibleUser: z
-        .string()
-        .optional()
-        .describe(
-            'Assign task to this user. Can be "me" (assigns to current user), a user ID, name, or email address. User must be a collaborator on the target project.',
-        ),
+    responsibleUser: optionalString(
+        'Assign task to this user. Can be "me" (assigns to current user), a user ID, name, or email address. User must be a collaborator on the target project.',
+    ),
     isUncompletable: z
         .boolean()
         .optional()
@@ -94,7 +80,10 @@ const addTasks = {
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
-    async execute({ tasks }, client) {
+    async execute(args, client) {
+        // Parse through the schema to ensure transforms run (e.g., empty string stripping)
+        // even when execute() is called directly without MCP server parsing
+        const { tasks } = z.object(ArgsSchema).parse(args)
         // Group tasks by destination to preserve sibling order within each group,
         // while parallelizing across different destinations
         const groups = new Map<string, Array<{ task: (typeof tasks)[number]; index: number }>>()
@@ -185,12 +174,6 @@ function destinationKey(task: z.infer<typeof TaskSchema>): string {
 }
 
 async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi): Promise<Task> {
-    // Strip empty strings from optional fields — LLMs often send "" instead of omitting,
-    // but the Todoist API rejects empty strings for fields like sectionId, parentId, etc.
-    const sanitizedTask = Object.fromEntries(
-        Object.entries(task).map(([key, value]) => [key, value === '' ? undefined : value]),
-    ) as z.infer<typeof TaskSchema>
-
     const {
         duration: durationStr,
         projectId,
@@ -202,7 +185,7 @@ async function processTask(task: z.infer<typeof TaskSchema>, client: TodoistApi)
         labels,
         deadlineDate,
         ...otherTaskArgs
-    } = sanitizedTask
+    } = task
 
     // Strip "inbox" — the API defaults to inbox when no projectId is provided
     const resolvedProjectId = isInboxProjectId(projectId) ? undefined : projectId

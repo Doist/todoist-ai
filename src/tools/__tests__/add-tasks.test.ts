@@ -500,12 +500,12 @@ describe(`${ADD_TASKS} tool`, () => {
         })
 
         it('should throw error when single task fails (all-fail case)', async () => {
-            const apiError = new Error('API Error: Task content is required')
+            const apiError = new Error('API Error: Bad Request')
             mockTodoistApi.addTask.mockRejectedValue(apiError)
 
             await expect(
                 addTasks.execute(
-                    { tasks: [{ content: '', projectId: '6cfCcrrCFg2xP94Q' }] },
+                    { tasks: [{ content: 'Test task', projectId: '6cfCcrrCFg2xP94Q' }] },
                     mockTodoistApi,
                 ),
             ).rejects.toThrow(apiError.message)
