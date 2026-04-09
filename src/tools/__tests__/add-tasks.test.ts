@@ -938,7 +938,7 @@ describe(`${ADD_TASKS} tool`, () => {
                             deadlineDate: '',
                             duration: '',
                             labels: [],
-                            projectId: 'inbox',
+                            projectId: '',
                             sectionId: '',
                             parentId: '',
                             order: 0,
