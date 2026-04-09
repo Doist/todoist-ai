@@ -7,9 +7,10 @@ import { z } from 'zod'
  *
  * `.optional()` must be outermost so the field stays optional in `z.infer` output types.
  */
-export const optionalString = (description: string) =>
-    z
+export function optionalString(description: string) {
+    return z
         .string()
         .transform((v) => (v === '' ? undefined : v))
         .optional()
         .describe(description)
+}
