@@ -1,3 +1,9 @@
+## [8.8.6](https://github.com/Doist/todoist-ai/compare/v8.8.5...v8.8.6) (2026-04-09)
+
+### Bug Fixes
+
+* prevent deletion of unarchived workspace projects ([#447](https://github.com/Doist/todoist-ai/issues/447)) ([7bdfff8](https://github.com/Doist/todoist-ai/commit/7bdfff8006c1a8ac2f4b0f95af72ef6fd2d05e21))
+
 ## [8.8.5](https://github.com/Doist/todoist-ai/compare/v8.8.4...v8.8.5) (2026-04-05)
 
 ### Bug Fixes
