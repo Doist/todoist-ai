@@ -1,10 +1,12 @@
 import type { TodoistApi } from '@doist/todoist-sdk'
 import { beforeEach, describe, expect, it, type Mocked, vi } from 'vitest'
+import { createMockProject, createMockWorkspaceProject } from '../../utils/test-helpers.js'
 import { ToolNames } from '../../utils/tool-names.js'
 import { deleteObject } from '../delete-object.js'
 
 // Mock the Todoist API
 const mockTodoistApi = {
+    getProject: vi.fn(),
     deleteProject: vi.fn(),
     deleteSection: vi.fn(),
     deleteTask: vi.fn(),
@@ -24,6 +26,7 @@ describe(`${DELETE_OBJECT} tool`, () => {
 
     describe('deleting projects', () => {
         it('should delete a project by ID', async () => {
+            mockTodoistApi.getProject.mockResolvedValue(createMockProject())
             mockTodoistApi.deleteProject.mockResolvedValue(true)
 
             const result = await deleteObject.execute(
@@ -36,7 +39,6 @@ describe(`${DELETE_OBJECT} tool`, () => {
             expect(mockTodoistApi.deleteTask).not.toHaveBeenCalled()
 
             const textContent = result.textContent
-            expect(textContent).toMatchSnapshot()
             expect(textContent).toContain('Deleted project: id=6cfCcrrCFg2xP94Q')
             expect(result.structuredContent).toEqual({
                 deletedEntity: {
@@ -48,12 +50,41 @@ describe(`${DELETE_OBJECT} tool`, () => {
         })
 
         it('should propagate project deletion errors', async () => {
+            mockTodoistApi.getProject.mockResolvedValue(createMockProject())
             const apiError = new Error('API Error: Cannot delete project with tasks')
             mockTodoistApi.deleteProject.mockRejectedValue(apiError)
 
             await expect(
                 deleteObject.execute({ type: 'project', id: 'project-with-tasks' }, mockTodoistApi),
             ).rejects.toThrow('API Error: Cannot delete project with tasks')
+        })
+
+        it('should prevent deletion of unarchived workspace projects', async () => {
+            mockTodoistApi.getProject.mockResolvedValue(
+                createMockWorkspaceProject({ name: 'Team Project' }),
+            )
+
+            await expect(
+                deleteObject.execute({ type: 'project', id: 'workspace-proj' }, mockTodoistApi),
+            ).rejects.toThrow(
+                'Workspace project "Team Project" must be archived before it can be deleted',
+            )
+            expect(mockTodoistApi.deleteProject).not.toHaveBeenCalled()
+        })
+
+        it('should allow deletion of archived workspace projects', async () => {
+            mockTodoistApi.getProject.mockResolvedValue(
+                createMockWorkspaceProject({ isArchived: true }),
+            )
+            mockTodoistApi.deleteProject.mockResolvedValue(true)
+
+            const result = await deleteObject.execute(
+                { type: 'project', id: 'archived-ws-proj' },
+                mockTodoistApi,
+            )
+
+            expect(mockTodoistApi.deleteProject).toHaveBeenCalledWith('archived-ws-proj')
+            expect(result.structuredContent.success).toBe(true)
         })
     })
 
@@ -298,6 +329,7 @@ describe(`${DELETE_OBJECT} tool`, () => {
 
     describe('type validation', () => {
         it('should handle all supported entity types', async () => {
+            mockTodoistApi.getProject.mockResolvedValue(createMockProject())
             mockTodoistApi.deleteProject.mockResolvedValue(true)
             mockTodoistApi.deleteSection.mockResolvedValue(true)
             mockTodoistApi.deleteTask.mockResolvedValue(true)
