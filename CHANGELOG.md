@@ -1,3 +1,9 @@
+## [8.8.7](https://github.com/Doist/todoist-ai/compare/v8.8.6...v8.8.7) (2026-04-09)
+
+### Bug Fixes
+
+* strip empty strings from add-tasks optional fields ([#448](https://github.com/Doist/todoist-ai/issues/448)) ([4f4244f](https://github.com/Doist/todoist-ai/commit/4f4244fc39a63bc4d18249539506ae171d91d7b1))
+
 ## [8.8.6](https://github.com/Doist/todoist-ai/compare/v8.8.5...v8.8.6) (2026-04-09)
 
 ### Bug Fixes
