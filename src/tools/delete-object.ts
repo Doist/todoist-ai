@@ -38,7 +38,7 @@ const deleteObject = {
     annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
     async execute(args, client) {
         switch (args.type) {
-            case 'project':
+            case 'project': {
                 const project = await client.getProject(args.id)
                 if (isWorkspaceProject(project) && !project.isArchived) {
                     throw new Error(
@@ -47,6 +47,7 @@ const deleteObject = {
                 }
                 await client.deleteProject(args.id)
                 break
+            }
             case 'section':
                 await client.deleteSection(args.id)
                 break
