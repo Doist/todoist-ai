@@ -1,3 +1,9 @@
+## [8.8.8](https://github.com/Doist/todoist-ai/compare/v8.8.7...v8.8.8) (2026-04-10)
+
+### Bug Fixes
+
+* return HTTP 401 for invalid Todoist API tokens in HTTP transport ([#450](https://github.com/Doist/todoist-ai/issues/450)) ([b20eb96](https://github.com/Doist/todoist-ai/commit/b20eb96bbf3b179abe63c39b8118aca26bf4d1b4))
+
 ## [8.8.7](https://github.com/Doist/todoist-ai/compare/v8.8.6...v8.8.7) (2026-04-09)
 
 ### Bug Fixes
