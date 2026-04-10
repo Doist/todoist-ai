@@ -38,22 +38,43 @@ type CacheEntry = {
 
 const DEFAULT_STATIC_TTL_MS = 300_000 // 5 minutes
 const DEFAULT_DYNAMIC_TTL_MS = 120_000 // 2 minutes
+const MAX_CACHE_SIZE = 10_000
 
 const cache = new Map<string, CacheEntry>()
 
-function getCachedResult(apiKey: string): boolean | undefined {
-    const entry = cache.get(apiKey)
+function makeCacheKey(apiKey: string, baseUrl?: string): string {
+    return baseUrl ? `${apiKey}::${baseUrl}` : apiKey
+}
+
+function pruneExpiredEntries(): void {
+    const now = Date.now()
+    for (const [key, entry] of cache) {
+        if (now >= entry.expiresAt) {
+            cache.delete(key)
+        }
+    }
+}
+
+function getCachedResult(cacheKey: string): boolean | undefined {
+    const entry = cache.get(cacheKey)
     if (entry && Date.now() < entry.expiresAt) {
         return entry.valid
     }
     if (entry) {
-        cache.delete(apiKey)
+        cache.delete(cacheKey)
     }
     return undefined
 }
 
-function setCachedResult(apiKey: string, valid: boolean, ttlMs: number): void {
-    cache.set(apiKey, { valid, expiresAt: Date.now() + ttlMs })
+function setCachedResult(cacheKey: string, valid: boolean, ttlMs: number): void {
+    if (cache.size >= MAX_CACHE_SIZE) {
+        pruneExpiredEntries()
+    }
+    // If still at capacity after pruning, clear everything
+    if (cache.size >= MAX_CACHE_SIZE) {
+        cache.clear()
+    }
+    cache.set(cacheKey, { valid, expiresAt: Date.now() + ttlMs })
 }
 
 function buildWwwAuthenticateHeader(resourceMetadataUrl?: string): string {
@@ -89,7 +110,8 @@ function requireValidTodoistToken(options: RequireValidTodoistTokenOptions): Req
             return
         }
 
-        const cached = getCachedResult(apiKey)
+        const cacheKey = makeCacheKey(apiKey, options.baseUrl)
+        const cached = getCachedResult(cacheKey)
         if (cached !== undefined) {
             if (cached) {
                 next()
@@ -101,7 +123,7 @@ function requireValidTodoistToken(options: RequireValidTodoistTokenOptions): Req
 
         try {
             const valid = await validateTodoistToken(apiKey, options.baseUrl)
-            setCachedResult(apiKey, valid, ttlMs)
+            setCachedResult(cacheKey, valid, ttlMs)
 
             if (valid) {
                 next()

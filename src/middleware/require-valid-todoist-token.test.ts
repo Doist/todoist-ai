@@ -186,6 +186,27 @@ describe('requireValidTodoistToken', () => {
 
             vi.useRealTimers()
         })
+
+        it('should use separate cache entries for different baseUrls', async () => {
+            mockValidate.mockResolvedValue(true)
+            const middleware1 = requireValidTodoistToken({
+                type: 'static',
+                apiKey: 'same-key',
+                baseUrl: 'https://api.todoist.com',
+            })
+            const middleware2 = requireValidTodoistToken({
+                type: 'static',
+                apiKey: 'same-key',
+                baseUrl: 'https://staging.todoist.com',
+            })
+
+            await middleware1({} as Request, createMockRes(), next)
+            await middleware2({} as Request, createMockRes(), next)
+
+            expect(mockValidate).toHaveBeenCalledTimes(2)
+            expect(mockValidate).toHaveBeenCalledWith('same-key', 'https://api.todoist.com')
+            expect(mockValidate).toHaveBeenCalledWith('same-key', 'https://staging.todoist.com')
+        })
     })
 
     describe('transient errors', () => {

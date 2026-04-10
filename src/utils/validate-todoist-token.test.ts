@@ -57,6 +57,22 @@ describe('validateTodoistToken', () => {
         await expect(validateTodoistToken('valid-token')).rejects.toThrow('fetch failed')
     })
 
+    it('should return false for a nested 401 error (response.status shape)', async () => {
+        mockGetUser.mockRejectedValue({ response: { status: 401 }, message: 'Request failed' })
+
+        const result = await validateTodoistToken('invalid-token')
+
+        expect(result).toBe(false)
+    })
+
+    it('should return false for a nested 403 error (response.status shape)', async () => {
+        mockGetUser.mockRejectedValue({ response: { status: 403 }, message: 'Forbidden' })
+
+        const result = await validateTodoistToken('forbidden-token')
+
+        expect(result).toBe(false)
+    })
+
     it('should pass baseUrl to TodoistApi', async () => {
         mockGetUser.mockResolvedValue({ id: '123' })
 
