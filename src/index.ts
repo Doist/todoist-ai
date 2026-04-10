@@ -1,5 +1,9 @@
 import { FEATURE_NAMES, type Feature, type FeatureName, type Features } from './mcp-helpers.js'
 import { getMcpServer } from './mcp-server.js'
+import {
+    requireValidTodoistToken,
+    type RequireValidTodoistTokenOptions,
+} from './middleware/require-valid-todoist-token.js'
 // Comment management tools
 import { addComments } from './tools/add-comments.js'
 // Filter management tools
@@ -47,6 +51,7 @@ import { updateSections } from './tools/update-sections.js'
 import { updateTasks } from './tools/update-tasks.js'
 import { userInfo } from './tools/user-info.js'
 import { viewAttachment } from './tools/view-attachment.js'
+import { validateTodoistToken } from './utils/validate-todoist-token.js'
 
 const tools = {
     // Task management tools
@@ -148,6 +153,9 @@ export {
     listWorkspaces,
     manageAssignments,
     reorderObjects,
+    // Token validation middleware
+    requireValidTodoistToken,
+    type RequireValidTodoistTokenOptions,
     rescheduleTasks,
     // OpenAI MCP tools
     search,
@@ -159,6 +167,8 @@ export {
     updateSections,
     updateTasks,
     userInfo,
+    // Token validation utility
+    validateTodoistToken,
     // Attachment tools
     viewAttachment,
 }

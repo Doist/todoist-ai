@@ -17,6 +17,7 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import dotenv from 'dotenv'
 import express, { type Request, type Response } from 'express'
 import { getMcpServer } from './mcp-server.js'
+import { requireValidTodoistToken } from './middleware/require-valid-todoist-token.js'
 
 dotenv.config({ quiet: true })
 
@@ -40,27 +41,34 @@ function main() {
     })
 
     // MCP endpoint - POST for requests
-    app.post('/mcp', async (req: Request, res: Response) => {
-        try {
-            const transport = new StreamableHTTPServerTransport({
-                sessionIdGenerator: undefined,
-            })
+    // Validate the Todoist API token before MCP processing so that invalid
+    // tokens produce an HTTP 401 (per MCP spec) instead of being swallowed
+    // into a 200 JSON-RPC response with isError: true.
+    app.post(
+        '/mcp',
+        requireValidTodoistToken({ type: 'static', apiKey: todoistApiKey, baseUrl }),
+        async (req: Request, res: Response) => {
+            try {
+                const transport = new StreamableHTTPServerTransport({
+                    sessionIdGenerator: undefined,
+                })
 
-            const server = getMcpServer({ todoistApiKey, baseUrl })
-            await server.connect(transport)
-            await transport.handleRequest(req, res, req.body)
-        } catch (error) {
-            console.error('[Error] Request handling failed:', error)
-            res.status(500).json({
-                jsonrpc: '2.0',
-                error: {
-                    code: -32603,
-                    message: 'Internal server error',
-                },
-                id: null,
-            })
-        }
-    })
+                const server = getMcpServer({ todoistApiKey, baseUrl })
+                await server.connect(transport)
+                await transport.handleRequest(req, res, req.body)
+            } catch (error) {
+                console.error('[Error] Request handling failed:', error)
+                res.status(500).json({
+                    jsonrpc: '2.0',
+                    error: {
+                        code: -32603,
+                        message: 'Internal server error',
+                    },
+                    id: null,
+                })
+            }
+        },
+    )
 
     // MCP endpoint - GET returns 405 (needed for MCP client compatibility)
     app.get('/mcp', (_req: Request, res: Response) => {
