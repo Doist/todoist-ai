@@ -51,11 +51,11 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                     id: '8485093748',
                     content: 'Completed task 1',
                     description: 'Task completed yesterday',
-                    completedAt: '2024-01-01T00:00:00Z',
+                    completedAt: new Date('2024-01-01T00:00:00Z'),
                     labels: ['work'],
                     priority: 'p3',
                     url: 'https://todoist.com/showTask?id=8485093748',
-                    addedAt: '2025-08-13T22:09:56.123456Z',
+                    addedAt: new Date('2025-08-13T22:09:56.123456Z'),
                     due: {
                         date: '2025-08-14',
                         isRecurring: false,
@@ -264,11 +264,11 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                     id: '8485093750',
                     content: 'Task completed by due date',
                     description: 'This task was due and completed',
-                    completedAt: '2024-01-01T00:00:00Z',
+                    completedAt: new Date('2024-01-01T00:00:00Z'),
                     labels: ['urgent'],
                     priority: 'p2',
                     url: 'https://todoist.com/showTask?id=8485093750',
-                    addedAt: '2025-08-13T22:09:58.123456Z',
+                    addedAt: new Date('2025-08-13T22:09:58.123456Z'),
                     due: {
                         date: '2025-08-15',
                         isRecurring: true,
@@ -354,7 +354,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                         id: '8485093748',
                         content: 'Completed task with label',
                         labels: params.labels,
-                        completedAt: '2024-01-01T00:00:00Z',
+                        completedAt: new Date('2024-01-01T00:00:00Z'),
                     }),
                 ]
 
@@ -419,7 +419,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                 createMockTask({
                     content: 'Important completed task',
                     labels: ['important'],
-                    completedAt: '2024-01-01T00:00:00Z',
+                    completedAt: new Date('2024-01-01T00:00:00Z'),
                 }),
             ]
             const mockResponse = { items: mockTasks, nextCursor: null }
@@ -462,7 +462,7 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                 createMockTask({
                     id: '8485093750',
                     content: 'Task completed in Madrid timezone',
-                    completedAt: '2025-10-11T15:30:00Z',
+                    completedAt: new Date('2025-10-11T15:30:00Z'),
                 }),
             ]
 
@@ -555,9 +555,9 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                     id: '8485093760',
                     content: 'Completed inbox task',
                     projectId: TEST_IDS.PROJECT_INBOX,
-                    completedAt: '2025-08-15T12:00:00Z',
+                    completedAt: new Date('2025-08-15T12:00:00Z'),
                     url: 'https://todoist.com/showTask?id=8485093760',
-                    addedAt: '2025-08-13T22:09:56.123456Z',
+                    addedAt: new Date('2025-08-13T22:09:56.123456Z'),
                 }),
             ]
 
@@ -617,9 +617,9 @@ describe(`${FIND_COMPLETED_TASKS} tool`, () => {
                     id: '8485093761',
                     content: 'Completed regular task',
                     projectId: '6cfCcrrCFg2xP94Q',
-                    completedAt: '2025-08-15T12:00:00Z',
+                    completedAt: new Date('2025-08-15T12:00:00Z'),
                     url: 'https://todoist.com/showTask?id=8485093761',
-                    addedAt: '2025-08-13T22:09:56.123456Z',
+                    addedAt: new Date('2025-08-13T22:09:56.123456Z'),
                 }),
             ]
 

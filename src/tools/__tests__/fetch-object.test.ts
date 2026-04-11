@@ -21,8 +21,8 @@ const MOCK_SECTION: Section = {
     projectId: 'project123',
     sectionOrder: 1,
     userId: 'user123',
-    addedAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
+    addedAt: new Date('2024-01-01T00:00:00Z'),
+    updatedAt: new Date('2024-01-01T00:00:00Z'),
     archivedAt: null,
     isArchived: false,
     isDeleted: false,
@@ -34,7 +34,7 @@ function createMockComment(overrides: Partial<Comment> = {}): Comment {
     return {
         id: 'comment123',
         content: 'Test comment content',
-        postedAt: '2024-01-01T12:00:00Z',
+        postedAt: new Date('2024-01-01T12:00:00Z'),
         postedUid: 'user123',
         taskId: 'task123',
         projectId: undefined,
@@ -151,7 +151,7 @@ describe(`${FETCH_OBJECT} tool`, () => {
             expect(result.textContent).toContain('Found comment')
             expect(result.textContent).toContain('id=comment123')
             expect(result.textContent).toContain('This is a test comment')
-            expect(result.textContent).toContain('posted=2024-01-01T12:00:00Z')
+            expect(result.textContent).toContain('posted=2024-01-01T12:00:00.000Z')
 
             expect(result.structuredContent).toEqual({
                 type: 'comment',
@@ -159,7 +159,7 @@ describe(`${FETCH_OBJECT} tool`, () => {
                 object: expect.objectContaining({
                     id: 'comment123',
                     content: 'This is a test comment',
-                    postedAt: '2024-01-01T12:00:00Z',
+                    postedAt: '2024-01-01T12:00:00.000Z',
                 }),
             })
         })

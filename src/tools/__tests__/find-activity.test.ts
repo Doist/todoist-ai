@@ -19,7 +19,7 @@ function createMockActivityEvent(overrides: Partial<ActivityEvent> = {}): Activi
         objectType: 'task',
         objectId: 'task-456',
         eventType: 'added',
-        eventDate: '2024-10-23T10:30:00Z',
+        eventDate: new Date('2024-10-23T10:30:00Z'),
         parentProjectId: 'project-789',
         parentItemId: null,
         initiatorId: 'user-001',
@@ -39,12 +39,12 @@ describe(`${FIND_ACTIVITY} tool`, () => {
                 createMockActivityEvent({
                     id: 'event-1',
                     eventType: 'added',
-                    eventDate: '2024-10-23T10:00:00Z',
+                    eventDate: new Date('2024-10-23T10:00:00Z'),
                 }),
                 createMockActivityEvent({
                     id: 'event-2',
                     eventType: 'completed',
-                    eventDate: '2024-10-23T11:00:00Z',
+                    eventDate: new Date('2024-10-23T11:00:00Z'),
                 }),
             ]
 

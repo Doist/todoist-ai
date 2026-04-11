@@ -65,7 +65,7 @@ async function generateWorkspacesList(
         role: workspace.role,
         isLinkSharingEnabled: workspace.isLinkSharingEnabled,
         isGuestAllowed: workspace.isGuestAllowed,
-        createdAt: workspace.createdAt,
+        createdAt: workspace.createdAt?.toISOString(),
         creatorId: workspace.creatorId,
     }))
 

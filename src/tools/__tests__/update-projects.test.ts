@@ -25,7 +25,7 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
                 id: 'existing-project-123',
                 parentId: null,
                 isDeleted: false,
-                updatedAt: '2025-08-13T22:10:30.000000Z',
+                updatedAt: new Date('2025-08-13T22:10:30.000000Z'),
                 childOrder: 1,
                 description: '',
                 isCollapsed: false,
@@ -38,7 +38,7 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
                 isArchived: false,
                 inboxProject: false,
                 isShared: false,
-                createdAt: '2024-01-01T00:00:00Z',
+                createdAt: new Date('2024-01-01T00:00:00Z'),
                 defaultOrder: 0,
             }
 
@@ -84,7 +84,7 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
                 id: 'project-123',
                 parentId: null,
                 isDeleted: false,
-                updatedAt: '2025-08-13T22:10:30.000000Z',
+                updatedAt: new Date('2025-08-13T22:10:30.000000Z'),
                 childOrder: 1,
                 description: '',
                 isCollapsed: false,
@@ -97,7 +97,7 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
                 isArchived: false,
                 inboxProject: false,
                 isShared: false,
-                createdAt: '2024-01-01T00:00:00Z',
+                createdAt: new Date('2024-01-01T00:00:00Z'),
                 defaultOrder: 0,
             }
 
@@ -339,8 +339,8 @@ describe(`${UPDATE_PROJECTS} tool`, () => {
                 viewStyle: 'board',
                 // Extra properties that should NOT appear in structured output:
                 childOrder: 5,
-                createdAt: '2024-01-01T00:00:00Z',
-                updatedAt: '2024-06-15T12:00:00Z',
+                createdAt: new Date('2024-01-01T00:00:00Z'),
+                updatedAt: new Date('2024-06-15T12:00:00Z'),
                 defaultOrder: 10,
                 description: 'This should not appear in output',
                 isArchived: false,

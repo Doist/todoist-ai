@@ -258,7 +258,7 @@ function mapTask(task: Task) {
         responsibleUid: task.responsibleUid ?? undefined,
         assignedByUid: task.assignedByUid ?? undefined,
         checked: task.checked,
-        completedAt: task.completedAt ?? undefined,
+        completedAt: task.completedAt?.toISOString() ?? undefined,
     }
 }
 
@@ -296,7 +296,7 @@ function mapComment(comment: Comment) {
         taskId: comment.taskId ?? undefined,
         projectId: comment.projectId ?? undefined,
         content: comment.content,
-        postedAt: comment.postedAt,
+        postedAt: comment.postedAt.toISOString(),
         postedUid: comment.postedUid ?? undefined,
         fileAttachment: comment.fileAttachment
             ? {
@@ -328,7 +328,7 @@ function mapActivityEvent(event: ActivityEvent) {
         objectType: event.objectType,
         objectId: event.objectId,
         eventType: event.eventType,
-        eventDate: event.eventDate,
+        eventDate: event.eventDate.toISOString(),
         parentProjectId: event.parentProjectId ?? undefined,
         parentItemId: event.parentItemId ?? undefined,
         initiatorId: event.initiatorId ?? undefined,

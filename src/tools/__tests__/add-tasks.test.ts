@@ -27,7 +27,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 id: '8485093748',
                 content: 'First task content',
                 url: 'https://todoist.com/showTask?id=8485093748',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             const mockApiResponse2: Task = createMockTask({
@@ -38,7 +38,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 childOrder: 2,
                 priority: 'p3',
                 url: 'https://todoist.com/showTask?id=8485093749',
-                addedAt: '2025-08-13T22:09:57.123456Z',
+                addedAt: new Date('2025-08-13T22:09:57.123456Z'),
                 due: {
                     date: '2025-08-15',
                     isRecurring: false,
@@ -104,7 +104,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 sectionId: 'section-123',
                 parentId: 'parent-task-456',
                 url: 'https://todoist.com/showTask?id=8485093750',
-                addedAt: '2025-08-13T22:09:58.123456Z',
+                addedAt: new Date('2025-08-13T22:09:58.123456Z'),
             })
 
             mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
@@ -156,7 +156,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 content: 'Task with 2 hour duration',
                 duration: { amount: 120, unit: 'minute' },
                 url: 'https://todoist.com/showTask?id=8485093752',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             const mockApiResponse2: Task = createMockTask({
@@ -164,7 +164,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 content: 'Task with 45 minute duration',
                 duration: { amount: 45, unit: 'minute' },
                 url: 'https://todoist.com/showTask?id=8485093753',
-                addedAt: '2025-08-13T22:09:57.123456Z',
+                addedAt: new Date('2025-08-13T22:09:57.123456Z'),
             })
 
             mockTodoistApi.addTask
@@ -214,7 +214,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 content: 'Task with combined duration',
                 duration: { amount: 150, unit: 'minute' },
                 url: 'https://todoist.com/showTask?id=8485093754',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
@@ -261,7 +261,7 @@ describe(`${ADD_TASKS} tool`, () => {
                     lang: 'en',
                 },
                 url: 'https://todoist.com/showTask?id=8485093756',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
@@ -315,7 +315,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 content: 'Task with labels',
                 labels: ['urgent', 'work'],
                 url: 'https://todoist.com/showTask?id=8485093755',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
@@ -355,7 +355,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 content: 'Task with empty labels',
                 labels: [],
                 url: 'https://todoist.com/showTask?id=8485093756',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
@@ -387,7 +387,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 id: '8485093757',
                 content: 'Task without labels',
                 url: 'https://todoist.com/showTask?id=8485093757',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
@@ -516,7 +516,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 id: '8485093751',
                 content: 'First task content',
                 url: 'https://todoist.com/showTask?id=8485093751',
-                addedAt: '2025-08-13T22:09:59.123456Z',
+                addedAt: new Date('2025-08-13T22:09:59.123456Z'),
             })
 
             const apiError = new Error('API Error: Second task failed')
@@ -582,7 +582,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 id: '8485093755',
                 content: 'Task due today',
                 url: 'https://todoist.com/showTask?id=8485093755',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
                 due: {
                     date: TODAY,
                     isRecurring: false,
@@ -619,7 +619,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 id: '8485093756',
                 content: 'Regular task',
                 url: 'https://todoist.com/showTask?id=8485093756',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
@@ -642,7 +642,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 id: '8485093758',
                 content: 'Simple inbox task',
                 url: 'https://todoist.com/showTask?id=8485093758',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)
@@ -697,7 +697,7 @@ describe(`${ADD_TASKS} tool`, () => {
                 content: 'Task for inbox',
                 projectId: TEST_IDS.PROJECT_INBOX,
                 url: 'https://todoist.com/showTask?id=8485093760',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.addTask.mockResolvedValue(mockApiResponse)

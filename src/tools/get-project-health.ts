@@ -143,7 +143,7 @@ function generateTextContent(
         lines.push('**Note:** A health analysis update is currently in progress.')
     }
     if (health.updatedAt) {
-        lines.push(`**Last Updated:** ${health.updatedAt}`)
+        lines.push(`**Last Updated:** ${health.updatedAt.toISOString()}`)
     }
 
     // Progress
@@ -253,7 +253,7 @@ const getProjectHealth = {
                     taskRecommendations: data.health.taskRecommendations ?? null,
                     isStale: data.health.isStale,
                     updateInProgress: data.health.updateInProgress,
-                    updatedAt: data.health.updatedAt ?? null,
+                    updatedAt: data.health.updatedAt?.toISOString() ?? null,
                 },
                 context,
             },

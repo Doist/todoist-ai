@@ -45,8 +45,8 @@ describe('Assignment Integration Tests', () => {
         projectId: 'project-123',
         url: 'https://todoist.com/showTask?id=task-123',
         addedByUid: 'creator-123',
-        addedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        addedAt: new Date(),
+        updatedAt: new Date(),
         userId: 'creator-123',
         completedAt: null,
     })

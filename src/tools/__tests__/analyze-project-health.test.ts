@@ -15,7 +15,7 @@ function createMockHealth(overrides: Partial<ProjectHealth> = {}): ProjectHealth
         descriptionSummary: null,
         taskRecommendations: null,
         projectId: 'proj-123',
-        updatedAt: '2026-03-29T10:00:00Z',
+        updatedAt: new Date('2026-03-29T10:00:00Z'),
         isStale: false,
         updateInProgress: false,
         ...overrides,
