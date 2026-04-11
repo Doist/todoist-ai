@@ -28,7 +28,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 content: 'Updated task content',
                 description: 'Updated task description',
                 url: 'https://todoist.com/showTask?id=8485093748',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
@@ -69,7 +69,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 content: 'Updated task content',
                 description: 'Updated task description',
                 url: 'https://todoist.com/showTask?id=8485093748',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
@@ -121,7 +121,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 labels: ['urgent'],
                 priority: 'p2',
                 url: 'https://todoist.com/showTask?id=8485093749',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
                 due: {
                     date: '2025-08-20',
                     isRecurring: false,
@@ -163,7 +163,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 content: 'Task to move',
                 projectId: 'new-project-id',
                 url: 'https://todoist.com/showTask?id=8485093750',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.moveTask.mockResolvedValue(mockApiResponse)
@@ -197,7 +197,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 content: 'Subtask content',
                 parentId: 'parent-task-123',
                 url: 'https://todoist.com/showTask?id=8485093751',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.moveTask.mockResolvedValue(mockApiResponse)
@@ -239,7 +239,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 priority: 'p1',
                 projectId: 'different-project-id',
                 url: 'https://todoist.com/showTask?id=8485093752',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
                 due: {
                     date: '2025-08-25',
                     isRecurring: true,
@@ -298,7 +298,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 content: 'Task with updated duration',
                 duration: { amount: 150, unit: 'minute' },
                 url: 'https://todoist.com/showTask?id=8485093753',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
@@ -439,7 +439,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                     lang: 'en',
                 },
                 url: 'https://todoist.com/showTask?id=8485093760',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
@@ -483,7 +483,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 content: 'Task without deadline',
                 deadline: null,
                 url: 'https://todoist.com/showTask?id=8485093761',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
@@ -517,7 +517,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 content: 'Task without deadline',
                 deadline: null,
                 url: 'https://todoist.com/showTask?id=8485093765',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
@@ -547,7 +547,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 content: 'Task without due date',
                 due: null,
                 url: 'https://todoist.com/showTask?id=8485093762',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
@@ -588,7 +588,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 content: 'Task without due date',
                 due: null,
                 url: 'https://todoist.com/showTask?id=8485093763',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
@@ -616,7 +616,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 content: 'Task without due date',
                 due: null,
                 url: 'https://todoist.com/showTask?id=8485093764',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
@@ -646,7 +646,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 content: 'Task with updated labels',
                 labels: ['work', 'important'],
                 url: 'https://todoist.com/showTask?id=8485093750',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
@@ -685,7 +685,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 content: 'Task with cleared labels',
                 labels: [],
                 url: 'https://todoist.com/showTask?id=8485093751',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
@@ -714,7 +714,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                 labels: ['personal', 'todo'],
                 priority: 'p2',
                 url: 'https://todoist.com/showTask?id=8485093752',
-                addedAt: '2025-08-13T22:09:56.123456Z',
+                addedAt: new Date('2025-08-13T22:09:56.123456Z'),
             })
 
             mockTodoistApi.updateTask.mockResolvedValue(mockApiResponse)
@@ -929,7 +929,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                     content: 'Single task update',
                     sectionId: 'target-section',
                     url: 'https://todoist.com/showTask?id=8485093751',
-                    addedAt: '2025-08-13T22:09:59.123456Z',
+                    addedAt: new Date('2025-08-13T22:09:59.123456Z'),
                 })
 
                 mockTodoistApi.moveTask.mockResolvedValue(mockTaskResponse)
@@ -966,21 +966,21 @@ describe(`${UPDATE_TASKS} tool`, () => {
                         content: 'Task moved to new project',
                         projectId: 'project-new',
                         url: 'https://todoist.com/showTask?id=task-1',
-                        addedAt: '2025-08-13T22:10:00.123456Z',
+                        addedAt: new Date('2025-08-13T22:10:00.123456Z'),
                     }),
                     createMockTask({
                         id: 'task-2',
                         content: 'Task made into subtask',
                         parentId: 'task-1',
                         url: 'https://todoist.com/showTask?id=task-2',
-                        addedAt: '2025-08-13T22:10:01.123456Z',
+                        addedAt: new Date('2025-08-13T22:10:01.123456Z'),
                     }),
                     createMockTask({
                         id: 'task-3',
                         content: 'Task moved to section',
                         sectionId: 'section-new',
                         url: 'https://todoist.com/showTask?id=task-3',
-                        addedAt: '2025-08-13T22:10:02.123456Z',
+                        addedAt: new Date('2025-08-13T22:10:02.123456Z'),
                     }),
                 ]
 
@@ -1029,7 +1029,7 @@ describe(`${UPDATE_TASKS} tool`, () => {
                     content: 'Minimal update task',
                     projectId: 'new-project-only',
                     url: 'https://todoist.com/showTask?id=8485093752',
-                    addedAt: '2025-08-13T22:10:07.123456Z',
+                    addedAt: new Date('2025-08-13T22:10:07.123456Z'),
                 })
 
                 mockTodoistApi.moveTask.mockResolvedValue(mockResponse)

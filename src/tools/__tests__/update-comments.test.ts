@@ -13,7 +13,7 @@ const { UPDATE_COMMENTS } = ToolNames
 const createMockComment = (overrides: Partial<Comment> = {}): Comment => ({
     id: '12345',
     content: 'Updated comment content',
-    postedAt: '2024-01-01T12:00:00Z',
+    postedAt: new Date('2024-01-01T12:00:00Z'),
     postedUid: 'user123',
     taskId: 'task123',
     projectId: undefined,

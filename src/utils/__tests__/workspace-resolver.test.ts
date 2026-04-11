@@ -16,7 +16,7 @@ function createMockWorkspace(overrides: Partial<Workspace> = {}): Workspace {
         isLinkSharingEnabled: true,
         isGuestAllowed: true,
         limits: { current: null, next: null },
-        createdAt: '2024-01-15T10:00:00Z',
+        createdAt: new Date('2024-01-15T10:00:00Z'),
         creatorId: 'user-456',
         properties: {},
         ...overrides,

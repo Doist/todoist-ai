@@ -30,7 +30,7 @@ describe(`${ADD_PROJECTS} tool`, () => {
                 id: TEST_IDS.PROJECT_TEST,
                 name: 'test-abc123def456-project',
                 childOrder: 1,
-                createdAt: '2024-01-01T00:00:00Z',
+                createdAt: new Date('2024-01-01T00:00:00Z'),
             })
 
             mockTodoistApi.addProject.mockResolvedValue(mockApiResponse)
@@ -77,7 +77,7 @@ describe(`${ADD_PROJECTS} tool`, () => {
                 viewStyle: 'board',
                 childOrder: 2,
                 description: 'A test project',
-                createdAt: '2024-01-01T00:00:00Z',
+                createdAt: new Date('2024-01-01T00:00:00Z'),
             })
 
             mockTodoistApi.addProject.mockResolvedValue(mockApiResponse)
@@ -281,8 +281,8 @@ describe(`${ADD_PROJECTS} tool`, () => {
                 viewStyle: 'board',
                 // Extra properties that should NOT appear in structured output:
                 childOrder: 5,
-                createdAt: '2024-01-01T00:00:00Z',
-                updatedAt: '2024-06-15T12:00:00Z',
+                createdAt: new Date('2024-01-01T00:00:00Z'),
+                updatedAt: new Date('2024-06-15T12:00:00Z'),
                 defaultOrder: 10,
                 description: 'This should not appear in output',
                 isArchived: false,
@@ -399,7 +399,7 @@ describe(`${ADD_PROJECTS} tool`, () => {
                 isLinkSharingEnabled: true,
                 isGuestAllowed: true,
                 limits: { current: null, next: null },
-                createdAt: '2024-01-15T10:00:00Z',
+                createdAt: new Date('2024-01-15T10:00:00Z'),
                 creatorId: 'user-456',
                 properties: {},
                 ...overrides,
