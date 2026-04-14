@@ -66,4 +66,41 @@ describe('UserResolver', () => {
             expect(result).toBeNull()
         })
     })
+
+    describe('getAllCollaborators', () => {
+        it('paginates through every page of getProjects before collecting collaborators', async () => {
+            const page1Project = { id: 'p1', isShared: true } as unknown
+            const page2Project = { id: 'p2', isShared: true } as unknown
+            const page3Project = { id: 'p3', isShared: false } as unknown
+
+            mockClient.getProjects = vi
+                .fn()
+                .mockResolvedValueOnce({ results: [page1Project], nextCursor: 'cursor-2' })
+                .mockResolvedValueOnce({ results: [page2Project], nextCursor: 'cursor-3' })
+                .mockResolvedValueOnce({
+                    results: [page3Project],
+                    nextCursor: null,
+                }) as unknown as typeof mockClient.getProjects
+
+            mockClient.getProjectCollaborators = vi
+                .fn()
+                .mockImplementation(async (projectId: string) => ({
+                    results: [
+                        {
+                            id: `user-${projectId}`,
+                            name: `User ${projectId}`,
+                            email: `${projectId}@example.com`,
+                        },
+                    ],
+                    nextCursor: null,
+                })) as unknown as typeof mockClient.getProjectCollaborators
+
+            const collaborators = await resolver.getAllCollaborators(mockClient)
+
+            expect(mockClient.getProjects).toHaveBeenCalledTimes(3)
+            // Only the two shared projects should have been queried for collaborators.
+            expect(mockClient.getProjectCollaborators).toHaveBeenCalledTimes(2)
+            expect(collaborators.map((c) => c.id).sort()).toEqual(['user-p1', 'user-p2'])
+        })
+    })
 })

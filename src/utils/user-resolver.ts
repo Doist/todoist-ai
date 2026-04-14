@@ -1,4 +1,5 @@
-import type { TodoistApi } from '@doist/todoist-sdk'
+import type { PersonalProject, TodoistApi, WorkspaceProject } from '@doist/todoist-sdk'
+import { fetchAllPages } from '../tool-helpers.js'
 
 export type ResolvedUser = {
     userId: string
@@ -228,8 +229,13 @@ export class UserResolver {
         }
 
         try {
-            // Get all projects to find shared ones
-            const { results: projects } = await client.getProjects({})
+            // Get all projects to find shared ones (paginated — accounts with
+            // more than one page of projects would otherwise miss collaborators
+            // from later pages).
+            const projects: (PersonalProject | WorkspaceProject)[] = await fetchAllPages({
+                apiMethod: client.getProjects.bind(client),
+                args: {},
+            })
             const sharedProjects = projects.filter((p) => p.isShared)
 
             if (sharedProjects.length === 0) {

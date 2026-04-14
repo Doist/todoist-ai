@@ -38,6 +38,7 @@ describe(`${FIND_PROJECT_COLLABORATORS} tool`, () => {
         vi.clearAllMocks()
         mockTodoistApi = {
             getProject: vi.fn(),
+            getUser: vi.fn().mockRejectedValue(new Error('getUser not stubbed in test')),
         } as unknown as Mocked<TodoistApi>
     })
 
@@ -157,7 +158,7 @@ describe(`${FIND_PROJECT_COLLABORATORS} tool`, () => {
             expect(result.structuredContent.collaborators).toEqual([ernesto])
         })
 
-        it('returns helpful empty result when workspace has no shared projects', async () => {
+        it('returns helpful empty result when workspace has no shared projects and getUser fails', async () => {
             vi.mocked(userResolver.getAllCollaborators).mockResolvedValue([])
 
             const result = await findProjectCollaborators.execute(
@@ -168,7 +169,43 @@ describe(`${FIND_PROJECT_COLLABORATORS} tool`, () => {
             expect(result.structuredContent.collaborators).toEqual([])
             expect(result.structuredContent.totalCount).toBe(0)
             expect(result.structuredContent.totalAvailable).toBe(0)
-            expect(result.textContent).toContain('No users found in workspace')
+            expect(result.textContent).toContain('No users found')
+        })
+
+        it('prepends the authenticated user so personal accounts can look up themselves', async () => {
+            vi.mocked(userResolver.getAllCollaborators).mockResolvedValue([])
+            vi.mocked(mockTodoistApi.getUser).mockResolvedValue({
+                id: 'me-id',
+                fullName: 'Scott Lovegrove',
+                email: 'scott@example.com',
+            } as Awaited<ReturnType<TodoistApi['getUser']>>)
+
+            const result = await findProjectCollaborators.execute(
+                { searchTerm: 'Scott' },
+                mockTodoistApi,
+            )
+
+            expect(result.structuredContent.collaborators).toEqual([
+                { id: 'me-id', name: 'Scott Lovegrove', email: 'scott@example.com' },
+            ])
+            expect(result.structuredContent.totalAvailable).toBe(1)
+        })
+
+        it('does not duplicate the authenticated user when already a collaborator', async () => {
+            vi.mocked(userResolver.getAllCollaborators).mockResolvedValue([
+                { id: 'me-id', name: 'Scott Lovegrove', email: 'scott@example.com' },
+                ernesto,
+            ])
+            vi.mocked(mockTodoistApi.getUser).mockResolvedValue({
+                id: 'me-id',
+                fullName: 'Scott Lovegrove',
+                email: 'scott@example.com',
+            } as Awaited<ReturnType<TodoistApi['getUser']>>)
+
+            const result = await findProjectCollaborators.execute({}, mockTodoistApi)
+
+            expect(result.structuredContent.collaborators).toHaveLength(2)
+            expect(result.structuredContent.totalAvailable).toBe(2)
         })
 
         it('returns helpful empty result when search term has no matches', async () => {

@@ -15,7 +15,7 @@ const ArgsSchema = {
         .min(1)
         .optional()
         .describe(
-            'Optional. If provided, searches only collaborators of this project. If omitted, searches across all shared projects in the workspace — use this for general "find a user" / "who is X" lookups.',
+            'Optional. If provided, searches only collaborators of this project. If omitted, searches across the collaborators of all shared projects the authenticated user can access (plus the authenticated user themselves) — use this for general "find a user" / "who is X" lookups.',
         ),
     searchTerm: z
         .string()
@@ -48,7 +48,7 @@ const OutputSchema = {
 const findProjectCollaborators = {
     name: ToolNames.FIND_PROJECT_COLLABORATORS,
     description:
-        'Find Todoist users (workspace members, collaborators, teammates) by name or email to look up their user ID. Use this whenever the user asks to find, look up, or identify a person — e.g. "find Carrie\'s user ID", "who is Ernesto", "look up a user in my workspace". Searches across all shared projects by default; pass projectId to scope to a single project. Partial, case-insensitive match on name and email.',
+        'Find Todoist users (collaborators, teammates) by name or email to look up their user ID. Use this whenever the user asks to find, look up, or identify a person — e.g. "find Carrie\'s user ID", "who is Ernesto", "look up a user". When projectId is omitted, searches across the collaborators of every shared project the authenticated user has access to, plus the authenticated user themselves — an empty result means the person is not a collaborator on any project you share with them, not necessarily that they do not exist in Todoist. When projectId is provided, searches only that project. Partial, case-insensitive match on name and email.',
     parameters: ArgsSchema,
     outputSchema: OutputSchema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
@@ -149,10 +149,14 @@ async function executeWorkspaceSearch({
     client: TodoistApi
     appliedFilters: Record<string, unknown>
 }) {
-    const allCollaborators = await userResolver.getAllCollaborators(client)
+    const sharedCollaborators = await userResolver.getAllCollaborators(client)
+
+    // Always include the authenticated user so "find my user ID" / personal
+    // accounts (no shared projects) still work. Mirrors resolveUser().
+    const allCollaborators = await prependCurrentUser(client, sharedCollaborators)
 
     if (allCollaborators.length === 0) {
-        const textContent = `No users found in workspace. You may have no shared projects, or collaborator data is not accessible.\n\n**Next steps:**\n• Use ${FIND_PROJECTS} to find shared projects\n• Share a project to add collaborators\n• Ensure you have permission to view collaborators`
+        const textContent = `No users found. You may have no shared projects, or collaborator data is not accessible.\n\n**Next steps:**\n• Use ${FIND_PROJECTS} to find shared projects\n• Share a project to add collaborators\n• Ensure you have permission to view collaborators`
 
         return {
             textContent,
@@ -184,6 +188,23 @@ async function executeWorkspaceSearch({
             totalAvailable: allCollaborators.length,
             appliedFilters,
         },
+    }
+}
+
+async function prependCurrentUser(
+    client: TodoistApi,
+    collaborators: ProjectCollaborator[],
+): Promise<ProjectCollaborator[]> {
+    try {
+        const currentUser = await client.getUser()
+        if (!currentUser) return collaborators
+        if (collaborators.some((c) => c.id === currentUser.id)) return collaborators
+        return [
+            { id: currentUser.id, name: currentUser.fullName, email: currentUser.email },
+            ...collaborators,
+        ]
+    } catch {
+        return collaborators
     }
 }
 
@@ -237,20 +258,16 @@ function generateTextContent({
         }
     }
 
+    // Empty-result messages for the no-collaborators-at-all cases are emitted
+    // by the execute paths before they reach generateTextContent, so if we
+    // end up here with an empty list it's necessarily because searchTerm
+    // filtered everyone out.
     const zeroReasonHints: string[] = []
-    if (collaborators.length === 0) {
-        if (searchTerm) {
-            zeroReasonHints.push(`No users match "${searchTerm}"`)
-            zeroReasonHints.push('Try a broader search term or check spelling')
-            if (totalAvailable > 0) {
-                zeroReasonHints.push(`${totalAvailable} users available without filter`)
-            }
-        } else if (projectName) {
-            zeroReasonHints.push('Project has no collaborators')
-            zeroReasonHints.push('Share the project to add collaborators')
-        } else {
-            zeroReasonHints.push('No users found in workspace')
-            zeroReasonHints.push('Share a project to add collaborators')
+    if (collaborators.length === 0 && searchTerm) {
+        zeroReasonHints.push(`No users match "${searchTerm}"`)
+        zeroReasonHints.push('Try a broader search term or check spelling')
+        if (totalAvailable > 0) {
+            zeroReasonHints.push(`${totalAvailable} users available without filter`)
         }
     }
 
