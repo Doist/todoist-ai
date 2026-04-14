@@ -1,3 +1,9 @@
+## [8.9.0](https://github.com/Doist/todoist-ai/compare/v8.8.8...v8.9.0) (2026-04-14)
+
+### Features
+
+* make find-project-collaborators discoverable as user-lookup ([#454](https://github.com/Doist/todoist-ai/issues/454)) ([bb7dab4](https://github.com/Doist/todoist-ai/commit/bb7dab4d484faaa8c7d6dbee9dd855ba62ca0273)), closes [Doist/automations#2332](https://github.com/Doist/automations/issues/2332)
+
 ## [8.8.8](https://github.com/Doist/todoist-ai/compare/v8.8.7...v8.8.8) (2026-04-10)
 
 ### Bug Fixes
