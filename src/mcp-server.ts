@@ -97,7 +97,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 **Collaboration & Comments:**
 - **add-comments/update-comments/find-comments**: Manage task and project discussions
 - **view-attachment**: View file attachments from comments. Pass the fileUrl from a comment's fileAttachment. Returns images inline, text files as text, and binary files as embedded resources.
-- **find-project-collaborators**: Find team members by name or email for assignments
+- **find-project-collaborators**: Look up Todoist users (workspace members, collaborators, teammates) by name or email to get their user ID — use for "find/who is X" questions or any time you need to resolve a person's name to an ID. Searches the whole workspace by default; pass projectId to scope to a single project
 - **manage-assignments**: Bulk assign/unassign/reassign up to 50 tasks with atomic operations and dry-run validation
 
 **Filters:**
@@ -127,7 +127,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 2. **Search Strategy**: Use specific search queries combining multiple filters for precise results. When searching for tasks, start with broader queries and narrow down as needed.
 
-3. **Assignments**: Always validate project collaborators exist before assigning tasks. Use find-project-collaborators to verify user access.
+3. **Assignments & user lookup**: Always validate project collaborators exist before assigning tasks. Use find-project-collaborators to verify user access. Also use find-project-collaborators (with just a searchTerm and no projectId) to resolve a user's ID whenever the user references a person by name or email — it searches across the whole workspace.
 
 4. **Bulk Operations**: When working with multiple items, prefer bulk tools (complete-tasks, manage-assignments) over individual operations for better performance.
 
@@ -143,6 +143,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 - **Daily Planning**: Use find-tasks-by-date with 'today' and get-overview for project status
 - **Team Assignment**: find-project-collaborators → add-tasks with responsibleUser → manage-assignments for bulk changes
+- **User Lookup**: find-project-collaborators with just a searchTerm (no projectId) to resolve a name or email to a Todoist user ID across the entire workspace
 - **Task Search**: find-tasks with multiple filters → update-tasks or complete-tasks based on results
 - **Project Organization**: add-projects → add-sections → add-tasks with projectId and sectionId
 - **Progress Reviews**: find-completed-tasks (defaults to last 7 days; optionally use explicit date ranges) → get-overview for project summaries

@@ -217,9 +217,9 @@ export class UserResolver {
     }
 
     /**
-     * Get all collaborators from all shared projects
+     * Get all collaborators from all shared projects, deduplicated by user ID.
      */
-    private async getAllCollaborators(client: TodoistApi): Promise<ProjectCollaborator[]> {
+    async getAllCollaborators(client: TodoistApi): Promise<ProjectCollaborator[]> {
         // Check cache first
         const cacheKey = 'all_collaborators'
         const cached = collaboratorsCache.get(cacheKey)
