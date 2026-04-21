@@ -23,6 +23,7 @@ TypeScript · ESM-only · Node 18+ · `zod` v4 for schemas · MCP SDK ≥1.25.
 ├─ scripts/               # run-tool.ts (direct tool invocation), validate-schemas.ts, test-executable.cjs
 ├─ dist/                  # Build output (Vite). Never edit.
 ├─ CLAUDE.md              # Prescriptive rules (schema design, testing, field clearing)
+├─ AGENTS.md              # Fuller agent guidelines — includes the authoritative new-tool checklist
 ├─ CODEBASE.md            # This file — descriptive map
 ├─ package.json           # See Scripts section
 └─ .github/workflows/     # ci.yml, release.yml (semantic-release), check-semantic-pull-request.yml
@@ -34,8 +35,8 @@ TypeScript · ESM-only · Node 18+ · `zod` v4 for schemas · MCP SDK ≥1.25.
 src/
 ├─ main.ts                    # stdio entry: dotenv → getMcpServer() → StdioServerTransport
 ├─ main-http.ts               # Express entry: same server behind HTTP
-├─ index.ts                   # Public package exports (every tool, helpers, types)
-├─ mcp-server.ts              # getMcpServer() factory. Imports every tool, calls registerTool() for each, registers productivity-analysis prompt, contains the giant `instructions` string shown to the LLM
+├─ index.ts                   # Public package exports — a curated subset of tools + helpers + types. NOT the full registry.
+├─ mcp-server.ts              # getMcpServer() factory. **Authoritative tool registry** — imports every tool, calls registerTool() for each, registers productivity-analysis prompt, contains the giant `instructions` string shown to the LLM
 ├─ mcp-helpers.ts             # registerTool(), FEATURE_NAMES, output formatting, retry wrapping
 ├─ todoist-tool.ts            # TodoistTool<Params, Output> contract (the tool interface)
 ├─ tool-helpers.ts            # Shared transforms: mapTask, fetchAllPages, resolveInboxProjectId, isInboxProjectId, isPersonalProject, isWorkspaceProject. Re-exports filter-helpers.
@@ -80,7 +81,7 @@ type TodoistTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape> = {
     }
     _meta?: Record<string, unknown>
     execute: (
-        args,
+        args: z.infer<z.ZodObject<Params>>,
         client: TodoistApi,
     ) => Promise<{
         textContent?: string
@@ -111,7 +112,7 @@ Tool files are flat in `src/tools/` (kebab-case). Don't enumerate — grep. Curr
 - **Productivity/activity** — get-overview, get-productivity-stats, find-activity
 - **Generic** — delete-object, fetch, fetch-object, search, reorder-objects, view-attachment
 
-New tool? Copy `add-tasks.ts`, add export to `src/index.ts`, import + register in `src/mcp-server.ts`, add tool name to `src/utils/tool-names.ts`, write test in `src/tools/__tests__/`.
+New tool? Full checklist in `AGENTS.md`. Short version: copy `add-tasks.ts`; import + register in `src/mcp-server.ts`; add tool name to `src/utils/tool-names.ts`; add to `src/index.ts` (exports) and `scripts/run-tool.ts` (direct-run registry); add annotation entry to `src/tools/__tests__/tool-annotations.test.ts`; write `<tool-name>.test.ts` alongside it.
 
 ## `src/utils/` catalog — don't reimplement
 
@@ -137,7 +138,7 @@ New tool? Copy `add-tasks.ts`, add export to `src/index.ts`, import + register i
 ## Todoist SDK + auth
 
 - Client: `new TodoistApi(apiKey, baseUrl?)` — created once per server in `mcp-server.ts`, passed into every `execute()`.
-- Auth: `TODOIST_API_KEY` env var (stdio) or Bearer token via HTTP middleware (`src/middleware/require-valid-todoist-token.ts`).
+- Auth: `TODOIST_API_KEY` env var, validated at startup. Both stdio and HTTP use this; the HTTP server passes it through `requireValidTodoistToken({ type: 'static', apiKey })` middleware (`src/middleware/require-valid-todoist-token.ts`). The middleware _also_ supports a per-request bearer-token mode, but `main-http.ts` does not wire that up today.
 - Optional `TODOIST_BASE_URL` for staging/dev APIs.
 - Errors: wrap SDK throws in `ToolExecutionError` (classify user vs system) — `registerTool` handles this automatically.
 
@@ -156,7 +157,7 @@ New tool? Copy `add-tasks.ts`, add export to `src/index.ts`, import + register i
 - **Format/lint:** `npm run format:check` / `npm run format:fix` — uses **oxlint + oxfmt**, not eslint/prettier.
 - **Schema lint:** `npm run lint:schemas` — validates every tool's Zod schema via `scripts/validate-schemas.ts`. Runs automatically on `src/tools/*.ts` via lint-staged.
 - **Release:** `semantic-release` on merge to `main` (GitHub Actions). Commits must follow Conventional Commits — enforced by `check-semantic-pull-request.yml`.
-- **Husky:** `prepare` hook runs lint-staged on commit.
+- **Husky:** `prepare` script installs Husky. Actual commit-time behavior is in `.husky/pre-commit`, which runs `lint-staged` then `npm run type-check`.
 
 ## Run a tool without MCP
 
@@ -174,7 +175,7 @@ Needs `TODOIST_API_KEY` in `.env`.
 - Priority: **`"p1"`–`"p4"` strings only**, never integers
 - Clearing optional fields: special strings `"remove"` / `"unassign"`, never `null` (Gemini compatibility — see `CLAUDE.md`)
 - Tool parameters: Zod **raw shape** (`{ foo: z.string() }`), not `z.object({...})`
-- Every new tool: export from `src/index.ts`, register in `src/mcp-server.ts`, add to `tool-names.ts`, test in `__tests__/`
+- Every new tool: register in `src/mcp-server.ts`, add to `src/utils/tool-names.ts`, `src/index.ts`, and `scripts/run-tool.ts`; add annotation entry to `src/tools/__tests__/tool-annotations.test.ts`; write a `<tool>.test.ts` — full checklist in `AGENTS.md`
 
 ## Start here if new
 
