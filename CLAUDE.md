@@ -1,5 +1,7 @@
 # Todoist AI MCP Server - Development Guidelines
 
+> For repo structure, architecture, shared utilities, and where things live, read [`CODEBASE.md`](./CODEBASE.md) first. This file covers the _rules_; CODEBASE.md is the _map_.
+
 ## Tool Schema Design Rules
 
 ### Removing/Clearing Optional Fields
@@ -50,6 +52,16 @@ When adding new tool features:
 2. Update `src/mcp-server.ts` tool usage guidelines
 3. Add tests demonstrating the feature
 4. Include examples in descriptions where helpful
+
+### Keeping CODEBASE.md accurate
+
+`CODEBASE.md` is a structural map, not a file index. Update it when **structure** changes — not on every new file. Triggers:
+
+- new top-level dir under `src/`, or a new tool-file _category_
+- a new broadly-reusable helper in `src/utils/` (the "don't reimplement" list)
+- changes to the tool contract, registration flow, auth, or build/test/release tooling
+
+Adding a single tool in an existing category or a narrowly-scoped helper used by one caller does not require an update.
 
 ## Running Tools Directly
 
