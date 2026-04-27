@@ -1,3 +1,9 @@
+## [8.9.2](https://github.com/Doist/todoist-ai/compare/v8.9.1...v8.9.2) (2026-04-27)
+
+### Bug Fixes
+
+* **deps:** update dependency @doist/todoist-sdk to v9.8.0 ([#459](https://github.com/Doist/todoist-ai/issues/459)) ([a35cba2](https://github.com/Doist/todoist-ai/commit/a35cba295df87e7d8bf2beef4a952e4751d6aea3))
+
 ## [8.9.1](https://github.com/Doist/todoist-ai/compare/v8.9.0...v8.9.1) (2026-04-20)
 
 ### Bug Fixes
