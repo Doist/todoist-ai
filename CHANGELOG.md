@@ -1,3 +1,9 @@
+## [8.10.0](https://github.com/Doist/todoist-ai/compare/v8.9.2...v8.10.0) (2026-04-29)
+
+### Features
+
+* add update-labels tool ([#463](https://github.com/Doist/todoist-ai/issues/463)) ([06efd13](https://github.com/Doist/todoist-ai/commit/06efd1378e2873ea49d02f89aa1070a16bd514d3))
+
 ## [8.9.2](https://github.com/Doist/todoist-ai/compare/v8.9.1...v8.9.2) (2026-04-27)
 
 ### Bug Fixes
