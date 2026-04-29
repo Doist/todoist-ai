@@ -48,6 +48,7 @@ import { search } from './tools/search.js'
 import { uncompleteTasks } from './tools/uncomplete-tasks.js'
 import { updateComments } from './tools/update-comments.js'
 import { updateFilters } from './tools/update-filters.js'
+import { updateLabels } from './tools/update-labels.js'
 import { updateProjects } from './tools/update-projects.js'
 import { updateReminders } from './tools/update-reminders.js'
 import { updateSections } from './tools/update-sections.js'
@@ -133,7 +134,7 @@ You have access to comprehensive Todoist management tools for personal productiv
 
 5. **Date Handling**: All dates respect user timezone settings. Use 'today' keyword for dynamic date filtering (includes overdue tasks). **When rescheduling/moving tasks to a different date, always use reschedule-tasks** — never update-tasks with dueString, as that destroys recurrence on recurring tasks.
 
-6. **Labels**: Use label filtering with AND/OR operators for advanced task organization. Most search tools support labels parameter. Use **find-labels** to discover personal and shared labels — use label **names** (not IDs) when filtering tasks, and use label **IDs** only with **delete-object**. Use **add-labels** to create new personal labels.
+6. **Labels**: Use label filtering with AND/OR operators for advanced task organization. Most search tools support labels parameter. Use **find-labels** to discover personal and shared labels — use label **names** (not IDs) when filtering tasks, and use label **IDs** only with **delete-object** and **update-labels** (for personal label updates). Use **add-labels** to create new personal labels. Use **update-labels** to rename or recolor personal labels (by ID), or to rename shared labels (by name) — note that shared labels support renaming only, not color/order/favorite changes.
 
 7. **Pagination**: Large result sets use cursor-based pagination. Use limit parameter to control result size (default varies by tool).
 
@@ -239,6 +240,7 @@ function getMcpServer({
 
     // Label management tools
     registerTool({ tool: addLabels, ...toolArgs })
+    registerTool({ tool: updateLabels, ...toolArgs })
     registerTool({ tool: findLabels, ...toolArgs })
 
     // Filter management tools

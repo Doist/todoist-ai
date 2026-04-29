@@ -64,6 +64,7 @@ export const ToolNames = {
 
     // Label management tools
     ADD_LABELS: 'add-labels',
+    UPDATE_LABELS: 'update-labels',
     FIND_LABELS: 'find-labels',
 
     // Filter management tools

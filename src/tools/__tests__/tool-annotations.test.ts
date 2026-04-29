@@ -186,6 +186,13 @@ const TOOL_EXPECTATIONS: ToolExpectation[] = [
         idempotentHint: false,
     },
     {
+        name: ToolNames.UPDATE_LABELS,
+        title: 'Todoist: Update Labels',
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+    },
+    {
         name: ToolNames.FIND_LABELS,
         title: 'Todoist: Find Labels',
         readOnlyHint: true,
