@@ -52,6 +52,7 @@ import { search } from '../src/tools/search.js'
 import { uncompleteTasks } from '../src/tools/uncomplete-tasks.js'
 import { updateComments } from '../src/tools/update-comments.js'
 import { updateFilters } from '../src/tools/update-filters.js'
+import { updateLabels } from '../src/tools/update-labels.js'
 import { updateProjects } from '../src/tools/update-projects.js'
 import { updateSections } from '../src/tools/update-sections.js'
 import { updateTasks } from '../src/tools/update-tasks.js'
@@ -107,6 +108,7 @@ const tools: Record<string, ExecutableTool> = {
     search: search,
     'update-comments': updateComments,
     'update-filters': updateFilters,
+    'update-labels': updateLabels,
     'update-projects': updateProjects,
     'update-sections': updateSections,
     'update-tasks': updateTasks,

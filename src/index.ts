@@ -46,6 +46,7 @@ import { search } from './tools/search.js'
 import { uncompleteTasks } from './tools/uncomplete-tasks.js'
 import { updateComments } from './tools/update-comments.js'
 import { updateFilters } from './tools/update-filters.js'
+import { updateLabels } from './tools/update-labels.js'
 import { updateProjects } from './tools/update-projects.js'
 import { updateSections } from './tools/update-sections.js'
 import { updateTasks } from './tools/update-tasks.js'
@@ -79,6 +80,7 @@ const tools = {
     viewAttachment,
     // Label management tools
     addLabels,
+    updateLabels,
     findLabels,
     // Filter management tools
     findFilters,
@@ -163,6 +165,7 @@ export {
     uncompleteTasks,
     updateComments,
     updateFilters,
+    updateLabels,
     updateProjects,
     updateSections,
     updateTasks,
