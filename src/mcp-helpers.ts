@@ -5,6 +5,7 @@ import type { ContentBlock, ToolAnnotations } from '@modelcontextprotocol/sdk/ty
 import type { z } from 'zod'
 import type { TodoistTool } from './todoist-tool.js'
 import { formatToolExecutionError } from './tool-execution-error.js'
+import { runWithUsageTrackingContext } from './usage-tracking.js'
 import { executeWithRetry } from './utils/retry.js'
 import { removeNullFields } from './utils/sanitize-data.js'
 import { ToolNames } from './utils/tool-names.js'
@@ -236,9 +237,12 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
     // @ts-expect-error I give up
     const cb: ToolCallback<Params> = async (args: z.infer<z.ZodObject<Params>>, _context) => {
         try {
-            let { textContent, structuredContent, contentItems } = await executeWithRetry(() =>
-                tool.execute(args as z.infer<z.ZodObject<Params>>, client),
-            )
+            let { textContent, structuredContent, contentItems } =
+                await runWithUsageTrackingContext(tool.name, () =>
+                    executeWithRetry(() =>
+                        tool.execute(args as z.infer<z.ZodObject<Params>>, client),
+                    ),
+                )
 
             // Strip emails from outputs for ChatGPT clients on collaborator-related tools
             if (shouldStripEmails) {

@@ -78,6 +78,9 @@ describe('validateTodoistToken', () => {
 
         await validateTodoistToken('token', 'https://custom.api.com')
 
-        expect(TodoistApi).toHaveBeenCalledWith('token', { baseUrl: 'https://custom.api.com' })
+        expect(TodoistApi).toHaveBeenCalledWith('token', {
+            baseUrl: 'https://custom.api.com',
+            customFetch: expect.any(Function),
+        })
     })
 })

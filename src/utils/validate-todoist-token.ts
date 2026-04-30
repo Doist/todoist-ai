@@ -1,5 +1,4 @@
-import { TodoistApi } from '@doist/todoist-sdk'
-
+import { createTodoistClient, runWithUsageTrackingContext } from '../usage-tracking.js'
 import { extractHttpStatusCode } from './retry.js'
 
 const AUTH_ERROR_CODES = new Set([401, 403])
@@ -29,9 +28,9 @@ function extractAuthStatusCode(error: unknown): number | undefined {
  * @throws On transient errors (network failures, 5xx) so the caller can decide.
  */
 async function validateTodoistToken(apiKey: string, baseUrl?: string): Promise<boolean> {
-    const client = new TodoistApi(apiKey, { baseUrl })
+    const client = createTodoistClient(apiKey, { baseUrl })
     try {
-        await client.getUser()
+        await runWithUsageTrackingContext('auth:validate-token', () => client.getUser())
         return true
     } catch (error) {
         const statusCode = extractAuthStatusCode(error)
