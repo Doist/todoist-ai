@@ -50,8 +50,8 @@ const OutputSchema = {
             lastWeeklyStreak: StreakSchema.describe('Previous weekly goal streak.'),
             maxDailyStreak: StreakSchema.describe('Best daily goal streak ever.'),
             maxWeeklyStreak: StreakSchema.describe('Best weekly goal streak ever.'),
-            vacationMode: z.number().describe('Whether vacation mode is enabled (0 or 1).'),
-            karmaDisabled: z.number().describe('Whether karma tracking is disabled (0 or 1).'),
+            vacationMode: z.boolean().describe('Whether vacation mode is enabled.'),
+            karmaDisabled: z.boolean().describe('Whether karma tracking is disabled.'),
         })
         .describe('Goal and streak information.'),
     karma: z.number().describe('Current karma score.'),
