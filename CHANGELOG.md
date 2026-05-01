@@ -1,3 +1,9 @@
+## [8.11.0](https://github.com/Doist/todoist-ai/compare/v8.10.0...v8.11.0) (2026-05-01)
+
+### Features
+
+* upgrade @doist/todoist-sdk to v10 ([#465](https://github.com/Doist/todoist-ai/issues/465)) ([f49709a](https://github.com/Doist/todoist-ai/commit/f49709ab802b2c1831f60e449aeae822e5e8b9b9))
+
 ## [8.10.0](https://github.com/Doist/todoist-ai/compare/v8.9.2...v8.10.0) (2026-04-29)
 
 ### Features
