@@ -61,9 +61,9 @@ function createMockStats(overrides: Partial<ProductivityStats> = {}): Productivi
             maxWeeklyStreak: { count: 12, start: '2025-09-01', end: '2025-11-24' },
             user: 'user123',
             userId: 'user123',
-            vacationMode: 0,
-            karmaDisabled: 0,
-            ignoreDays: [6, 7],
+            vacationMode: false,
+            karmaDisabled: false,
+            ignoreDays: ['Saturday', 'Sunday'],
         },
         karma: 86394,
         karmaTrend: 'up',
@@ -114,8 +114,8 @@ describe(`${GET_PRODUCTIVITY_STATS} tool`, () => {
         expect(sc?.goals.currentWeeklyStreak.count).toBe(6)
         expect(sc?.goals.maxDailyStreak.count).toBe(30)
         expect(sc?.goals.maxWeeklyStreak.count).toBe(12)
-        expect(sc?.goals.vacationMode).toBe(0)
-        expect(sc?.goals.karmaDisabled).toBe(0)
+        expect(sc?.goals.vacationMode).toBe(false)
+        expect(sc?.goals.karmaDisabled).toBe(false)
         expect(sc?.daysItems).toHaveLength(3)
         expect(sc?.weekItems).toHaveLength(2)
         expect(sc?.karmaGraphData).toHaveLength(2)
