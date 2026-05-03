@@ -260,7 +260,7 @@ function registerTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape
     const toolConfig = {
         description: tool.description,
         inputSchema: tool.parameters,
-        outputSchema: tool.outputSchema as Output,
+        ...(tool.outputSchema ? { outputSchema: tool.outputSchema as Output } : {}),
         annotations: getMcpAnnotations(tool),
         ...(tool._meta ? { _meta: tool._meta } : {}),
     }

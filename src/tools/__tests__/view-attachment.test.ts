@@ -100,9 +100,8 @@ describe('view-attachment tool', () => {
                 data: Buffer.from(imageData).toString('base64'),
                 mimeType: 'image/png',
             })
-            expect(result.structuredContent.contentDelivery).toBe('image')
-            expect(result.structuredContent.fileType).toBe('image/png')
-            expect(result.structuredContent.fileName).toBe('file.png')
+            expect(result.textContent).toContain('file.png')
+            expect(result.textContent).toContain('image/png')
         })
 
         it('should return ImageContent for JPEG files', async () => {
@@ -123,7 +122,6 @@ describe('view-attachment tool', () => {
                 type: 'image',
                 mimeType: 'image/jpeg',
             })
-            expect(result.structuredContent.contentDelivery).toBe('image')
         })
 
         it('should return ImageContent for GIF files', async () => {
@@ -185,8 +183,7 @@ describe('view-attachment tool', () => {
                 type: 'text',
                 text: textContent,
             })
-            expect(result.structuredContent.contentDelivery).toBe('text')
-            expect(result.structuredContent.fileType).toBe('text/plain')
+            expect(result.textContent).toContain('text/plain')
         })
 
         it('should return TextContent for JSON files', async () => {
@@ -207,7 +204,6 @@ describe('view-attachment tool', () => {
                 type: 'text',
                 text: jsonContent,
             })
-            expect(result.structuredContent.contentDelivery).toBe('text')
         })
 
         it('should return TextContent for CSV files', async () => {
@@ -243,7 +239,11 @@ describe('view-attachment tool', () => {
                 mockTodoistApi,
             )
 
-            expect(result.structuredContent.contentDelivery).toBe('text')
+            expect(result.contentItems?.[0]).toEqual({
+                type: 'text',
+                text: '<h1>Hello</h1>',
+            })
+            expect((result as Record<string, unknown>).structuredContent).toBeUndefined()
         })
     })
 
@@ -270,8 +270,7 @@ describe('view-attachment tool', () => {
                     blob: Buffer.from(pdfData).toString('base64'),
                 },
             })
-            expect(result.structuredContent.contentDelivery).toBe('embedded_resource')
-            expect(result.structuredContent.fileType).toBe('application/pdf')
+            expect(result.textContent).toContain('application/pdf')
         })
 
         it('should return EmbeddedResource for unknown binary types', async () => {
@@ -291,7 +290,6 @@ describe('view-attachment tool', () => {
                 type: 'resource',
                 resource: { mimeType: 'application/zip' },
             })
-            expect(result.structuredContent.contentDelivery).toBe('embedded_resource')
         })
     })
 
@@ -309,8 +307,8 @@ describe('view-attachment tool', () => {
                 mockTodoistApi,
             )
 
-            expect(result.structuredContent.fileType).toBe('text/plain')
-            expect(result.structuredContent.contentDelivery).toBe('text')
+            expect(result.textContent).toContain('text/plain')
+            expect(result.contentItems?.[0]).toMatchObject({ type: 'text' })
         })
 
         it('should fall back to URL extension when content-type is application/octet-stream', async () => {
@@ -327,8 +325,8 @@ describe('view-attachment tool', () => {
                 mockTodoistApi,
             )
 
-            expect(result.structuredContent.fileType).toBe('image/png')
-            expect(result.structuredContent.contentDelivery).toBe('image')
+            expect(result.textContent).toContain('image/png')
+            expect(result.contentItems?.[0]).toMatchObject({ type: 'image', mimeType: 'image/png' })
         })
 
         it('should use application/octet-stream when no content-type and no extension match', async () => {
@@ -344,8 +342,8 @@ describe('view-attachment tool', () => {
                 mockTodoistApi,
             )
 
-            expect(result.structuredContent.fileType).toBe('application/octet-stream')
-            expect(result.structuredContent.contentDelivery).toBe('embedded_resource')
+            expect(result.textContent).toContain('application/octet-stream')
+            expect(result.contentItems?.[0]).toMatchObject({ type: 'resource' })
         })
 
         it('should fall back to URL extension for PDF when content-type is generic', async () => {
@@ -361,7 +359,7 @@ describe('view-attachment tool', () => {
                 mockTodoistApi,
             )
 
-            expect(result.structuredContent.fileType).toBe('application/pdf')
+            expect(result.textContent).toContain('application/pdf')
         })
     })
 
@@ -382,7 +380,6 @@ describe('view-attachment tool', () => {
             )
 
             expect(result.contentItems).toBeUndefined()
-            expect(result.structuredContent.contentDelivery).toBe('metadata_only')
             expect(result.textContent).toContain('too large')
             expect(result.textContent).toContain('10MB')
         })
@@ -402,11 +399,10 @@ describe('view-attachment tool', () => {
             )
 
             expect(result.contentItems).toBeUndefined()
-            expect(result.structuredContent.contentDelivery).toBe('metadata_only')
             expect(result.textContent).toContain('too large')
         })
 
-        it('should use actual body size for fileSize in structured content', async () => {
+        it('should use actual body size for fileSize in text content', async () => {
             mockTodoistApi.viewAttachment.mockResolvedValue(
                 createMockResponse({
                     contentType: 'text/plain',
@@ -419,8 +415,11 @@ describe('view-attachment tool', () => {
                 mockTodoistApi,
             )
 
-            expect(result.structuredContent.fileSize).toBe(5)
-            expect(result.textContent).toContain('KB')
+            expect(result.contentItems?.[0]).toEqual({
+                type: 'text',
+                text: 'hello',
+            })
+            expect(result.textContent).toContain('0.0KB')
         })
     })
 
@@ -450,7 +449,7 @@ describe('view-attachment tool', () => {
         })
     })
 
-    describe('text content and structured output', () => {
+    describe('text content', () => {
         it('should include file name from URL in text content', async () => {
             mockTodoistApi.viewAttachment.mockResolvedValue(
                 createMockResponse({
@@ -466,7 +465,6 @@ describe('view-attachment tool', () => {
 
             expect(result.textContent).toContain('screenshot.png')
             expect(result.textContent).toContain('image/png')
-            expect(result.structuredContent.fileName).toBe('screenshot.png')
         })
 
         it('should handle URLs without file names gracefully', async () => {

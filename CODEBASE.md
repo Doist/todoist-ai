@@ -68,11 +68,14 @@ src/
 ## Tool contract (`src/todoist-tool.ts`)
 
 ```ts
-type TodoistTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape> = {
+type TodoistTool<
+    Params extends z.ZodRawShape,
+    Output extends z.ZodRawShape = Record<string, never>,
+> = {
     name: string
     description: string
     parameters: Params // Zod raw shape (NOT z.object)
-    outputSchema: Output // Zod raw shape
+    outputSchema?: Output // Zod raw shape; omit for tools that return only content blocks (e.g. view-attachment)
     annotations: {
         // required hints
         readOnlyHint: boolean
