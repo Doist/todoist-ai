@@ -77,20 +77,10 @@ function getFileNameFromUrl(url: string): string | undefined {
 
 const ArgsSchema = {
     fileUrl: z
-        .string()
         .url()
         .describe(
             "The URL of the attachment file to view. Get this from the fileUrl field in a comment's fileAttachment.",
         ),
-}
-
-const OutputSchema = {
-    fileName: z.string().optional().describe('The name of the file.'),
-    fileType: z.string().optional().describe('The MIME type of the file.'),
-    fileSize: z.number().optional().describe('The size of the file in bytes.'),
-    contentDelivery: z
-        .enum(['image', 'text', 'embedded_resource', 'metadata_only'])
-        .describe('How the content was delivered.'),
 }
 
 const viewAttachment = {
@@ -98,7 +88,6 @@ const viewAttachment = {
     description:
         "View a file attachment from a Todoist comment. Pass the fileUrl from a comment's fileAttachment field. Supports images (returned inline), text files (returned as text), and binary files like PDFs (returned as embedded resources).",
     parameters: ArgsSchema,
-    outputSchema: OutputSchema,
     annotations: {
         readOnlyHint: true,
         destructiveHint: false,
@@ -111,7 +100,6 @@ const viewAttachment = {
         const headerFileSize = contentLength ? Number.parseInt(contentLength, 10) : undefined
         const fileName = getFileNameFromUrl(fileUrl)
 
-        // Determine MIME type from Content-Type header, fall back to URL extension
         const rawContentType = response.headers['content-type']
         const headerMime = rawContentType ? parseMimeType(rawContentType) : undefined
         const mimeType =
@@ -119,38 +107,23 @@ const viewAttachment = {
                 ? headerMime
                 : (getMimeTypeFromUrl(fileUrl) ?? headerMime ?? 'application/octet-stream')
 
-        // Early reject if content-length header exceeds limit
         if (headerFileSize && headerFileSize > MAX_FILE_SIZE) {
             return {
                 textContent: `Attachment "${fileName ?? fileUrl}" is too large to display inline (${(headerFileSize / 1024 / 1024).toFixed(1)}MB, limit is 10MB). File type: ${mimeType}`,
-                structuredContent: {
-                    fileName,
-                    fileType: mimeType,
-                    fileSize: headerFileSize,
-                    contentDelivery: 'metadata_only' as const,
-                },
             }
         }
 
-        // Read body and enforce size limit on actual bytes
         const buffer = Buffer.from(await response.arrayBuffer())
         const fileSize = buffer.byteLength
 
         if (fileSize > MAX_FILE_SIZE) {
             return {
                 textContent: `Attachment "${fileName ?? fileUrl}" is too large to display inline (${(fileSize / 1024 / 1024).toFixed(1)}MB, limit is 10MB). File type: ${mimeType}`,
-                structuredContent: {
-                    fileName,
-                    fileType: mimeType,
-                    fileSize,
-                    contentDelivery: 'metadata_only' as const,
-                },
             }
         }
 
         const category = getContentCategory(mimeType)
         const contentItems: ContentBlock[] = []
-        let contentDelivery: 'image' | 'text' | 'embedded_resource'
 
         if (category === 'image') {
             contentItems.push({
@@ -158,13 +131,11 @@ const viewAttachment = {
                 data: buffer.toString('base64'),
                 mimeType,
             })
-            contentDelivery = 'image'
         } else if (category === 'text') {
             contentItems.push({
                 type: 'text',
                 text: buffer.toString('utf-8'),
             })
-            contentDelivery = 'text'
         } else {
             contentItems.push({
                 type: 'resource',
@@ -174,22 +145,15 @@ const viewAttachment = {
                     blob: buffer.toString('base64'),
                 },
             })
-            contentDelivery = 'embedded_resource'
         }
 
         const textContent = `Attachment: ${fileName ?? 'unknown'} (${mimeType}, ${(fileSize / 1024).toFixed(1)}KB)`
 
         return {
             textContent,
-            structuredContent: {
-                fileName,
-                fileType: mimeType,
-                fileSize,
-                contentDelivery,
-            },
             contentItems,
         }
     },
-} satisfies TodoistTool<typeof ArgsSchema, typeof OutputSchema>
+} satisfies TodoistTool<typeof ArgsSchema>
 
 export { viewAttachment }
