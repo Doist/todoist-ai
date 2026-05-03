@@ -17,7 +17,10 @@ type RequiredToolAnnotations = ToolAnnotations & {
 /**
  * A Todoist tool that can be used in an MCP server or other conversational AI interfaces.
  */
-type TodoistTool<Params extends z.ZodRawShape, Output extends z.ZodRawShape = z.ZodRawShape> = {
+type TodoistTool<
+    Params extends z.ZodRawShape,
+    Output extends z.ZodRawShape = Record<string, never>,
+> = {
     /**
      * The name of the tool.
      */

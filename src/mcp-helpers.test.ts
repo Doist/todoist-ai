@@ -51,6 +51,61 @@ describe('stripEmailsFromText', () => {
     })
 })
 
+describe('registerTool config', () => {
+    it('omits outputSchema when the tool does not declare one', () => {
+        const registerToolMock = vi.fn()
+
+        registerTool({
+            tool: {
+                name: 'no-schema-tool',
+                description: 'Tool without output schema',
+                parameters: {},
+                annotations: {
+                    readOnlyHint: true,
+                    destructiveHint: false,
+                    idempotentHint: true,
+                },
+                execute: async () => ({ textContent: 'ok' }),
+            },
+            server: {
+                registerTool: registerToolMock,
+            } as unknown as Parameters<typeof registerTool>[0]['server'],
+            client: {} as Parameters<typeof registerTool>[0]['client'],
+        })
+
+        expect(registerToolMock).toHaveBeenCalledTimes(1)
+        const config = registerToolMock.mock.calls[0]?.[1] as Record<string, unknown>
+        expect(Object.hasOwn(config, 'outputSchema')).toBe(false)
+    })
+
+    it('includes outputSchema when the tool declares one', () => {
+        const registerToolMock = vi.fn()
+        const outputSchema = {}
+
+        registerTool({
+            tool: {
+                name: 'schema-tool',
+                description: 'Tool with output schema',
+                parameters: {},
+                outputSchema,
+                annotations: {
+                    readOnlyHint: true,
+                    destructiveHint: false,
+                    idempotentHint: true,
+                },
+                execute: async () => ({ textContent: 'ok' }),
+            },
+            server: {
+                registerTool: registerToolMock,
+            } as unknown as Parameters<typeof registerTool>[0]['server'],
+            client: {} as Parameters<typeof registerTool>[0]['client'],
+        })
+
+        const config = registerToolMock.mock.calls[0]?.[1] as Record<string, unknown>
+        expect(config.outputSchema).toBe(outputSchema)
+    })
+})
+
 describe('registerTool error path', () => {
     it('applies centralized API formatting in MCP callback errors', async () => {
         const registerToolMock = vi.fn()

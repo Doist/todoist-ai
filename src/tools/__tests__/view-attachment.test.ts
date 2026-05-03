@@ -243,6 +243,7 @@ describe('view-attachment tool', () => {
                 type: 'text',
                 text: '<h1>Hello</h1>',
             })
+            expect((result as Record<string, unknown>).structuredContent).toBeUndefined()
         })
     })
 
@@ -418,7 +419,7 @@ describe('view-attachment tool', () => {
                 type: 'text',
                 text: 'hello',
             })
-            expect(result.textContent).toContain('KB')
+            expect(result.textContent).toContain('0.0KB')
         })
     })
 
