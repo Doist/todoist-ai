@@ -1,3 +1,9 @@
+## [8.11.1](https://github.com/Doist/todoist-ai/compare/v8.11.0...v8.11.1) (2026-05-03)
+
+### Bug Fixes
+
+* surface view-attachment file body in content blocks ([#467](https://github.com/Doist/todoist-ai/issues/467)) ([0106fe1](https://github.com/Doist/todoist-ai/commit/0106fe1eda998954f3985df6fb098c0165eb51fd))
+
 ## [8.11.0](https://github.com/Doist/todoist-ai/compare/v8.10.0...v8.11.0) (2026-05-01)
 
 ### Features
