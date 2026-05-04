@@ -185,7 +185,11 @@ async function main() {
     }
 
     const baseUrl = process.env.TODOIST_BASE_URL
-    const client = createTodoistClient(apiKey, { baseUrl })
+    const client = createTodoistClient(apiKey, {
+        baseUrl,
+        // Local direct runs are a dev helper, not real MCP traffic.
+        tracking: { enabled: false },
+    })
 
     console.log(`Running ${toolName} with args:`)
     console.log(JSON.stringify(parsedArgs, null, 2))
