@@ -38,6 +38,7 @@ src/
 ├─ index.ts                   # Public package exports — a curated subset of tools + helpers + types. NOT the full registry.
 ├─ mcp-server.ts              # getMcpServer() factory. **Authoritative tool registry** — imports every tool, calls registerTool() for each, registers productivity-analysis prompt, contains the giant `instructions` string shown to the LLM
 ├─ mcp-helpers.ts             # registerTool(), FEATURE_NAMES, output formatting, retry wrapping
+├─ usage-tracking.ts          # Shared Todoist request headers + SDK customFetch wrapper for MCP usage attribution
 ├─ todoist-tool.ts            # TodoistTool<Params, Output> contract (the tool interface)
 ├─ tool-helpers.ts            # Shared transforms: mapTask, fetchAllPages, resolveInboxProjectId, isInboxProjectId, isPersonalProject, isWorkspaceProject. Re-exports filter-helpers.
 ├─ filter-helpers.ts          # appendToQuery, buildResponsibleUserQueryFilter, resolveResponsibleUser
@@ -54,7 +55,7 @@ src/
 
 1. `main.ts` reads `TODOIST_API_KEY` (and optional `TODOIST_BASE_URL`) from env.
 2. Calls `getMcpServer()` in `mcp-server.ts`, which:
-    - instantiates `new TodoistApi(apiKey, baseUrl)`,
+    - instantiates a shared tracked `TodoistApi` client via `usage-tracking.ts`,
     - iterates every imported tool object and calls
       `registerTool(server, tool, client, features)` from `mcp-helpers.ts`,
     - registers the `productivity-analysis` prompt,

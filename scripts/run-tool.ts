@@ -58,6 +58,7 @@ import { updateSections } from '../src/tools/update-sections.js'
 import { updateTasks } from '../src/tools/update-tasks.js'
 import { userInfo } from '../src/tools/user-info.js'
 import { viewAttachment } from '../src/tools/view-attachment.js'
+import { createTodoistClient, runWithUsageTrackingContext } from '../src/usage-tracking.js'
 
 config()
 
@@ -184,14 +185,20 @@ async function main() {
     }
 
     const baseUrl = process.env.TODOIST_BASE_URL
-    const client = new TodoistApi(apiKey, baseUrl ? { baseUrl } : undefined)
+    const client = createTodoistClient(apiKey, {
+        baseUrl,
+        // Local direct runs are a dev helper, not real MCP traffic.
+        tracking: { enabled: false },
+    })
 
     console.log(`Running ${toolName} with args:`)
     console.log(JSON.stringify(parsedArgs, null, 2))
     console.log('---')
 
     try {
-        const result = await tool.execute(parsedArgs, client)
+        const result = await runWithUsageTrackingContext(tool.name, () =>
+            tool.execute(parsedArgs, client),
+        )
 
         if (result.textContent) {
             console.log('\nText output:')

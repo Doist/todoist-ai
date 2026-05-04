@@ -1,4 +1,3 @@
-import { TodoistApi } from '@doist/todoist-sdk'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 import { registerTaskListApp, taskListResourceUri } from './mcp-apps/resources.js'
@@ -55,6 +54,7 @@ import { updateSections } from './tools/update-sections.js'
 import { updateTasks } from './tools/update-tasks.js'
 import { userInfo } from './tools/user-info.js'
 import { viewAttachment } from './tools/view-attachment.js'
+import { TODOIST_AI_VERSION, createTodoistClient } from './usage-tracking.js'
 
 const instructions = `
 ## Todoist Task and Project Management Tools
@@ -172,7 +172,7 @@ function getMcpServer({
     features?: Features
 }) {
     const server = new McpServer(
-        { name: 'todoist-mcp-server', version: '0.1.0' },
+        { name: 'todoist-mcp-server', version: TODOIST_AI_VERSION },
         {
             capabilities: {
                 tools: { listChanged: true },
@@ -182,7 +182,7 @@ function getMcpServer({
         },
     )
 
-    const todoist = new TodoistApi(todoistApiKey, { baseUrl })
+    const todoist = createTodoistClient(todoistApiKey, { baseUrl })
 
     /**
      * MCP Apps
