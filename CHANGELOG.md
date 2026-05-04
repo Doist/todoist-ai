@@ -1,3 +1,9 @@
+## [8.12.0](https://github.com/Doist/todoist-ai/compare/v8.11.1...v8.12.0) (2026-05-04)
+
+### Features
+
+* track mcp usage in request headers ([#464](https://github.com/Doist/todoist-ai/issues/464)) ([72ac446](https://github.com/Doist/todoist-ai/commit/72ac446ddb7eb95674ced11d14bdeadcc888bcc9))
+
 ## [8.11.1](https://github.com/Doist/todoist-ai/compare/v8.11.0...v8.11.1) (2026-05-03)
 
 ### Bug Fixes
