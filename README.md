@@ -115,6 +115,42 @@ This will take you through a wizard to authenticate using your browser with Todo
 }
 ```
 
+#### Kiro
+
+[![Add to Kiro](https://kiro.dev/images/add-to-kiro.svg)](https://kiro.dev/launch/mcp/add?name=todoist&config=%7B%22url%22%3A%22https%3A%2F%2Fai.todoist.net%2Fmcp%22%7D)
+
+Create or edit a configuration file:
+
+- **Global:** `~/.kiro/settings/mcp.json`
+- **Project-specific:** `.kiro/settings/mcp.json`
+
+Using the remote URL (recommended):
+
+```json
+{
+    "mcpServers": {
+        "todoist": {
+            "url": "https://ai.todoist.net/mcp"
+        }
+    }
+}
+```
+
+Or using npx:
+
+```json
+{
+    "mcpServers": {
+        "todoist": {
+            "command": "npx",
+            "args": ["-y", "mcp-remote", "https://ai.todoist.net/mcp"]
+        }
+    }
+}
+```
+
+For more information, see the [Kiro MCP documentation](https://kiro.dev/docs/mcp/).
+
 #### Other MCP Clients
 
 ```bash
